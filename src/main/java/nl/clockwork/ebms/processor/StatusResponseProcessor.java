@@ -15,20 +15,18 @@
  */
 package nl.clockwork.ebms.processor;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import java.time.Instant;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -41,6 +39,7 @@ import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 @Slf4j
 @Builder
@@ -48,37 +47,33 @@ import nl.clockwork.ebms.validation.ValidatorException;
 @AllArgsConstructor
 class StatusResponseProcessor
 {
-  @NonNull
+	@NonNull
 	EbMSDAO ebMSDAO;
-  @NonNull
+	@NonNull
 	CPAManager cpaManager;
-  @NonNull
+	@NonNull
 	EbMSMessageValidator messageValidator;
-  @NonNull
+	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
-  @NonNull
-  DeliveryManager deliveryManager;
+	@NonNull
+	DeliveryManager deliveryManager;
 
-  public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest) throws ValidatorException, EbMSProcessorException
+	public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest) throws ValidatorException, EbMSProcessorException
 	{
 		val p = ebMSDAO.getEbMSMessageProperties(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
 		val result = createEbMSMessageStatusAndTimestamp(statusRequest,p);
-		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result._1,result._2); 
+		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result._1,result._2);
 	}
-	
-  public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
+
+	public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
 	{
 		val messageHeader = statusResponse.getMessageHeader();
-		val uri = cpaManager.getReceivingUri(
-				messageHeader.getCPAId(),
-				messageHeader.getTo().getPartyId(),
-				messageHeader.getTo().getRole(),
-				CPAUtils.toString(messageHeader.getService()),
-				messageHeader.getAction());
+		val uri = cpaManager.getReceivingUri(messageHeader
+				.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 		deliveryManager.sendResponseMessage(uri,statusResponse);
 	}
-	
-  public void processStatusResponse(EbMSStatusResponse statusResponse)
+
+	public void processStatusResponse(EbMSStatusResponse statusResponse)
 	{
 		try
 		{
@@ -107,10 +102,8 @@ class StatusResponseProcessor
 
 	private Tuple2<EbMSMessageStatus,Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
 	{
-		if (status != null
-				&& (MessageStatusType.RECEIVED.equals(status.getStatusCode())
-						|| MessageStatusType.PROCESSED.equals(status.getStatusCode())
-						|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
+		if (status != null && (MessageStatusType.RECEIVED.equals(status.getStatusCode()) || MessageStatusType.PROCESSED.equals(status.getStatusCode())
+				|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
 			return Tuple.of(status,timestamp);
 		else
 			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);

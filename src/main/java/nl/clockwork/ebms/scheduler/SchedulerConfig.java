@@ -15,11 +15,19 @@
  */
 package nl.clockwork.ebms.scheduler;
 
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.util.Arrays;
 import java.util.Properties;
-
 import javax.sql.DataSource;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,17 +39,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 
 @Configuration
 @EnableTransactionManagement
@@ -60,17 +57,13 @@ public class SchedulerConfig
 		MSSQL("jdbc:sqlserver:","org.quartz.impl.jdbcjobstore.MSSQLDelegate"),
 		ORACLE("jdbc:oracle:","org.quartz.impl.jdbcjobstore.oracle.OracleDelegate"),
 		POSTGRES("jdbc:postgresql:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate");
-		
+
 		String jdbcUrl;
 		String driverDelegateClass;
-		
+
 		public static String getClass(String jdbcUrl)
 		{
-			return Arrays.stream(values())
-					.filter(l -> jdbcUrl.startsWith(l.jdbcUrl))
-					.map(l -> l.driverDelegateClass)
-					.findFirst()
-					.get();
+			return Arrays.stream(values()).filter(l -> jdbcUrl.startsWith(l.jdbcUrl)).map(l -> l.driverDelegateClass).findFirst().get();
 		}
 	}
 
@@ -110,14 +103,14 @@ public class SchedulerConfig
 	@Bean
 	@Conditional(QuartzTaskHandlerType.class)
 	public SchedulerFactoryBean scheduler(
-		JobFactory jobFactory,
-		@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager,
-		DataSource dataSource)
+			JobFactory jobFactory,
+			@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager,
+			DataSource dataSource)
 	{
 		val result = new SchedulerFactoryBean();
-    result.setQuartzProperties(quartzProperties());
-    result.setJobFactory(jobFactory);
-    result.setTransactionManager(dataSourceTransactionManager);
+		result.setQuartzProperties(quartzProperties());
+		result.setJobFactory(jobFactory);
+		result.setTransactionManager(dataSourceTransactionManager);
 		result.setDataSource(dataSource);
 		if (deliveryTaskHandlerType == DeliveryTaskHandlerType.QUARTZ_JMS)
 			result.setNonTransactionalDataSource(hikariDataSource());
@@ -133,7 +126,7 @@ public class SchedulerConfig
 		return result;
 	}
 
-  private Properties quartzProperties()
+	private Properties quartzProperties()
 	{
 		val result = new Properties();
 		result.put("org.quartz.scheduler.instanceId","AUTO");

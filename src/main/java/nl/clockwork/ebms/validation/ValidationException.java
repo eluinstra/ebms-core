@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.validation;
 
+
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor

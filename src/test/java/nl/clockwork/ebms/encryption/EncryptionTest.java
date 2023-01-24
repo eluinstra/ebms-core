@@ -25,23 +25,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.xml.security.Init;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.MockitoAnnotations;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
@@ -62,6 +51,14 @@ import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
+import org.apache.commons.io.IOUtils;
+import org.apache.xml.security.Init;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.MockitoAnnotations;
+import org.xml.sax.SAXException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -97,7 +94,8 @@ public class EncryptionTest
 	}
 
 	@Test
-	public void testEncryptionAttachmentValidationFailure() throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
+	public void testEncryptionAttachmentValidationFailure()
+			throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
@@ -106,7 +104,8 @@ public class EncryptionTest
 	}
 
 	@Test
-	public void testEncryptionAttachmentValidationFailure1() throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
+	public void testEncryptionAttachmentValidationFailure1()
+			throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
@@ -131,7 +130,9 @@ public class EncryptionTest
 		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(0);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		message.getAttachments().remove(0);
-		message.getAttachments().add(EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
+		message.getAttachments()
+				.add(EbMSAttachmentFactory
+						.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
 	private void changeAttachment1(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
@@ -141,7 +142,9 @@ public class EncryptionTest
 		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(1);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		message.getAttachments().remove(0);
-		message.getAttachments().add(EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
+		message.getAttachments()
+				.add(EbMSAttachmentFactory
+						.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
 	private CPAManager initCPAManager() throws IOException, JAXBException
@@ -194,11 +197,7 @@ public class EncryptionTest
 
 	private MessageRequestProperties createMessageProperties(String cpaId)
 	{
-		return new MessageRequestProperties(
-				cpaId,
-				new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"),
-				"urn:osb:services:osb:afleveren:1.1$1.0",
-				"afleveren");
+		return new MessageRequestProperties(cpaId,new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"),"urn:osb:services:osb:afleveren:1.1$1.0","afleveren");
 	}
 
 	private List<DataSource> createDataSources()
@@ -217,7 +216,7 @@ public class EncryptionTest
 
 	private javax.activation.DataSource createDataSource()
 	{
-		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8"))); 
+		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
 	}
 
 	private String createContentId(String messageId, int i)

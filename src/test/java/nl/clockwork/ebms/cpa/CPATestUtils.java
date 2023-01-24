@@ -15,24 +15,22 @@
  */
 package nl.clockwork.ebms.cpa;
 
+
+import io.vavr.Function1;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
-
 import javax.xml.bind.JAXBException;
-
+import lombok.val;
+import nl.clockwork.ebms.jaxb.JAXBParser;
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
-import io.vavr.Function1;
-import lombok.val;
-import nl.clockwork.ebms.jaxb.JAXBParser;
-
 public class CPATestUtils
 {
-	public static Function1<String, Optional<CollaborationProtocolAgreement>> cpaCache = Function1.of(CPATestUtils::loadCPA).memoized();
+	public static Function1<String,Optional<CollaborationProtocolAgreement>> cpaCache = Function1.of(CPATestUtils::loadCPA).memoized();
 
-  public static Optional<CollaborationProtocolAgreement> loadCPA(String cpaId)
+	public static Optional<CollaborationProtocolAgreement> loadCPA(String cpaId)
 	{
 		try
 		{

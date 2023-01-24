@@ -15,27 +15,23 @@
  */
 package nl.clockwork.ebms.processor;
 
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -52,6 +48,8 @@ import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @Builder
@@ -77,7 +75,8 @@ class AcknowledgmentProcessor
 	MessageEventListener messageEventListener;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
-	public EbMSDocument processAcknowledgment(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message, final boolean isSyncReply) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public EbMSDocument processAcknowledgment(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message, final boolean isSyncReply)
+			throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val acknowledgment = createAcknowledgment(timestamp,message);
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
@@ -92,13 +91,24 @@ class AcknowledgmentProcessor
 		return acknowledgmentDocument;
 	}
 
-	private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument acknowledgmentDocument, EbMSAcknowledgment acknowledgment)
+	private void storeMessages(
+			Instant timestamp,
+			EbMSDocument messageDocument,
+			EbMSMessage message,
+			EbMSDocument acknowledgmentDocument,
+			EbMSAcknowledgment acknowledgment)
 	{
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(message.getMessageHeader().getService());
-		val deliveryChannel =
-				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+		val deliveryChannel = cpaManager
+				.getReceiveDeliveryChannel(messageHeader
+						.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",
+						messageHeader.getCPAId(),
+						messageHeader.getTo().getPartyId(),
+						messageHeader.getTo().getRole(),
+						service,
+						messageHeader.getAction()));
 		val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
 		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
 		ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
@@ -108,25 +118,36 @@ class AcknowledgmentProcessor
 	{
 		MessageHeader messageHeader = acknowledgment.getMessageHeader();
 		val service = CPAUtils.toString(messageHeader.getService());
-		val sendDeliveryChannel =
-				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-		val receiveDeliveryChannel =
-				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+		val sendDeliveryChannel = cpaManager
+				.getReceiveDeliveryChannel(messageHeader
+						.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",
+						messageHeader.getCPAId(),
+						messageHeader.getFrom().getPartyId(),
+						messageHeader.getFrom().getRole(),
+						service,
+						messageHeader.getAction()));
+		val receiveDeliveryChannel = cpaManager
+				.getReceiveDeliveryChannel(messageHeader
+						.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",
+						messageHeader.getCPAId(),
+						messageHeader.getTo().getPartyId(),
+						messageHeader.getTo().getRole(),
+						service,
+						messageHeader.getAction()));
 		if (!isSyncReply)
-			deliveryTaskManager.insertTask(
-					deliveryTaskManager.createNewTask(
-							messageHeader.getCPAId(),
-							sendDeliveryChannel.getChannelId(),
-							receiveDeliveryChannel.getChannelId(),
-							messageHeader.getMessageData().getMessageId(),
-							messageHeader.getMessageData().getTimeToLive(),
-							messageHeader.getMessageData().getTimestamp(),
-							false));
+			deliveryTaskManager.insertTask(deliveryTaskManager.createNewTask(messageHeader.getCPAId(),
+					sendDeliveryChannel.getChannelId(),
+					receiveDeliveryChannel.getChannelId(),
+					messageHeader.getMessageData().getMessageId(),
+					messageHeader.getMessageData().getTimeToLive(),
+					messageHeader.getMessageData().getTimestamp(),
+					false));
 	}
 
-	public void processAcknowledgment(Instant timestamp, EbMSDocument acknowledgmentDocument, EbMSMessage requestMessage, EbMSAcknowledgment acknowledgment) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
+	public void processAcknowledgment(Instant timestamp, EbMSDocument acknowledgmentDocument, EbMSMessage requestMessage, EbMSAcknowledgment acknowledgment)
+			throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
 	{
 		try
 		{
@@ -150,17 +171,15 @@ class AcknowledgmentProcessor
 		return ebMSMessageFactory.createEbMSAcknowledgment(message,timestamp);
 	}
 
-	public void storeAcknowledgment(final Instant timestamp, final EbMSDocument acknowledgmentDocument, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
+	public void storeAcknowledgment(final Instant timestamp, final EbMSDocument acknowledgmentDocument, final EbMSAcknowledgment acknowledgment)
+			throws EbMSProcessingException
 	{
 		val responseMessageHeader = acknowledgment.getMessageHeader();
 		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
 		Runnable storeMessage = () ->
 		{
 			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
-			if (ebMSDAO.updateMessage(
-					responseMessageHeader.getMessageData().getRefToMessageId(),
-					EbMSMessageStatus.CREATED,
-					EbMSMessageStatus.DELIVERED) > 0)
+			if (ebMSDAO.updateMessage(responseMessageHeader.getMessageData().getRefToMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERED) > 0)
 			{
 				messageEventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
 				if (deleteEbMSAttachmentsOnMessageProcessed)

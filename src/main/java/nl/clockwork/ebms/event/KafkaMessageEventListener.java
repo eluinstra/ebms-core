@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

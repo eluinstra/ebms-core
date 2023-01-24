@@ -1,7 +1,11 @@
-# ignore hidden files/directories
 .classpath
+.factorypath
 .project
 .settings
 target
+
+.vscode
+*.code-workspace
+
 .idea
 *.iml

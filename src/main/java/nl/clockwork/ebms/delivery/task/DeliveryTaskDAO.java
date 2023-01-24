@@ -15,15 +15,21 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.time.Instant;
 import java.util.List;
 
 interface DeliveryTaskDAO
 {
 	List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId);
+
 	List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr);
+
 	String insertTask(DeliveryTask task, String serverId);
+
 	void insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage);
+
 	int updateTask(DeliveryTask task);
+
 	int deleteTask(String messageId);
 }

@@ -15,24 +15,23 @@
  */
 package nl.clockwork.ebms.server;
 
+
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
@@ -73,7 +72,7 @@ class SSLFactoryManager
 
 	private KeyManagerFactory createKeyManagerFactory(EbMSKeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException
 	{
-		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		// KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		val result = KeyManagerFactory.getInstance("SunX509");
 		result.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
 		return result;
@@ -81,7 +80,7 @@ class SSLFactoryManager
 
 	private TrustManagerFactory createTrustManagerFactory(EbMSTrustStore trustStore) throws NoSuchAlgorithmException, KeyStoreException
 	{
-		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		// TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		val result = TrustManagerFactory.getInstance("SunX509");
 		result.init(trustStore.getKeyStore());
 		return result;
@@ -96,7 +95,7 @@ class SSLFactoryManager
 
 	private SSLEngine createEngine(boolean requireClientAuthentication, final SSLContext sslContext)
 	{
-		//val result = sslContext.createSSLEngine(hostname,port);
+		// val result = sslContext.createSSLEngine(hostname,port);
 		val result = sslContext.createSSLEngine();
 		result.setUseClientMode(false);
 		result.setSSLParameters(createSSLParameters());

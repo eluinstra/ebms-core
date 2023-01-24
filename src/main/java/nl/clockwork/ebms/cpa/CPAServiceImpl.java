@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import java.util.List;
 
+import java.util.List;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -26,19 +26,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.jaxrs.WithService;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.XSDValidator;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -46,16 +44,16 @@ import nl.clockwork.ebms.validation.XSDValidator;
 @Produces(MediaType.APPLICATION_JSON)
 public class CPAServiceImpl implements CPAService, WithService
 {
-  @NonNull
+	@NonNull
 	CPAManager cpaManager;
-  @NonNull
+	@NonNull
 	CPAValidator cpaValidator;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
 
 	@POST
 	@Path("validate")
 	@Override
-	public void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
+	public void validateCPA(/* CollaborationProtocolAgreement */String cpa) throws CPAServiceException
 	{
 		try
 		{
@@ -71,12 +69,13 @@ public class CPAServiceImpl implements CPAService, WithService
 			throw toServiceException(new CPAServiceException(e));
 		}
 	}
-	
+
 	@POST
 	@Path("")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/* CollaborationProtocolAgreement */String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite)
+			throws CPAServiceException
 	{
 		try
 		{
@@ -139,7 +138,7 @@ public class CPAServiceImpl implements CPAService, WithService
 	@Path("{cpaId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
-	public /*CollaborationProtocolAgreement*/String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
+	public /* CollaborationProtocolAgreement */String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
 	{
 		try
 		{

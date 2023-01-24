@@ -15,6 +15,12 @@
  */
 package nl.clockwork.ebms.kafka;
 
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import javax.annotation.PostConstruct;
+import lombok.val;
 import nl.clockwork.ebms.delivery.task.DeliveryTask;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
@@ -35,13 +41,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
-
-import lombok.val;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Configuration
 @Conditional(DeliveryTaskHandlerConfig.KafkaTaskHandlerType.class)

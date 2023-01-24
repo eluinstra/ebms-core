@@ -15,24 +15,17 @@
  */
 package nl.clockwork.ebms.encryption;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.utils.EncryptionConstants;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -48,6 +41,11 @@ import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.utils.EncryptionConstants;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -64,19 +62,25 @@ public class EbMSMessageDecrypter
 		{
 			val messageHeader = message.getMessageHeader();
 			val service = CPAUtils.toString(messageHeader.getService());
-			if (cpaManager.isSendingConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+			if (cpaManager.isSendingConfidential(messageHeader
+					.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			{
 				val toPartyId = messageHeader.getTo().getPartyId();
-				val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
-						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+				val deliveryChannel =
+						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",
+										messageHeader.getCPAId(),
+										toPartyId,
+										messageHeader.getTo().getRole(),
+										service,
+										messageHeader.getAction()));
 				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				if (certificate == null)
 					throw new EbMSProcessingException(
 							"No encryption certificate found for deliveryChannel \"" + deliveryChannel.getChannelId() + "\" in CPA \"" + messageHeader.getCPAId() + "\"");
 				val alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
-					throw new ValidationException(
-							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore + "\"");
+					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore + "\"");
 				val keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
 				message.getAttachments().replaceAll(a -> decrypt(keyPair,a));
 			}
@@ -102,8 +106,7 @@ public class EbMSMessageDecrypter
 			val document = DOMUtils.read((attachment.getInputStream()));
 			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
 				throw new ValidationException("Attachment " + attachment.getContentId() + " not encrypted!");
-			val encryptedDataElement =
-					(Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+			val encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
 			val xmlCipher = createXmlCipher(keyPair);
 			val buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 			val contentType = encryptedDataElement.getAttribute("MimeType");
@@ -115,8 +118,7 @@ public class EbMSMessageDecrypter
 		}
 		catch (SAXException | IOException | XMLEncryptionException | IllegalArgumentException e)
 		{
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("cid:" + attachment.getContentId(),EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}
 	}
 }

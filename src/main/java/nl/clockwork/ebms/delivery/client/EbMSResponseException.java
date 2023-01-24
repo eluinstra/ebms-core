@@ -15,9 +15,8 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-import java.net.http.HttpHeaders;
-import java.net.http.HttpResponse;
 
+import java.net.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,19 +37,19 @@ public class EbMSResponseException extends EbMSProcessingException
 		super(message);
 		this.repsonse = repsonse;
 	}
-	
+
 	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, Throwable cause)
 	{
 		super(cause);
 		this.repsonse = repsonse;
 	}
-	
+
 	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, String message, Throwable cause)
 	{
 		super(message,cause);
 		this.repsonse = repsonse;
 	}
-	
+
 	@Override
 	public String getMessage()
 	{

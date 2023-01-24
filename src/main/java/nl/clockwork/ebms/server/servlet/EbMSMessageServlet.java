@@ -15,11 +15,11 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -27,14 +27,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.server.EbMSInputStreamHandler;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSMessageServlet extends GenericServlet
@@ -70,7 +68,7 @@ public class EbMSMessageServlet extends GenericServlet
 			{
 				val result = new ArrayList<String>();
 				val headers = ((HttpServletRequest)request).getHeaders(headerName);
-				while(headers.hasMoreElements())
+				while (headers.hasMoreElements())
 					result.add((String)headers.nextElement());
 				return result;
 			}
@@ -78,9 +76,7 @@ public class EbMSMessageServlet extends GenericServlet
 			@Override
 			public String getRequestHeader(String headerName)
 			{
-				return "Content-Type".equals(headerName)
-						? request.getContentType()
-						: ((HttpServletRequest)request).getHeader(headerName);
+				return "Content-Type".equals(headerName) ? request.getContentType() : ((HttpServletRequest)request).getHeader(headerName);
 			}
 
 			@Override
@@ -103,7 +99,7 @@ public class EbMSMessageServlet extends GenericServlet
 				else
 					((HttpServletResponse)response).setHeader(name,value);
 			}
-		
+
 			@Override
 			public OutputStream getOutputStream() throws IOException
 			{

@@ -15,11 +15,12 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -55,15 +56,13 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status, final String errorMessage)
 	{
-		val deliveryChannel = cpaManager.getDeliveryChannel(
-				task.getCpaId(),
-				task.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
+		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(),task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
 		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
 			deliveryTaskDAO.updateTask(createNextTask(task,deliveryChannel));
-		else if (mustUpdate(task, reliableMessaging))
+		else if (mustUpdate(task,reliableMessaging))
 			deliveryTaskDAO.updateTask(createNextTask(task,autoRetryInterval));
 		else
 			deliveryTaskDAO.deleteTask(task.getMessageId());
@@ -71,13 +70,11 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 
 	private boolean mustUpdate(DeliveryTask event, boolean reliableMessaging)
 	{
-		return ebMSDAO.getMessageAction(event.getMessageId()).map(a ->
-				(a.equals(EbMSAction.ACKNOWLEDGMENT) || a.equals(EbMSAction.MESSAGE_ERROR))
-				&& !reliableMessaging
-				&& event.getRetries() < nrAutoRetries)
-			.orElse(false);
+		return ebMSDAO.getMessageAction(event.getMessageId())
+				.map(a -> (a.equals(EbMSAction.ACKNOWLEDGMENT) || a.equals(EbMSAction.MESSAGE_ERROR)) && !reliableMessaging && event.getRetries() < nrAutoRetries)
+				.orElse(false);
 	}
-	
+
 	@Override
 	public void deleteTask(String messageId)
 	{

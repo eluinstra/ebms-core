@@ -15,16 +15,16 @@
  */
 package nl.clockwork.ebms.validation;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.service.model.MessageRequestProperties;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -59,17 +59,15 @@ public class MessagePropertiesValidator
 	{
 		if (!cpaManager.existsCPA(properties.getCpaId()))
 			throw new ValidationException("No CPA found for message.cpaId=" + properties.getCpaId());
-		val fromPartyInfo =
-				cpaManager.getFromPartyInfo(properties.getCpaId(),Party.of(properties.getFromPartyId(),properties.getFromRole()),properties.getService(),properties.getAction());
+		val fromPartyInfo = cpaManager
+				.getFromPartyInfo(properties.getCpaId(),Party.of(properties.getFromPartyId(),properties.getFromRole()),properties.getService(),properties.getAction());
 		if (!fromPartyInfo.isPresent())
 			throw new ValidationException("No CanSend action found for " + properties);
 		val toParty = properties.getToPartyId() != null ? Party.of(properties.getToPartyId(),properties.getToRole()) : null;
-		val toPartyInfo =
-				cpaManager.getToPartyInfo(properties.getCpaId(),toParty,properties.getService(),properties.getAction());
+		val toPartyInfo = cpaManager.getToPartyInfo(properties.getCpaId(),toParty,properties.getService(),properties.getAction());
 		if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
 			throw new ValidationException("No CanReceive action found for " + properties);
-		else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
-				&& toPartyInfo.isPresent()
+		else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && toPartyInfo.isPresent()
 				&& !equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding(),fromPartyInfo.get().getCanSend().getOtherPartyActionBinding()))
 			throw new ValidationException("Action for to party does not match action for from party for " + properties);
 	}

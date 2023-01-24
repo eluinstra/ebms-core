@@ -15,21 +15,15 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.time.Instant;
 import java.util.concurrent.Future;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.slf4j.MDC;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -46,6 +40,11 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.slf4j.MDC;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -71,7 +70,17 @@ class DeliveryTaskHandler
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Builder
-	public DeliveryTaskHandler(@NonNull MessageEventListener messageEventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull DeliveryTaskManager deliveryTaskManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedTask timedTask, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public DeliveryTaskHandler(
+			@NonNull MessageEventListener messageEventListener,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull CPAManager cpaManager,
+			@NonNull URLMapper urlMapper,
+			@NonNull DeliveryTaskManager deliveryTaskManager,
+			@NonNull EbMSHttpClientFactory ebMSClientFactory,
+			@NonNull EbMSMessageEncrypter messageEncrypter,
+			@NonNull EbMSMessageProcessor messageProcessor,
+			TimedTask timedTask,
+			boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		this.messageEventListener = messageEventListener;
 		this.ebMSDAO = ebMSDAO;
@@ -107,18 +116,15 @@ class DeliveryTaskHandler
 
 	private void sendTask(final DeliveryTask task)
 	{
-		val receiveDeliveryChannel = cpaManager.getDeliveryChannel(
-				task.getCpaId(),
-				task.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
+		val receiveDeliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(),task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
 		val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
 		val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId());
-		StreamUtils.ifPresentOrElse(requestDocument,
-				d -> sendTask(task,receiveDeliveryChannel,url,d),
-				() -> {
-					log.info("Finished task " + task);
-					deliveryTaskManager.deleteTask(task.getMessageId());
-				});
+		StreamUtils.ifPresentOrElse(requestDocument,d -> sendTask(task,receiveDeliveryChannel,url,d),() ->
+		{
+			log.info("Finished task " + task);
+			deliveryTaskManager.deleteTask(task.getMessageId());
+		});
 	}
 
 	private void sendTask(DeliveryTask task, DeliveryChannel receiveDeliveryChannel, String url, EbMSDocument requestDocument)
@@ -174,7 +180,12 @@ class DeliveryTaskHandler
 		log.info("Sent message {}",task.getMessageId());
 	}
 
-	private void handleResponse(final DeliveryTask task, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument, final nl.clockwork.ebms.model.EbMSDocument responseDocument)
+	private void handleResponse(
+			final DeliveryTask task,
+			DeliveryChannel receiveDeliveryChannel,
+			final String url,
+			EbMSDocument requestDocument,
+			final nl.clockwork.ebms.model.EbMSDocument responseDocument)
 	{
 		Runnable runnable = () ->
 		{
@@ -194,9 +205,8 @@ class DeliveryTaskHandler
 	private EbMSClient createClient(DeliveryTask task)
 	{
 		String cpaId = task.getCpaId();
-		val sendDeliveryChannel = task.getSendDeliveryChannelId() != null
-				? cpaManager.getDeliveryChannel(cpaId,task.getSendDeliveryChannelId()).orElse(null)
-				: null;
+		val sendDeliveryChannel =
+				task.getSendDeliveryChannelId() != null ? cpaManager.getDeliveryChannel(cpaId,task.getSendDeliveryChannelId()).orElse(null) : null;
 		return ebMSClientFactory.getEbMSClient(cpaId,sendDeliveryChannel);
 	}
 

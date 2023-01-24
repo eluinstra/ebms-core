@@ -15,6 +15,11 @@
  */
 package nl.clockwork.ebms.cache.ehcache;
 
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.cache.SomeCacheType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -28,11 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cache.SomeCacheType;
 
 @Configuration
 @EnableCaching
@@ -72,7 +72,7 @@ public class CacheConfig
 		return ehCacheManagerFactory.getObject();
 	}
 
-  private Resource getConfigLocation()
+	private Resource getConfigLocation()
 	{
 		return configLocation == null ? new ClassPathResource(DEFAULT_CONFIG_LOCATION) : configLocation;
 	}

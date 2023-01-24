@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.util;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +23,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -41,16 +41,14 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.val;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DOMUtils
@@ -67,7 +65,7 @@ public class DOMUtils
 		dbf.setNamespaceAware(true);
 		return dbf.newDocumentBuilder();
 	}
-	
+
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
 		val result = createTransformerFactory().newTransformer();
@@ -97,7 +95,7 @@ public class DOMUtils
 			child = child.getNextSibling();
 		return (Element)child;
 	}
-	
+
 	public static Document read(String s) throws ParserConfigurationException, SAXException, IOException
 	{
 		val db = getDocumentBuilder();
@@ -161,20 +159,22 @@ public class DOMUtils
 		val transformer = getTransformer();
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
 	}
-	
+
 	public static void write(Document document, Writer writer, String encoding) throws TransformerException
 	{
 		val transformer = getTransformer();
 		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
 	}
-	
-	public static Node executeXPathQuery(NamespaceContext namespaceContext, Document document, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+
+	public static Node executeXPathQuery(NamespaceContext namespaceContext, Document document, String query)
+			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
 		return (Node)executeXPathQuery(namespaceContext,document,query,XPathConstants.NODE);
 	}
 
-	public static Object executeXPathQuery(NamespaceContext namespaceContext, Document document, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+	public static Object executeXPathQuery(NamespaceContext namespaceContext, Document document, String query, QName returnType)
+			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
 		val xpath = XPathFactory.newInstance().newXPath();
 		xpath.setNamespaceContext(namespaceContext);

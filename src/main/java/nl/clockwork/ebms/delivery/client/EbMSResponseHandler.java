@@ -15,19 +15,13 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -36,6 +30,10 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.DOMUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -48,12 +46,12 @@ class EbMSResponseHandler
 	List<Integer> recoverableHttpErrors;
 	@NonNull
 	List<Integer> unrecoverableHttpErrors;
-	
+
 	public EbMSDocument read() throws EbMSProcessorException
 	{
 		try
 		{
-			switch(response.statusCode() / 100)
+			switch (response.statusCode() / 100)
 			{
 				case 2:
 					if (response.statusCode() == HttpServletResponse.SC_NO_CONTENT || response.body().length() == 0)
@@ -100,26 +98,18 @@ class EbMSResponseHandler
 	public EbMSDocument toEbMSDocument(String contentId, String message) throws IOException, ParserConfigurationException, SAXException
 	{
 		return StringUtils.isNotBlank(message)
-				? EbMSDocument.builder()
-						.contentId(contentId)
-						.message(DOMUtils.read(message))
-						.attachments(Collections.emptyList())
-						.build()
+				? EbMSDocument.builder().contentId(contentId).message(DOMUtils.read(message)).attachments(Collections.emptyList()).build()
 				: null;
 	}
 
 	private EbMSResponseException createRecoverableErrorException(HttpResponse<String> response)
 	{
-		return recoverableHttpErrors.contains(response.statusCode())
-				? new EbMSResponseException(response)
-				: new EbMSUnrecoverableResponseException(response);
+		return recoverableHttpErrors.contains(response.statusCode()) ? new EbMSResponseException(response) : new EbMSUnrecoverableResponseException(response);
 	}
 
 	private EbMSResponseException createUnrecoverableErrorException(HttpResponse<String> response)
 	{
-		return unrecoverableHttpErrors.contains(response.statusCode())
-				? new EbMSUnrecoverableResponseException(response)
-				: new EbMSResponseException(response);
+		return unrecoverableHttpErrors.contains(response.statusCode()) ? new EbMSUnrecoverableResponseException(response) : new EbMSResponseException(response);
 	}
 
 	private void logResponse(HttpResponse<String> response)

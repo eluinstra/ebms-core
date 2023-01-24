@@ -15,19 +15,17 @@
  */
 package nl.clockwork.ebms.model;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import javax.activation.DataSource;
-
-import org.apache.commons.io.IOUtils;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.io.IOUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -37,7 +35,7 @@ public class PlainEbMSAttachment implements EbMSAttachment
 	String contentId;
 	@NonNull
 	DataSource dataSource;
-	
+
 	@Override
 	public String getContentType()
 	{

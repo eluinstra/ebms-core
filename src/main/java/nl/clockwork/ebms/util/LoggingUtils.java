@@ -15,16 +15,15 @@
  */
 package nl.clockwork.ebms.util;
 
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoggingUtils

@@ -15,14 +15,14 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
+
 import java.security.cert.X509Certificate;
 import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -39,7 +39,8 @@ public class CertificateMapper
 
 	public X509Certificate getCertificate(X509Certificate certificate, String cpaId)
 	{
-		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getCertificateId(certificate),cpaId,false).orElse(certificate) : null;
+		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getCertificateId(certificate),cpaId,false).orElse(certificate)
+				: null;
 	}
 
 	public void setCertificateMapping(CertificateMapping mapping)

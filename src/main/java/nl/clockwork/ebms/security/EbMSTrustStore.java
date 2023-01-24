@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.security;
 
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -25,14 +26,13 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
-@FieldDefaults(level=AccessLevel.PROTECTED, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @Getter
 @ToString
 public class EbMSTrustStore
@@ -47,7 +47,7 @@ public class EbMSTrustStore
 			trustStores.put(path,new EbMSTrustStore(KeyStoreUtils.loadKeyStore(type,path,password)));
 		return trustStores.get(path);
 	}
-	
+
 	public EbMSTrustStore(@NonNull KeyStore keyStore)
 	{
 		this.keyStore = keyStore;

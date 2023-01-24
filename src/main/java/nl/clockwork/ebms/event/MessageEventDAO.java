@@ -15,15 +15,18 @@
  */
 package nl.clockwork.ebms.event;
 
-import java.util.List;
 
+import java.util.List;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
 
 public interface MessageEventDAO
 {
 	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types);
+
 	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types, int maxNr);
+
 	String insertEbMSMessageEvent(String messageId, MessageEventType eventType);
+
 	int processEbMSMessageEvent(String messageId);
 }

@@ -15,27 +15,23 @@
  */
 package nl.clockwork.ebms.processor;
 
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -53,6 +49,8 @@ import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @Builder
@@ -78,16 +76,34 @@ class MessageErrorProcessor
 	MessageEventListener messageEventListener;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
-	public EbMSDocument processMessageError(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message, final boolean isSyncReply, final EbMSValidationException e) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public EbMSDocument processMessageError(
+			final Instant timestamp,
+			final EbMSDocument messageDocument,
+			final EbMSMessage message,
+			final boolean isSyncReply,
+			final EbMSValidationException e) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException,
+			IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val messageError = createMessageError(timestamp,message,e);
 		val result = EbMSMessageUtils.getEbMSDocument(messageError);
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(messageError.getMessageHeader().getService());
-		val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageError.getMessageHeader().getFrom().getPartyId(),messageError.getMessageHeader().getFrom().getRole(),service,messageError.getMessageHeader().getAction())
-				.orElse(null);
-		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageError.getMessageHeader().getTo().getPartyId(),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
-				.orElse(null);
+		val sendDeliveryChannel =
+				cpaManager
+						.getSendDeliveryChannel(messageHeader.getCPAId(),
+								messageError.getMessageHeader().getFrom().getPartyId(),
+								messageError.getMessageHeader().getFrom().getRole(),
+								service,
+								messageError.getMessageHeader().getAction())
+						.orElse(null);
+		val receiveDeliveryChannel =
+				cpaManager
+						.getReceiveDeliveryChannel(messageHeader.getCPAId(),
+								messageError.getMessageHeader().getTo().getPartyId(),
+								messageError.getMessageHeader().getTo().getRole(),
+								service,
+								messageError.getMessageHeader().getAction())
+						.orElse(null);
 		Runnable storeMessage = () ->
 		{
 			storeMessages(timestamp,messageDocument,message,result,messageError);
@@ -100,33 +116,42 @@ class MessageErrorProcessor
 		return result;
 	}
 
-	private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
+	private void
+			storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
 	{
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(message.getMessageHeader().getService());
-		val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
-				.orElse(null);
+		val deliveryChannel =
+				cpaManager
+						.getReceiveDeliveryChannel(messageHeader
+								.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
+						.orElse(null);
 		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
 		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
 		ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
 	}
 
-	private void storeDeliveryTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, EbMSMessageError messageError, boolean isSyncReply)
+	private void storeDeliveryTask(
+			String cpaId,
+			DeliveryChannel sendDeliveryChannel,
+			DeliveryChannel receiveDeliveryChannel,
+			EbMSMessageError messageError,
+			boolean isSyncReply)
 	{
 		if (!isSyncReply)
 		{
-			deliveryTaskManager.insertTask(
-					deliveryTaskManager.createNewTask(
-						cpaId,
-						sendDeliveryChannel.getChannelId(),
-						receiveDeliveryChannel.getChannelId(),
-						messageError.getMessageHeader().getMessageData().getMessageId(),
-						messageError.getMessageHeader().getMessageData().getTimeToLive(),
-						messageError.getMessageHeader().getMessageData().getTimestamp(),
-						false));
+			deliveryTaskManager.insertTask(deliveryTaskManager.createNewTask(cpaId,
+					sendDeliveryChannel.getChannelId(),
+					receiveDeliveryChannel.getChannelId(),
+					messageError.getMessageHeader().getMessageData().getMessageId(),
+					messageError.getMessageHeader().getMessageData().getTimeToLive(),
+					messageError.getMessageHeader().getMessageData().getTimestamp(),
+					false));
 		}
 	}
-	public void processMessageError(Instant timestamp, EbMSDocument response, EbMSMessage requestMessage, EbMSMessageError messageError) throws TransformerException
+
+	public void processMessageError(Instant timestamp, EbMSDocument response, EbMSMessage requestMessage, EbMSMessageError messageError)
+			throws TransformerException
 	{
 		try
 		{
@@ -144,8 +169,9 @@ class MessageErrorProcessor
 			log.warn("Unable to process MessageError " + messageError.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
-	
-	public EbMSMessageError createMessageError(final Instant timestamp, final EbMSMessage message, final EbMSValidationException e) throws DatatypeConfigurationException, JAXBException
+
+	public EbMSMessageError createMessageError(final Instant timestamp, final EbMSMessage message, final EbMSValidationException e)
+			throws DatatypeConfigurationException, JAXBException
 	{
 		val errorList = EbMSMessageUtils.createErrorList();
 		errorList.getError().add(e.getError());
@@ -159,10 +185,7 @@ class MessageErrorProcessor
 		Runnable insertMessage = () ->
 		{
 			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
-			if (ebMSDAO.updateMessage(
-					responseMessageHeader.getMessageData().getRefToMessageId(),
-					EbMSMessageStatus.CREATED,
-					EbMSMessageStatus.DELIVERY_FAILED) > 0)
+			if (ebMSDAO.updateMessage(responseMessageHeader.getMessageData().getRefToMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 			{
 				messageEventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
 				if (deleteEbMSAttachmentsOnMessageProcessed)

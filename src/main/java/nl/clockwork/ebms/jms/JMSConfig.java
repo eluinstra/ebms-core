@@ -15,11 +15,17 @@
  */
 package nl.clockwork.ebms.jms;
 
-import java.util.UUID;
 
+import com.atomikos.jms.AtomikosConnectionFactoryBean;
+import java.util.UUID;
 import javax.jms.ConnectionFactory;
 import javax.jms.XAConnectionFactory;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -28,15 +34,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-
-import com.atomikos.jms.AtomikosConnectionFactoryBean;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)

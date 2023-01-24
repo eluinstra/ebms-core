@@ -15,16 +15,15 @@
  */
 package nl.clockwork.ebms.security;
 
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 
 @Conditional(DefaultKeyStoreConfig.class)
 @Configuration

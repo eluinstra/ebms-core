@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;
@@ -24,14 +25,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.List;
-
 import javax.net.ssl.SSLParameters;
 import javax.xml.transform.TransformerException;
-
 import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -45,7 +44,6 @@ class EbMSHttpClient implements EbMSClient
 	List<Integer> unrecoverableHttpErrors;
 	HttpClient httpClient;
 
-	
 	public EbMSHttpClient(
 			@NonNull SSLParameters sslParameters,
 			@NonNull SSLContextFactory sslFactoryManager,
@@ -69,14 +67,14 @@ class EbMSHttpClient implements EbMSClient
 
 	private ProxySelector getProxy(EbMSProxy proxy)
 	{
-		return proxy == null ? ProxySelector.getDefault() : ProxySelector.of(new InetSocketAddress(proxy.getHost(), proxy.getPort()));
+		return proxy == null ? ProxySelector.getDefault() : ProxySelector.of(new InetSocketAddress(proxy.getHost(),proxy.getPort()));
 	}
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
 		try
 		{
-			val response = httpClient.send(createRequest(readTimeout, proxy, uri, document), BodyHandlers.ofString());
+			val response = httpClient.send(createRequest(readTimeout,proxy,uri,document),BodyHandlers.ofString());
 			return new EbMSResponseHandler(response,recoverableHttpErrors,unrecoverableHttpErrors).read();
 		}
 		catch (IOException | TransformerException | InterruptedException e)
@@ -87,10 +85,8 @@ class EbMSHttpClient implements EbMSClient
 
 	private static HttpRequest createRequest(int readTimeout, EbMSProxy proxy, String uri, EbMSDocument document) throws TransformerException
 	{
-		var request = HttpRequest.newBuilder()
-				.uri(URI.create(uri))
-				.timeout(Duration.ofMillis(readTimeout));
-		request = new EbMSMessageWriter().write(request, document);
+		var request = HttpRequest.newBuilder().uri(URI.create(uri)).timeout(Duration.ofMillis(readTimeout));
+		request = new EbMSMessageWriter().write(request,document);
 		if (proxy.useProxyAuthorization())
 			request = request.setHeader(proxy.getProxyAuthorizationKey(),proxy.getProxyAuthorizationValue());
 		return request.build();

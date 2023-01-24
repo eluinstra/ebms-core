@@ -15,24 +15,22 @@
  */
 package org.apache.jcp.xml.dsig.internal.dom;
 
+
 import java.io.IOException;
 import java.util.List;
-
 import javax.xml.crypto.Data;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
-
-import org.apache.xml.security.signature.XMLSignatureInput;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import org.apache.xml.security.signature.XMLSignatureInput;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

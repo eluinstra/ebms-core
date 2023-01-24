@@ -15,12 +15,12 @@
  */
 package nl.clockwork.ebms;
 
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +31,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public enum EbMSAction
 {
-	MESSAGE_ERROR("MessageError"),
+	MESSAGE_ERROR(
+			"MessageError"),
 	ACKNOWLEDGMENT("Acknowledgment"),
 	STATUS_REQUEST("StatusRequest"),
 	STATUS_RESPONSE("StatusResponse"),
@@ -45,7 +46,7 @@ public enum EbMSAction
 	{
 		return Stream.of(values());
 	}
-	
+
 	public static Optional<EbMSAction> get(String action)
 	{
 		return stream().filter(a -> a.action.equals(action)).findFirst();

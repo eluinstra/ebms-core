@@ -15,16 +15,15 @@
  */
 package nl.clockwork.ebms.validation;
 
+
 import javax.xml.bind.JAXBException;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Error;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.jaxb.JAXBParser;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Error;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

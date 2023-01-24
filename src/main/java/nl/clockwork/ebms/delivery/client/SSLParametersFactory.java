@@ -15,14 +15,13 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import javax.net.ssl.SSLParameters;
-
-import org.springframework.beans.factory.FactoryBean;
-
 import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.springframework.beans.factory.FactoryBean;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SSLParametersFactory implements FactoryBean<SSLParameters>

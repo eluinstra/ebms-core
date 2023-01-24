@@ -15,13 +15,12 @@
  */
 package nl.clockwork.ebms.security.azure;
 
-import java.security.Security;
 
+import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
+import java.security.Security;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-
-import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 
 public class AzureKeyStoreConfig implements Condition
 {

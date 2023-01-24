@@ -15,17 +15,16 @@
  */
 package nl.clockwork.ebms.scheduler;
 
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.quartz.SchedulerContext;
 import org.quartz.spi.TriggerFiredBundle;
-import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
@@ -58,7 +57,7 @@ public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 	{
 		this.applicationContext = applicationContext;
 	}
-	
+
 	@Override
 	public void setSchedulerContext(SchedulerContext schedulerContext)
 	{

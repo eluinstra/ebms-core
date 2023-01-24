@@ -15,12 +15,11 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-import java.io.Serializable;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,10 +35,10 @@ import lombok.experimental.FieldDefaults;
 public class URLMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	String source;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	String destination;
 }

@@ -15,15 +15,14 @@
  */
 package nl.clockwork.ebms.service.model;
 
+
 import java.io.Serializable;
 import java.time.Instant;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,7 +59,7 @@ public class MessageProperties implements Serializable
 	String action;
 	@XmlElement(required = true)
 	@XmlJavaTypeAdapter(InstantAdapter.class)
-	@XmlSchemaType(name="dateTime")
+	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant timestamp;
 	@XmlElement(required = true)
@@ -74,7 +73,19 @@ public class MessageProperties implements Serializable
 	@NonNull
 	EbMSMessageStatus messageStatus;
 
-	public MessageProperties(String cpaId, String fromPartyId, String fromRole, String toPartyId, String toRole, String service, String action, Instant timestamp, String conversationId, String messageId, String refToMessageId, EbMSMessageStatus messageStatus)
+	public MessageProperties(
+			String cpaId,
+			String fromPartyId,
+			String fromRole,
+			String toPartyId,
+			String toRole,
+			String service,
+			String action,
+			Instant timestamp,
+			String conversationId,
+			String messageId,
+			String refToMessageId,
+			EbMSMessageStatus messageStatus)
 	{
 		this.cpaId = cpaId;
 		this.fromParty = new Party(fromPartyId,fromRole);

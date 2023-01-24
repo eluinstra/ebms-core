@@ -20,7 +20,18 @@ import static java.util.Optional.empty;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.cpa.url.URLMapper;
+import nl.clockwork.ebms.model.EbMSPartyInfo;
+import nl.clockwork.ebms.model.FromPartyInfo;
+import nl.clockwork.ebms.model.Party;
+import nl.clockwork.ebms.model.ToPartyInfo;
+import nl.clockwork.ebms.util.StreamUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessagingCharacteristics;
@@ -29,19 +40,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.cpa.url.URLMapper;
-import nl.clockwork.ebms.model.EbMSPartyInfo;
-import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.ToPartyInfo;
-import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -56,7 +54,7 @@ public class CPAManager
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public void clearCache()
 	{
-		//do nothing
+		// do nothing
 	}
 
 	public boolean existsCPA(String cpaId)
@@ -131,8 +129,7 @@ public class CPAManager
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
 		return getFromPartyInfo(cpaId,fromParty,service,action)
-				.flatMap(fromPartyInfo -> getCPA(cpaId)
-						.map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo,fromParty,service,action)))
+				.flatMap(fromPartyInfo -> getCPA(cpaId).map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo,fromParty,service,action)))
 				.orElse(empty());
 	}
 
@@ -169,56 +166,43 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		return EbMSAction.EBMS_SERVICE_URI.equals(service)
-				? getDefaultDeliveryChannel(cpaId,partyId,action)
-				: getPartyInfo(cpaId,partyId)
-							.flatMap(CPAQuery.getSendDeliveryChannel(role, service, action));
+		return EbMSAction.EBMS_SERVICE_URI.equals(service) ? getDefaultDeliveryChannel(cpaId,partyId,action)
+				: getPartyInfo(cpaId,partyId).flatMap(CPAQuery.getSendDeliveryChannel(role,service,action));
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		return EbMSAction.EBMS_SERVICE_URI.equals(service)
-				? getDefaultDeliveryChannel(cpaId,partyId,action)
-				: getPartyInfo(cpaId,partyId)
-							.flatMap(CPAQuery.getReceiveDeliveryChannel(role, service, action));
+		return EbMSAction.EBMS_SERVICE_URI.equals(service) ? getDefaultDeliveryChannel(cpaId,partyId,action)
+				: getPartyInfo(cpaId,partyId).flatMap(CPAQuery.getReceiveDeliveryChannel(role,service,action));
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean isSendingNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		val docExchange = CPAUtils.getDocExchange(
-				getSendDeliveryChannel(cpaId,partyId,role,service,action)
-						.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
-		return getCPA(cpaId)
-				.map(CPAQuery.isSendingNonRepudiationRequired(docExchange, partyId, role, service, action))
-				.orElse(false);
+		val docExchange = CPAUtils.getDocExchange(getSendDeliveryChannel(cpaId,partyId,role,service,action)
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
+		return getCPA(cpaId).map(CPAQuery.isSendingNonRepudiationRequired(docExchange,partyId,role,service,action)).orElse(false);
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean isSendingConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		val docExchange = CPAUtils.getDocExchange(
-				getSendDeliveryChannel(cpaId,partyId,role,service,action)
-						.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
-		return getCPA(cpaId)
-				.map(CPAQuery.isSendingConfidential(docExchange, partyId, role, service, action))
-				.orElse(false);
+		val docExchange = CPAUtils.getDocExchange(getSendDeliveryChannel(cpaId,partyId,role,service,action)
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
+		return getCPA(cpaId).map(CPAQuery.isSendingConfidential(docExchange,partyId,role,service,action)).orElse(false);
 	}
 
 	public String getReceivingUri(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		return urlMapper.getURL(CPAUtils.getUri(
-				getReceiveDeliveryChannel(cpaId,partyId,role,service,action)
-						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",cpaId,partyId,role,service,action))
-		));
+		return urlMapper.getURL(CPAUtils.getUri(getReceiveDeliveryChannel(cpaId,partyId,role,service,action)
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",cpaId,partyId,role,service,action))));
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<SyncReplyModeType> getSendSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		return getSendDeliveryChannel(cpaId,partyId,role,service,action)
-				.map(DeliveryChannel::getMessagingCharacteristics)
+		return getSendDeliveryChannel(cpaId,partyId,role,service,action).map(DeliveryChannel::getMessagingCharacteristics)
 				.map(MessagingCharacteristics::getSyncReplyMode);
 	}
 }

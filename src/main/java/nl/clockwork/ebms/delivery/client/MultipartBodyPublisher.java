@@ -36,7 +36,6 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.function.Supplier;
-
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.val;
@@ -255,10 +254,10 @@ class MultipartChannel implements ReadableByteChannel
 
 	String currentHeaders()
 	{
-		return Match(current).of(
-			Case($(instanceOf(XmlPart.class)),this::headers),
-			Case($(instanceOf(AttachmentPart.class)),this::headers),
-			Case($(),() -> { throw new IllegalStateException(); }));
+		return Match(current).of(Case($(instanceOf(XmlPart.class)),this::headers),Case($(instanceOf(AttachmentPart.class)),this::headers),Case($(),() ->
+		{
+			throw new IllegalStateException();
+		}));
 	}
 
 	private String headers(XmlPart part)

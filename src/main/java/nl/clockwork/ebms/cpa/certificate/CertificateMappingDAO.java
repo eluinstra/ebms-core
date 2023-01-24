@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
+
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +23,16 @@ import java.util.Optional;
 interface CertificateMappingDAO
 {
 	void clearCache();
+
 	boolean existsCertificateMapping(String id, String cpaId);
+
 	Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific);
+
 	List<CertificateMapping> getCertificateMappings();
+
 	void insertCertificateMapping(CertificateMapping mapping);
+
 	int updateCertificateMapping(CertificateMapping mapping);
+
 	int deleteCertificateMapping(String id, String cpaId);
 }

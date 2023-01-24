@@ -15,28 +15,26 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import java.time.Instant;
 
+import java.time.Instant;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-
-import org.apache.activemq.ScheduledMessage;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.util.StreamUtils;
+import org.apache.activemq.ScheduledMessage;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
@@ -97,11 +95,9 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage)
 	{
-		val deliveryChannel = cpaManager.getDeliveryChannel(
-				task.getCpaId(),
-				task.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
-		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(), url, status, errorMessage);
+		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(),task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
+		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
 		if (task.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 		{
 			val nextTask = createNextTask(task,deliveryChannel);
@@ -131,6 +127,6 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void deleteTask(String messageId)
 	{
-   	// do nothing
- 	}
+		// do nothing
+	}
 }

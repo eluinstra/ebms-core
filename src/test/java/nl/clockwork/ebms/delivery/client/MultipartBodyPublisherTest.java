@@ -19,6 +19,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.sun.net.httpserver.HttpServer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -30,13 +31,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
-import com.sun.net.httpserver.HttpServer;
-
 import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
+import org.junit.jupiter.api.Test;
 
 public class MultipartBodyPublisherTest
 {
@@ -63,7 +60,8 @@ public class MultipartBodyPublisherTest
 		val filename = "test.txt";
 		val value = "Hello world!";
 		val contentType = "text/plain";
-		val part = new AttachmentPart(contentId,filename,() -> {
+		val part = new AttachmentPart(contentId,filename,() ->
+		{
 			return Channels.newChannel(new ByteArrayInputStream(value.getBytes()));
 		},contentType);
 
@@ -99,7 +97,8 @@ public class MultipartBodyPublisherTest
 		}
 		assertEquals(false,channel.isOpen());
 
-		val expect = "--boundary\r\n" + "Content-Type: text/xml; charset=UTF-8\r\n" + "Content-ID: <contentId>\r\n" + "\r\n" + "<content/>\r\n" + "--boundary--\r\n";
+		val expect =
+				"--boundary\r\n" + "Content-Type: text/xml; charset=UTF-8\r\n" + "Content-ID: <contentId>\r\n" + "\r\n" + "<content/>\r\n" + "--boundary--\r\n";
 		assertEquals(expect,content.toString());
 	}
 
@@ -147,10 +146,9 @@ public class MultipartBodyPublisherTest
 		new Thread(() -> httpd.start()).start();
 		try
 		{
-			EbMSAttachmentFactory.init(null, 1024, null);
-			val publisher = new MultipartBodyPublisher("contentId")
-					.addXml("contentId", "<content/>")
-					.addAttachment(EbMSAttachmentFactory.createEbMSAttachment("test.txt", "test", "text/plain", "Hello world!".getBytes()));
+			EbMSAttachmentFactory.init(null,1024,null);
+			val publisher = new MultipartBodyPublisher("contentId").addXml("contentId","<content/>")
+					.addAttachment(EbMSAttachmentFactory.createEbMSAttachment("test.txt","test","text/plain","Hello world!".getBytes()));
 			val client = HttpClient.newHttpClient();
 			val request = HttpRequest.newBuilder(new URI("http",null,"localhost",httpd.getAddress().getPort(),"/",null,null))
 					.header("Content-Type",publisher.contentType())

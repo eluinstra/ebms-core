@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,6 @@ public enum EbMSErrorCode
 	SECURITY_FAILURE("SecurityFailure"),
 	MIME_PROBLEM("MimeProblem"),
 	UNKNOWN("Unknown");
-	
+
 	String errorCode;
 }

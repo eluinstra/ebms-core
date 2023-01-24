@@ -15,14 +15,10 @@
  */
 package nl.clockwork.ebms.dao;
 
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
-import org.w3c.dom.Document;
-
-import io.vavr.Tuple2;
-import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -32,28 +28,45 @@ import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageFilter;
+import org.w3c.dom.Document;
 
 public interface EbMSDAO
 {
 	void executeTransaction(Runnable runnable);
 
 	boolean existsMessage(String messageId);
+
 	boolean existsIdenticalMessage(EbMSBaseMessage message);
 
 	Optional<Message> getMessage(String messageId);
+
 	Optional<MTOMMessage> getMTOMMessage(String messageId);
+
 	Optional<EbMSMessageProperties> getEbMSMessageProperties(String messageId);
+
 	Optional<EbMSMessageProperties> getEbMSMessagePropertiesByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
+
 	Optional<Document> getDocument(String messageId);
+
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId);
+
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
+
 	Optional<Instant> getPersistTime(String messageId);
+
 	Optional<EbMSAction> getMessageAction(String messageId);
 
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status);
+
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status, int maxNr);
 
-	String insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
+	String insertMessage(
+			Instant timestamp,
+			Instant persistTime,
+			Document document,
+			EbMSBaseMessage message,
+			List<EbMSAttachment> attachments,
+			EbMSMessageStatus status);
 
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
 

@@ -21,7 +21,16 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.util.StreamUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -30,17 +39,6 @@ import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -93,10 +91,8 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage)
 	{
-		val deliveryChannel = cpaManager.getDeliveryChannel(
-				task.getCpaId(),
-				task.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
+		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(),task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
 		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
@@ -116,10 +112,7 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	private void scheduleNextTask(DeliveryTask task, final DeliveryChannel deliveryChannel)
 	{
 		val nextTask = createNextTask(task,deliveryChannel);
-		val trigger = newTrigger()
-				.withIdentity(TriggerKey.triggerKey(nextTask.getMessageId()))
-				.startAt(Date.from(nextTask.getTimestamp()))
-				.build();
+		val trigger = newTrigger().withIdentity(TriggerKey.triggerKey(nextTask.getMessageId())).startAt(Date.from(nextTask.getTimestamp())).build();
 		try
 		{
 			scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
@@ -133,9 +126,7 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	private void scheduleNextTask(DeliveryTask task)
 	{
 		val nextTask = createNextTask(task,autoRetryInterval);
-		val trigger = newTrigger()
-				.startAt(Date.from(nextTask.getTimestamp()))
-				.build();
+		val trigger = newTrigger().startAt(Date.from(nextTask.getTimestamp())).build();
 		try
 		{
 			scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
@@ -159,8 +150,7 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 
 	private JobDetail createJob(DeliveryTask task)
 	{
-		return newJob(getJobClass())
-				.withIdentity(JobKey.jobKey(task.getMessageId()))
+		return newJob(getJobClass()).withIdentity(JobKey.jobKey(task.getMessageId()))
 				.usingJobData("cpaId",task.getCpaId())
 				.usingJobData("sendDeliveryChannel",task.getSendDeliveryChannelId())
 				.usingJobData("receiveDeliveryChannel",task.getReceiveDeliveryChannelId())

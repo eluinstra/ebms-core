@@ -15,21 +15,30 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.time.Instant;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-
 import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 public interface DeliveryTaskManager
 {
 	void insertTask(final DeliveryTask task);
+
 	void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status);
+
 	void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status, final String errorMessage);
+
 	void deleteTask(String messageId);
 
-	default DeliveryTask createNewTask(String cpaId, String sendDeliveryChannelId, String receiveDeliveryChannelId, String messageId, Instant timeToLive, Instant timestamp, boolean confidential)
+	default DeliveryTask createNewTask(
+			String cpaId,
+			String sendDeliveryChannelId,
+			String receiveDeliveryChannelId,
+			String messageId,
+			Instant timeToLive,
+			Instant timestamp,
+			boolean confidential)
 	{
 		return new DeliveryTask(cpaId,sendDeliveryChannelId,receiveDeliveryChannelId,messageId,timeToLive,timestamp,confidential,0);
 	}
@@ -37,9 +46,7 @@ public interface DeliveryTaskManager
 	default DeliveryTask createNextTask(DeliveryTask task, DeliveryChannel deliveryChannel)
 	{
 		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
-		val timestamp = task.getRetries() < rm.getRetries().intValue()
-				? Instant.now().plus(rm.getRetryInterval())
-				: task.getTimeToLive();
+		val timestamp = task.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : task.getTimeToLive();
 		return task.createNextTask(timestamp);
 	}
 

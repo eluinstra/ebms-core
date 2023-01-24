@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event;
 
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,7 +32,7 @@ class LoggingMessageEventListener implements MessageEventListener
 	{
 		log.info("Delivered message " + messageId);
 	}
-	
+
 	@Override
 	public void onMessageFailed(String messageId) throws MessageEventException
 	{

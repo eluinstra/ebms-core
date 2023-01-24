@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.net.http.HttpResponse;
 
 public class EbMSUnrecoverableResponseException extends EbMSResponseException
@@ -25,10 +26,10 @@ public class EbMSUnrecoverableResponseException extends EbMSResponseException
 	{
 		super(repsonse);
 	}
-	
+
 	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse, String message)
 	{
 		super(repsonse,message);
 	}
-	
+
 }

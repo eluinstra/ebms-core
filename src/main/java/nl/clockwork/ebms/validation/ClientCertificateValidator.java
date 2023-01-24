@@ -15,19 +15,18 @@
  */
 package nl.clockwork.ebms.validation;
 
+
 import java.security.cert.X509Certificate;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.util.StreamUtils;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -70,8 +69,15 @@ class ClientCertificateValidator
 	private X509Certificate getClientCertificate(MessageHeader messageHeader)
 	{
 		val service = CPAUtils.toString(messageHeader.getService());
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+		val deliveryChannel = cpaManager
+				.getSendDeliveryChannel(messageHeader
+						.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",
+						messageHeader.getCPAId(),
+						messageHeader.getFrom().getPartyId(),
+						messageHeader.getFrom().getRole(),
+						service,
+						messageHeader.getAction()));
 		return CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel));
 	}
 

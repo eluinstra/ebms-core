@@ -15,9 +15,14 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,12 +36,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -91,7 +90,7 @@ public class DeliveryTaskManagerConfig
 	@Conditional(QuartzKafkaTaskManagerType.class)
 	public DeliveryTaskManager quartzKafkaDeliveryTaskManager(
 			DeliveryTaskDAO deliveryTaskDAO,
-			@Autowired(required=false) @Qualifier("deliveryTaskKafkaTemplate") KafkaTemplate<String, DeliveryTask> kafkaTemplate)
+			@Autowired(required = false) @Qualifier("deliveryTaskKafkaTemplate") KafkaTemplate<String,DeliveryTask> kafkaTemplate)
 	{
 		return new QuartzKafkaDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval,kafkaTemplate);
 	}
@@ -112,39 +111,48 @@ public class DeliveryTaskManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
+			return context.getEnvironment()
+					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
 		}
 	}
+
 	public static class JmsTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
+			return context.getEnvironment()
+					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
 		}
 	}
+
 	public static class QuartzTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
+			return context.getEnvironment()
+					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
 		}
 	}
+
 	public static class QuartzJMSTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS;
+			return context.getEnvironment()
+					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS;
 		}
 	}
+
 	public static class QuartzKafkaTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_KAFKA;
+			return context.getEnvironment()
+					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_KAFKA;
 		}
 	}
 }

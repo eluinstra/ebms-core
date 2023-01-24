@@ -15,19 +15,18 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -61,30 +60,25 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId)
 	{
-		return jdbcTemplate.query(
-				EbMSEventRowMapper.SELECT +
-				" from delivery_task" +
-				" where time_stamp <= ?" +
-				(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-				" order by time_stamp asc",
-				new EbMSEventRowMapper(),
-				Timestamp.from(timestamp));
+		return jdbcTemplate.query(EbMSEventRowMapper.SELECT + " from delivery_task"
+				+ " where time_stamp <= ?"
+				+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+				+ " order by time_stamp asc",new EbMSEventRowMapper(),Timestamp.from(timestamp));
 	}
 
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return jdbcTemplate.query(
-			EbMSEventRowMapper.SELECT +
-				" from delivery_task" +
-				" where time_stamp <= ?" +
-				(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-				" order by time_stamp asc" +
-				" offset 0 rows" +
-				" fetch first " + maxNr + " rows only",
-			new EbMSEventRowMapper(),Timestamp.from(timestamp));
+		return jdbcTemplate.query(EbMSEventRowMapper.SELECT + " from delivery_task"
+				+ " where time_stamp <= ?"
+				+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+				+ " order by time_stamp asc"
+				+ " offset 0 rows"
+				+ " fetch first "
+				+ maxNr
+				+ " rows only",new EbMSEventRowMapper(),Timestamp.from(timestamp));
 	}
-	
+
 	@Override
 	public String insertTask(DeliveryTask task, String serverId)
 	{
@@ -105,9 +99,12 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public int updateTask(DeliveryTask task)
 	{
-		return jdbcTemplate.update("update delivery_task set time_stamp = ?, retries = ? where message_id = ?",Timestamp.from(task.getTimestamp()),task.getRetries(),task.getMessageId());
+		return jdbcTemplate.update("update delivery_task set time_stamp = ?, retries = ? where message_id = ?",
+				Timestamp.from(task.getTimestamp()),
+				task.getRetries(),
+				task.getMessageId());
 	}
-	
+
 	@Override
 	public int deleteTask(String messageId)
 	{
@@ -117,8 +114,7 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public void insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage)
 	{
-		jdbcTemplate.update(
-				"insert into delivery_log (message_id,time_stamp,uri,status,error_message) values (?,?,?,?,?)",
+		jdbcTemplate.update("insert into delivery_log (message_id,time_stamp,uri,status,error_message) values (?,?,?,?,?)",
 				messageId,
 				Timestamp.from(timestamp),
 				uri,

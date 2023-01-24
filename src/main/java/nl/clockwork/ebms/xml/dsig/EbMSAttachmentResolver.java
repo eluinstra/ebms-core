@@ -15,22 +15,21 @@
  */
 package nl.clockwork.ebms.xml.dsig;
 
+
 import java.io.IOException;
 import java.util.List;
-
-import org.apache.xml.security.signature.XMLSignatureInput;
-import org.apache.xml.security.utils.resolver.ResourceResolverContext;
-import org.apache.xml.security.utils.resolver.ResourceResolverException;
-import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.utils.resolver.ResourceResolverContext;
+import org.apache.xml.security.utils.resolver.ResourceResolverException;
+import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -47,16 +46,22 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 			return attachments.stream().anyMatch(a -> context.uriToResolve.substring(Constants.CID.length()).equals(a.getContentId()));
 		return false;
 	}
-	
+
 	@Override
 	public XMLSignatureInput engineResolveURI(ResourceResolverContext context) throws ResourceResolverException
 	{
 		if (!context.uriToResolve.startsWith(Constants.CID))
-			throw new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},context.uriToResolve,context.baseUri);
+			throw new ResourceResolverException(context.uriToResolve,
+					new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},
+					context.uriToResolve,
+					context.baseUri);
 		val result = attachments.stream()
 				.filter(a -> context.uriToResolve.substring(Constants.CID.length()).equals(a.getContentId()))
 				.findFirst()
-				.orElseThrow(() -> new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI = " + context.uriToResolve + " does not exist!"},context.uriToResolve,context.baseUri));
+				.orElseThrow(() -> new ResourceResolverException(context.uriToResolve,
+						new Object[]{"Reference URI = " + context.uriToResolve + " does not exist!"},
+						context.uriToResolve,
+						context.baseUri));
 		try
 		{
 			val input = new XMLSignatureInput(result.getInputStream());

@@ -15,13 +15,14 @@
  */
 package nl.clockwork.ebms.processor;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -37,25 +38,24 @@ import nl.clockwork.ebms.validation.ValidatorException;
 @AllArgsConstructor
 class PongProcessor
 {
-  @NonNull
+	@NonNull
 	CPAManager cpaManager;
-  @NonNull
+	@NonNull
 	EbMSMessageValidator messageValidator;
-  @NonNull
+	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
-  @NonNull
-  DeliveryManager deliveryManager;
+	@NonNull
+	DeliveryManager deliveryManager;
 
-  public EbMSPong createPong(EbMSPing message) throws ValidatorException, EbMSProcessorException
+	public EbMSPong createPong(EbMSPing message) throws ValidatorException, EbMSProcessorException
 	{
 		return ebMSMessageFactory.createEbMSPong(message);
 	}
 
-  public void sendPong(final nl.clockwork.ebms.model.EbMSPong pong)
+	public void sendPong(final nl.clockwork.ebms.model.EbMSPong pong)
 	{
 		val responseMessageHeader = pong.getMessageHeader();
-		val uri = cpaManager.getReceivingUri(
-				responseMessageHeader.getCPAId(),
+		val uri = cpaManager.getReceivingUri(responseMessageHeader.getCPAId(),
 				responseMessageHeader.getTo().getPartyId(),
 				responseMessageHeader.getTo().getRole(),
 				CPAUtils.toString(responseMessageHeader.getService()),
@@ -63,7 +63,7 @@ class PongProcessor
 		deliveryManager.sendResponseMessage(uri,pong);
 	}
 
-  public void processPong(EbMSPong pong)
+	public void processPong(EbMSPong pong)
 	{
 		try
 		{

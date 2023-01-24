@@ -15,12 +15,11 @@
  */
 package nl.clockwork.ebms.service.model;
 
-import java.io.Serializable;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +35,7 @@ import lombok.experimental.FieldDefaults;
 public class Party implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	String partyId;
 	String role;

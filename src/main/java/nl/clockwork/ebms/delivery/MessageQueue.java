@@ -15,9 +15,9 @@
  */
 package nl.clockwork.ebms.delivery;
 
+
 import java.util.LinkedHashMap;
 import java.util.Optional;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,7 +39,7 @@ public class MessageQueue<T>
 		@Setter
 		private U object;
 	}
-	
+
 	private static final float LOAD_FACTOR = .75F;
 	int timeout;
 	@NonNull
@@ -48,7 +48,7 @@ public class MessageQueue<T>
 	public MessageQueue(int maxEntries, int timeout)
 	{
 		this.timeout = timeout;
-		this.queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1, LOAD_FACTOR, true)
+		this.queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1,LOAD_FACTOR,true)
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -80,7 +80,7 @@ public class MessageQueue<T>
 		try
 		{
 			Thread.sleep(timeout);
-			//Thread.currentThread().wait(timeout);
+			// Thread.currentThread().wait(timeout);
 		}
 		catch (InterruptedException e)
 		{
@@ -102,11 +102,11 @@ public class MessageQueue<T>
 			{
 				queue.get(correlationId).setObject(object);
 				queue.get(correlationId).getThread().interrupt();
-				//queue.get(correlationId).thread.notify();
+				// queue.get(correlationId).thread.notify();
 			}
 		}
 	}
-	
+
 	public void remove(String correlationId)
 	{
 		synchronized (queue)

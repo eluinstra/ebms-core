@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
-import java.io.IOException;
 
+import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,12 +24,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.MDC;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.slf4j.MDC;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RemoteAddressMDCFilter implements Filter

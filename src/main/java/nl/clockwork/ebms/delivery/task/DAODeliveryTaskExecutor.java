@@ -15,19 +15,18 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
+import io.vavr.control.Try;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.Future;
-
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -37,12 +36,18 @@ class DAODeliveryTaskExecutor implements Runnable
 	DeliveryTaskDAO deliveryTaskDAO;
 	@NonNull
 	DeliveryTaskHandler deliveryTaskHandler;
-	@NonNull TimedTask timedTask;
+	@NonNull
+	TimedTask timedTask;
 	int maxTasks;
 	String serverId;
 
 	@Builder
-	public DAODeliveryTaskExecutor(@NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull DeliveryTaskHandler deliveryTaskHandler, @NonNull TimedTask timedTask, int maxTasks, String serverId)
+	public DAODeliveryTaskExecutor(
+			@NonNull DeliveryTaskDAO deliveryTaskDAO,
+			@NonNull DeliveryTaskHandler deliveryTaskHandler,
+			@NonNull TimedTask timedTask,
+			int maxTasks,
+			String serverId)
 	{
 		this.deliveryTaskDAO = deliveryTaskDAO;
 		this.deliveryTaskHandler = deliveryTaskHandler;
@@ -58,10 +63,10 @@ class DAODeliveryTaskExecutor implements Runnable
 
 	public void run()
 	{
-  	while (true)
+		while (true)
 		{
-  		Runnable runnable = () ->
-  		{
+			Runnable runnable = () ->
+			{
 				val futures = new ArrayList<Future<?>>();
 				try
 				{
@@ -74,15 +79,15 @@ class DAODeliveryTaskExecutor implements Runnable
 					log.error("",e);
 				}
 				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
-  		};
-  		try
-  		{
-	  		timedTask.run(runnable);
-  		}
-  		catch(Exception e)
-  		{
+			};
+			try
+			{
+				timedTask.run(runnable);
+			}
+			catch (Exception e)
+			{
 				log.error("",e);
-  		}
+			}
 		}
 	}
 }

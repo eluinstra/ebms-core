@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.util;
 
+
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
@@ -29,20 +30,17 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
-import org.apache.xml.security.encryption.XMLCipher;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
+import org.apache.xml.security.encryption.XMLCipher;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,7 +49,6 @@ public class SecurityUtils
 	private static final int KEYSIZE_192 = 192;
 	private static final int KEYSIZE_128 = 128;
 	private static final int KEYSIZE_256 = 256;
-	
 
 	public static KeyPair getKeyPair(EbMSKeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
@@ -87,7 +84,8 @@ public class SecurityUtils
 
 	private static Function<String,Optional<Certificate>> findCertificate(EbMSTrustStore trustStore)
 	{
-		return alias -> {
+		return alias ->
+		{
 			try
 			{
 				return trustStore.getCertificate(alias);
@@ -103,10 +101,10 @@ public class SecurityUtils
 	{
 		return c -> c instanceof X509Certificate && certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName());
 	}
-	
+
 	private static Predicate<? super Certificate> verifyWith(X509Certificate certificate)
 	{
-		return c -> 
+		return c ->
 		{
 			try
 			{

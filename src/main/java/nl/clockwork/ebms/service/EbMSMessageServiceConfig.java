@@ -15,9 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +26,9 @@ import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventDAO;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -51,14 +51,14 @@ public class EbMSMessageServiceConfig
 
 	@Bean
 	public EbMSMessageServiceHandler ebMSMessageServiceHandler(
-		DeliveryManager deliveryManager,
-		EbMSDAO ebMSDAO,
-		MessageEventDAO messageEventDAO,
-		CPAManager cpaManager,
-		EbMSMessageFactory ebMSMessageFactory,
-		DeliveryTaskManager deliveryTaskManager,
-		MessagePropertiesValidator messagePropertiesValidator,
-		EbMSSignatureGenerator signatureGenerator)
+			DeliveryManager deliveryManager,
+			EbMSDAO ebMSDAO,
+			MessageEventDAO messageEventDAO,
+			CPAManager cpaManager,
+			EbMSMessageFactory ebMSMessageFactory,
+			DeliveryTaskManager deliveryTaskManager,
+			MessagePropertiesValidator messagePropertiesValidator,
+			EbMSSignatureGenerator signatureGenerator)
 	{
 		return EbMSMessageServiceHandler.builder()
 				.deliveryManager(deliveryManager)

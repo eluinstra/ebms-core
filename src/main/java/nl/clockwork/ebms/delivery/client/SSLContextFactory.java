@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -23,20 +24,18 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
-
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
@@ -96,10 +95,8 @@ public class SSLContextFactory
 	SSLContext sslContext;
 
 	@Builder
-	public SSLContextFactory(
-			@NonNull EbMSKeyStore keyStore,
-			@NonNull EbMSTrustStore trustStore,
-			String clientAlias) throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException
+	public SSLContextFactory(@NonNull EbMSKeyStore keyStore, @NonNull EbMSTrustStore trustStore, String clientAlias)
+			throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException
 	{
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
@@ -144,7 +141,7 @@ public class SSLContextFactory
 	{
 		val result = sslContext.createSSLEngine();
 		result.setUseClientMode(true);
-		//result.setSSLParameters(createSSLParameters());
+		// result.setSSLParameters(createSSLParameters());
 		return result;
 	}
 }

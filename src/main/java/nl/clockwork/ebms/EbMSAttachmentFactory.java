@@ -15,23 +15,21 @@
  */
 package nl.clockwork.ebms;
 
+
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.io.CachedOutputStream;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.PlainEbMSAttachment;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.io.CachedOutputStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EbMSAttachmentFactory

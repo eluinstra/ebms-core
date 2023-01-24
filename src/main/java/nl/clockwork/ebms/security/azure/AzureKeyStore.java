@@ -15,9 +15,9 @@
  */
 package nl.clockwork.ebms.security.azure;
 
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -27,21 +27,24 @@ import nl.clockwork.ebms.security.EbMSKeyStore;
 public class AzureKeyStore
 {
 	private static EbMSKeyStore keyStore = null;
-	
-	public static EbMSKeyStore of(@NonNull String keyvaultURI, @NonNull String tennantID, @NonNull String clientID, @NonNull String clientSecret, String defaultAlias) throws GeneralSecurityException, IOException
+
+	public static EbMSKeyStore
+			of(@NonNull String keyvaultURI, @NonNull String tennantID, @NonNull String clientID, @NonNull String clientSecret, String defaultAlias)
+					throws GeneralSecurityException, IOException
 	{
 		if (keyStore == null)
 		{
-			keyStore = new EbMSKeyStore("azure", KeyStoreUtils.loadKeyStore(keyvaultURI, tennantID, clientID, clientSecret), "", defaultAlias);
+			keyStore = new EbMSKeyStore("azure",KeyStoreUtils.loadKeyStore(keyvaultURI,tennantID,clientID,clientSecret),"",defaultAlias);
 		}
 		return keyStore;
 	}
-	
-	public static EbMSKeyStore of(@NonNull String keyvaultURI, @NonNull String tennantID, @NonNull String clientID, @NonNull String clientSecret) throws GeneralSecurityException, IOException
+
+	public static EbMSKeyStore of(@NonNull String keyvaultURI, @NonNull String tennantID, @NonNull String clientID, @NonNull String clientSecret)
+			throws GeneralSecurityException, IOException
 	{
 		if (keyStore == null)
 		{
-			keyStore = new EbMSKeyStore("azure", KeyStoreUtils.loadKeyStore(keyvaultURI, tennantID, clientID, clientSecret), "", "");
+			keyStore = new EbMSKeyStore("azure",KeyStoreUtils.loadKeyStore(keyvaultURI,tennantID,clientID,clientSecret),"","");
 		}
 		return keyStore;
 	}

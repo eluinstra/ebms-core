@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -22,21 +23,18 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.net.ssl.SSLParameters;
-
-import org.apache.commons.lang3.StringUtils;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import org.apache.commons.lang3.StringUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSHttpClientFactory
@@ -78,13 +76,13 @@ public class EbMSHttpClientFactory
 		this.httpErrors = httpErrors;
 		this.certificateMapper = certificateMapper;
 		this.useClientCertificate = useClientCertificate;
-		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.toString(verifyHostnames));
+		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification",Boolean.toString(verifyHostnames));
 	}
 
 	public EbMSClient getEbMSClient(String clientAlias)
 	{
 		val key = clientAlias == null ? "" : clientAlias;
-		return clients.computeIfAbsent(key, k -> createEbMSClient(clientAlias));
+		return clients.computeIfAbsent(key,k -> createEbMSClient(clientAlias));
 	}
 
 	private EbMSClient createEbMSClient(String clientAlias)
@@ -92,7 +90,13 @@ public class EbMSHttpClientFactory
 		try
 		{
 			val sslContextFactory = createSslContextFactory(getClientAlias(clientAlias));
-			return new EbMSHttpClient(sslParameters,sslContextFactory,connectTimeout,readTimeout,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
+			return new EbMSHttpClient(sslParameters,
+					sslContextFactory,
+					connectTimeout,
+					readTimeout,
+					proxy,
+					httpErrors.getRecoverableHttpErrors(),
+					httpErrors.getUnrecoverableHttpErrors());
 		}
 		catch (Exception e)
 		{
@@ -102,18 +106,13 @@ public class EbMSHttpClientFactory
 
 	private String getClientAlias(String clientAlias)
 	{
-		return clientAlias == null && StringUtils.isNotEmpty(keyStore.getDefaultAlias())
-				? keyStore.getDefaultAlias()
-				: clientAlias;
+		return clientAlias == null && StringUtils.isNotEmpty(keyStore.getDefaultAlias()) ? keyStore.getDefaultAlias() : clientAlias;
 	}
 
-	private SSLContextFactory createSslContextFactory(String clientAlias) throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException
+	private SSLContextFactory createSslContextFactory(String clientAlias)
+			throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException
 	{
-		return SSLContextFactory.builder()
-				.keyStore(keyStore)
-				.trustStore(trustStore)
-				.clientAlias(clientAlias)
-				.build();
+		return SSLContextFactory.builder().keyStore(keyStore).trustStore(trustStore).clientAlias(clientAlias).build();
 	}
 
 	public EbMSClient getEbMSClient(String cpaId, DeliveryChannel sendDeliveryChannel)

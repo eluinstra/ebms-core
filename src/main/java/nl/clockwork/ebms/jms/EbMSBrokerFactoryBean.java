@@ -42,8 +42,7 @@ class EbMSBrokerFactoryBean implements DisposableBean
 
 	private static Resource createResource(String path)
 	{
-		return Match(path).of(
-				Case($(startsWith("classpath:")),o -> new ClassPathResource(path.substring("classpath:".length()))),
+		return Match(path).of(Case($(startsWith("classpath:")),o -> new ClassPathResource(path.substring("classpath:".length()))),
 				Case($(startsWith("file:")),o -> new FileSystemResource(path.substring("file:".length()))),
 				Case($(),o -> new FileSystemResource(path)));
 	}

@@ -15,6 +15,12 @@
  */
 package nl.clockwork.ebms.datasource;
 
+
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import com.ibm.db2.jcc.DB2XADataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.util.IsolationLevel;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
@@ -22,31 +28,22 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-
-import com.atomikos.jdbc.AtomikosDataSourceBean;
-import com.ibm.db2.jcc.DB2XADataSource;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.util.IsolationLevel;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -71,17 +68,14 @@ public class DataSourceConfig
 		ORACLE_STRICT("jdbc:oracle:",BASEPATH + "oracle.strict",true),
 		POSTGRES("jdbc:postgresql:",BASEPATH + "postgresql",false),
 		POSTGRES_STRICT("jdbc:postgresql:",BASEPATH + "postgresql.strict",true);
-		
+
 		String jdbcUrl;
 		String location;
 		boolean strict;
-		
+
 		public static Optional<String> getLocation(String jdbcUrl, boolean strict)
 		{
-			return Arrays.stream(values())
-					.filter(l -> jdbcUrl.startsWith(l.jdbcUrl) && (l.strict == strict))
-					.map(l -> l.location)
-					.findFirst();
+			return Arrays.stream(values()).filter(l -> jdbcUrl.startsWith(l.jdbcUrl) && (l.strict == strict)).map(l -> l.location).findFirst();
 		}
 	}
 
@@ -115,7 +109,7 @@ public class DataSourceConfig
 	int minPoolSize;
 	@Value("${ebms.pool.maxPoolSize}")
 	int maxPoolSize;
-	
+
 	@Bean(destroyMethod = "close")
 	@Conditional(DefaultTransactionManagerType.class)
 	public DataSource hikariDataSource()
@@ -142,7 +136,10 @@ public class DataSourceConfig
 		val result = new AtomikosDataSourceBean();
 		result.setUniqueResourceName(UUID.randomUUID().toString());
 		if (jdbcUrl.contains("db2"))
-			createDB2XADataSource().ifPresentOrElse(result::setXaDataSource,() -> { throw new IllegalStateException("Error creating DB2XADataSource"); });
+			createDB2XADataSource().ifPresentOrElse(result::setXaDataSource,() ->
+			{
+				throw new IllegalStateException("Error creating DB2XADataSource");
+			});
 		else
 		{
 			result.setXaDataSourceClassName(driverClassName);
@@ -170,7 +167,7 @@ public class DataSourceConfig
 
 	private Optional<XADataSource> createDB2XADataSource()
 	{
-		return matchJdbcUrl(jdbcUrl).map(matcher -> 
+		return matchJdbcUrl(jdbcUrl).map(matcher ->
 		{
 			val result = new DB2XADataSource();
 			result.setDatabaseName(matcher.group(3));
@@ -198,11 +195,7 @@ public class DataSourceConfig
 			val locations = Location.getLocation(jdbcUrl,updateDbStrict);
 			locations.ifPresent(l ->
 			{
-				val config = Flyway.configure()
-						.dataSource(jdbcUrl,username,password)
-						.locations(l)
-						.ignoreMigrationPatterns("*:missing")
-						.outOfOrder(true);
+				val config = Flyway.configure().dataSource(jdbcUrl,username,password).locations(l).ignoreMigrationPatterns("*:missing").outOfOrder(true);
 				config.load().migrate();
 			});
 		}
@@ -217,8 +210,8 @@ public class DataSourceConfig
 			result.put("URL",jdbcUrl);
 		else
 			result.put("url",jdbcUrl);
-    result.put("user",username);
-    result.put("password",password);
+		result.put("user",username);
+		result.put("password",password);
 		return result;
 	}
 }

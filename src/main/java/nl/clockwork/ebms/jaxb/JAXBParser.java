@@ -15,10 +15,11 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -26,20 +27,16 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -53,9 +50,9 @@ public class JAXBParser<T>
 		try
 		{
 			saxParserFactory = SAXParserFactory.newInstance();
-			saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities",false);
+			saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
+			saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
 		}
 		catch (SAXNotRecognizedException | SAXNotSupportedException | ParserConfigurationException e)
 		{
@@ -71,9 +68,7 @@ public class JAXBParser<T>
 		val r = new StringReader(xml);
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(r);
-		return o instanceof JAXBElement<?>
-				? ((JAXBElement<T>)o).getValue()
-				: (T)o;
+		return o instanceof JAXBElement<?> ? ((JAXBElement<T>)o).getValue() : (T)o;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -83,9 +78,7 @@ public class JAXBParser<T>
 			return null;
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(n);
-		return o instanceof JAXBElement<?>
-				? ((JAXBElement<T>)o).getValue()
-				: (T)o;
+		return o instanceof JAXBElement<?> ? ((JAXBElement<T>)o).getValue() : (T)o;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -98,9 +91,7 @@ public class JAXBParser<T>
 		val s = new SAXSource(parser.getXMLReader(),is);
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(s);
-		return o instanceof JAXBElement<?>
-				? ((JAXBElement<T>)o).getValue()
-				: (T)o;
+		return o instanceof JAXBElement<?> ? ((JAXBElement<T>)o).getValue() : (T)o;
 	}
 
 	public String handle(JAXBElement<T> e) throws JAXBException

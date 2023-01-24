@@ -15,18 +15,17 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.StringUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -64,7 +63,8 @@ public class URLMapper
 	{
 		return isValid(urlMapping.getSource()).map(e -> new IllegalArgumentException("Source invalid",e))
 				.orElse(() -> isValid(urlMapping.getDestination()).map(e -> new IllegalArgumentException("Destination invalid",e)))
-				.toEither(urlMapping).swap();
+				.toEither(urlMapping)
+				.swap();
 	}
 
 	private Option<MalformedURLException> isValid(String url)
@@ -86,7 +86,7 @@ public class URLMapper
 			urlMappingDAO.updateURLMapping(urlMapping);
 		else
 			urlMappingDAO.insertURLMapping(urlMapping);
-}
+	}
 
 	public int deleteURLMapping(String source)
 	{

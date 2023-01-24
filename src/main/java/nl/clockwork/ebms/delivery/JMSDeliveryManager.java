@@ -15,26 +15,21 @@
  */
 package nl.clockwork.ebms.delivery;
 
+
 import java.io.IOException;
 import java.util.Optional;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
-
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.scheduling.annotation.Async;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
@@ -44,6 +39,9 @@ import nl.clockwork.ebms.model.EbMSRequestMessage;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -78,7 +76,8 @@ public class JMSDeliveryManager extends DeliveryManager
 			else if (message.getSyncReply() == null)
 			{
 				jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
-				return Optional.ofNullable((EbMSResponseMessage)jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME,"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
+				return Optional.ofNullable((EbMSResponseMessage)jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME,
+						"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
 			}
 			return Optional.empty();
 		}
@@ -100,7 +99,7 @@ public class JMSDeliveryManager extends DeliveryManager
 		jmsTemplate.convertAndSend(JMS_DESTINATION_NAME,message,m ->
 		{
 			m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
-			//m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
+			// m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
 			return m;
 		});
 	}
@@ -114,7 +113,8 @@ public class JMSDeliveryManager extends DeliveryManager
 			log.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 			createClient(response.getMessageHeader()).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 		}
-		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError
+				| TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}

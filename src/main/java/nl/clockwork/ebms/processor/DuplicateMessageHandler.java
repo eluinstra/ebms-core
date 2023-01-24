@@ -15,15 +15,15 @@
  */
 package nl.clockwork.ebms.processor;
 
-import javax.xml.transform.TransformerException;
 
+import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -45,13 +45,13 @@ import nl.clockwork.ebms.validation.ValidationException;
 @AllArgsConstructor
 class DuplicateMessageHandler
 {
-  @NonNull
-  EbMSDAO ebMSDAO;
-  @NonNull
-  CPAManager cpaManager;
-  @NonNull
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
 	DeliveryTaskManager deliveryTaskManager;
-  @NonNull
+	@NonNull
 	EbMSMessageValidator messageValidator;
 
 	public EbMSDocument handleMessage(final EbMSMessage message) throws EbMSProcessingException
@@ -62,8 +62,7 @@ class DuplicateMessageHandler
 			log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
 			if (messageValidator.isSyncReply(message))
 			{
-				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
-						messageHeader.getCPAId(),
+				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
@@ -72,29 +71,29 @@ class DuplicateMessageHandler
 			}
 			else
 			{
-				val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
-						messageHeader.getCPAId(),
+				val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(messageProperties,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils.ifNotPresent(messageProperties,
+						() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
-				val sendDeliveryChannel =	cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,null)
-						.orElse(null);
-				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
-						.orElse(null);
+				val sendDeliveryChannel =
+						cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,null)
+								.orElse(null);
+				val receiveDeliveryChannel =
+						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
+								.orElse(null);
 				Runnable storeMessage = () ->
 				{
 					if (receiveDeliveryChannel != null && messageProperties.isPresent())
-						deliveryTaskManager.insertTask(
-								deliveryTaskManager.createNewTask(
-										messageHeader.getCPAId(),
-										sendDeliveryChannel.getChannelId(),
-										receiveDeliveryChannel.getChannelId(),
-										messageProperties.get().getMessageId(),
-										messageHeader.getMessageData().getTimeToLive(),
-										messageProperties.get().getTimestamp(),
-										false));
+						deliveryTaskManager.insertTask(deliveryTaskManager.createNewTask(messageHeader.getCPAId(),
+								sendDeliveryChannel.getChannelId(),
+								receiveDeliveryChannel.getChannelId(),
+								messageProperties.get().getMessageId(),
+								messageHeader.getMessageData().getTimeToLive(),
+								messageProperties.get().getTimestamp(),
+								false));
 				};
 				ebMSDAO.executeTransaction(storeMessage);
 				if (receiveDeliveryChannel == null && messageProperties.isPresent())
@@ -121,7 +120,7 @@ class DuplicateMessageHandler
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
-	
+
 	public void handleAcknowledgment(final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
@@ -129,7 +128,7 @@ class DuplicateMessageHandler
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
-	
+
 	private boolean isIdenticalMessage(EbMSBaseMessage message)
 	{
 		return ebMSDAO.existsIdenticalMessage(message);

@@ -15,22 +15,10 @@
  */
 package nl.clockwork.ebms;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
-import org.w3._2000._09.xmldsig.SignatureType;
-
 import static io.vavr.API.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -46,6 +34,16 @@ import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
+import org.w3._2000._09.xmldsig.SignatureType;
 
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -136,7 +134,8 @@ public class EbMSMessageBuilder
 		try
 		{
 			List<EbMSAttachment> attachments$value = this.attachments$value;
-			if (!this.attachments$set) attachments$value = new ArrayList<>();
+			if (!this.attachments$set)
+				attachments$value = new ArrayList<>();
 			if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 				return EbMSMessage.builder()
 						.messageHeader(messageHeader)
@@ -155,8 +154,10 @@ public class EbMSMessageBuilder
 						Case($(EbMSAction.PONG.getAction()),o -> new EbMSPong(messageHeader,signature)),
 						Case($(EbMSAction.STATUS_REQUEST.getAction()),o -> new EbMSStatusRequest(messageHeader,signature,syncReply,statusRequest)),
 						Case($(EbMSAction.STATUS_RESPONSE.getAction()),o -> new EbMSStatusResponse(messageHeader,signature,statusResponse)),
-						Case($(),o -> {
-							throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
+						Case($(),o ->
+						{
+							throw new EbMSProcessingException(
+									"Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
 						}));
 		}
 		catch (EbMSProcessingException e)
@@ -172,6 +173,27 @@ public class EbMSMessageBuilder
 	@java.lang.Override
 	public java.lang.String toString()
 	{
-		return "EbMSMessage.EbMSMessageBuilder(messageHeader=" + this.messageHeader + ", syncReply=" + this.syncReply + ", messageOrder=" + this.messageOrder + ", ackRequested=" + this.ackRequested + ", errorList=" + this.errorList + ", acknowledgment=" + this.acknowledgment + ", manifest=" + this.manifest + ", statusRequest=" + this.statusRequest + ", statusResponse=" + this.statusResponse + ", signature=" + this.signature + ", attachments$value=" + this.attachments$value + ")";
+		return "EbMSMessage.EbMSMessageBuilder(messageHeader=" + this.messageHeader
+				+ ", syncReply="
+				+ this.syncReply
+				+ ", messageOrder="
+				+ this.messageOrder
+				+ ", ackRequested="
+				+ this.ackRequested
+				+ ", errorList="
+				+ this.errorList
+				+ ", acknowledgment="
+				+ this.acknowledgment
+				+ ", manifest="
+				+ this.manifest
+				+ ", statusRequest="
+				+ this.statusRequest
+				+ ", statusResponse="
+				+ this.statusResponse
+				+ ", signature="
+				+ this.signature
+				+ ", attachments$value="
+				+ this.attachments$value
+				+ ")";
 	}
 }

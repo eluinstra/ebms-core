@@ -15,12 +15,11 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+
 import java.time.Instant;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import javax.xml.bind.DatatypeConverter;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;

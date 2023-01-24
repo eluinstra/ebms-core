@@ -15,12 +15,11 @@
  */
 package nl.clockwork.ebms.service.model;
 
-import java.io.Serializable;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,27 +31,27 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
-//@RequiredArgsConstructor
+// @RequiredArgsConstructor
 @AllArgsConstructor
 public class MessageRequestProperties implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	String cpaId;
-	@XmlElement(required=true)
-	//@NonNull
+	@XmlElement(required = true)
+	// @NonNull
 	String fromPartyId;
-	@XmlElement(required=true)
-	//@NonNull
+	@XmlElement(required = true)
+	// @NonNull
 	String fromRole;
 	String toPartyId;
 	String toRole;
-	@XmlElement(required=true)
-	//@NonNull
+	@XmlElement(required = true)
+	// @NonNull
 	String service;
-	@XmlElement(required=true)
-	//@NonNull
+	@XmlElement(required = true)
+	// @NonNull
 	String action;
 	String conversationId;
 	String messageId;

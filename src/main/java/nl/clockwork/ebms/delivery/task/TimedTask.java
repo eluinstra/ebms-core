@@ -15,14 +15,14 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 class TimedTask
 {
 	long executionInterval;
-	
+
 	public void run(Runnable task)
 	{
 		if (executionInterval > 0)

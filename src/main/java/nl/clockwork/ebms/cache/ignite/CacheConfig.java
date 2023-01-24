@@ -15,8 +15,12 @@
  */
 package nl.clockwork.ebms.cache.ignite;
 
-import java.io.IOException;
 
+import java.io.IOException;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.cache.SomeCacheType;
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicyFactory;
 import org.apache.ignite.cache.spring.SpringCacheManager;
 import org.apache.ignite.configuration.NearCacheConfiguration;
@@ -31,11 +35,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cache.SomeCacheType;
 
 @Configuration
 @EnableCaching
@@ -59,7 +58,7 @@ public class CacheConfig
 		return result;
 	}
 
-  private Resource getConfigLocation()
+	private Resource getConfigLocation()
 	{
 		return configLocation == null ? new ClassPathResource(DEFAULT_CONFIG_LOCATION) : configLocation;
 	}

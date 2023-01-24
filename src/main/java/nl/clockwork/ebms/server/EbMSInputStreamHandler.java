@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.server;
 
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,23 +23,15 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.MimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -47,6 +40,11 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.ValidationException;
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.MimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -54,14 +52,14 @@ import nl.clockwork.ebms.validation.ValidationException;
 public abstract class EbMSInputStreamHandler
 {
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
-  @NonNull
+	@NonNull
 	EbMSMessageProcessor messageProcessor;
 
 	public void handle(InputStream request)
 	{
-	  try
+		try
 		{
-	  	val responseDocument = handleRequest(request);
+			val responseDocument = handleRequest(request);
 			returnResponse(responseDocument);
 		}
 		catch (ValidationException e)
@@ -77,19 +75,19 @@ public abstract class EbMSInputStreamHandler
 	}
 
 	public abstract List<String> getRequestHeaderNames();
-	
+
 	public abstract List<String> getRequestHeaders(String headerName);
 
 	public abstract String getRequestHeader(String headerName);
-	
+
 	public abstract String getRequestMethod();
-	
+
 	public abstract void writeResponseStatus(int statusCode);
-	
+
 	public abstract void writeResponseHeader(String name, String value);
 
 	public abstract OutputStream getOutputStream() throws IOException;
-	
+
 	private EbMSDocument handleRequest(InputStream request) throws IOException, MimeException, ParserConfigurationException, SAXException, TransformerException
 	{
 		validateRequest();
@@ -133,7 +131,7 @@ public abstract class EbMSInputStreamHandler
 	{
 		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + "=" + h)).collect(Collectors.joining("\n"));
 	}
-	
+
 	private void returnResponse(final nl.clockwork.ebms.model.EbMSDocument responseDocument) throws TransformerException, IOException
 	{
 		if (responseDocument == null)
@@ -144,7 +142,10 @@ public abstract class EbMSInputStreamHandler
 		else
 		{
 			if (messageLog.isInfoEnabled())
-				messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\nSOAPAction={}\n{}",HttpServletResponse.SC_OK,Constants.EBMS_SOAP_ACTION,DOMUtils.toString(responseDocument.getMessage()));
+				messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\nSOAPAction={}\n{}",
+						HttpServletResponse.SC_OK,
+						Constants.EBMS_SOAP_ACTION,
+						DOMUtils.toString(responseDocument.getMessage()));
 			writeResponseStatus(HttpServletResponse.SC_OK);
 			writeResponseHeader("Content-Type","text/xml");
 			writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);

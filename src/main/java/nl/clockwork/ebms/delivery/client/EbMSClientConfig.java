@@ -15,21 +15,19 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.util.Set;
-
 import javax.net.ssl.SSLParameters;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -69,11 +67,11 @@ public class EbMSClientConfig
 	@Bean
 	@DependsOn("ebMSProxyFactory")
 	public EbMSHttpClientFactory ebMSClientFactory(
-		EbMSProxy ebMSProxy,
-		SSLParameters sslParameters,
-		@Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore,
-		EbMSTrustStore trustStore,
-		CertificateMapper certificateMapper)
+			EbMSProxy ebMSProxy,
+			SSLParameters sslParameters,
+			@Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore,
+			EbMSTrustStore trustStore,
+			CertificateMapper certificateMapper)
 	{
 		return EbMSHttpClientFactory.builder()
 				.connectTimeout(connectTimeout)
@@ -103,6 +101,6 @@ public class EbMSClientConfig
 	@Bean
 	public SSLParametersFactory sslParametersFactory()
 	{
-		return new SSLParametersFactory(enabledProtocols, enabledCipherSuites);
+		return new SSLParametersFactory(enabledProtocols,enabledCipherSuites);
 	}
 }

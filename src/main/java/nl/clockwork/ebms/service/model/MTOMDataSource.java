@@ -15,15 +15,14 @@
  */
 package nl.clockwork.ebms.service.model;
 
-import java.io.Serializable;
 
+import java.io.Serializable;
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlType;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,7 +44,7 @@ public class MTOMDataSource implements Serializable
 	private static final long serialVersionUID = 1L;
 	String contentId;
 	@XmlMimeType("application/octet-stream")
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	@ToString.Exclude
 	DataHandler attachment;

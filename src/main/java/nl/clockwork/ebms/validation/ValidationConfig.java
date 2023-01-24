@@ -15,10 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +22,10 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -43,10 +43,7 @@ public class ValidationConfig
 	}
 
 	@Bean
-	public EbMSMessageValidator messageValidator(
-			EbMSDAO ebMSDAO,
-			EbMSSignatureValidator signatureValidator,
-			EbMSMessageDecrypter messageDecrypter)
+	public EbMSMessageValidator messageValidator(EbMSDAO ebMSDAO, EbMSSignatureValidator signatureValidator, EbMSMessageDecrypter messageDecrypter)
 	{
 		return EbMSMessageValidator.builder()
 				.ebMSDAO(ebMSDAO)

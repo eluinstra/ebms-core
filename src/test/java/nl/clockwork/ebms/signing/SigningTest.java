@@ -24,24 +24,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.apache.xml.security.Init;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.MockitoAnnotations;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
@@ -63,6 +53,13 @@ import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
+import org.apache.xml.security.Init;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.MockitoAnnotations;
+import org.xml.sax.SAXException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -89,7 +86,8 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException,
+			IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
@@ -98,7 +96,8 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
@@ -108,7 +107,8 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException,
+			ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
@@ -176,11 +176,7 @@ public class SigningTest
 
 	private MessageRequestProperties createMessageProperties(String cpaId)
 	{
-		return new MessageRequestProperties(
-				cpaId,
-				new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"),
-				"urn:osb:services:osb:afleveren:1.1$1.0",
-				"afleveren");
+		return new MessageRequestProperties(cpaId,new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"),"urn:osb:services:osb:afleveren:1.1$1.0","afleveren");
 	}
 
 	private List<DataSource> createDataSources()
@@ -199,7 +195,7 @@ public class SigningTest
 
 	private javax.activation.DataSource createDataSource()
 	{
-		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8"))); 
+		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
 	}
 
 	private String createContentId(String messageId, int i)

@@ -15,24 +15,22 @@
  */
 package nl.clockwork.ebms.event;
 
-import java.util.Map;
 
+import java.util.Map;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-
-import org.springframework.jms.JmsException;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
+import org.springframework.jms.JmsException;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -99,14 +97,13 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 			throw new MessageEventException(e);
 		}
 	}
-	
+
 	@Override
 	public void onMessageFailed(String messageId) throws MessageEventException
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()),new EventMessageCreator(p)));
+			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()),new EventMessageCreator(p)));
 			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)

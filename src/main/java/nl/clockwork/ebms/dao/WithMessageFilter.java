@@ -15,12 +15,13 @@
  */
 package nl.clockwork.ebms.dao;
 
-import java.util.List;
 
+import java.util.List;
 import lombok.val;
 import nl.clockwork.ebms.service.model.MessageFilter;
 
-public interface WithMessageFilter {
+public interface WithMessageFilter
+{
 	default String getMessageFilter(MessageFilter messageFilter, List<Object> parameters)
 	{
 		val result = new StringBuilder();

@@ -24,7 +24,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -32,7 +31,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -75,7 +73,9 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		{
 			try
 			{
-				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(parseCertificate(decodeBase64(source)),parseCertificate(decodeBase64(destination)),cpaId);
+				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(parseCertificate(decodeBase64(source)),
+						parseCertificate(decodeBase64(destination)),
+						cpaId);
 			}
 			catch (CertificateException e)
 			{
@@ -84,7 +84,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		}
 	}
 
-  @NonNull
+	@NonNull
 	CertificateMapper certificateMapper;
 
 	@POST

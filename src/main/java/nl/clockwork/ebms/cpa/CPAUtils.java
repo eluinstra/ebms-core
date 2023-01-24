@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.cpa;
 
+
+import io.vavr.control.Try;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -29,9 +31,14 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import javax.xml.bind.JAXBElement;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.val;
+import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.model.FromPartyInfo;
+import nl.clockwork.ebms.model.ToPartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -47,15 +54,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
-
-import io.vavr.control.Try;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.ToPartyInfo;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CPAUtils
@@ -257,8 +255,7 @@ public class CPAUtils
 				&& !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
 		{
 			val senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
-			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null
-					? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C()
+			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C()
 					: senderNonRepudiation.getSignatureAlgorithm().get(0).getValue();
 		}
 		return null;
@@ -304,42 +301,36 @@ public class CPAUtils
 	private static Predicate<Object> isJaxbElement = o -> o instanceof JAXBElement<?>;
 	private static Predicate<Object> isX509DataType = o -> ((JAXBElement<?>)o).getValue() instanceof X509DataType;
 	private static Predicate<Object> isX509Certificate = o -> "X509Certificate".equals(((JAXBElement<?>)o).getName().getLocalPart());
-	private static Function<Object, List<Object>> toX509IssuerSerialOrX509SKIOrX509SubjectName = o -> ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName();
-	private static Function<Object, byte[]> toByteArray = o -> (byte[])((JAXBElement<?>)o).getValue();
+	private static Function<Object,List<Object>> toX509IssuerSerialOrX509SKIOrX509SubjectName =
+			o -> ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName();
+	private static Function<Object,byte[]> toByteArray = o -> (byte[])((JAXBElement<?>)o).getValue();
 
 	public static X509Certificate getX509Certificate(Certificate certificate)
 	{
 		return Optional.ofNullable(certificate)
-				.flatMap(c -> c.getKeyInfo().getContent().stream()
+				.flatMap(c -> c.getKeyInfo()
+						.getContent()
+						.stream()
 						.filter(isJaxbElement.and(isX509DataType))
 						.map(toX509IssuerSerialOrX509SKIOrX509SubjectName)
-						.flatMap(l -> l.stream()
-								.filter(isJaxbElement.and(isX509Certificate))
-								.map(toByteArray)
-								.map(ByteArrayInputStream::new)
-								.map(CPAUtils::toCertificate))
+						.flatMap(l -> l.stream().filter(isJaxbElement.and(isX509Certificate)).map(toByteArray).map(ByteArrayInputStream::new).map(CPAUtils::toCertificate))
 						.findFirst())
 				.orElse(null);
 	}
 
 	private static X509Certificate toCertificate(InputStream s)
 	{
-		return Try.of(() -> (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(s))
-				.getOrElseThrow(e -> new IllegalStateException(e));
+		return Try.of(() -> (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(s)).getOrElseThrow(e -> new IllegalStateException(e));
 	}
 
 	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
-		return headerPartyIds.stream()
-				.map(EbMSMessageUtils::toString)
-				.allMatch(anyMatchIn(cpaPartyIds));
+		return headerPartyIds.stream().map(EbMSMessageUtils::toString).allMatch(anyMatchIn(cpaPartyIds));
 	}
 
 	private static Predicate<String> anyMatchIn(List<PartyId> cpaPartyIds)
 	{
-		return headerPartyId -> cpaPartyIds.stream()
-				.map(CPAUtils::toString)
-				.anyMatch(headerPartyId::equals);
+		return headerPartyId -> cpaPartyIds.stream().map(CPAUtils::toString).anyMatch(headerPartyId::equals);
 	}
 
 }

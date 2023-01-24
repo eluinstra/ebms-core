@@ -15,9 +15,9 @@
  */
 package nl.clockwork.ebms.model;
 
+
 import java.io.Serializable;
 import java.time.Instant;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,7 +43,19 @@ public class EbMSMessageProperties implements Serializable
 	String refToMessageId;
 	EbMSMessageStatus messageStatus;
 
-	public EbMSMessageProperties(String cpaId, String fromPartyId, String fromRole, String toPartyId, String toRole, String service, String action, Instant timestamp, String conversationId, String messageId, String refToMessageId, EbMSMessageStatus messageStatus)
+	public EbMSMessageProperties(
+			String cpaId,
+			String fromPartyId,
+			String fromRole,
+			String toPartyId,
+			String toRole,
+			String service,
+			String action,
+			Instant timestamp,
+			String conversationId,
+			String messageId,
+			String refToMessageId,
+			EbMSMessageStatus messageStatus)
 	{
 		this.cpaId = cpaId;
 		this.fromParty = Party.of(fromPartyId,fromRole);

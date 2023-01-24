@@ -15,17 +15,16 @@
  */
 package nl.clockwork.ebms.validation;
 
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
-
 import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
 
 class ManifestValidator
 {
@@ -52,14 +51,12 @@ class ManifestValidator
 				throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),EbMSErrorCode.MIME_PROBLEM,"MIME part not found."));
 		}
 		else
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
 	}
 
 	private EbMSAttachment findAttachment(List<EbMSAttachment> attachments, String href)
 	{
-		return attachments.stream()
-				.filter(a -> href.substring(Constants.CID.length()).equals(a.getContentId()))
-				.findFirst()
-				.orElse(null);
+		return attachments.stream().filter(a -> href.substring(Constants.CID.length()).equals(a.getContentId())).findFirst().orElse(null);
 	}
 }
