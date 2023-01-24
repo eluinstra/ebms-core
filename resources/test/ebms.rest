@@ -1,7 +1,7 @@
 ### validateCPA
 
 POST http://localhost:8080/service/rest/v18/cpas/validate
-Content-Type: application/json
+Content-Type: text/plain
 
 <?xml version="1.0" encoding="UTF-8"?>
 <tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.https.signed" tns:version="1.0">
@@ -448,7 +448,7 @@ Content-Type: application/json
 ### insertCPA
 
 POST http://localhost:8080/service/rest/v18/cpas?overwrite=true
-Content-Type: application/json
+Content-Type: text/plain
 
 <?xml version="1.0" encoding="UTF-8"?>
 <tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.https.signed" tns:version="1.0">
@@ -892,10 +892,6 @@ Content-Type: application/json
 	</tns:Packaging>
 </tns:CollaborationProtocolAgreement>
 
-### deleteCPA
-
-DELETE http://localhost:8080/service/rest/v18/cpas/cpaStubEBF.rm.https.signed
-
 ### getCPAIds
 
 GET http://localhost:8080/service/rest/v18/cpas
@@ -903,6 +899,14 @@ GET http://localhost:8080/service/rest/v18/cpas
 ### getCPA
 
 GET http://localhost:8080/service/rest/v18/cpas/cpaStubEBF.rm.https.signed
+
+### deleteCPA
+
+DELETE http://localhost:8080/service/rest/v18/cpas/cpaStubEBF.rm.https.signed
+
+### deleteCache
+
+DELETE http://localhost:8080/service/rest/v18/cpas/cache
 
 ### setURLMapping
 
@@ -921,6 +925,10 @@ GET http://localhost:8080/service/rest/v18/urlMappings
 ### deleteURLMapping
 
 DELETE http://localhost:8080/service/rest/v18/urlMappings/http%3A%2F%2Fwww.a.com
+
+### deleteCache
+
+DELETE http://localhost:8080/service/rest/v18/urlMappings/cache
 
 ### setCertificateMapping
 
@@ -942,6 +950,10 @@ DELETE http://localhost:8080/service/rest/v18/certificateMappings
 Content-Type: application/json
 
 MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
+
+### deleteCache
+
+DELETE http://localhost:8080/service/rest/v18/certificateMappings/cache
 
 ### ping
 

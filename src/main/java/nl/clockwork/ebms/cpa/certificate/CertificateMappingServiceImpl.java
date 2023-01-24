@@ -24,6 +24,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -43,6 +44,7 @@ import nl.clockwork.ebms.jaxrs.WithService;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class CertificateMappingServiceImpl implements CertificateMappingService, WithService
 {
@@ -120,6 +122,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 
 	@DELETE
 	@Path("")
+	@Consumes(MediaType.TEXT_PLAIN)
 	public void deleteCertificateMapping(String source, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
 	{
 		try

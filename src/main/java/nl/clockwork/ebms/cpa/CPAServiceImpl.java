@@ -17,6 +17,7 @@ package nl.clockwork.ebms.cpa;
 
 
 import java.util.List;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -37,10 +38,12 @@ import nl.clockwork.ebms.jaxrs.WithService;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.XSDValidator;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class CPAServiceImpl implements CPAService, WithService
 {
@@ -52,6 +55,7 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@POST
 	@Path("validate")
+	@Consumes(MediaType.TEXT_PLAIN)
 	@Override
 	public void validateCPA(/* CollaborationProtocolAgreement */String cpa) throws CPAServiceException
 	{
@@ -63,6 +67,11 @@ public class CPAServiceImpl implements CPAService, WithService
 			log.info("Validating CPA " + parsedCpa.getCpaid());
 			cpaValidator.validate(parsedCpa);
 		}
+		catch (IllegalArgumentException e)
+		{
+			log.error("ValidateCPA\n" + cpa,e);
+			throw toServiceException(new CPABadRequestException(e));
+		}
 		catch (Exception e)
 		{
 			log.error("ValidateCPA\n" + cpa,e);
@@ -72,7 +81,8 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@POST
 	@Path("")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.TEXT_PLAIN)
+	@Produces({MediaType.TEXT_PLAIN})
 	@Override
 	public String insertCPA(/* CollaborationProtocolAgreement */String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite)
 			throws CPAServiceException
@@ -87,10 +97,15 @@ public class CPAServiceImpl implements CPAService, WithService
 			log.debug("InsertCPA done");
 			return parsedCpa.getCpaid();
 		}
+		catch (SAXException | IllegalArgumentException e)
+		{
+			log.error("ValidateCPA\n" + cpa,e);
+			throw toServiceException(new CPABadRequestException(e),MediaType.TEXT_PLAIN);
+		}
 		catch (Exception e)
 		{
 			log.error("InsertCPA\n" + cpa,e);
-			throw toServiceException(new CPAServiceException(e));
+			throw toServiceException(new CPAServiceException(e),MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -136,19 +151,24 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@GET
 	@Path("{cpaId}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.TEXT_PLAIN})
 	@Override
 	public /* CollaborationProtocolAgreement */String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
 	{
 		try
 		{
 			log.debug("GetCPAId " + cpaId);
-			return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElse(null));
+			return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElseThrow(CPANotFoundException::new));
+		}
+		catch (CPAServiceException e)
+		{
+			log.error("GetCPAId " + cpaId,e);
+			throw toServiceException(e,MediaType.TEXT_PLAIN);
 		}
 		catch (Exception e)
 		{
 			log.error("GetCPAId " + cpaId,e);
-			throw toServiceException(new CPAServiceException(e));
+			throw toServiceException(new CPAServiceException(e),MediaType.TEXT_PLAIN);
 		}
 	}
 

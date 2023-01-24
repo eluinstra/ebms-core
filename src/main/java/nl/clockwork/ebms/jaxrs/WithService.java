@@ -19,6 +19,7 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static io.vavr.Predicates.instanceOf;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -29,6 +30,7 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.val;
+import nl.clockwork.ebms.cpa.CPABadRequestException;
 import nl.clockwork.ebms.cpa.CPANotFoundException;
 import nl.clockwork.ebms.cpa.CPAServiceException;
 import nl.clockwork.ebms.cpa.certificate.CertificateMappingServiceException;
@@ -50,13 +52,19 @@ public interface WithService
 
 	default CPAServiceException toServiceException(CPAServiceException exception) throws CPAServiceException
 	{
+		return (toServiceException(exception,MediaType.APPLICATION_JSON));
+	}
+
+	default CPAServiceException toServiceException(CPAServiceException exception, String responseType) throws CPAServiceException
+	{
 		val message = PhaseInterceptorChain.getCurrentMessage();
 		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON))
+		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
+				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
 		{
-			val response =
-					Match(exception).of(Case($(instanceOf(CPANotFoundException.class)),o -> Response.status(NOT_FOUND).type(MediaType.APPLICATION_JSON).build()),
-							Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity(exception.getMessage()).build()));
+			val response = Match(exception).of(Case($(instanceOf(CPANotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
+					Case($(instanceOf(CPABadRequestException.class)),o -> Response.status(BAD_REQUEST).type(responseType).entity(exception.getMessage()).build()),
+					Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(responseType).entity(exception.getMessage()).build()));
 			throw new WebApplicationException(response);
 		}
 		else
@@ -67,7 +75,8 @@ public interface WithService
 	{
 		val message = PhaseInterceptorChain.getCurrentMessage();
 		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON))
+		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
+				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
 		{
 			val response =
 					Match(exception).of(Case($(instanceOf(CertificateNotFoundException.class)),o -> Response.status(NOT_FOUND).type(MediaType.APPLICATION_JSON).build()),
@@ -82,7 +91,8 @@ public interface WithService
 	{
 		val message = PhaseInterceptorChain.getCurrentMessage();
 		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON))
+		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
+				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
 		{
 			val response =
 					Match(exception).of(Case($(instanceOf(URLNotFoundException.class)),o -> Response.status(NOT_FOUND).type(MediaType.APPLICATION_JSON).build()),
@@ -97,7 +107,8 @@ public interface WithService
 	{
 		val message = PhaseInterceptorChain.getCurrentMessage();
 		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON))
+		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
+				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
 		{
 			val response = Match(exception).of(Case($(instanceOf(NotFoundException.class)),o -> Response.status(NOT_FOUND).type(MediaType.APPLICATION_JSON).build()),
 					Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity(exception.getMessage()).build()));

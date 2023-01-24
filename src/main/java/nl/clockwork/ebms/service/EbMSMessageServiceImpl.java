@@ -56,6 +56,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 {

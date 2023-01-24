@@ -17,6 +17,7 @@ package nl.clockwork.ebms.cpa.url;
 
 
 import java.util.List;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -34,6 +35,7 @@ import nl.clockwork.ebms.jaxrs.WithService;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class URLMappingServiceImpl implements URLMappingService, WithService
 {
