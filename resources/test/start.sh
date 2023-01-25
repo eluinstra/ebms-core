@@ -1,1 +1,1 @@
-java -Djavax.net.ssl.trustStore= -Debms.jdbc.update=true -cp ebms-admin-2.17.3.jar nl.clockwork.ebms.admin.StartEmbedded -hsqldb -soap
+java -Djavax.net.ssl.trustStore= -Debms.jdbc.update=true -cp ebms-admin-2.17.3.jar nl.clockwork.ebms.admin.StartEmbedded -soap

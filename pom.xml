@@ -82,51 +82,44 @@
     </snapshotRepository>
   </distributionManagement>
   <properties>
-    <activemq.version>5.17.2</activemq.version>
     <checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
     <checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <httpclient.version>4.5.13</httpclient.version>
     <jdk.version>11</jdk.version>
-    <junit.jupiter.version>5.9.1</junit.jupiter.version>
-    <lombok.version>1.18.24</lombok.version>
-    <mapstruct.version>1.5.3.Final</mapstruct.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring.version>5.3.23</spring.version>
-    <surefire.version>3.0.0-M5</surefire.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
-        <version>2.14.0</version>
+        <version>2.14.1</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.14.0</version>
+        <version>2.14.1</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.14.0</version>
+        <version>2.14.1</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jsr310</artifactId>
-        <version>2.14.0</version>
+        <version>2.14.1</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.3</version>
+        <version>2.0.6</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.4.0</version>
+        <version>6.5.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -134,7 +127,7 @@
     <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>apache-mime4j-core</artifactId>
-      <version>0.8.8</version>
+      <version>0.8.9</version>
     </dependency>
     <dependency>
       <groupId>com.azure</groupId>
@@ -165,16 +158,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>31.1-jre</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>${httpclient.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpmime</artifactId>
-      <version>${httpclient.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ignite</groupId>
@@ -231,13 +214,13 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
+      <version>1.18.24</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
-      <version>${mapstruct.version}</version>
+      <version>1.5.3.Final</version>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
@@ -248,7 +231,7 @@
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
-      <version>2.9.2</version>
+      <version>2.9.5</version>
     </dependency>
     <dependency>
       <groupId>com.atomikos</groupId>
@@ -273,37 +256,37 @@
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-broker</artifactId>
-      <version>${activemq.version}</version>
+      <version>5.17.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-client</artifactId>
-      <version>${activemq.version}</version>
+      <version>5.17.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-kahadb-store</artifactId>
-      <version>${activemq.version}</version>
+      <version>5.17.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-spring</artifactId>
-      <version>${activemq.version}</version>
+      <version>5.17.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-core</artifactId>
-      <version>3.5.4</version>
+      <version>3.5.5</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-      <version>3.5.4</version>
+      <version>3.5.5</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -315,7 +298,7 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
-      <version>9.8.1</version>
+      <version>9.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -345,49 +328,49 @@
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>3.0.9</version>
+      <version>3.1.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>11.2.1.jre8</version>
+      <version>11.2.3.jre11</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
-      <artifactId>ojdbc8</artifactId>
-      <version>18.3.0.0</version>
+      <artifactId>ojdbc11</artifactId>
+      <version>21.8.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.5.0</version>
+      <version>42.5.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
-      <version>${spring.version}</version>
+      <version>5.3.25</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>${spring.version}</version>
+      <version>5.3.25</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jms</artifactId>
-      <version>${spring.version}</version>
+      <version>5.3.25</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>${spring.version}</version>
+      <version>5.3.25</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -399,7 +382,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.23.1</version>
+      <version>3.24.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -411,25 +394,25 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit.jupiter.version}</version>
+      <version>5.9.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.jupiter.version}</version>
+      <version>5.9.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>${junit.jupiter.version}</version>
+      <version>5.9.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>4.8.1</version>
+      <version>4.11.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -520,7 +503,7 @@
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-              <version>${lombok.version}</version>
+              <version>1.18.24</version>
             </path>
             <path>
               <groupId>org.projectlombok</groupId>
@@ -530,7 +513,7 @@
             <path>
               <groupId>org.mapstruct</groupId>
               <artifactId>mapstruct-processor</artifactId>
-              <version>${mapstruct.version}</version>
+              <version>1.5.3.Final</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -642,7 +625,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${surefire.version}</version>
+        <version>3.0.0-M5</version>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -740,16 +723,13 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
-        <version>2.13.0</version>
+        <version>2.14.2</version>
         <configuration>
           <excludes>
             <exclude>com.microsoft.sqlserver:mssql-jdbc</exclude>
             <exclude>com.sun.xml.bind:jaxb-core</exclude>
             <exclude>com.sun.xml.bind:jaxb-impl</exclude>
             <exclude>javax.xml.bind:jaxb-api</exclude>
-            <exclude>org.postgresql:postgresql</exclude>
-            <exclude>org.junit.jupiter:junit-jupiter-api</exclude>
-            <exclude>org.junit.jupiter:junit-jupiter-engine</exclude>
             <exclude>io.vavr:vavr</exclude>
           </excludes>
         </configuration>
@@ -845,7 +825,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>${surefire.version}</version>
+        <version>3.0.0-M5</version>
       </plugin>
       <plugin>
         <groupId>com.github.spotbugs</groupId>
