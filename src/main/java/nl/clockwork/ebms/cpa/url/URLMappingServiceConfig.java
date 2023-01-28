@@ -35,6 +35,12 @@ public class URLMappingServiceConfig
 	}
 
 	@Bean
+	public URLMappingRestService urlMappingRestService(URLMappingService mappingService)
+	{
+		return new URLMappingRestService((URLMappingServiceImpl)mappingService);
+	}
+
+	@Bean
 	public URLMapper urlMapper(DataSource dataSource)
 	{
 		return new URLMapper(urlMappingDAO(dataSource));

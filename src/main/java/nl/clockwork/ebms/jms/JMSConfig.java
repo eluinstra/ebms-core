@@ -34,6 +34,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.jms.connection.JmsTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -70,6 +72,13 @@ public class JMSConfig
 		val result = new PooledConnectionFactory(jmsBrokerUrl);
 		result.setMaxConnections(maxPoolSize);
 		return result;
+	}
+
+	@Bean("jmsTransactionManager")
+	@Conditional(DefaultTransactionManagerType.class)
+	public PlatformTransactionManager jmsTransactionManager(ConnectionFactory connectionFactory)
+	{
+		return new JmsTransactionManager(connectionFactory);
 	}
 
 	@Bean(initMethod = "init", destroyMethod = "close")

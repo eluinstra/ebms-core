@@ -16,10 +16,10 @@
     limitations under the License.
 
 -->
-<tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.https.signed.encrypted" tns:version="1.0">
+<tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.be.https.signed" tns:version="1.0">
 	<tns:Status tns:value="agreed" />
 	<tns:Start>2011-01-01T00:00:00Z</tns:Start>
-	<tns:End>2021-01-01T00:00:00Z</tns:End>
+	<tns:End>2031-01-01T00:00:00Z</tns:End>
 	<tns:PartyInfo tns:partyName="Logius" tns:defaultMshChannelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:defaultMshPackageId="MshSignalPackage">
 		<tns:PartyId tns:type="urn:osb:oin">00000000000000000000</tns:PartyId>
 		<tns:PartyRef xlink:href="" />
@@ -30,15 +30,15 @@
 				<tns:Service tns:type="urn:osb:services">osb:afleveren:1.1$1.0</tns:Service>
 				<tns:CanSend>
 					<tns:ThisPartyActionBinding tns:id="DIGIPOORT_S_Afleveren" tns:action="afleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>OVERHEID_R_Afleveren</tns:OtherPartyActionBinding>
 				</tns:CanSend>
 				<tns:CanReceive>
 					<tns:ThisPartyActionBinding tns:id="DIGIPOORT_R_BevestigAfleveren" tns:action="bevestigAfleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>OVERHEID_S_BevestigAfleveren</tns:OtherPartyActionBinding>
 				</tns:CanReceive>
@@ -51,15 +51,15 @@
 				<tns:Service tns:type="urn:osb:services">osb:aanleveren:1.1$1.0</tns:Service>
 				<tns:CanSend>
 					<tns:ThisPartyActionBinding tns:id="DIGIPOORT_S_BevestigAanleveren" tns:action="bevestigAanleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>OVERHEID_R_BevestigAanleveren</tns:OtherPartyActionBinding>
 				</tns:CanSend>
 				<tns:CanReceive>
 					<tns:ThisPartyActionBinding tns:id="DIGIPOORT_R_Aanleveren" tns:action="aanleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>OVERHEID_S_Aanleveren</tns:OtherPartyActionBinding>
 				</tns:CanReceive>
@@ -153,11 +153,8 @@
 				<tns:AnchorCertificateRef tns:certId="DIGIPOORT_ClientCert" />
 			</tns:TrustAnchors>
 		</tns:SecurityDetails>
-		<tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="DIGIPOORT_SIGNED_ENCRYPTED_BestEffort" tns:transportId="DIGIPOORT_transport_HTTPS">
+		<tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="DIGIPOORT_SIGNED_BestEffort" tns:transportId="DIGIPOORT_transport_HTTPS">
 			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never" />
-		</tns:DeliveryChannel>
-		<tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned" tns:docExchangeId="DIGIPOORT_SIGNED_ENCRYPTED_ReliableMessaging" tns:transportId="DIGIPOORT_transport_HTTPS">
-			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="always" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="always" />
 		</tns:DeliveryChannel>
 		<tns:Transport tns:transportId="DIGIPOORT_transport_HTTPS">
 			<tns:TransportSender>
@@ -178,7 +175,7 @@
 				</tns:TransportServerSecurity>
 			</tns:TransportReceiver>
 		</tns:Transport>
-		<tns:DocExchange tns:docExchangeId="DIGIPOORT_SIGNED_ENCRYPTED_BestEffort">
+		<tns:DocExchange tns:docExchangeId="DIGIPOORT_SIGNED_BestEffort">
 			<tns:ebXMLSenderBinding tns:version="2.0">
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
@@ -186,11 +183,6 @@
 					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
 					<tns:SigningCertificateRef tns:certId="DIGIPOORT_SigningCert" />
 				</tns:SenderNonRepudiation>
-				<tns:SenderDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionSecurityDetailsRef tns:securityId="DIGIPOORT_Security"/>
-				</tns:SenderDigitalEnvelope>
 			</tns:ebXMLSenderBinding>
 			<tns:ebXMLReceiverBinding tns:version="2.0">
 				<tns:ReceiverNonRepudiation>
@@ -199,51 +191,6 @@
 					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
 					<tns:SigningSecurityDetailsRef tns:securityId="DIGIPOORT_Security" />
 				</tns:ReceiverNonRepudiation>
-				<tns:ReceiverDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionCertificateRef tns:certId="DIGIPOORT_EncryptionCert"/>
-				</tns:ReceiverDigitalEnvelope>
-			</tns:ebXMLReceiverBinding>
-		</tns:DocExchange>
-		<tns:DocExchange tns:docExchangeId="DIGIPOORT_SIGNED_ENCRYPTED_ReliableMessaging">
-			<tns:ebXMLSenderBinding tns:version="2.0">
-				<tns:ReliableMessaging>
-					<tns:Retries>5</tns:Retries>
-					<tns:RetryInterval>PT5M</tns:RetryInterval>
-					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
-				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT30M</tns:PersistDuration>
-				<tns:SenderNonRepudiation>
-					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
-					<tns:SigningCertificateRef tns:certId="DIGIPOORT_SigningCert" />
-				</tns:SenderNonRepudiation>
-				<tns:SenderDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionSecurityDetailsRef tns:securityId="DIGIPOORT_Security"/>
-				</tns:SenderDigitalEnvelope>
-			</tns:ebXMLSenderBinding>
-			<tns:ebXMLReceiverBinding tns:version="2.0">
-				<tns:ReliableMessaging>
-					<tns:Retries>5</tns:Retries>
-					<tns:RetryInterval>PT5M</tns:RetryInterval>
-					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
-				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT30M</tns:PersistDuration>
-				<tns:ReceiverNonRepudiation>
-					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
-					<tns:SigningSecurityDetailsRef tns:securityId="DIGIPOORT_Security" />
-				</tns:ReceiverNonRepudiation>
-				<tns:ReceiverDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionCertificateRef tns:certId="DIGIPOORT_EncryptionCert"/>
-				</tns:ReceiverDigitalEnvelope>
 			</tns:ebXMLReceiverBinding>
 		</tns:DocExchange>
 	</tns:PartyInfo>
@@ -257,15 +204,15 @@
 				<tns:Service tns:type="urn:osb:services">osb:afleveren:1.1$1.0</tns:Service>
 				<tns:CanSend>
 					<tns:ThisPartyActionBinding tns:id="OVERHEID_S_BevestigAfleveren" tns:action="bevestigAfleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>DIGIPOORT_R_BevestigAfleveren</tns:OtherPartyActionBinding>
 				</tns:CanSend>
 				<tns:CanReceive>
 					<tns:ThisPartyActionBinding tns:id="OVERHEID_R_Afleveren" tns:action="afleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>DIGIPOORT_S_Afleveren</tns:OtherPartyActionBinding>
 				</tns:CanReceive>
@@ -278,15 +225,15 @@
 				<tns:Service tns:type="urn:osb:services">osb:aanleveren:1.1$1.0</tns:Service>
 				<tns:CanSend>
 					<tns:ThisPartyActionBinding tns:id="OVERHEID_S_Aanleveren" tns:action="aanleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>DIGIPOORT_R_Aanleveren</tns:OtherPartyActionBinding>
 				</tns:CanSend>
 				<tns:CanReceive>
 					<tns:ThisPartyActionBinding tns:id="OVERHEID_R_BevestigAanleveren" tns:action="bevestigAanleveren" tns:packageId="XMLMessagePackage">
-						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient-and-persistent" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
-						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</tns:ChannelId>
+						<tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent" />
+						<tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
 					</tns:ThisPartyActionBinding>
 					<tns:OtherPartyActionBinding>DIGIPOORT_S_BevestigAanleveren</tns:OtherPartyActionBinding>
 				</tns:CanReceive>
@@ -380,11 +327,8 @@
 				<tns:AnchorCertificateRef tns:certId="OVERHEID_ClientCert" />
 			</tns:TrustAnchors>
 		</tns:SecurityDetails>
-		<tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="OVERHEID_SIGNED_ENCRYPTED_BestEffort" tns:transportId="OVERHEID_transport_HTTPS">
+		<tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="OVERHEID_SIGNED_BestEffort" tns:transportId="OVERHEID_transport_HTTPS">
 			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never" />
-		</tns:DeliveryChannel>
-		<tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned" tns:docExchangeId="OVERHEID_SIGNED_ENCRYPTED_ReliableMessaging" tns:transportId="OVERHEID_transport_HTTPS">
-			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="always" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="always" />
 		</tns:DeliveryChannel>
 		<tns:Transport tns:transportId="OVERHEID_transport_HTTPS">
 			<tns:TransportSender>
@@ -405,7 +349,7 @@
 				</tns:TransportServerSecurity>
 			</tns:TransportReceiver>
 		</tns:Transport>
-		<tns:DocExchange tns:docExchangeId="OVERHEID_SIGNED_ENCRYPTED_BestEffort">
+		<tns:DocExchange tns:docExchangeId="OVERHEID_SIGNED_BestEffort">
 			<tns:ebXMLSenderBinding tns:version="2.0">
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
@@ -413,11 +357,6 @@
 					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
 					<tns:SigningCertificateRef tns:certId="OVERHEID_SigningCert" />
 				</tns:SenderNonRepudiation>
-				<tns:SenderDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionSecurityDetailsRef tns:securityId="OVERHEID_Security"/>
-				</tns:SenderDigitalEnvelope>
 			</tns:ebXMLSenderBinding>
 			<tns:ebXMLReceiverBinding tns:version="2.0">
 				<tns:ReceiverNonRepudiation>
@@ -426,53 +365,6 @@
 					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
 					<tns:SigningSecurityDetailsRef tns:securityId="OVERHEID_Security" />
 				</tns:ReceiverNonRepudiation>
-				<tns:ReceiverDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionCertificateRef tns:certId="OVERHEID_EncryptionCert"/>
-				</tns:ReceiverDigitalEnvelope>
-			</tns:ebXMLReceiverBinding>
-		</tns:DocExchange>
-		<tns:DocExchange tns:docExchangeId="OVERHEID_SIGNED_ENCRYPTED_ReliableMessaging">
-			<tns:ebXMLSenderBinding tns:version="2.0">
-				<tns:ReliableMessaging>
-					<tns:Retries>5</tns:Retries>
-					<tns:RetryInterval>PT5M</tns:RetryInterval>
-					<tns:MessageOrderSemantics>NotGuaranteed
-					</tns:MessageOrderSemantics>
-				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT30M</tns:PersistDuration>
-				<tns:SenderNonRepudiation>
-					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
-					<tns:SigningCertificateRef tns:certId="OVERHEID_SigningCert" />
-				</tns:SenderNonRepudiation>
-				<tns:SenderDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionSecurityDetailsRef tns:securityId="OVERHEID_Security"/>
-				</tns:SenderDigitalEnvelope>
-			</tns:ebXMLSenderBinding>
-			<tns:ebXMLReceiverBinding tns:version="2.0">
-				<tns:ReliableMessaging>
-					<tns:Retries>5</tns:Retries>
-					<tns:RetryInterval>PT5M</tns:RetryInterval>
-					<tns:MessageOrderSemantics>NotGuaranteed
-					</tns:MessageOrderSemantics>
-				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT30M</tns:PersistDuration>
-				<tns:ReceiverNonRepudiation>
-					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
-					<tns:SigningSecurityDetailsRef tns:securityId="OVERHEID_Security" />
-				</tns:ReceiverNonRepudiation>
-				<tns:ReceiverDigitalEnvelope>
-					<tns:DigitalEnvelopeProtocol tns:version="1.0">XMLENC</tns:DigitalEnvelopeProtocol>
-					<tns:EncryptionAlgorithm tns:w3c="http://www.w3.org/2001/04/xmlenc#aes256-cbc" tns:minimumStrength="256" tns:oid="2.16.840.1.101.3.4.1.42">http://www.w3.org/2001/04/xmlenc#aes256-cbc</tns:EncryptionAlgorithm>
-					<tns:EncryptionCertificateRef tns:certId="OVERHEID_EncryptionCert"/>
-				</tns:ReceiverDigitalEnvelope>
 			</tns:ebXMLReceiverBinding>
 		</tns:DocExchange>
 	</tns:PartyInfo>

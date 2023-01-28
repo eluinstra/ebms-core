@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.service;
 
-public class CPABadRequestException extends CPAServiceException
+
+import javax.xml.ws.Endpoint;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class EbMSEndpointConfig
 {
-	private static final long serialVersionUID = 1L;
-
-	public CPABadRequestException(Throwable throwable)
+	@Bean
+	Endpoint publishEndpoint(EbMSMessageService messageService)
 	{
-		super(throwable);
+		return Endpoint.publish("http://localhost:8080/service/ebms",messageService);
 	}
 }

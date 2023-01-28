@@ -17,94 +17,114 @@ package nl.clockwork.ebms.cpa.url;
 
 
 import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.jaxrs.WithService;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public class URLMappingServiceImpl implements URLMappingService, WithService
+public class URLMappingServiceImpl implements URLMappingService
 {
 	@NonNull
 	URLMapper urlMapper;
 
-	@POST
-	@Path("")
 	@Override
 	public void setURLMapping(URLMapping urlMapping) throws URLMappingServiceException
 	{
 		try
 		{
-			if (log.isDebugEnabled())
-				log.debug("SetURLMapping " + urlMapping);
-			urlMapper.setURLMapping(urlMapping);
+			setURLMappingImpl(urlMapping);
+		}
+		catch (URLMappingServiceException e)
+		{
+			log.error("SetURLMapping " + urlMapping,e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("SetURLMapping " + urlMapping,e);
-			throw toServiceException(new URLMappingServiceException(e));
+			throw new URLMappingServiceException(e);
 		}
 	}
 
-	@DELETE
-	@Path("{id}")
+	protected void setURLMappingImpl(URLMapping urlMapping)
+	{
+		if (log.isDebugEnabled())
+			log.debug("SetURLMapping " + urlMapping);
+		urlMapper.setURLMapping(urlMapping);
+	}
+
 	@Override
-	public void deleteURLMapping(@PathParam("id") String source) throws URLMappingServiceException
+	public void deleteURLMapping(String source) throws URLMappingServiceException
 	{
 		try
 		{
-			log.debug("DeleteURLMapping " + source);
-			if (urlMapper.deleteURLMapping(source) == 0)
-				throw new URLNotFoundException();
+			deleteURLMappingImpl(source);
 		}
 		catch (URLMappingServiceException e)
 		{
 			log.error("DeleteURLMapping " + source,e);
-			throw toServiceException(e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("DeleteURLMapping " + source,e);
-			throw toServiceException(new URLMappingServiceException(e));
+			throw new URLMappingServiceException(e);
 		}
 	}
 
-	@GET
-	@Path("")
+	protected void deleteURLMappingImpl(String source)
+	{
+		log.debug("DeleteURLMapping " + source);
+		if (urlMapper.deleteURLMapping(source) == 0)
+			throw new URLNotFoundException();
+	}
+
 	@Override
 	public List<URLMapping> getURLMappings() throws URLMappingServiceException
 	{
 		try
 		{
-			log.debug("GetURLMappings");
-			return urlMapper.getURLs();
+			return getURLMappingsImpl();
+		}
+		catch (URLMappingServiceException e)
+		{
+			log.error("GetURLMappings",e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("GetURLMappings",e);
-			throw toServiceException(new URLMappingServiceException(e));
+			throw new URLMappingServiceException(e);
 		}
 	}
 
-	@DELETE
-	@Path("cache")
+	protected List<URLMapping> getURLMappingsImpl()
+	{
+		log.debug("GetURLMappings");
+		return urlMapper.getURLs();
+	}
+
 	@Override
 	public void deleteCache()
 	{
+		try
+		{
+			deleteCacheImpl();
+		}
+		catch (Exception e)
+		{
+			log.error("DeleteCache",e);
+			throw new URLMappingServiceException(e);
+		}
+	}
+
+	protected void deleteCacheImpl()
+	{
+		log.debug("DeleteCache");
 		urlMapper.deleteCache();
 	}
 }

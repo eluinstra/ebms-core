@@ -13,34 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms;
 
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.validation.CPAValidator;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 @Configuration
+@PropertySource(value = {"classpath:nl/clockwork/ebms/default.properties"}, ignoreResourceNotFound = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CPAServiceConfig
+public class PropertiesConfig
 {
-	@Bean
-	public CPAValidator cpaValidator(CPAManager cpaManager)
-	{
-		return new CPAValidator(cpaManager);
-	}
-
-	@Bean
-	public CPAService cpaService(CPAManager cpaManager, CPAValidator cpaValidator)
-	{
-		return new CPAServiceImpl(cpaManager,cpaValidator);
-	}
-
-	@Bean
-	public CPARestService cpaRestService(CPAService cpaService)
-	{
-		return new CPARestService((CPAServiceImpl)cpaService);
-	}
 }

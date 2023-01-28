@@ -50,6 +50,12 @@ public class EbMSMessageServiceConfig
 	}
 
 	@Bean
+	public EbMSMessageRestService ebMSMessageRestService(EbMSMessageServiceHandler ebMSMessageServiceHandler)
+	{
+		return new EbMSMessageRestService(ebMSMessageServiceHandler);
+	}
+
+	@Bean
 	public EbMSMessageServiceHandler ebMSMessageServiceHandler(
 			DeliveryManager deliveryManager,
 			EbMSDAO ebMSDAO,

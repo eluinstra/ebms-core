@@ -16,31 +16,16 @@
 package nl.clockwork.ebms.cpa;
 
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.validation.CPAValidator;
+import javax.xml.ws.Endpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class CPAServiceConfig
+public class CPAEndpointConfig
 {
 	@Bean
-	public CPAValidator cpaValidator(CPAManager cpaManager)
+	Endpoint publishEndpoint(CPAService cpaService)
 	{
-		return new CPAValidator(cpaManager);
-	}
-
-	@Bean
-	public CPAService cpaService(CPAManager cpaManager, CPAValidator cpaValidator)
-	{
-		return new CPAServiceImpl(cpaManager,cpaValidator);
-	}
-
-	@Bean
-	public CPARestService cpaRestService(CPAService cpaService)
-	{
-		return new CPARestService((CPAServiceImpl)cpaService);
+		return Endpoint.publish("http://localhost:8080/service/cpa",cpaService);
 	}
 }

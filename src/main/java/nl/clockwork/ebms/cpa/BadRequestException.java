@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service;
+package nl.clockwork.ebms.cpa;
 
-
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-
-public class NotFoundException extends EbMSProcessingException
+public class BadRequestException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
-	public NotFoundException()
+	public BadRequestException(Throwable throwable)
 	{
-		super("Not found");
+		super(throwable);
 	}
-
-	public NotFoundException(String message)
-	{
-		super(message);
-	}
-
 }

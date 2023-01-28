@@ -16,72 +16,41 @@
 package nl.clockwork.ebms.service;
 
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.event.MessageEventType;
-import nl.clockwork.ebms.jaxrs.WithService;
-import nl.clockwork.ebms.service.model.MTOMDataSource;
-import nl.clockwork.ebms.service.model.MTOMMessage;
-import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
-import nl.clockwork.ebms.service.model.MessageProperties;
 import nl.clockwork.ebms.service.model.MessageRequest;
-import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import nl.clockwork.ebms.service.model.MessageStatus;
-import nl.clockwork.ebms.service.model.Party;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
+public class EbMSMessageServiceImpl implements EbMSMessageService
 {
 	@NonNull
 	EbMSMessageServiceHandler serviceHandler;
 
-	@POST
-	@Path("ping/{cpaId}/from/{fromPartyId}/to/{toPartyId}")
 	@Override
-	public void ping(@PathParam("cpaId") String cpaId, @PathParam("fromPartyId") String fromPartyId, @PathParam("toPartyId") String toPartyId)
-			throws EbMSMessageServiceException
+	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
 	{
 		try
 		{
 			serviceHandler.ping(cpaId,fromPartyId,toPartyId);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("Ping " + cpaId,e);
+			throw new EbMSMessageServiceException(e);
 		}
 	}
 
-	@POST
-	@Path("messages")
-	@Produces(MediaType.TEXT_PLAIN)
 	@Override
 	public String sendMessage(MessageRequest messageRequest) throws EbMSMessageServiceException
 	{
@@ -89,78 +58,25 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		{
 			return serviceHandler.sendMessage(messageRequest);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("SendMessage " + messageRequest,e);
+			throw new EbMSMessageServiceException(e);
 		}
 	}
 
-	@POST
-	@Path("messages/mtom")
-	@Produces(MediaType.TEXT_PLAIN)
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public String sendMessage(@Multipart("requestProperties") MessageRequestProperties requestProperties, @Multipart("attachment") List<Attachment> attachments)
-			throws EbMSMessageServiceException
-	{
-		try
-		{
-			return serviceHandler
-					.sendMessageMTOM(new MTOMMessageRequest(requestProperties,attachments.stream().map(toMTOMDataSource()).collect(Collectors.toList())));
-		}
-		catch (EbMSMessageServiceException e)
-		{
-			throw toServiceException(e);
-		}
-	}
-
-	private Function<Attachment,MTOMDataSource> toMTOMDataSource()
-	{
-		return attachment -> new MTOMDataSource(attachment.getContentId(),attachment.getDataHandler());
-	}
-
-	@PUT
-	@Path("messages/{messageId}")
-	@Produces(MediaType.TEXT_PLAIN)
 	@Override
-	public String resendMessage(@PathParam("messageId") String messageId) throws EbMSMessageServiceException
+	public String resendMessage(String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
 			return serviceHandler.resendMessage(messageId);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("ResendMessage {}",messageId);
+			throw new EbMSMessageServiceException(e);
 		}
-	}
-
-	@GET
-	@Path("messages/unprocessed")
-	public List<String> getUnprocessedMessageIds(
-			@QueryParam("cpaId") String cpaId,
-			@QueryParam("fromPartyId") String fromPartyId,
-			@QueryParam("fromRole") String fromRole,
-			@QueryParam("toPartyId") String toPartyId,
-			@QueryParam("toRole") String toRole,
-			@QueryParam("service") String service,
-			@QueryParam("action") String action,
-			@QueryParam("conversationId") String conversationId,
-			@QueryParam("messageId") String messageId,
-			@QueryParam("refToMessageId") String refToMessageId,
-			@QueryParam("maxNr") @DefaultValue("0") Integer maxNr) throws EbMSMessageServiceException
-	{
-		return getUnprocessedMessageIds(
-				MessageFilter.builder()
-						.cpaId(cpaId)
-						.fromParty(fromPartyId == null ? null : new Party(fromPartyId,fromRole))
-						.toParty(toPartyId == null ? null : new Party(toPartyId,toRole))
-						.service(service)
-						.action(action)
-						.conversationId(conversationId)
-						.messageId(messageId)
-						.refToMessageId(refToMessageId)
-						.build(),
-				maxNr);
 	}
 
 	@Override
@@ -170,118 +86,53 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		{
 			return serviceHandler.getUnprocessedMessageIds(messageFilter,maxNr);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("GetMessageIds " + messageFilter,e);
+			throw new EbMSMessageServiceException(e);
 		}
 	}
 
-	@GET
-	@Path("messages/{messageId}")
 	@Override
-	public Message getMessage(@PathParam("messageId") final String messageId, @QueryParam("process") @DefaultValue("false") Boolean process)
-			throws EbMSMessageServiceException
+	public Message getMessage(String messageId, Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
 			return serviceHandler.getMessage(messageId,process);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("GetMessage " + messageId,e);
+			throw new EbMSMessageServiceException(e);
 		}
 	}
 
-	@GET
-	@Path("messages/mtom/{messageId}")
-	@Produces(MediaType.MULTIPART_FORM_DATA)
-	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @QueryParam("process") @DefaultValue("false") Boolean process)
-			throws EbMSMessageServiceException
-	{
-		try
-		{
-			return toMultipartBody(serviceHandler.getMessageMTOM(messageId,process));
-		}
-		catch (EbMSMessageServiceException e)
-		{
-			throw toServiceException(e);
-		}
-	}
-
-	private MultipartBody toMultipartBody(MTOMMessage message)
-	{
-		val attachments = new LinkedList<Attachment>();
-		attachments.add(toAttachment(message.getProperties()));
-		attachments.addAll(message.getDataSources().stream().map(this::toAttachment).collect(Collectors.toList()));
-		return new MultipartBody(attachments,true);
-	}
-
-	private Attachment toAttachment(MessageProperties messageProperties)
-	{
-		return new Attachment("properties","application/json",messageProperties);
-	}
-
-	private Attachment toAttachment(MTOMDataSource dataSource)
-	{
-		return new Attachment(dataSource.getContentId(),dataSource.getAttachment(),new MultivaluedHashMap<>());
-	}
-
-	@PATCH
-	@Path("messages/{messageId}")
 	@Override
-	public void processMessage(@PathParam("messageId") final String messageId) throws EbMSMessageServiceException
+	public void processMessage(String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
 			serviceHandler.processMessage(messageId);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("ProcessMessage " + messageId,e);
+			throw new EbMSMessageServiceException(e);
 		}
 	}
 
-	@GET
-	@Path("messages/{messageId}/status")
 	@Override
-	public MessageStatus getMessageStatus(@PathParam("messageId") String messageId) throws EbMSMessageServiceException
+	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
 			return serviceHandler.getMessageStatus(messageId);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("GetMessageStatus " + messageId,e);
+			throw new EbMSMessageServiceException(e);
 		}
-	}
-
-	@GET
-	@Path("events/unprocessed")
-	public List<MessageEvent> getUnprocessedMessageEvents(
-			@QueryParam("cpaId") String cpaId,
-			@QueryParam("fromPartyId") String fromPartyId,
-			@QueryParam("fromRole") String fromRole,
-			@QueryParam("toPartyId") String toPartyId,
-			@QueryParam("toRole") String toRole,
-			@QueryParam("service") String service,
-			@QueryParam("action") String action,
-			@QueryParam("conversationId") String conversationId,
-			@QueryParam("messageId") String messageId,
-			@QueryParam("refToMessageId") String refToMessageId,
-			@QueryParam("eventTypes") MessageEventType[] eventTypes,
-			@QueryParam("maxNr") @DefaultValue("0") Integer maxNr) throws EbMSMessageServiceException
-	{
-		return getUnprocessedMessageEvents(MessageFilter.builder()
-				.cpaId(cpaId)
-				.fromParty(fromPartyId == null ? null : new Party(fromPartyId,fromRole))
-				.toParty(toPartyId == null ? null : new Party(toPartyId,toRole))
-				.service(service)
-				.action(action)
-				.conversationId(conversationId)
-				.messageId(messageId)
-				.refToMessageId(refToMessageId)
-				.build(),eventTypes,maxNr);
 	}
 
 	@Override
@@ -292,24 +143,24 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		{
 			return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("GetMessageEvents" + messageFilter,e);
+			throw new EbMSMessageServiceException(e);
 		}
 	}
 
-	@PATCH
-	@Path("events/{messageId}")
 	@Override
-	public void processMessageEvent(@PathParam("messageId") final String messageId) throws EbMSMessageServiceException
+	public void processMessageEvent(String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
 			serviceHandler.processMessageEvent(messageId);
 		}
-		catch (EbMSMessageServiceException e)
+		catch (Exception e)
 		{
-			throw toServiceException(e);
+			log.error("ProcessMessageEvent " + messageId,e);
+			throw new EbMSMessageServiceException(e);
 		}
 	}
 }

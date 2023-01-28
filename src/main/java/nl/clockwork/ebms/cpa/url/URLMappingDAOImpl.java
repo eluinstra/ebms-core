@@ -38,7 +38,7 @@ class URLMappingDAOImpl implements URLMappingDAO
 	JdbcTemplate jdbcTemplate;
 
 	@Override
-	@CacheEvict(cacheNames = "CPA", allEntries = true)
+	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public void clearCache()
 	{
 		// do nothing

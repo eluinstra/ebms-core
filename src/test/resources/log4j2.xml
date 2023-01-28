@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<Configuration>
+
+	<Appenders>
+		<Console name="Console">
+			<PatternLayout pattern="%d [%t] %-5p %c - %m %X %n" />
+		</Console>
+		<RollingFile name="File" 
+			fileName="logs/ebms-admin.log"
+			filePattern="logs/ebms-admin-%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="%d [%t] %-5p %c - %m %X %n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"/>
+			</Policies>                               
+		</RollingFile>
+	</Appenders>
+
+	<Loggers>
+
+		<AsyncRoot level="INFO">
+			<AppenderRef ref="Console" />
+		</AsyncRoot>
+
+		<AsyncLogger name="com.zaxxer.hikari" level="DEBUG" />
+
+		<AsyncLogger name="nl.clockwork.ebms" level="INFO" />
+
+		<AsyncLogger name="nl.clockwork.ebms.message" level="INFO" />
+
+		<AsyncLogger name="nl.clockwork.ebms.client" level="DEBUG" />
+
+		<AsyncLogger name="nl.clockwork.ebms.server" level="DEBUG" />
+
+		<AsyncLogger name="nl.clockwork.ebms.job" level="INFO" />
+
+		<AsyncLogger name="org.apache" level="WARN" />
+
+		<AsyncLogger name="org.apache.http.headers" level="WARN" />
+
+		<AsyncLogger name="org.apache.http.wire" level="WARN" />
+
+		<AsyncLogger name="org.apache.cxf" level="WARN" />
+		
+		<AsyncLogger name="org.apache.wicket" level="WARN" />
+		
+		<AsyncLogger name="org.apache.wicket.protocol.http.HttpSessionStore" level="DEBUG" />
+
+		<AsyncLogger name="org.apache.wicket.version" level="DEBUG" />
+
+		<AsyncLogger name="org.apache.wicket.RequestCycle" level="WARN" />
+
+		<AsyncLogger name="org.springframework.beans.factory" level="WARN" />
+
+		<AsyncLogger name="org.springframework.jdbc" level="WARN" />
+
+	</Loggers>
+
+</Configuration>

@@ -34,7 +34,7 @@ public class CPATestUtils
 	{
 		try
 		{
-			val s = IOUtils.toString(CPAUtils.class.getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
+			val s = IOUtils.toString(CPAUtils.class.getResourceAsStream("/nl/clockwork/ebms/cpas/" + cpaId + ".xml"),Charset.forName("UTF-8"));
 			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(s));
 		}
 		catch (IOException | JAXBException e)

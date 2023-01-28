@@ -16,10 +16,10 @@
     limitations under the License.
 
 -->
-<tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.https.signed" tns:version="1.0">
+<tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.http.signed-sha256" tns:version="1.0">
 	<tns:Status tns:value="agreed" />
 	<tns:Start>2011-01-01T00:00:00Z</tns:Start>
-	<tns:End>2021-01-01T00:00:00Z</tns:End>
+	<tns:End>2031-01-01T00:00:00Z</tns:End>
 	<tns:PartyInfo tns:partyName="Logius" tns:defaultMshChannelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:defaultMshPackageId="MshSignalPackage">
 		<tns:PartyId tns:type="urn:osb:oin">00000000000000000000</tns:PartyId>
 		<tns:PartyRef xlink:href="" />
@@ -84,73 +84,9 @@
 				</X509Data>
 			</KeyInfo>
 		</tns:Certificate>
-		<tns:Certificate tns:certId="DIGIPOORT_EncryptionCert">
-			<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-				<KeyValue>
-					<RSAKeyValue>
-						<Modulus>jOtmODIw7Qv3QOVMyIUbpgT0HDrHBynE2LfjAZk7bNfZrOtNdAq65mIDqUEn8SRsY2zBEmPHxgf38nmJcpcOIORApFDxZMZd44rbrghq+AutKr36krDvLl4kFiUFRefl7IjhyKFwZvH2bK3odwDNIExy285amVduCkG7bPkBcTwOVJbAYR9A2zXJHDZti2fvWMZpEm3B0M7LPJ6KfwCBmPDWXIiqqXIAeOWZjAC4UuqUm6jzkcs9tfO2Qm9bvJZdceeJcWMC90AouL5f8iR3aRt4rHQQZNknmNxTrpqE4G4eTBau9ix9F3iyV15QWgYQLZR7Q2kfZwCV7Zp4JgLYcQ==</Modulus>
-						<Exponent>AQAB</Exponent>
-					</RSAKeyValue>
-				</KeyValue>
-				<X509Data>
-					<X509SubjectName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509SubjectName>
-					<X509IssuerSerial>
-						<X509IssuerName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509IssuerName>
-						<X509SerialNumber>1336114976</X509SerialNumber>
-					</X509IssuerSerial>
-					<X509Certificate>MIIDlzCCAn+gAwIBAgIET6N/IDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNjA3MTQyOTU5WhcNMzAwNjA1MTQyOTU5WjBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCM62Y4MjDtC/dA5UzIhRumBPQcOscHKcTYt+MBmTts19ms6010CrrmYgOpQSfxJGxjbMESY8fGB/fyeYlylw4g5ECkUPFkxl3jituuCGr4C60qvfqSsO8uXiQWJQVF5+XsiOHIoXBm8fZsreh3AM0gTHLbzlqZV24KQbts+QFxPA5UlsBhH0DbNckcNm2LZ+9YxmkSbcHQzss8nop/AIGY8NZciKqpcgB45ZmMALhS6pSbqPORyz2187ZCb1u8ll1x54lxYwL3QCi4vl/yJHdpG3isdBBk2SeY3FOumoTgbh5MFq72LH0XeLJXXlBaBhAtlHtDaR9nAJXtmngmAthxAgMBAAGjNzA1MBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAdBgNVHQ4EFgQUIGrhAcn6OsrmULDTpbcHhS31ezcwDQYJKoZIhvcNAQELBQADggEBABsqfBJfepASqhu7m7HU97k4aCYiElrJEcyhUluUmAfV/sKo2zD1EtziE4zdQMBHICOYkBLIIvNEpIrYXhsTWOymwjIp+niz8cDYw8Ya57RPNs4cQHZXEnOqwpqal2n9WGIq7Op4OkRT8thQisua/x2zI+N1WzM+MOu5Z/mKRRKQDdWTvNnWpHNp5JZ1TAGbZxHoUUQDQNwEXCMOuzXdE6x8rVLwfEMwpievFnIn9DwegzXM4GBBe+fHErox1WA+ijrcNjl4zhFQ1himdCuEY6AQeAEd5wAalQJ34FpZPfcWRHXRSkUszoiIGArhX0fmL3GeZq+a4tN7XCBNaTPqib4=
-					</X509Certificate>
-				</X509Data>
-			</KeyInfo>
-		</tns:Certificate>
-		<tns:Certificate tns:certId="DIGIPOORT_ServerCert">
-			<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-				<KeyValue>
-					<RSAKeyValue>
-						<Modulus>jOtmODIw7Qv3QOVMyIUbpgT0HDrHBynE2LfjAZk7bNfZrOtNdAq65mIDqUEn8SRsY2zBEmPHxgf38nmJcpcOIORApFDxZMZd44rbrghq+AutKr36krDvLl4kFiUFRefl7IjhyKFwZvH2bK3odwDNIExy285amVduCkG7bPkBcTwOVJbAYR9A2zXJHDZti2fvWMZpEm3B0M7LPJ6KfwCBmPDWXIiqqXIAeOWZjAC4UuqUm6jzkcs9tfO2Qm9bvJZdceeJcWMC90AouL5f8iR3aRt4rHQQZNknmNxTrpqE4G4eTBau9ix9F3iyV15QWgYQLZR7Q2kfZwCV7Zp4JgLYcQ==</Modulus>
-						<Exponent>AQAB</Exponent>
-					</RSAKeyValue>
-				</KeyValue>
-				<X509Data>
-					<X509SubjectName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509SubjectName>
-					<X509IssuerSerial>
-						<X509IssuerName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509IssuerName>
-						<X509SerialNumber>1336114976</X509SerialNumber>
-					</X509IssuerSerial>
-					<X509Certificate>MIIDlzCCAn+gAwIBAgIET6N/IDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNjA3MTQyOTU5WhcNMzAwNjA1MTQyOTU5WjBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCM62Y4MjDtC/dA5UzIhRumBPQcOscHKcTYt+MBmTts19ms6010CrrmYgOpQSfxJGxjbMESY8fGB/fyeYlylw4g5ECkUPFkxl3jituuCGr4C60qvfqSsO8uXiQWJQVF5+XsiOHIoXBm8fZsreh3AM0gTHLbzlqZV24KQbts+QFxPA5UlsBhH0DbNckcNm2LZ+9YxmkSbcHQzss8nop/AIGY8NZciKqpcgB45ZmMALhS6pSbqPORyz2187ZCb1u8ll1x54lxYwL3QCi4vl/yJHdpG3isdBBk2SeY3FOumoTgbh5MFq72LH0XeLJXXlBaBhAtlHtDaR9nAJXtmngmAthxAgMBAAGjNzA1MBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAdBgNVHQ4EFgQUIGrhAcn6OsrmULDTpbcHhS31ezcwDQYJKoZIhvcNAQELBQADggEBABsqfBJfepASqhu7m7HU97k4aCYiElrJEcyhUluUmAfV/sKo2zD1EtziE4zdQMBHICOYkBLIIvNEpIrYXhsTWOymwjIp+niz8cDYw8Ya57RPNs4cQHZXEnOqwpqal2n9WGIq7Op4OkRT8thQisua/x2zI+N1WzM+MOu5Z/mKRRKQDdWTvNnWpHNp5JZ1TAGbZxHoUUQDQNwEXCMOuzXdE6x8rVLwfEMwpievFnIn9DwegzXM4GBBe+fHErox1WA+ijrcNjl4zhFQ1himdCuEY6AQeAEd5wAalQJ34FpZPfcWRHXRSkUszoiIGArhX0fmL3GeZq+a4tN7XCBNaTPqib4=
-					</X509Certificate>
-				</X509Data>
-			</KeyInfo>
-		</tns:Certificate>
-		<tns:Certificate tns:certId="DIGIPOORT_ClientCert">
-			<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-				<KeyValue>
-					<RSAKeyValue>
-						<Modulus>jOtmODIw7Qv3QOVMyIUbpgT0HDrHBynE2LfjAZk7bNfZrOtNdAq65mIDqUEn8SRsY2zBEmPHxgf38nmJcpcOIORApFDxZMZd44rbrghq+AutKr36krDvLl4kFiUFRefl7IjhyKFwZvH2bK3odwDNIExy285amVduCkG7bPkBcTwOVJbAYR9A2zXJHDZti2fvWMZpEm3B0M7LPJ6KfwCBmPDWXIiqqXIAeOWZjAC4UuqUm6jzkcs9tfO2Qm9bvJZdceeJcWMC90AouL5f8iR3aRt4rHQQZNknmNxTrpqE4G4eTBau9ix9F3iyV15QWgYQLZR7Q2kfZwCV7Zp4JgLYcQ==</Modulus>
-						<Exponent>AQAB</Exponent>
-					</RSAKeyValue>
-				</KeyValue>
-				<X509Data>
-					<X509SubjectName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509SubjectName>
-					<X509IssuerSerial>
-						<X509IssuerName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509IssuerName>
-						<X509SerialNumber>1336114976</X509SerialNumber>
-					</X509IssuerSerial>
-					<X509Certificate>MIIDlzCCAn+gAwIBAgIET6N/IDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNjA3MTQyOTU5WhcNMzAwNjA1MTQyOTU5WjBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCM62Y4MjDtC/dA5UzIhRumBPQcOscHKcTYt+MBmTts19ms6010CrrmYgOpQSfxJGxjbMESY8fGB/fyeYlylw4g5ECkUPFkxl3jituuCGr4C60qvfqSsO8uXiQWJQVF5+XsiOHIoXBm8fZsreh3AM0gTHLbzlqZV24KQbts+QFxPA5UlsBhH0DbNckcNm2LZ+9YxmkSbcHQzss8nop/AIGY8NZciKqpcgB45ZmMALhS6pSbqPORyz2187ZCb1u8ll1x54lxYwL3QCi4vl/yJHdpG3isdBBk2SeY3FOumoTgbh5MFq72LH0XeLJXXlBaBhAtlHtDaR9nAJXtmngmAthxAgMBAAGjNzA1MBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAdBgNVHQ4EFgQUIGrhAcn6OsrmULDTpbcHhS31ezcwDQYJKoZIhvcNAQELBQADggEBABsqfBJfepASqhu7m7HU97k4aCYiElrJEcyhUluUmAfV/sKo2zD1EtziE4zdQMBHICOYkBLIIvNEpIrYXhsTWOymwjIp+niz8cDYw8Ya57RPNs4cQHZXEnOqwpqal2n9WGIq7Op4OkRT8thQisua/x2zI+N1WzM+MOu5Z/mKRRKQDdWTvNnWpHNp5JZ1TAGbZxHoUUQDQNwEXCMOuzXdE6x8rVLwfEMwpievFnIn9DwegzXM4GBBe+fHErox1WA+ijrcNjl4zhFQ1himdCuEY6AQeAEd5wAalQJ34FpZPfcWRHXRSkUszoiIGArhX0fmL3GeZq+a4tN7XCBNaTPqib4=
-					</X509Certificate>
-				</X509Data>
-			</KeyInfo>
-		</tns:Certificate>
 		<tns:SecurityDetails tns:securityId="DIGIPOORT_Security">
 			<tns:TrustAnchors>
 				<tns:AnchorCertificateRef tns:certId="DIGIPOORT_SigningCert" />
-				<tns:AnchorCertificateRef tns:certId="DIGIPOORT_EncryptionCert" />
-			</tns:TrustAnchors>
-		</tns:SecurityDetails>
-		<tns:SecurityDetails tns:securityId="DIGIPOORT_TransportSecurity">
-			<tns:TrustAnchors>
-				<tns:AnchorCertificateRef tns:certId="DIGIPOORT_ServerCert" />
-				<tns:AnchorCertificateRef tns:certId="DIGIPOORT_ClientCert" />
 			</tns:TrustAnchors>
 		</tns:SecurityDetails>
 		<tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="DIGIPOORT_SIGNED_BestEffort" tns:transportId="DIGIPOORT_transport_HTTPS">
@@ -162,36 +98,26 @@
 		<tns:Transport tns:transportId="DIGIPOORT_transport_HTTPS">
 			<tns:TransportSender>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:TransportClientSecurity>
-					<tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-					<tns:ClientCertificateRef tns:certId="DIGIPOORT_ClientCert" />
-					<tns:ServerSecurityDetailsRef tns:securityId="DIGIPOORT_TransportSecurity" />
-				</tns:TransportClientSecurity>
 			</tns:TransportSender>
 			<tns:TransportReceiver>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:Endpoint tns:uri="https://localhost:8888/ebms" tns:type="allPurpose" />
-				<tns:TransportServerSecurity>
-					<tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-					<tns:ServerCertificateRef tns:certId="DIGIPOORT_ServerCert" />
-					<tns:ClientSecurityDetailsRef tns:securityId="DIGIPOORT_TransportSecurity" />
-				</tns:TransportServerSecurity>
+				<tns:Endpoint tns:uri="http://localhost:8888/ebms" tns:type="allPurpose" />
 			</tns:TransportReceiver>
 		</tns:Transport>
 		<tns:DocExchange tns:docExchangeId="DIGIPOORT_SIGNED_BestEffort">
 			<tns:ebXMLSenderBinding tns:version="2.0">
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningCertificateRef tns:certId="DIGIPOORT_SigningCert" />
 				</tns:SenderNonRepudiation>
 			</tns:ebXMLSenderBinding>
 			<tns:ebXMLReceiverBinding tns:version="2.0">
 				<tns:ReceiverNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningSecurityDetailsRef tns:securityId="DIGIPOORT_Security" />
 				</tns:ReceiverNonRepudiation>
 			</tns:ebXMLReceiverBinding>
@@ -206,8 +132,8 @@
 				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningCertificateRef tns:certId="DIGIPOORT_SigningCert" />
 				</tns:SenderNonRepudiation>
 			</tns:ebXMLSenderBinding>
@@ -220,8 +146,8 @@
 				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:ReceiverNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningSecurityDetailsRef tns:securityId="DIGIPOORT_Security" />
 				</tns:ReceiverNonRepudiation>
 			</tns:ebXMLReceiverBinding>
@@ -291,73 +217,9 @@
 				</X509Data>
 			</KeyInfo>
 		</tns:Certificate>
-		<tns:Certificate tns:certId="OVERHEID_EncryptionCert">
-			<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-				<KeyValue>
-					<RSAKeyValue>
-						<Modulus>jOtmODIw7Qv3QOVMyIUbpgT0HDrHBynE2LfjAZk7bNfZrOtNdAq65mIDqUEn8SRsY2zBEmPHxgf38nmJcpcOIORApFDxZMZd44rbrghq+AutKr36krDvLl4kFiUFRefl7IjhyKFwZvH2bK3odwDNIExy285amVduCkG7bPkBcTwOVJbAYR9A2zXJHDZti2fvWMZpEm3B0M7LPJ6KfwCBmPDWXIiqqXIAeOWZjAC4UuqUm6jzkcs9tfO2Qm9bvJZdceeJcWMC90AouL5f8iR3aRt4rHQQZNknmNxTrpqE4G4eTBau9ix9F3iyV15QWgYQLZR7Q2kfZwCV7Zp4JgLYcQ==</Modulus>
-						<Exponent>AQAB</Exponent>
-					</RSAKeyValue>
-				</KeyValue>
-				<X509Data>
-					<X509SubjectName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509SubjectName>
-					<X509IssuerSerial>
-						<X509IssuerName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509IssuerName>
-						<X509SerialNumber>1336114976</X509SerialNumber>
-					</X509IssuerSerial>
-					<X509Certificate>MIIDlzCCAn+gAwIBAgIET6N/IDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNjA3MTQyOTU5WhcNMzAwNjA1MTQyOTU5WjBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCM62Y4MjDtC/dA5UzIhRumBPQcOscHKcTYt+MBmTts19ms6010CrrmYgOpQSfxJGxjbMESY8fGB/fyeYlylw4g5ECkUPFkxl3jituuCGr4C60qvfqSsO8uXiQWJQVF5+XsiOHIoXBm8fZsreh3AM0gTHLbzlqZV24KQbts+QFxPA5UlsBhH0DbNckcNm2LZ+9YxmkSbcHQzss8nop/AIGY8NZciKqpcgB45ZmMALhS6pSbqPORyz2187ZCb1u8ll1x54lxYwL3QCi4vl/yJHdpG3isdBBk2SeY3FOumoTgbh5MFq72LH0XeLJXXlBaBhAtlHtDaR9nAJXtmngmAthxAgMBAAGjNzA1MBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAdBgNVHQ4EFgQUIGrhAcn6OsrmULDTpbcHhS31ezcwDQYJKoZIhvcNAQELBQADggEBABsqfBJfepASqhu7m7HU97k4aCYiElrJEcyhUluUmAfV/sKo2zD1EtziE4zdQMBHICOYkBLIIvNEpIrYXhsTWOymwjIp+niz8cDYw8Ya57RPNs4cQHZXEnOqwpqal2n9WGIq7Op4OkRT8thQisua/x2zI+N1WzM+MOu5Z/mKRRKQDdWTvNnWpHNp5JZ1TAGbZxHoUUQDQNwEXCMOuzXdE6x8rVLwfEMwpievFnIn9DwegzXM4GBBe+fHErox1WA+ijrcNjl4zhFQ1himdCuEY6AQeAEd5wAalQJ34FpZPfcWRHXRSkUszoiIGArhX0fmL3GeZq+a4tN7XCBNaTPqib4=
-					</X509Certificate>
-				</X509Data>
-			</KeyInfo>
-		</tns:Certificate>
-		<tns:Certificate tns:certId="OVERHEID_ServerCert">
-			<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-				<KeyValue>
-					<RSAKeyValue>
-						<Modulus>jOtmODIw7Qv3QOVMyIUbpgT0HDrHBynE2LfjAZk7bNfZrOtNdAq65mIDqUEn8SRsY2zBEmPHxgf38nmJcpcOIORApFDxZMZd44rbrghq+AutKr36krDvLl4kFiUFRefl7IjhyKFwZvH2bK3odwDNIExy285amVduCkG7bPkBcTwOVJbAYR9A2zXJHDZti2fvWMZpEm3B0M7LPJ6KfwCBmPDWXIiqqXIAeOWZjAC4UuqUm6jzkcs9tfO2Qm9bvJZdceeJcWMC90AouL5f8iR3aRt4rHQQZNknmNxTrpqE4G4eTBau9ix9F3iyV15QWgYQLZR7Q2kfZwCV7Zp4JgLYcQ==</Modulus>
-						<Exponent>AQAB</Exponent>
-					</RSAKeyValue>
-				</KeyValue>
-				<X509Data>
-					<X509SubjectName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509SubjectName>
-					<X509IssuerSerial>
-						<X509IssuerName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509IssuerName>
-						<X509SerialNumber>1336114976</X509SerialNumber>
-					</X509IssuerSerial>
-					<X509Certificate>MIIDlzCCAn+gAwIBAgIET6N/IDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNjA3MTQyOTU5WhcNMzAwNjA1MTQyOTU5WjBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCM62Y4MjDtC/dA5UzIhRumBPQcOscHKcTYt+MBmTts19ms6010CrrmYgOpQSfxJGxjbMESY8fGB/fyeYlylw4g5ECkUPFkxl3jituuCGr4C60qvfqSsO8uXiQWJQVF5+XsiOHIoXBm8fZsreh3AM0gTHLbzlqZV24KQbts+QFxPA5UlsBhH0DbNckcNm2LZ+9YxmkSbcHQzss8nop/AIGY8NZciKqpcgB45ZmMALhS6pSbqPORyz2187ZCb1u8ll1x54lxYwL3QCi4vl/yJHdpG3isdBBk2SeY3FOumoTgbh5MFq72LH0XeLJXXlBaBhAtlHtDaR9nAJXtmngmAthxAgMBAAGjNzA1MBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAdBgNVHQ4EFgQUIGrhAcn6OsrmULDTpbcHhS31ezcwDQYJKoZIhvcNAQELBQADggEBABsqfBJfepASqhu7m7HU97k4aCYiElrJEcyhUluUmAfV/sKo2zD1EtziE4zdQMBHICOYkBLIIvNEpIrYXhsTWOymwjIp+niz8cDYw8Ya57RPNs4cQHZXEnOqwpqal2n9WGIq7Op4OkRT8thQisua/x2zI+N1WzM+MOu5Z/mKRRKQDdWTvNnWpHNp5JZ1TAGbZxHoUUQDQNwEXCMOuzXdE6x8rVLwfEMwpievFnIn9DwegzXM4GBBe+fHErox1WA+ijrcNjl4zhFQ1himdCuEY6AQeAEd5wAalQJ34FpZPfcWRHXRSkUszoiIGArhX0fmL3GeZq+a4tN7XCBNaTPqib4=
-					</X509Certificate>
-				</X509Data>
-			</KeyInfo>
-		</tns:Certificate>
-		<tns:Certificate tns:certId="OVERHEID_ClientCert">
-			<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-				<KeyValue>
-					<RSAKeyValue>
-						<Modulus>jOtmODIw7Qv3QOVMyIUbpgT0HDrHBynE2LfjAZk7bNfZrOtNdAq65mIDqUEn8SRsY2zBEmPHxgf38nmJcpcOIORApFDxZMZd44rbrghq+AutKr36krDvLl4kFiUFRefl7IjhyKFwZvH2bK3odwDNIExy285amVduCkG7bPkBcTwOVJbAYR9A2zXJHDZti2fvWMZpEm3B0M7LPJ6KfwCBmPDWXIiqqXIAeOWZjAC4UuqUm6jzkcs9tfO2Qm9bvJZdceeJcWMC90AouL5f8iR3aRt4rHQQZNknmNxTrpqE4G4eTBau9ix9F3iyV15QWgYQLZR7Q2kfZwCV7Zp4JgLYcQ==</Modulus>
-						<Exponent>AQAB</Exponent>
-					</RSAKeyValue>
-				</KeyValue>
-				<X509Data>
-					<X509SubjectName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509SubjectName>
-					<X509IssuerSerial>
-						<X509IssuerName>CN=localhost, OU=Rules Matter, O=Ordina, L=Groningen, ST=Groningen, C=NL</X509IssuerName>
-						<X509SerialNumber>1336114976</X509SerialNumber>
-					</X509IssuerSerial>
-					<X509Certificate>MIIDlzCCAn+gAwIBAgIET6N/IDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNjA3MTQyOTU5WhcNMzAwNjA1MTQyOTU5WjBxMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTEVMBMGA1UECxMMUnVsZXMgTWF0dGVyMRIwEAYDVQQDEwlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCM62Y4MjDtC/dA5UzIhRumBPQcOscHKcTYt+MBmTts19ms6010CrrmYgOpQSfxJGxjbMESY8fGB/fyeYlylw4g5ECkUPFkxl3jituuCGr4C60qvfqSsO8uXiQWJQVF5+XsiOHIoXBm8fZsreh3AM0gTHLbzlqZV24KQbts+QFxPA5UlsBhH0DbNckcNm2LZ+9YxmkSbcHQzss8nop/AIGY8NZciKqpcgB45ZmMALhS6pSbqPORyz2187ZCb1u8ll1x54lxYwL3QCi4vl/yJHdpG3isdBBk2SeY3FOumoTgbh5MFq72LH0XeLJXXlBaBhAtlHtDaR9nAJXtmngmAthxAgMBAAGjNzA1MBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAdBgNVHQ4EFgQUIGrhAcn6OsrmULDTpbcHhS31ezcwDQYJKoZIhvcNAQELBQADggEBABsqfBJfepASqhu7m7HU97k4aCYiElrJEcyhUluUmAfV/sKo2zD1EtziE4zdQMBHICOYkBLIIvNEpIrYXhsTWOymwjIp+niz8cDYw8Ya57RPNs4cQHZXEnOqwpqal2n9WGIq7Op4OkRT8thQisua/x2zI+N1WzM+MOu5Z/mKRRKQDdWTvNnWpHNp5JZ1TAGbZxHoUUQDQNwEXCMOuzXdE6x8rVLwfEMwpievFnIn9DwegzXM4GBBe+fHErox1WA+ijrcNjl4zhFQ1himdCuEY6AQeAEd5wAalQJ34FpZPfcWRHXRSkUszoiIGArhX0fmL3GeZq+a4tN7XCBNaTPqib4=
-					</X509Certificate>
-				</X509Data>
-			</KeyInfo>
-		</tns:Certificate>
 		<tns:SecurityDetails tns:securityId="OVERHEID_Security">
 			<tns:TrustAnchors>
 				<tns:AnchorCertificateRef tns:certId="OVERHEID_SigningCert" />
-				<tns:AnchorCertificateRef tns:certId="OVERHEID_EncryptionCert" />
-			</tns:TrustAnchors>
-		</tns:SecurityDetails>
-		<tns:SecurityDetails tns:securityId="OVERHEID_TransportSecurity">
-			<tns:TrustAnchors>
-				<tns:AnchorCertificateRef tns:certId="OVERHEID_ServerCert" />
-				<tns:AnchorCertificateRef tns:certId="OVERHEID_ClientCert" />
 			</tns:TrustAnchors>
 		</tns:SecurityDetails>
 		<tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="OVERHEID_SIGNED_BestEffort" tns:transportId="OVERHEID_transport_HTTPS">
@@ -369,36 +231,26 @@
 		<tns:Transport tns:transportId="OVERHEID_transport_HTTPS">
 			<tns:TransportSender>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:TransportClientSecurity>
-					<tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-					<tns:ClientCertificateRef tns:certId="OVERHEID_ClientCert" />
-					<tns:ServerSecurityDetailsRef tns:securityId="OVERHEID_TransportSecurity" />
-				</tns:TransportClientSecurity>
 			</tns:TransportSender>
 			<tns:TransportReceiver>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:Endpoint tns:uri="https://localhost:8088/ebms" tns:type="allPurpose" />
-				<tns:TransportServerSecurity>
-					<tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-					<tns:ServerCertificateRef tns:certId="OVERHEID_ServerCert" />
-					<tns:ClientSecurityDetailsRef tns:securityId="OVERHEID_TransportSecurity" />
-				</tns:TransportServerSecurity>
+				<tns:Endpoint tns:uri="http://localhost:8088/ebms" tns:type="allPurpose" />
 			</tns:TransportReceiver>
 		</tns:Transport>
 		<tns:DocExchange tns:docExchangeId="OVERHEID_SIGNED_BestEffort">
 			<tns:ebXMLSenderBinding tns:version="2.0">
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningCertificateRef tns:certId="OVERHEID_SigningCert" />
 				</tns:SenderNonRepudiation>
 			</tns:ebXMLSenderBinding>
 			<tns:ebXMLReceiverBinding tns:version="2.0">
 				<tns:ReceiverNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningSecurityDetailsRef tns:securityId="OVERHEID_Security" />
 				</tns:ReceiverNonRepudiation>
 			</tns:ebXMLReceiverBinding>
@@ -408,14 +260,13 @@
 				<tns:ReliableMessaging>
 					<tns:Retries>5</tns:Retries>
 					<tns:RetryInterval>PT5M</tns:RetryInterval>
-					<tns:MessageOrderSemantics>NotGuaranteed
-					</tns:MessageOrderSemantics>
+					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
 				</tns:ReliableMessaging>
 				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningCertificateRef tns:certId="OVERHEID_SigningCert" />
 				</tns:SenderNonRepudiation>
 			</tns:ebXMLSenderBinding>
@@ -423,14 +274,13 @@
 				<tns:ReliableMessaging>
 					<tns:Retries>5</tns:Retries>
 					<tns:RetryInterval>PT5M</tns:RetryInterval>
-					<tns:MessageOrderSemantics>NotGuaranteed
-					</tns:MessageOrderSemantics>
+					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
 				</tns:ReliableMessaging>
 				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:ReceiverNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
-					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
-					<tns:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tns:SignatureAlgorithm>
+					<tns:HashFunction>http://www.w3.org/2001/04/xmlenc#sha256</tns:HashFunction>
+					<tns:SignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</tns:SignatureAlgorithm>
 					<tns:SigningSecurityDetailsRef tns:securityId="OVERHEID_Security" />
 				</tns:ReceiverNonRepudiation>
 			</tns:ebXMLReceiverBinding>

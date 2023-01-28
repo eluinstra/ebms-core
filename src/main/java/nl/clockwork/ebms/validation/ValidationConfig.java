@@ -33,14 +33,10 @@ public class ValidationConfig
 {
 	@Autowired
 	CPAManager cpaManager;
+	@Autowired
+	CPAValidator cpaValidator;
 	@Value("${https.clientCertificateAuthentication}")
 	boolean clientCertificateValidatorEnabled;
-
-	@Bean
-	public CPAValidator cpaValidator()
-	{
-		return new CPAValidator(cpaManager);
-	}
 
 	@Bean
 	public EbMSMessageValidator messageValidator(EbMSDAO ebMSDAO, EbMSSignatureValidator signatureValidator, EbMSMessageDecrypter messageDecrypter)
@@ -49,7 +45,7 @@ public class ValidationConfig
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.clientCertificateValidator(ClientCertificateValidator.of(cpaManager,clientCertificateValidatorEnabled))
-				.cpaValidator(cpaValidator())
+				.cpaValidator(cpaValidator)
 				.messageHeaderValidator(new MessageHeaderValidator(ebMSDAO,cpaManager))
 				.manifestValidator(new ManifestValidator())
 				.signatureValidator(new SignatureValidator(cpaManager,signatureValidator))

@@ -23,23 +23,18 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPABadRequestException;
+import nl.clockwork.ebms.cpa.BadRequestException;
 import nl.clockwork.ebms.cpa.CPANotFoundException;
 import nl.clockwork.ebms.cpa.CPAServiceException;
-import nl.clockwork.ebms.cpa.certificate.CertificateMappingServiceException;
 import nl.clockwork.ebms.cpa.certificate.CertificateNotFoundException;
-import nl.clockwork.ebms.cpa.url.URLMappingServiceException;
 import nl.clockwork.ebms.cpa.url.URLNotFoundException;
-import nl.clockwork.ebms.service.EbMSMessageServiceException;
 import nl.clockwork.ebms.service.NotFoundException;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public interface WithService
 {
@@ -50,72 +45,19 @@ public interface WithService
 		String message;
 	}
 
-	default CPAServiceException toServiceException(CPAServiceException exception) throws CPAServiceException
+	default WebApplicationException toWebApplicationException(Exception exception) throws CPAServiceException
 	{
-		return (toServiceException(exception,MediaType.APPLICATION_JSON));
+		return toWebApplicationException(exception,MediaType.APPLICATION_JSON);
 	}
 
-	default CPAServiceException toServiceException(CPAServiceException exception, String responseType) throws CPAServiceException
+	default WebApplicationException toWebApplicationException(Exception exception, String responseType)
 	{
-		val message = PhaseInterceptorChain.getCurrentMessage();
-		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
-				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
-		{
-			val response = Match(exception).of(Case($(instanceOf(CPANotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
-					Case($(instanceOf(CPABadRequestException.class)),o -> Response.status(BAD_REQUEST).type(responseType).entity(exception.getMessage()).build()),
-					Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(responseType).entity(exception.getMessage()).build()));
-			throw new WebApplicationException(response);
-		}
-		else
-			return exception;
+		val response = Match(exception).of(Case($(instanceOf(NotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(CPANotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(CertificateNotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(URLNotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(BadRequestException.class)),o -> Response.status(BAD_REQUEST).type(responseType).entity(exception.getMessage()).build()),
+				Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(responseType).entity(exception.getMessage()).build()));
+		return new WebApplicationException(response);
 	}
-
-	default CertificateMappingServiceException toServiceException(CertificateMappingServiceException exception) throws CertificateMappingServiceException
-	{
-		val message = PhaseInterceptorChain.getCurrentMessage();
-		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
-				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
-		{
-			val response =
-					Match(exception).of(Case($(instanceOf(CertificateNotFoundException.class)),o -> Response.status(NOT_FOUND).type(MediaType.APPLICATION_JSON).build()),
-							Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity(exception.getMessage()).build()));
-			throw new WebApplicationException(response);
-		}
-		else
-			return exception;
-	}
-
-	default URLMappingServiceException toServiceException(URLMappingServiceException exception) throws URLMappingServiceException
-	{
-		val message = PhaseInterceptorChain.getCurrentMessage();
-		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
-				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
-		{
-			val response =
-					Match(exception).of(Case($(instanceOf(URLNotFoundException.class)),o -> Response.status(NOT_FOUND).type(MediaType.APPLICATION_JSON).build()),
-							Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity(exception.getMessage()).build()));
-			throw new WebApplicationException(response);
-		}
-		else
-			return exception;
-	}
-
-	default EbMSMessageServiceException toServiceException(EbMSMessageServiceException exception) throws EbMSMessageServiceException
-	{
-		val message = PhaseInterceptorChain.getCurrentMessage();
-		val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-		if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON)
-				|| servletRequest.getContentType().equals(MediaType.TEXT_PLAIN))
-		{
-			val response = Match(exception).of(Case($(instanceOf(NotFoundException.class)),o -> Response.status(NOT_FOUND).type(MediaType.APPLICATION_JSON).build()),
-					Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity(exception.getMessage()).build()));
-			throw new WebApplicationException(response);
-		}
-		else
-			return exception;
-	}
-
 }

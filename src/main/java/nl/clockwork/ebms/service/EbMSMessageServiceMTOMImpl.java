@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.event.MessageEventType;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MTOMMessageRequest;
@@ -27,6 +28,7 @@ import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
 import nl.clockwork.ebms.service.model.MessageStatus;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
@@ -36,55 +38,127 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	@Override
 	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
 	{
-		serviceHandler.ping(cpaId,fromPartyId,toPartyId);
+		try
+		{
+			serviceHandler.ping(cpaId,fromPartyId,toPartyId);
+		}
+		catch (Exception e)
+		{
+			log.error("Ping " + cpaId,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public String sendMessageMTOM(MTOMMessageRequest message) throws EbMSMessageServiceException
 	{
-		return serviceHandler.sendMessageMTOM(message);
+		try
+		{
+			return serviceHandler.sendMessageMTOM(message);
+		}
+		catch (Exception e)
+		{
+			log.error("SendMessage " + message,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public String resendMessage(String messageId) throws EbMSMessageServiceException
 	{
-		return serviceHandler.resendMessage(messageId);
+		try
+		{
+			return serviceHandler.resendMessage(messageId);
+		}
+		catch (Exception e)
+		{
+			log.error("ResendMessage {}",messageId);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getUnprocessedMessageIds(messageFilter,maxNr);
+		try
+		{
+			return serviceHandler.getUnprocessedMessageIds(messageFilter,maxNr);
+		}
+		catch (Exception e)
+		{
+			log.error("GetMessageIds " + messageFilter,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public MTOMMessage getMessageMTOM(String messageId, Boolean process) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getMessageMTOM(messageId,process);
+		try
+		{
+			return serviceHandler.getMessageMTOM(messageId,process);
+		}
+		catch (Exception e)
+		{
+			log.error("GetMessage " + messageId,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public void processMessage(String messageId) throws EbMSMessageServiceException
 	{
-		serviceHandler.processMessage(messageId);
+		try
+		{
+			serviceHandler.processMessage(messageId);
+		}
+		catch (Exception e)
+		{
+			log.error("ProcessMessage " + messageId,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getMessageStatus(messageId);
+		try
+		{
+			return serviceHandler.getMessageStatus(messageId);
+		}
+		catch (Exception e)
+		{
+			log.error("GetMessageStatus " + messageId,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr)
 			throws EbMSMessageServiceException
 	{
-		return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
+		try
+		{
+			return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
+		}
+		catch (Exception e)
+		{
+			log.error("GetMessageEvents" + messageFilter,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 	@Override
 	public void processMessageEvent(String messageId) throws EbMSMessageServiceException
 	{
-		serviceHandler.processMessageEvent(messageId);
+		try
+		{
+			serviceHandler.processMessageEvent(messageId);
+		}
+		catch (Exception e)
+		{
+			log.error("ProcessMessageEvent " + messageId,e);
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 }

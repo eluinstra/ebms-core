@@ -35,6 +35,12 @@ public class CertificateMappingServiceConfig
 	}
 
 	@Bean
+	public CertificateMappingRestService certificateMappingRestService(CertificateMappingService mappingService)
+	{
+		return new CertificateMappingRestService((CertificateMappingServiceImpl)mappingService);
+	}
+
+	@Bean
 	public CertificateMapper certificateMapper(DataSource dataSource)
 	{
 		return new CertificateMapper(certificateMappingDAO(dataSource));

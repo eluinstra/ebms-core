@@ -18,7 +18,6 @@ package nl.clockwork.ebms.transaction;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
-import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
 import lombok.AccessLevel;
@@ -32,7 +31,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
@@ -55,13 +53,6 @@ public class TransactionManagerConfig
 	public PlatformTransactionManager dataSourceTransactionManager(DataSource dataSource)
 	{
 		return new DataSourceTransactionManager(dataSource);
-	}
-
-	@Bean("jmsTransactionManager")
-	@Conditional(DefaultTransactionManagerType.class)
-	public PlatformTransactionManager jmsTransactionManager(ConnectionFactory connectionFactory)
-	{
-		return new JmsTransactionManager(connectionFactory);
 	}
 
 	@Bean(name = {"dataSourceTransactionManager","jmsTransactionManager"})

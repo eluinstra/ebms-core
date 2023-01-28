@@ -15,162 +15,72 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-import static nl.clockwork.ebms.jaxb.X509CertificateConverter.parseCertificate;
-import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.jaxrs.WithService;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public class CertificateMappingServiceImpl implements CertificateMappingService, WithService
+public class CertificateMappingServiceImpl implements CertificateMappingService
 {
-	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	private static class CertificateMapping
-	{
-		@NonNull
-		String source;
-		@NonNull
-		String destination;
-		String cpaId;
-
-		static CertificateMapping of(nl.clockwork.ebms.cpa.certificate.CertificateMapping m)
-		{
-			try
-			{
-				return new CertificateMapping(encodeBase64String(m.getSource().getEncoded()),encodeBase64String(m.getDestination().getEncoded()),m.getCpaId());
-			}
-			catch (CertificateEncodingException e)
-			{
-				throw new IllegalStateException(e);
-			}
-		}
-
-		nl.clockwork.ebms.cpa.certificate.CertificateMapping toCertificateMapping()
-		{
-			try
-			{
-				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(parseCertificate(decodeBase64(source)),
-						parseCertificate(decodeBase64(destination)),
-						cpaId);
-			}
-			catch (CertificateException e)
-			{
-				throw new IllegalStateException(e);
-			}
-		}
-	}
-
-	@NonNull
 	CertificateMapper certificateMapper;
-
-	@POST
-	@Path("")
-	public void setCertificateMapping(CertificateMapping certificateMapping) throws CertificateMappingServiceException
-	{
-		try
-		{
-			setCertificateMapping(certificateMapping.toCertificateMapping());
-		}
-		catch (Exception e)
-		{
-			log.error("SetCertificateMapping " + certificateMapping,e);
-			throw toServiceException(new CertificateMappingServiceException(e));
-		}
-	}
 
 	@Override
 	public void setCertificateMapping(nl.clockwork.ebms.cpa.certificate.CertificateMapping certificateMapping) throws CertificateMappingServiceException
 	{
 		try
 		{
-			if (log.isDebugEnabled())
-				log.debug("SetCertificateMapping " + certificateMapping);
-			certificateMapper.setCertificateMapping(certificateMapping);
+			setCertificateMappingImpl(certificateMapping);
+		}
+		catch (CertificateMappingServiceException e)
+		{
+			log.error("SetCertificateMapping",e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("SetCertificateMapping " + certificateMapping,e);
-			throw toServiceException(new CertificateMappingServiceException(e));
+			throw new CertificateMappingServiceException(e);
 		}
 	}
 
-	@DELETE
-	@Path("")
-	@Consumes(MediaType.TEXT_PLAIN)
-	public void deleteCertificateMapping(String source, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
+	protected void setCertificateMappingImpl(nl.clockwork.ebms.cpa.certificate.CertificateMapping certificateMapping)
 	{
-		try
-		{
-			deleteCertificateMapping(parseCertificate(decodeBase64(source)),cpaId);
-		}
-		catch (Exception e)
-		{
-			log.error("DeleteCertificateMapping " + source,e);
-			throw toServiceException(new CertificateMappingServiceException(e));
-		}
+		if (log.isDebugEnabled())
+			log.debug("SetCertificateMapping " + certificateMapping);
+		certificateMapper.setCertificateMapping(certificateMapping);
 	}
 
 	@Override
-	public void deleteCertificateMapping(X509Certificate source, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
 	{
 		try
 		{
-			if (log.isDebugEnabled())
-				log.debug("DeleteCertificateMapping " + source);
-			if (certificateMapper.deleteCertificateMapping(source,cpaId) == 0)
-				throw new CertificateNotFoundException();
+			deleteCertificateMappingImpl(source,cpaId);
 		}
 		catch (CertificateMappingServiceException e)
 		{
-			log.error("GetCertificateMappings",e);
-			throw toServiceException(e);
+			log.error("DeleteCertificateMapping",e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("DeleteCertificateMapping " + source,e);
-			throw toServiceException(new CertificateMappingServiceException(e));
+			throw new CertificateMappingServiceException(e);
 		}
 	}
 
-	@GET
-	@Path("")
-	public List<CertificateMapping> getCertificateMappingsRest() throws CertificateMappingServiceException
+	protected void deleteCertificateMappingImpl(X509Certificate source, String cpaId)
 	{
-		try
-		{
-			return getCertificateMappings().stream().map(m -> CertificateMapping.of(m)).collect(Collectors.toList());
-		}
-		catch (Exception e)
-		{
-			log.error("GetCertificateMappings",e);
-			throw toServiceException(new CertificateMappingServiceException(e));
-		}
+		if (log.isDebugEnabled())
+			log.debug("DeleteCertificateMapping " + source);
+		if (certificateMapper.deleteCertificateMapping(source,cpaId) == 0)
+			throw new CertificateNotFoundException();
 	}
 
 	@Override
@@ -178,20 +88,41 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	{
 		try
 		{
-			log.debug("GetCertificateMappings");
-			return certificateMapper.getCertificates();
+			return getCertificateMappingsImpl();
+		}
+		catch (CertificateMappingServiceException e)
+		{
+			log.error("GetCertificateMappings",e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("GetCertificateMappings",e);
-			throw toServiceException(new CertificateMappingServiceException(e));
+			throw new CertificateMappingServiceException(e);
 		}
 	}
 
-	@DELETE
-	@Path("cache")
+	protected List<nl.clockwork.ebms.cpa.certificate.CertificateMapping> getCertificateMappingsImpl()
+	{
+		log.debug("GetCertificateMappings");
+		return certificateMapper.getCertificates();
+	}
+
 	@Override
-	public void deleteCache()
+	public void deleteCache() throws CertificateMappingServiceException
+	{
+		try
+		{
+			deleteCacheImpl();
+		}
+		catch (Exception e)
+		{
+			log.error("DeleteCache",e);
+			throw new CertificateMappingServiceException(e);
+		}
+	}
+
+	protected void deleteCacheImpl()
 	{
 		certificateMapper.deleteCache();
 	}

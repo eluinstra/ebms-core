@@ -16,17 +16,9 @@
 package nl.clockwork.ebms.cpa;
 
 
+import java.io.IOException;
 import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -34,7 +26,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.jaxb.JAXBParser;
-import nl.clockwork.ebms.jaxrs.WithService;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.XSDValidator;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -43,9 +34,7 @@ import org.xml.sax.SAXException;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public class CPAServiceImpl implements CPAService, WithService
+public class CPAServiceImpl implements CPAService
 {
 	@NonNull
 	CPAManager cpaManager;
@@ -53,130 +42,157 @@ public class CPAServiceImpl implements CPAService, WithService
 	CPAValidator cpaValidator;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
 
-	@POST
-	@Path("validate")
-	@Consumes(MediaType.TEXT_PLAIN)
 	@Override
-	public void validateCPA(/* CollaborationProtocolAgreement */String cpa) throws CPAServiceException
+	public void validateCPA(String cpa) throws CPAServiceException
 	{
 		try
 		{
-			log.debug("ValidateCPA");
-			xsdValidator.validate(cpa);
-			val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
-			log.info("Validating CPA " + parsedCpa.getCpaid());
-			cpaValidator.validate(parsedCpa);
+			validateCPAImpl(cpa);
 		}
-		catch (IllegalArgumentException e)
+		catch (CPAServiceException e)
 		{
 			log.error("ValidateCPA\n" + cpa,e);
-			throw toServiceException(new CPABadRequestException(e));
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("ValidateCPA\n" + cpa,e);
-			throw toServiceException(new CPAServiceException(e));
+			throw new CPAServiceException(e);
 		}
 	}
 
-	@POST
-	@Path("")
-	@Consumes(MediaType.TEXT_PLAIN)
-	@Produces({MediaType.TEXT_PLAIN})
+	protected void validateCPAImpl(String cpa) throws SAXException, IOException, JAXBException
+	{
+		log.debug("ValidateCPA");
+		xsdValidator.validate(cpa);
+		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+		log.info("Validating CPA " + parsedCpa.getCpaid());
+		cpaValidator.validate(parsedCpa);
+	}
+
 	@Override
-	public String insertCPA(/* CollaborationProtocolAgreement */String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite)
-			throws CPAServiceException
+	public String insertCPA(String cpa, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
-			log.debug("InsertCPA");
-			xsdValidator.validate(cpa);
-			val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
-			new CPAValidator(cpaManager).validate(parsedCpa);
-			cpaManager.setCPA(parsedCpa,overwrite);
-			log.debug("InsertCPA done");
-			return parsedCpa.getCpaid();
+			return insertCPAImpl(cpa,overwrite);
 		}
-		catch (SAXException | IllegalArgumentException e)
+		catch (CPAServiceException e)
 		{
-			log.error("ValidateCPA\n" + cpa,e);
-			throw toServiceException(new CPABadRequestException(e),MediaType.TEXT_PLAIN);
+			log.error("InsertCPA\n" + cpa,e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("InsertCPA\n" + cpa,e);
-			throw toServiceException(new CPAServiceException(e),MediaType.TEXT_PLAIN);
+			throw new CPAServiceException(e);
 		}
 	}
 
-	@DELETE
-	@Path("{cpaId}")
+	protected String insertCPAImpl(String cpa, Boolean overwrite) throws SAXException, IOException, JAXBException
+	{
+		log.debug("InsertCPA");
+		xsdValidator.validate(cpa);
+		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+		new CPAValidator(cpaManager).validate(parsedCpa);
+		cpaManager.setCPA(parsedCpa,overwrite);
+		log.debug("InsertCPA done");
+		return parsedCpa.getCpaid();
+	}
+
 	@Override
-	public void deleteCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
+	public void deleteCPA(String cpaId) throws CPAServiceException
 	{
 		try
 		{
-			log.debug("DeleteCPA " + cpaId);
-			if (cpaManager.deleteCPA(cpaId) == 0)
-				throw new CPANotFoundException();
+			deleteCPAImpl(cpaId);
 		}
 		catch (CPAServiceException e)
 		{
 			log.error("DeleteCPA " + cpaId,e);
-			throw toServiceException(e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("DeleteCPA " + cpaId,e);
-			throw toServiceException(new CPAServiceException(e));
+			throw new CPAServiceException(e);
 		}
 	}
 
-	@GET
-	@Path("")
+	protected void deleteCPAImpl(String cpaId)
+	{
+		log.debug("DeleteCPA " + cpaId);
+		if (cpaManager.deleteCPA(cpaId) == 0)
+			throw new CPANotFoundException();
+	}
+
 	@Override
 	public List<String> getCPAIds() throws CPAServiceException
 	{
 		try
 		{
-			log.debug("GetCPAIds");
-			return cpaManager.getCPAIds();
+			return getCPAIdsImpl();
+		}
+		catch (CPAServiceException e)
+		{
+			log.error("GetCPAIds",e);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("GetCPAIds",e);
-			throw toServiceException(new CPAServiceException(e));
+			throw new CPAServiceException(e);
 		}
 	}
 
-	@GET
-	@Path("{cpaId}")
-	@Produces({MediaType.TEXT_PLAIN})
+	protected List<String> getCPAIdsImpl()
+	{
+		log.debug("GetCPAIds");
+		return cpaManager.getCPAIds();
+	}
+
 	@Override
-	public /* CollaborationProtocolAgreement */String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
+	public String getCPA(String cpaId) throws CPAServiceException
 	{
 		try
 		{
-			log.debug("GetCPAId " + cpaId);
-			return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElseThrow(CPANotFoundException::new));
+			return getCPAImpl(cpaId);
 		}
 		catch (CPAServiceException e)
 		{
 			log.error("GetCPAId " + cpaId,e);
-			throw toServiceException(e,MediaType.TEXT_PLAIN);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			log.error("GetCPAId " + cpaId,e);
-			throw toServiceException(new CPAServiceException(e),MediaType.TEXT_PLAIN);
+			throw new CPAServiceException(e);
 		}
 	}
 
-	@DELETE
-	@Path("cache")
+	protected String getCPAImpl(String cpaId) throws JAXBException
+	{
+		log.debug("GetCPAId " + cpaId);
+		return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElseThrow(CPANotFoundException::new));
+	}
+
 	@Override
 	public void deleteCache()
 	{
+		try
+		{
+			deleteCacheImpl();
+		}
+		catch (Exception e)
+		{
+			log.error("DeleteCache",e);
+			throw new CPAServiceException(e);
+		}
+	}
+
+	protected void deleteCacheImpl()
+	{
+		log.debug("DeleteCache");
 		cpaManager.clearCache();
 	}
 }

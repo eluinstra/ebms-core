@@ -90,211 +90,121 @@ class EbMSMessageServiceHandler
 	EbMSSignatureGenerator signatureGenerator;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
-	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
+	public void ping(String cpaId, String fromPartyId, String toPartyId)
 	{
-		try
+		log.debug("Ping {}",cpaId);
+		messagePropertiesValidator.validate(cpaId,fromPartyId,toPartyId);
+		val request = ebMSMessageFactory.createEbMSPing(cpaId,fromPartyId,toPartyId);
+		val response = deliveryManager.sendMessage(request);
+		if (response.isPresent())
 		{
-			log.debug("Ping {}",cpaId);
-			messagePropertiesValidator.validate(cpaId,fromPartyId,toPartyId);
-			val request = ebMSMessageFactory.createEbMSPing(cpaId,fromPartyId,toPartyId);
-			val response = deliveryManager.sendMessage(request);
-			if (response.isPresent())
+			if (!EbMSAction.PONG.getAction().equals(response.get().getMessageHeader().getAction()))
+				throw new EbMSProcessingException("No valid response received!");
+		}
+		else
+			throw new EbMSProcessingException("No response received!");
+	}
+
+	public String sendMessage(MessageRequest messageRequest)
+			throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		log.debug("SendMessage");
+		messagePropertiesValidator.validate(messageRequest.getProperties());
+		val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
+		if (LoggingUtils.mdc == Status.ENABLED)
+			MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document,message);
+		storeMessage(document.getMessage(),message);
+		val result = message.getMessageHeader().getMessageData().getMessageId();
+		log.info("Created message {}",result);
+		return result;
+	}
+
+	public String sendMessageMTOM(MTOMMessageRequest messageRequest)
+			throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		log.debug("SendMessage");
+		messagePropertiesValidator.validate(messageRequest.getProperties());
+		val message = ebMSMessageFactory.createEbMSMessageMTOM(messageRequest);
+		if (LoggingUtils.mdc == Status.ENABLED)
+			MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document,message);
+		storeMessage(document.getMessage(),message);
+		String result = message.getMessageHeader().getMessageData().getMessageId();
+		log.info("Created message {}",result);
+		return result;
+	}
+
+	public String resendMessage(String messageId)
+	{
+		log.debug("ResendMessage {}",messageId);
+		return ebMSDAO.getMessage(messageId).map(p ->
+		{
+			try
 			{
-				if (!EbMSAction.PONG.getAction().equals(response.get().getMessageHeader().getAction()))
-					throw new EbMSProcessingException("No valid response received!");
+				val messageRequest = MessageMapper.INSTANCE.toMessage(p);
+				resetMessage(messageRequest.getProperties());
+				val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
+				if (LoggingUtils.mdc == Status.ENABLED)
+					MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+				val document = EbMSMessageUtils.getEbMSDocument(message);
+				signatureGenerator.generate(document,message);
+				storeMessage(document.getMessage(),message);
+				val newMessageId = message.getMessageHeader().getMessageData().getMessageId();
+				log.info("Created message {}",newMessageId);
+				return newMessageId;
 			}
-			else
-				throw new EbMSProcessingException("No response received!");
-		}
-		catch (Exception e)
-		{
-			log.error("Ping {}",cpaId,e);
-			throw new EbMSMessageServiceException(e);
-		}
-	}
-
-	public String sendMessage(MessageRequest messageRequest) throws EbMSMessageServiceException
-	{
-		try
-		{
-			log.debug("SendMessage");
-			messagePropertiesValidator.validate(messageRequest.getProperties());
-			val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
-			if (LoggingUtils.mdc == Status.ENABLED)
-				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
-			val document = EbMSMessageUtils.getEbMSDocument(message);
-			signatureGenerator.generate(document,message);
-			storeMessage(document.getMessage(),message);
-			val result = message.getMessageHeader().getMessageData().getMessageId();
-			log.info("Created message {}",result);
-			return result;
-		}
-		catch (Exception e)
-		{
-			log.error("SendMessage " + messageRequest,e);
-			throw new EbMSMessageServiceException(e);
-		}
-	}
-
-	public String sendMessageMTOM(MTOMMessageRequest messageRequest) throws EbMSMessageServiceException
-	{
-		try
-		{
-			log.debug("SendMessage");
-			messagePropertiesValidator.validate(messageRequest.getProperties());
-			val message = ebMSMessageFactory.createEbMSMessageMTOM(messageRequest);
-			if (LoggingUtils.mdc == Status.ENABLED)
-				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
-			val document = EbMSMessageUtils.getEbMSDocument(message);
-			signatureGenerator.generate(document,message);
-			storeMessage(document.getMessage(),message);
-			String result = message.getMessageHeader().getMessageData().getMessageId();
-			log.info("Created message {}",result);
-			return result;
-		}
-		catch (Exception e)
-		{
-			log.error("SendMessage " + messageRequest,e);
-			throw new EbMSMessageServiceException(e);
-		}
-	}
-
-	public String resendMessage(String messageId) throws EbMSMessageServiceException
-	{
-		try
-		{
-			log.debug("ResendMessage {}",messageId);
-			return ebMSDAO.getMessage(messageId).map(p ->
+			catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError
+					| TransformerException e)
 			{
-				try
-				{
-					val messageRequest = MessageMapper.INSTANCE.toMessage(p);
-					resetMessage(messageRequest.getProperties());
-					val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
-					if (LoggingUtils.mdc == Status.ENABLED)
-						MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
-					val document = EbMSMessageUtils.getEbMSDocument(message);
-					signatureGenerator.generate(document,message);
-					storeMessage(document.getMessage(),message);
-					val newMessageId = message.getMessageHeader().getMessageData().getMessageId();
-					log.info("Created message {}",newMessageId);
-					return newMessageId;
-				}
-				catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError
-						| TransformerException e)
-				{
-					throw new EbMSProcessorException(e);
-				}
-			}).orElseThrow(() -> new NotFoundException("Not found message " + messageId));
-		}
-		catch (EbMSMessageServiceException e)
-		{
-			log.error("ResendMessage {}",messageId);
-			throw e;
-		}
-		catch (Exception e)
-		{
-			log.error("ResendMessage {}",messageId);
-			throw new EbMSMessageServiceException(e);
-		}
+				throw new EbMSProcessorException(e);
+			}
+		}).orElseThrow(() -> new NotFoundException("Not found message " + messageId));
 	}
 
-	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr)
 	{
-		try
-		{
-			log.debug("GetMessageIds");
-			return maxNr == null || maxNr == 0 ? ebMSDAO.getMessageIds(messageFilter,EbMSMessageStatus.RECEIVED)
-					: ebMSDAO.getMessageIds(messageFilter,EbMSMessageStatus.RECEIVED,maxNr);
-		}
-		catch (Exception e)
-		{
-			log.error("GetMessageIds " + messageFilter,e);
-			throw new EbMSMessageServiceException(e);
-		}
+		log.debug("GetMessageIds");
+		return maxNr == null || maxNr == 0 ? ebMSDAO.getMessageIds(messageFilter,EbMSMessageStatus.RECEIVED)
+				: ebMSDAO.getMessageIds(messageFilter,EbMSMessageStatus.RECEIVED,maxNr);
 	}
 
-	public Message getMessage(final String messageId, Boolean process) throws EbMSMessageServiceException
+	public Message getMessage(final String messageId, Boolean process)
 	{
-		try
-		{
-			log.debug("GetMessage {}",messageId);
-			if (process != null && process)
-				processMessage(messageId);
-			return ebMSDAO.getMessage(messageId).orElseThrow(NotFoundException::new);
-		}
-		catch (EbMSMessageServiceException e)
-		{
-			log.error("GetMessage " + messageId,e);
-			throw e;
-		}
-		catch (Exception e)
-		{
-			log.error("GetMessage " + messageId,e);
-			throw new EbMSMessageServiceException(e);
-		}
+		log.debug("GetMessage {}",messageId);
+		if (process != null && process)
+			processMessage(messageId);
+		return ebMSDAO.getMessage(messageId).orElseThrow(NotFoundException::new);
 	}
 
-	public MTOMMessage getMessageMTOM(String messageId, Boolean process) throws EbMSMessageServiceException
+	public MTOMMessage getMessageMTOM(String messageId, Boolean process)
 	{
-		try
-		{
-			log.debug("GetMessage {}",messageId);
-			if (process != null && process)
-				processMessage(messageId);
-			return ebMSDAO.getMTOMMessage(messageId).orElseThrow(NotFoundException::new);
-		}
-		catch (EbMSMessageServiceException e)
-		{
-			log.error("GetMessage " + messageId,e);
-			throw e;
-		}
-		catch (Exception e)
-		{
-			log.error("GetMessage " + messageId,e);
-			throw new EbMSMessageServiceException(e);
-		}
+		log.debug("GetMessage {}",messageId);
+		if (process != null && process)
+			processMessage(messageId);
+		return ebMSDAO.getMTOMMessage(messageId).orElseThrow(NotFoundException::new);
 	}
 
-	public void processMessage(final String messageId) throws EbMSMessageServiceException
+	public void processMessage(final String messageId)
 	{
-		try
+		log.debug("ProcessMessage {}",messageId);
+		Runnable runnable = () ->
 		{
-			log.debug("ProcessMessage {}",messageId);
-			Runnable runnable = () ->
-			{
-				if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0 && deleteEbMSAttachmentsOnMessageProcessed)
-					ebMSDAO.deleteAttachments(messageId);
-			};
-			ebMSDAO.executeTransaction(runnable);
-			log.info("Processed message {}",messageId);
-		}
-		catch (Exception e)
-		{
-			log.error("ProcessMessage " + messageId,e);
-			throw new EbMSMessageServiceException(e);
-		}
+			if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0 && deleteEbMSAttachmentsOnMessageProcessed)
+				ebMSDAO.deleteAttachments(messageId);
+		};
+		ebMSDAO.executeTransaction(runnable);
+		log.info("Processed message {}",messageId);
 	}
 
-	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
+	public MessageStatus getMessageStatus(String messageId)
 	{
-		try
-		{
-			log.debug("GetMessageStatus {}",messageId);
-			return ebMSDAO.getEbMSMessageProperties(messageId)
-					.map(p -> getMessageStatus(messageId,p))
-					.orElseThrow(() -> new NotFoundException("No message found with messageId " + messageId + "!"));
-		}
-		catch (EbMSMessageServiceException e)
-		{
-			log.error("GetMessageStatus " + messageId,e);
-			throw e;
-		}
-		catch (Exception e)
-		{
-			log.error("GetMessageStatus " + messageId,e);
-			throw new EbMSMessageServiceException(e);
-		}
+		log.debug("GetMessageStatus {}",messageId);
+		return ebMSDAO.getEbMSMessageProperties(messageId)
+				.map(p -> getMessageStatus(messageId,p))
+				.orElseThrow(() -> new NotFoundException("No message found with messageId " + messageId + "!"));
 	}
 
 	private MessageStatus getMessageStatus(String messageId, EbMSMessageProperties messageProperties) throws EbMSProcessorException
@@ -328,36 +238,20 @@ class EbMSMessageServiceHandler
 	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr)
 			throws EbMSMessageServiceException
 	{
-		try
-		{
-			log.debug("GetMessageEvents");
-			return maxNr == null || maxNr == 0 ? messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes)
-					: messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes,maxNr);
-		}
-		catch (Exception e)
-		{
-			log.error("GetMessageEvents" + messageFilter,e);
-			throw new EbMSMessageServiceException(e);
-		}
+		log.debug("GetMessageEvents");
+		return maxNr == null || maxNr == 0 ? messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes)
+				: messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes,maxNr);
 	}
 
-	public void processMessageEvent(final String messageId) throws EbMSMessageServiceException
+	public void processMessageEvent(final String messageId)
 	{
-		try
+		log.debug("ProcessMessageEvent {}",messageId);
+		Runnable processMessage = () ->
 		{
-			log.debug("ProcessMessageEvent {}",messageId);
-			Runnable processMessage = () ->
-			{
-				messageEventDAO.processEbMSMessageEvent(messageId);
-				processMessage(messageId);
-			};
-			ebMSDAO.executeTransaction(processMessage);
-		}
-		catch (Exception e)
-		{
-			log.error("ProcessMessageEvent " + messageId,e);
-			throw new EbMSMessageServiceException(e);
-		}
+			messageEventDAO.processEbMSMessageEvent(messageId);
+			processMessage(messageId);
+		};
+		ebMSDAO.executeTransaction(processMessage);
 	}
 
 	private void resetMessage(@NonNull MessageRequestProperties messageRequestProperties)
