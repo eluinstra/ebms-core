@@ -1,0 +1,20 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:getUnprocessedMessageIds>
+         <messageFilter>
+            <cpaId>[[${cpaId}]]</cpaId>
+            <fromParty>
+               <partyId>[[${partyType}]]:[[${fromPartyId}]]</partyId>
+               <role>[[${fromRole}]]</role>
+            </fromParty>
+            <toParty>
+               <partyId>[[${partyType}]]:[[${toPartyId}]]</partyId>
+               <role>[[${toRole}]]</role>
+            </toParty>
+            <service>[[${serviceType}]]:[[${service}]]</service>
+            <action>[[${action}]]</action>
+         </messageFilter>
+      </ns:getUnprocessedMessageIds>
+   </soapenv:Body>
+</soapenv:Envelope>

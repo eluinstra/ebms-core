@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.service;
 
 
+import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +24,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EbMSEndpointConfig
 {
-	@Bean
+	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/2.18","CPAService");
+	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/2.18","CPAPort");
+	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/ebms";
+
+	@Bean(name = "ebMSEndpoint")
 	Endpoint publishEndpoint(EbMSMessageService messageService)
 	{
-		return Endpoint.publish("http://localhost:8080/service/ebms",messageService);
+		return Endpoint.publish(SERVICE_ENDPOINT,messageService);
 	}
 }

@@ -1,0 +1,26 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId th:eb:type="${partyType}">[[${fromPartyId}]]</eb:PartyId>
+                <eb:Role>[[${fromRole}]]</eb:Role>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId th:eb:type="${partyType}">[[${toPartyId}]]</eb:PartyId>
+                <eb:Role>[[${toRole}]]</eb:Role>
+            </eb:To>
+            <eb:CPAId>[[${cpaId}]]</eb:CPAId>
+            <eb:ConversationId>[[${uuid}]]</eb:ConversationId>
+            <eb:Service th:eb:type="${serviceType}">[[${service}]]</eb:Service>
+            <eb:Action>[[${action}]]</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>[[${uuid}]]@localhost</eb:MessageId>
+                <eb:Timestamp>[[${timestamp}]]</eb:Timestamp>
+                <eb:TimeToLive>[[${timeToLive}]]</eb:TimeToLive>
+            </eb:MessageData>
+            <eb:DuplicateElimination/>
+        </eb:MessageHeader>
+        <eb:AckRequested eb:signed="false" eb:version="2.0" soap:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body/>
+</soap:Envelope>

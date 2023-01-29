@@ -16,13 +16,13 @@
 package nl.clockwork.ebms;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
+import lombok.val;
 
 public interface WithFile
 {
@@ -31,13 +31,26 @@ public interface WithFile
 		return readFileS(path);
 	}
 
+	default File getFile(String path)
+	{
+		try
+		{
+			val filePath = Paths.get(ClassLoader.getSystemResource(path).toURI());
+			return filePath.toFile();
+		}
+		catch (URISyntaxException e)
+		{
+			throw new IllegalStateException(e);
+		}
+	}
+
 	static String readFileS(String path)
 	{
 		try
 		{
-			Path filePath = Paths.get(ClassLoader.getSystemResource(path).toURI());
-			StringBuilder contentBuilder = new StringBuilder();
-			try (Stream<String> stream = Files.lines(filePath,StandardCharsets.UTF_8))
+			val filePath = Paths.get(ClassLoader.getSystemResource(path).toURI());
+			val contentBuilder = new StringBuilder();
+			try (val stream = Files.lines(filePath,StandardCharsets.UTF_8))
 			{
 				stream.forEach(s -> contentBuilder.append(s).append("\n"));
 			}

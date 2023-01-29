@@ -21,17 +21,26 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.util.stream.Stream;
-import nl.clockwork.ebms.PostgreSQLContainerFactory;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPBinding;
+import lombok.val;
+import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.WithFile;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -39,23 +48,40 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 // @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
+@TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(initializers = PostgreSQLContainerFactory.DataSourceInitializer.class, classes = {PropertiesConfig.class,URLMappingEndpointConfig.class,
-		URLMappingServiceConfig.class,DataSourceConfig.class,TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class,URLMappingEndpointConfig.class,URLMappingServiceConfig.class,DataSourceConfig.class,
+		TransactionManagerConfig.class})
 class URLMappingServiceImplTest implements WithFile
 {
 	@Container
-	private static final PostgreSQLContainer<?> database = PostgreSQLContainerFactory.get();
+	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
+	URLMappingService mappingProxy;
 
 	@Autowired
-	URLMappingService mappingService;
+	@Qualifier("urlMappingEndpoint")
+	Endpoint endpoint;
+
+	@BeforeAll
+	void beforeAll()
+	{
+		val service = Service.create(URLMappingEndpointConfig.SERVICE_NAME);
+		service.addPort(URLMappingEndpointConfig.PORT_NAME,SOAPBinding.SOAP11HTTP_BINDING,URLMappingEndpointConfig.SERVICE_ENDPOINT);
+		mappingProxy = service.getPort(URLMappingEndpointConfig.PORT_NAME,URLMappingService.class);
+	}
+
+	@AfterAll
+	void afterAll()
+	{
+		endpoint.stop();
+	}
 
 	@ParameterizedTest
 	@MethodSource("invalidURLMappings")
 	void insertInvalidXML(URLMapping mapping, String message)
 	{
-		assertThatThrownBy(() -> mappingService.setURLMapping(mapping)).hasMessageContaining(message);
+		assertThatThrownBy(() -> mappingProxy.setURLMapping(mapping)).hasMessageContaining(message);
 	}
 
 	static Stream<Arguments> invalidURLMappings()
@@ -70,7 +96,7 @@ class URLMappingServiceImplTest implements WithFile
 	@MethodSource("validURLMappings")
 	void insertValidXML(URLMapping mapping)
 	{
-		assertThatCode(() -> mappingService.setURLMapping(mapping)).doesNotThrowAnyException();
+		assertThatCode(() -> mappingProxy.setURLMapping(mapping)).doesNotThrowAnyException();
 	}
 
 	static Stream<Arguments> validURLMappings()
@@ -85,8 +111,8 @@ class URLMappingServiceImplTest implements WithFile
 	@Test
 	void getURLMappings()
 	{
-		validURLMappings().forEach(arg -> mappingService.setURLMapping((URLMapping)arg.get()[0]));
-		assertThat(mappingService.getURLMappings()).hasSize(2)
+		validURLMappings().forEach(arg -> mappingProxy.setURLMapping((URLMapping)arg.get()[0]));
+		assertThat(mappingProxy.getURLMappings()).hasSize(2)
 				.contains(new URLMapping("http://www.example.com:8080","http://localhost:8090"))
 				.contains(new URLMapping("http://www.example.com:8090","http://localhost:8090"));
 	}
@@ -94,19 +120,18 @@ class URLMappingServiceImplTest implements WithFile
 	@Test
 	void deleteURLMappings()
 	{
-		validURLMappings().forEach(arg -> mappingService.setURLMapping((URLMapping)arg.get()[0]));
-		assertThat(mappingService.getURLMappings()).hasSize(2);
-		assertThatCode(() -> mappingService.deleteURLMapping("http://www.example.com:8080")).doesNotThrowAnyException();
-		assertThat(mappingService.getURLMappings()).hasSize(1);
-		assertThatThrownBy(() -> mappingService.deleteURLMapping("http://www.example.com:8080")).hasMessageContaining("URL not found");
-		assertThatCode(() -> mappingService.deleteURLMapping("http://www.example.com:8090")).doesNotThrowAnyException();
-		assertThat(mappingService.getURLMappings()).isEmpty();
-		;
+		validURLMappings().forEach(arg -> mappingProxy.setURLMapping((URLMapping)arg.get()[0]));
+		assertThat(mappingProxy.getURLMappings()).hasSize(2);
+		assertThatCode(() -> mappingProxy.deleteURLMapping("http://www.example.com:8080")).doesNotThrowAnyException();
+		assertThat(mappingProxy.getURLMappings()).hasSize(1);
+		assertThatThrownBy(() -> mappingProxy.deleteURLMapping("http://www.example.com:8080")).hasMessageContaining("URL not found");
+		assertThatCode(() -> mappingProxy.deleteURLMapping("http://www.example.com:8090")).doesNotThrowAnyException();
+		assertThat(mappingProxy.getURLMappings()).isNull();
 	}
 
 	@Test
 	void deleteCache()
 	{
-		assertThatCode(() -> mappingService.deleteCache()).doesNotThrowAnyException();
+		assertThatCode(() -> mappingProxy.deleteCache()).doesNotThrowAnyException();
 	}
 }

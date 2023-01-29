@@ -21,19 +21,27 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.util.stream.Stream;
-import nl.clockwork.ebms.PostgreSQLContainerFactory;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPBinding;
+import lombok.val;
+import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.WithFile;
 import nl.clockwork.ebms.cpa.url.URLMappingServiceConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
-import nl.clockwork.ebms.validation.CPAValidator;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -41,27 +49,40 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 // @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
+@TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(initializers = PostgreSQLContainerFactory.DataSourceInitializer.class, classes = {PropertiesConfig.class,CPAEndpointConfig.class,
-		CPAServiceConfig.class,CPAManagerConfig.class,URLMappingServiceConfig.class,DataSourceConfig.class,TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class,CPAEndpointConfig.class,CPAServiceConfig.class,CPAManagerConfig.class,URLMappingServiceConfig.class,
+		DataSourceConfig.class,TransactionManagerConfig.class})
 class CPAServiceImplTest implements WithFile
 {
 	@Container
-	private static final PostgreSQLContainer<?> database = PostgreSQLContainerFactory.get();
+	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
+	CPAService cpaProxy;
 
 	@Autowired
-	CPAService cpaService;
-	@Autowired
-	CPAManager cpamanager;
-	@Autowired
-	CPAValidator cpaValidator;
+	@Qualifier("cpaEndpoint")
+	Endpoint endpoint;
+
+	@BeforeAll
+	void beforeAll()
+	{
+		val service = Service.create(CPAEndpointConfig.SERVICE_NAME);
+		service.addPort(CPAEndpointConfig.PORT_NAME,SOAPBinding.SOAP11HTTP_BINDING,CPAEndpointConfig.SERVICE_ENDPOINT);
+		cpaProxy = service.getPort(CPAEndpointConfig.PORT_NAME,CPAService.class);
+	}
+
+	@AfterAll
+	void afterAll()
+	{
+		endpoint.stop();
+	}
 
 	@ParameterizedTest
 	@MethodSource("invalidCPAs")
 	void validateInvalidXML(String cpa, String message)
 	{
-		assertThatThrownBy(() -> cpaService.validateCPA(cpa)).hasMessageContaining(message);
+		assertThatThrownBy(() -> cpaProxy.validateCPA(cpa)).hasMessageContaining(message);
 	}
 
 	private static Stream<Arguments> invalidCPAs()
@@ -81,7 +102,7 @@ class CPAServiceImplTest implements WithFile
 	@MethodSource("validCPAs")
 	void validateValidXML(String path)
 	{
-		assertThatCode(() -> cpaService.validateCPA(readFile(path))).doesNotThrowAnyException();
+		assertThatCode(() -> cpaProxy.validateCPA(readFile(path))).doesNotThrowAnyException();
 	}
 
 	private static Stream<Arguments> validCPAs()
@@ -108,14 +129,14 @@ class CPAServiceImplTest implements WithFile
 	@MethodSource("validCPAs")
 	void insertValidXML(String path)
 	{
-		assertThatCode(() -> cpaService.insertCPA(readFile(path),true)).doesNotThrowAnyException();
+		assertThatCode(() -> cpaProxy.insertCPA(readFile(path),true)).doesNotThrowAnyException();
 	}
 
 	@Test
 	void getCPAIds()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]),true));
-		assertThat(cpaService.getCPAIds()).hasSize(15)
+		validCPAs().forEach(path -> cpaProxy.insertCPA(readFile((String)path.get()[0]),true));
+		assertThat(cpaProxy.getCPAIds()).hasSize(15)
 				.contains("CPAID_EchoService-1-0")
 				.contains("cpaStubEBF.be.http.signed")
 				.contains("cpaStubEBF.be.http.unsigned.sync")
@@ -136,26 +157,26 @@ class CPAServiceImplTest implements WithFile
 	@Test
 	void getCPA()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]),true));
-		assertThat(cpaService.getCPAIds()).hasSize(15);
-		assertThat(cpaService.getCPA("cpaStubEBF.rm.https.signed")).contains("cpaid=\"cpaStubEBF.rm.https.signed\"");
+		validCPAs().forEach(path -> cpaProxy.insertCPA(readFile((String)path.get()[0]),true));
+		assertThat(cpaProxy.getCPAIds()).hasSizeGreaterThan(0);
+		assertThat(cpaProxy.getCPA("cpaStubEBF.rm.https.signed")).contains("cpaid=\"cpaStubEBF.rm.https.signed\"");
 	}
 
 	@Test
 	void deleteCPA()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]),true));
-		assertThat(cpaService.getCPAIds()).hasSize(15);
-		assertThatCode(() -> cpaService.deleteCPA("CPAID_EchoService-1-0")).doesNotThrowAnyException();
-		assertThat(cpaService.getCPAIds()).hasSize(14);
-		assertThatThrownBy(() -> cpaService.deleteCPA("CPAID_EchoService-1-0")).hasMessageContaining("CPA not found");
-		assertThatCode(() -> cpaService.deleteCPA("cpaStubEBF.be.http.signed")).doesNotThrowAnyException();
-		assertThat(cpaService.getCPAIds()).hasSize(13);
+		validCPAs().forEach(path -> cpaProxy.insertCPA(readFile((String)path.get()[0]),true));
+		assertThat(cpaProxy.getCPAIds()).hasSize(15);
+		assertThatCode(() -> cpaProxy.deleteCPA("CPAID_EchoService-1-0")).doesNotThrowAnyException();
+		assertThat(cpaProxy.getCPAIds()).hasSize(14);
+		assertThatThrownBy(() -> cpaProxy.deleteCPA("CPAID_EchoService-1-0")).hasMessageContaining("CPA not found");
+		assertThatCode(() -> cpaProxy.deleteCPA("cpaStubEBF.be.http.signed")).doesNotThrowAnyException();
+		assertThat(cpaProxy.getCPAIds()).hasSize(13);
 	}
 
 	@Test
 	void deleteCache()
 	{
-		assertThatCode(() -> cpaService.deleteCache()).doesNotThrowAnyException();
+		assertThatCode(() -> cpaProxy.deleteCache()).doesNotThrowAnyException();
 	}
 }

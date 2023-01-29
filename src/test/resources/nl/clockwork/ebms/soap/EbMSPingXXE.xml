@@ -1,0 +1,24 @@
+<!DOCTYPE aa[<!ELEMENT bb ANY><!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
+            </eb:To>
+            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
+            <eb:ConversationId>[[${uuid}]]</eb:ConversationId>
+            <eb:Service>urn:oasis:names:tc:ebxml-msg:service</eb:Service>
+            <eb:Action>Ping</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>[[${uuid}]]@localhost</eb:MessageId>
+                <eb:Timestamp>[[${timestamp}]]</eb:Timestamp>
+                <eb:TimeToLive>[[${timeToLive}]]</eb:TimeToLive>
+            </eb:MessageData>
+        </eb:MessageHeader>
+        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body/>
+</soap:Envelope>

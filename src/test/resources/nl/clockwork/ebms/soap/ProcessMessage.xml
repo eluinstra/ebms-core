@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:processMessage>
+         <messageId>[[${messageId}]]</messageId>
+      </ns:processMessage>
+   </soapenv:Body>
+</soapenv:Envelope>
