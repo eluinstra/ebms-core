@@ -42,11 +42,11 @@ public class EbMSClientConfig
 	@Value("${http.proxy.port}")
 	int poxyPort;
 	@Value("${http.proxy.nonProxyHosts}")
-	String proxyUsername;
-	@Value("${http.proxy.username}")
-	String proxyPassword;
-	@Value("${http.proxy.password}")
 	Set<String> nonProxyHosts;
+	@Value("${http.proxy.username}")
+	String proxyUsername;
+	@Value("${http.proxy.password}")
+	String proxyPassword;
 	@Value("${https.protocols}")
 	String[] enabledProtocols;
 	@Value("${https.cipherSuites}")

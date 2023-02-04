@@ -67,7 +67,7 @@ class EbMSHttpClient implements EbMSClient
 
 	private ProxySelector getProxy(EbMSProxy proxy)
 	{
-		return proxy == null ? ProxySelector.getDefault() : ProxySelector.of(new InetSocketAddress(proxy.getHost(),proxy.getPort()));
+		return proxy != null && proxy.useProxy() ?  ProxySelector.of(new InetSocketAddress(proxy.getHost(),proxy.getPort())) : ProxySelector.getDefault();
 	}
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
@@ -87,7 +87,7 @@ class EbMSHttpClient implements EbMSClient
 	{
 		var request = HttpRequest.newBuilder().uri(URI.create(uri)).timeout(Duration.ofMillis(readTimeout));
 		request = new EbMSMessageWriter().write(request,document);
-		if (proxy.useProxyAuthorization())
+		if (proxy != null && proxy.useProxyAuthorization())
 			request = request.setHeader(proxy.getProxyAuthorizationKey(),proxy.getProxyAuthorizationValue());
 		return request.build();
 	}

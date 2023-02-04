@@ -32,9 +32,14 @@ public class EbMSProxy
 	String password;
 	Set<String> nonProxyHosts;
 
+	public boolean useProxy()
+	{
+		return StringUtils.isNotBlank(host);
+	}
+
 	public boolean useProxyAuthorization()
 	{
-		return StringUtils.isNotBlank(username);
+		return useProxy() && StringUtils.isNotBlank(username);
 	}
 
 	public String getProxyAuthorizationKey()
