@@ -25,16 +25,10 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.security.cert.CertificateException;
 import java.util.stream.Stream;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
-import lombok.val;
 import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -43,7 +37,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -54,37 +47,20 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class,CertificateMappingEndpointConfig.class,CertificateMappingServiceConfig.class,DataSourceConfig.class,
-		TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class,CertificateMappingServiceConfig.class,DataSourceConfig.class,TransactionManagerConfig.class})
 class CertificateMappingServiceImplTest
 {
 	@Container
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
-	CertificateMappingService mappingProxy;
 
 	@Autowired
-	@Qualifier("certificateMappingEndpoint")
-	Endpoint endpoint;
-
-	@BeforeAll
-	void beforeAll()
-	{
-		val service = Service.create(CertificateMappingEndpointConfig.SERVICE_NAME);
-		service.addPort(CertificateMappingEndpointConfig.PORT_NAME,SOAPBinding.SOAP11HTTP_BINDING,CertificateMappingEndpointConfig.SERVICE_ENDPOINT);
-		mappingProxy = service.getPort(CertificateMappingEndpointConfig.PORT_NAME,CertificateMappingService.class);
-	}
-
-	@AfterAll
-	void afterAll()
-	{
-		endpoint.stop();
-	}
+	CertificateMappingService mappingService;
 
 	@ParameterizedTest
 	@MethodSource("validCertificateMappings")
 	void insertValidXML(CertificateMapping mapping)
 	{
-		assertThatCode(() -> mappingProxy.setCertificateMapping(mapping)).doesNotThrowAnyException();
+		assertThatCode(() -> mappingService.setCertificateMapping(mapping)).doesNotThrowAnyException();
 	}
 
 	static Stream<Arguments> validCertificateMappings() throws CertificateException
@@ -104,8 +80,8 @@ class CertificateMappingServiceImplTest
 	@Test
 	void getURLMappings() throws CertificateException
 	{
-		validCertificateMappings().forEach(arg -> mappingProxy.setCertificateMapping((CertificateMapping)arg.get()[0]));
-		assertThat(mappingProxy.getCertificateMappings()).hasSize(3)
+		validCertificateMappings().forEach(arg -> mappingService.setCertificateMapping((CertificateMapping)arg.get()[0]));
+		assertThat(mappingService.getCertificateMappings()).hasSize(3)
 				.contains(new CertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
 						parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
 						null))
@@ -120,22 +96,23 @@ class CertificateMappingServiceImplTest
 	@Test
 	void deleteURLMappings() throws CertificateException
 	{
-		validCertificateMappings().forEach(arg -> mappingProxy.setCertificateMapping((CertificateMapping)arg.get()[0]));
-		assertThat(mappingProxy.getCertificateMappings()).hasSize(3);
-		assertThatCode(() -> mappingProxy.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),null))
-				.doesNotThrowAnyException();
-		assertThat(mappingProxy.getCertificateMappings()).hasSize(2);
+		validCertificateMappings().forEach(arg -> mappingService.setCertificateMapping((CertificateMapping)arg.get()[0]));
+		assertThat(mappingService.getCertificateMappings()).hasSize(3);
+		assertThatCode(
+				() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),null))
+						.doesNotThrowAnyException();
+		assertThat(mappingService.getCertificateMappings()).hasSize(2);
 		assertThatThrownBy(
-				() -> mappingProxy.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),null))
+				() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),null))
 						.hasMessageContaining("Certificate not found");
-		assertThatCode(() -> mappingProxy.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),""))
+		assertThatCode(() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),""))
 				.doesNotThrowAnyException();
-		assertThat(mappingProxy.getCertificateMappings()).hasSize(1);
+		assertThat(mappingService.getCertificateMappings()).hasSize(1);
 	}
 
 	@Test
 	void deleteCache()
 	{
-		assertThatCode(() -> mappingProxy.deleteCache()).doesNotThrowAnyException();
+		assertThatCode(() -> mappingService.deleteCache()).doesNotThrowAnyException();
 	}
 }

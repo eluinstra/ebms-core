@@ -21,16 +21,18 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 
 import io.restassured.RestAssured;
+import io.restassured.config.MultiPartConfig;
 import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 import java.util.List;
+import java.util.UUID;
 import lombok.val;
 import nl.clockwork.ebms.EbMSServer;
 import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.WithFile;
+import nl.clockwork.ebms.WithRestAssured;
 import nl.clockwork.ebms.WithTemplate;
 import org.eclipse.jetty.server.Server;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -39,17 +41,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.thymeleaf.TemplateEngine;
 
-@EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
+// @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
 @TestInstance(Lifecycle.PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
 @Testcontainers
-class EbMSMessageServiceImplTest implements WithFile, WithTemplate
+class EbMSMessageServiceImplTest implements WithFile, WithTemplate, WithRestAssured
 {
 	@Container
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
@@ -63,6 +64,7 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 	void beforeAll() throws Exception
 	{
 		RestAssured.port = 8888;
+		RestAssured.config().multiPartConfig(MultiPartConfig.multiPartConfig().defaultSubtype("related").defaultBoundary(UUID.randomUUID().toString()));
 		server = new EbMSServer().createServer();
 		server.start();
 	}
@@ -142,6 +144,8 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.header("SOAPAction","\"ebXML\"")
 				.header("Content-Type","text/xml; charset=UTF-8")
 				.body(ebMSMessage(templateEngine,ebMSMessageContext(messageId)))
+				// .multiPart(createEbMSPart(ebMSMessageWithAttachments(templateEngine,ebMSMessageContextWithAttachments(messageId,List.of("1")))))
+				// .multiPart(createAfleverberichtAttachment("1",readFile("nl/clockwork/ebms/soap/Afleverbericht.xml")))
 				.when()
 				.request(Method.POST,"/ebms")
 				.then()
@@ -213,7 +217,7 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.body("Envelope.Body.getUnprocessedMessageIdsResponse.messageId",startsWith(messageId));
 	}
 
-	// @Test
+	@Test
 	@Order(7)
 	void getMessage() throws Exception
 	{
@@ -222,16 +226,21 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.header("SOAPAction","")
 				.body(getMessage(templateEngine,getMessageContext(messageId)))
 				.when()
-				.log()
-				.all()
 				.port(8080)
 				.request(Method.POST,"/service/ebms")
 				.then()
-				.log()
-				.all()
 				.statusCode(200)
 				.contentType(ContentType.XML)
-				.body("Envelope.Body.getMessageResponse.messageId",startsWith(messageId));
+				.body("Envelope.Body.getMessageResponse.message.properties.cpaId",equalTo("cpaStubEBF.rm.http.unsigned.sync"))
+				.body("Envelope.Body.getMessageResponse.message.properties.fromParty.partyId",equalTo("urn:osb:oin:00000000000000000000"))
+				.body("Envelope.Body.getMessageResponse.message.properties.fromParty.role",equalTo("DIGIPOORT"))
+				.body("Envelope.Body.getMessageResponse.message.properties.toParty.partyId",equalTo("urn:osb:oin:00000000000000000001"))
+				.body("Envelope.Body.getMessageResponse.message.properties.toParty.role",equalTo("OVERHEID"))
+				.body("Envelope.Body.getMessageResponse.message.properties.service",equalTo("urn:osb:services:osb:afleveren:1.1$1.0"))
+				.body("Envelope.Body.getMessageResponse.message.properties.action",equalTo("afleveren"))
+				.body("Envelope.Body.getMessageResponse.message.properties.conversationId",equalTo(messageId))
+				.body("Envelope.Body.getMessageResponse.message.properties.messageId",startsWith(messageId))
+				.body("Envelope.Body.getMessageResponse.message.properties.messageStatus",equalTo("RECEIVED"));
 	}
 
 	@Test
@@ -248,10 +257,10 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.then()
 				.statusCode(200)
 				.contentType(ContentType.XML)
-				.body("Envelope.Body.processMessageResponse",Matchers.equalTo(""));
+				.body("Envelope.Body.processMessageResponse",equalTo(""));
 	}
 
-	// @Test
+	@Test
 	@Order(9)
 	void ebMSMessageStatusAgain()
 	{
@@ -261,12 +270,8 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.header("Content-Type","text/xml; charset=UTF-8")
 				.body(ebMSMessageStatus(templateEngine,ebMSMessageStatusContext(uuid,messageId)))
 				.when()
-				.log()
-				.all()
 				.request(Method.POST,"/ebms")
 				.then()
-				.log()
-				.all()
 				.statusCode(200)
 				.contentType(ContentType.XML)
 				.header("SOAPAction","\"ebXML\"")
@@ -283,7 +288,7 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.body("Envelope.Body.StatusResponse.RefToMessageId",startsWith(messageId));
 	}
 
-	// @Test
+	@Test
 	@Order(10)
 	void getUnprocessedMessageIdsAgain() throws Exception
 	{
@@ -292,13 +297,9 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.header("SOAPAction","")
 				.body(getUnprocessedMessageIds(templateEngine,getUnprocessedMessageIdsContext()))
 				.when()
-				.log()
-				.all()
 				.port(8080)
 				.request(Method.POST,"/service/ebms")
 				.then()
-				.log()
-				.all()
 				.statusCode(200)
 				.contentType(ContentType.XML)
 				// .body("Envelope.Body.getUnprocessedMessageIdsResponse.messageId*.length().sum()",equalTo(1))
@@ -1211,8 +1212,6 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.when()
 				.request(Method.POST,"/ebms")
 				.then()
-				.log()
-				.all()
 				.statusCode(200)
 				.contentType(ContentType.XML)
 				.header("SOAPAction","\"ebXML\"")
@@ -1245,8 +1244,6 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.when()
 				.request(Method.POST,"/ebms")
 				.then()
-				.log()
-				.all()
 				.statusCode(500)
 				.header("Content-Length",equalTo("0"));
 	}
@@ -1295,8 +1292,6 @@ class EbMSMessageServiceImplTest implements WithFile, WithTemplate
 				.when()
 				.request(Method.POST,"/ebms")
 				.then()
-				.log()
-				.all()
 				.statusCode(500)
 				.header("Content-Length",equalTo("0"));
 	}

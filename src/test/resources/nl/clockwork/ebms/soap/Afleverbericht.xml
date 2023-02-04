@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<tns:afleverBericht xsi:schemaLocation="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/ Afleveren_ebMS_2.0_v1.1.xsd" xmlns:tns="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<tns:kenmerk>kenmerk</tns:kenmerk>
+	<tns:berichtsoort>berichtsoort</tns:berichtsoort>
+	<tns:berichtkenmerk>berichtkenmerk</tns:berichtkenmerk>
+	<tns:aanleverkenmerk>aanleverkenmerk</tns:aanleverkenmerk>
+	<tns:tijdstempelAangeleverd>2016-01-01T00:00:00.0Z</tns:tijdstempelAangeleverd>
+	<tns:identiteitBelanghebbende>
+		<tns:nummer>nummer</tns:nummer>
+		<tns:type>BSN</tns:type>
+	</tns:identiteitBelanghebbende>
+	<tns:rolBelanghebbende>rolBelanghebbende</tns:rolBelanghebbende>
+	<tns:berichtInhoud>
+		<tns:mimeType>plain/text</tns:mimeType>
+		<tns:bestandsnaam>test.txt</tns:bestandsnaam>
+		<tns:inhoud>dGVzdA==</tns:inhoud>
+	</tns:berichtInhoud>
+	<tns:berichtBijlagen>
+		<tns:bijlage>
+			<tns:mimeType>plain/text</tns:mimeType>
+			<tns:bestandsnaam>test.txt</tns:bestandsnaam>
+			<tns:inhoud>dGVzdA==</tns:inhoud>
+		</tns:bijlage>
+	</tns:berichtBijlagen>
+</tns:afleverBericht>
