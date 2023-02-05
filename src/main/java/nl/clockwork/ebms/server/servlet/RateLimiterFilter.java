@@ -44,6 +44,6 @@ public class RateLimiterFilter implements Filter
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
 		rateLimiter.acquire();
-		chain.doFilter(request,response);
+		chain.doFilter(request, response);
 	}
 }

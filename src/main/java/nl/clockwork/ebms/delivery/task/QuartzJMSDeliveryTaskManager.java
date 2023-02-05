@@ -41,14 +41,14 @@ public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager
 			int autoRetryInterval,
 			@NonNull JmsTemplate jmsTemplate)
 	{
-		super(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+		super(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
 		this.jmsTemplate = jmsTemplate;
 	}
 
 	@Override
 	public void insertTask(DeliveryTask task)
 	{
-		jmsTemplate.send(JMSDeliveryTaskManager.JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(task));
+		jmsTemplate.send(JMSDeliveryTaskManager.JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(task));
 	}
 
 	@Override

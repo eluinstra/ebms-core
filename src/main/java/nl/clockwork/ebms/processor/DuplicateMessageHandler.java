@@ -62,38 +62,42 @@ class DuplicateMessageHandler
 			log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
 			if (messageValidator.isSyncReply(message))
 			{
-				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getCPAId(),
+				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
+						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(result,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils.ifNotPresent(result, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				return result.orElse(null);
 			}
 			else
 			{
-				val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(messageHeader.getCPAId(),
+				val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
+						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(messageProperties,
-						() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils
+						.ifNotPresent(messageProperties, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
 				val sendDeliveryChannel =
-						cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,null)
+						cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(), messageHeader.getTo().getPartyId(), messageHeader.getTo().getRole(), service, null)
 								.orElse(null);
-				val receiveDeliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
-								.orElse(null);
+				val receiveDeliveryChannel = cpaManager
+						.getReceiveDeliveryChannel(messageHeader.getCPAId(), messageHeader.getFrom().getPartyId(), messageHeader.getFrom().getRole(), service, null)
+						.orElse(null);
 				Runnable storeMessage = () ->
 				{
 					if (receiveDeliveryChannel != null && messageProperties.isPresent())
-						deliveryTaskManager.insertTask(deliveryTaskManager.createNewTask(messageHeader.getCPAId(),
-								sendDeliveryChannel.getChannelId(),
-								receiveDeliveryChannel.getChannelId(),
-								messageProperties.get().getMessageId(),
-								messageHeader.getMessageData().getTimeToLive(),
-								messageProperties.get().getTimestamp(),
-								false));
+						deliveryTaskManager.insertTask(
+								deliveryTaskManager.createNewTask(
+										messageHeader.getCPAId(),
+										sendDeliveryChannel.getChannelId(),
+										receiveDeliveryChannel.getChannelId(),
+										messageProperties.get().getMessageId(),
+										messageHeader.getMessageData().getTimeToLive(),
+										messageProperties.get().getTimestamp(),
+										false));
 				};
 				ebMSDAO.executeTransaction(storeMessage);
 				if (receiveDeliveryChannel == null && messageProperties.isPresent())
@@ -104,7 +108,7 @@ class DuplicateMessageHandler
 					}
 					catch (TransformerException e)
 					{
-						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!",e);
+						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!", e);
 					}
 				return null;
 			}

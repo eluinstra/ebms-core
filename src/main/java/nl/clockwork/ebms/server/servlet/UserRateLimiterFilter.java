@@ -34,7 +34,7 @@ import nl.clockwork.ebms.validation.ClientCertificateManager;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRateLimiterFilter implements Filter
 {
-	ConcurrentHashMap<String,RateLimiter> rateLimiters = new ConcurrentHashMap<>();
+	ConcurrentHashMap<String, RateLimiter> rateLimiters = new ConcurrentHashMap<>();
 	double queriesPerSecond;
 
 	@Override
@@ -47,8 +47,8 @@ public class UserRateLimiterFilter implements Filter
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
 		val subject = Optional.ofNullable(ClientCertificateManager.getCertificate()).map(c -> c.getSubjectDN().toString()).orElse("");
-		rateLimiters.computeIfAbsent(subject,s -> RateLimiter.create(queriesPerSecond));
+		rateLimiters.computeIfAbsent(subject, s -> RateLimiter.create(queriesPerSecond));
 		rateLimiters.get(subject).acquire();
-		chain.doFilter(request,response);
+		chain.doFilter(request, response);
 	}
 }

@@ -23,7 +23,7 @@ public class FixedPostgreSQLContainer extends PostgreSQLContainer<FixedPostgreSQ
 	public FixedPostgreSQLContainer()
 	{
 		super("postgres:15.1");
-		this.withDatabaseName("ebms").withUsername("ebms").withPassword("ebms").withReuse(true).addFixedExposedPort(5432,5432);
+		this.withDatabaseName("ebms").withUsername("ebms").withPassword("ebms").withReuse(true).addFixedExposedPort(5432, 5432);
 		this.start();
 	}
 }

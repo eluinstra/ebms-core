@@ -64,12 +64,12 @@ public abstract class EbMSInputStreamHandler
 		}
 		catch (ValidationException e)
 		{
-			log.error("",e);
-			handleValidationException("Client",e.getMessage());
+			log.error("", e);
+			handleValidationException("Client", e.getMessage());
 		}
 		catch (Exception e)
 		{
-			log.error("",e);
+			log.error("", e);
 			handleException();
 		}
 	}
@@ -94,10 +94,10 @@ public abstract class EbMSInputStreamHandler
 		validateSoapAction(request);
 		if (messageLog.isDebugEnabled())
 			request = getRequestLogger(request);
-		val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
+		val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"), getRequestHeader("Content-Type"));
 		val requestDocument = messageReader.read(request);
 		if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
-			messageLog.info("<<<<\n{}",DOMUtils.toString(requestDocument.getMessage()));
+			messageLog.info("<<<<\n{}", DOMUtils.toString(requestDocument.getMessage()));
 		return messageProcessor.processRequest(requestDocument);
 	}
 
@@ -113,7 +113,7 @@ public abstract class EbMSInputStreamHandler
 		if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 		{
 			if (messageLog.isInfoEnabled())
-				messageLog.info("<<<<\n{}\n{}",getRequestHeaders(),IOUtils.toString(request,Charset.defaultCharset()));
+				messageLog.info("<<<<\n{}\n{}", getRequestHeaders(), IOUtils.toString(request, Charset.defaultCharset()));
 			throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
 		}
 	}
@@ -122,7 +122,7 @@ public abstract class EbMSInputStreamHandler
 	{
 		val result = new BufferedInputStream(request);
 		result.mark(Integer.MAX_VALUE);
-		messageLog.info("<<<<\n{}\n{}",getRequestHeaders(),IOUtils.toString(result,Charset.defaultCharset()));
+		messageLog.info("<<<<\n{}\n{}", getRequestHeaders(), IOUtils.toString(result, Charset.defaultCharset()));
 		result.reset();
 		return result;
 	}
@@ -136,21 +136,22 @@ public abstract class EbMSInputStreamHandler
 	{
 		if (responseDocument == null)
 		{
-			messageLog.info(">>>>\nStatusCode={}",HttpServletResponse.SC_NO_CONTENT);
+			messageLog.info(">>>>\nStatusCode={}", HttpServletResponse.SC_NO_CONTENT);
 			writeResponseStatus(HttpServletResponse.SC_NO_CONTENT);
 		}
 		else
 		{
 			if (messageLog.isInfoEnabled())
-				messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\nSOAPAction={}\n{}",
+				messageLog.info(
+						">>>>\nStatusCode={}\nContent-Type=text/xml\nSOAPAction={}\n{}",
 						HttpServletResponse.SC_OK,
 						Constants.EBMS_SOAP_ACTION,
 						DOMUtils.toString(responseDocument.getMessage()));
 			writeResponseStatus(HttpServletResponse.SC_OK);
-			writeResponseHeader("Content-Type","text/xml");
-			writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
+			writeResponseHeader("Content-Type", "text/xml");
+			writeResponseHeader("SOAPAction", Constants.EBMS_SOAP_ACTION);
 			val response = getOutputStream();
-			DOMUtils.write(responseDocument.getMessage(),response);
+			DOMUtils.write(responseDocument.getMessage(), response);
 		}
 	}
 
@@ -158,24 +159,24 @@ public abstract class EbMSInputStreamHandler
 	{
 		try
 		{
-			val soapFault = EbMSMessageUtils.createSOAPFault(faultCode,faultString);
+			val soapFault = EbMSMessageUtils.createSOAPFault(faultCode, faultString);
 			if (messageLog.isInfoEnabled())
-				messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\n{}",HttpServletResponse.SC_INTERNAL_SERVER_ERROR,DOMUtils.toString(soapFault));
+				messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\n{}", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DOMUtils.toString(soapFault));
 			writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			writeResponseHeader("Content-Type","text/xml");
+			writeResponseHeader("Content-Type", "text/xml");
 			val response = getOutputStream();
-			DOMUtils.write(soapFault,response);
+			DOMUtils.write(soapFault, response);
 		}
 		catch (Exception e)
 		{
-			log.error("",e);
+			log.error("", e);
 			throw new IllegalStateException("An unexpected error occurred!");
 		}
 	}
 
 	private void handleException()
 	{
-		messageLog.info(">>>>\nStatusCode={}",HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		messageLog.info(">>>>\nStatusCode={}", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 }

@@ -75,12 +75,12 @@ public class DeliveryManager
 			if (message.getSyncReply() == null)
 			{
 				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				return sendMessage(message,messageHeader,uri);
+				return sendMessage(message, messageHeader, uri);
 			}
 			else
 			{
 				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
 					return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
 			}
@@ -103,7 +103,7 @@ public class DeliveryManager
 		try
 		{
 			messageQueue.register(messageHeader.getMessageData().getMessageId());
-			val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+			val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
 			if (response == null)
 				return messageQueue.get(messageHeader.getMessageData().getMessageId());
 			else
@@ -122,13 +122,17 @@ public class DeliveryManager
 
 	protected String getUri(MessageHeader messageHeader)
 	{
-		return cpaManager.getReceivingUri(messageHeader
-				.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+		return cpaManager.getReceivingUri(
+				messageHeader.getCPAId(),
+				messageHeader.getTo().getPartyId(),
+				messageHeader.getTo().getRole(),
+				CPAUtils.toString(messageHeader.getService()),
+				messageHeader.getAction());
 	}
 
 	public void handleResponseMessage(final EbMSResponseMessage message) throws EbMSProcessorException
 	{
-		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
+		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(), message);
 	}
 
 	@Async("deliveryManagerTaskExecutor")
@@ -138,7 +142,7 @@ public class DeliveryManager
 		{
 			val messageHeader = response.getMessageHeader();
 			log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-			createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+			createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(response));
 		}
 		catch (EbMSProcessorException e)
 		{
@@ -156,12 +160,13 @@ public class DeliveryManager
 		String cpaId = messageHeader.getCPAId();
 		val sendDeliveryChannel =
 				cpaManager
-						.getSendDeliveryChannel(cpaId,
+						.getSendDeliveryChannel(
+								cpaId,
 								messageHeader.getFrom().getPartyId(),
 								messageHeader.getFrom().getRole(),
 								CPAUtils.toString(messageHeader.getService()),
 								messageHeader.getAction())
 						.orElse(null);
-		return ebMSClientFactory.getEbMSClient(cpaId,sendDeliveryChannel);
+		return ebMSClientFactory.getEbMSClient(cpaId, sendDeliveryChannel);
 	}
 }

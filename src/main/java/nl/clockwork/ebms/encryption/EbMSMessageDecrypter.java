@@ -62,18 +62,24 @@ public class EbMSMessageDecrypter
 		{
 			val messageHeader = message.getMessageHeader();
 			val service = CPAUtils.toString(messageHeader.getService());
-			if (cpaManager.isSendingConfidential(messageHeader
-					.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+			if (cpaManager.isSendingConfidential(
+					messageHeader.getCPAId(),
+					messageHeader.getFrom().getPartyId(),
+					messageHeader.getFrom().getRole(),
+					service,
+					messageHeader.getAction()))
 			{
 				val toPartyId = messageHeader.getTo().getPartyId();
 				val deliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
-								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",
-										messageHeader.getCPAId(),
-										toPartyId,
-										messageHeader.getTo().getRole(),
-										service,
-										messageHeader.getAction()));
+						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(), toPartyId, messageHeader.getTo().getRole(), service, messageHeader.getAction())
+								.orElseThrow(
+										() -> StreamUtils.illegalStateException(
+												"ReceiveDeliveryChannel",
+												messageHeader.getCPAId(),
+												toPartyId,
+												messageHeader.getTo().getRole(),
+												service,
+												messageHeader.getAction()));
 				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				if (certificate == null)
 					throw new EbMSProcessingException(
@@ -81,8 +87,8 @@ public class EbMSMessageDecrypter
 				val alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
 					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore + "\"");
-				val keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
-				message.getAttachments().replaceAll(a -> decrypt(keyPair,a));
+				val keyPair = SecurityUtils.getKeyPair(keyStore, alias, keyStore.getKeyPassword());
+				message.getAttachments().replaceAll(a -> decrypt(keyPair, a));
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -94,7 +100,7 @@ public class EbMSMessageDecrypter
 	private XMLCipher createXmlCipher(KeyPair keyPair) throws XMLEncryptionException, GeneralSecurityException
 	{
 		val result = XMLCipher.getInstance();
-		result.init(XMLCipher.DECRYPT_MODE,null);
+		result.init(XMLCipher.DECRYPT_MODE, null);
 		result.setKEK(keyPair.getPrivate());
 		return result;
 	}
@@ -104,13 +110,13 @@ public class EbMSMessageDecrypter
 		try
 		{
 			val document = DOMUtils.read((attachment.getInputStream()));
-			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
+			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS, EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
 				throw new ValidationException("Attachment " + attachment.getContentId() + " not encrypted!");
-			val encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+			val encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS, EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
 			val xmlCipher = createXmlCipher(keyPair);
 			val buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 			val contentType = encryptedDataElement.getAttribute("MimeType");
-			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),contentType,new ByteArrayInputStream(buffer));
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(), attachment.getContentId(), contentType, new ByteArrayInputStream(buffer));
 		}
 		catch (ParserConfigurationException | GeneralSecurityException e)
 		{
@@ -118,7 +124,7 @@ public class EbMSMessageDecrypter
 		}
 		catch (SAXException | IOException | XMLEncryptionException | IllegalArgumentException e)
 		{
-			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(), EbMSErrorCode.SECURITY_FAILURE, e.getMessage()));
 		}
 	}
 }

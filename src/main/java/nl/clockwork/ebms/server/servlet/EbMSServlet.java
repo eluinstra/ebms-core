@@ -50,7 +50,7 @@ public class EbMSServlet extends GenericServlet
 	{
 		try
 		{
-			httpHandler.handle((HttpServletRequest)request,(HttpServletResponse)response);
+			httpHandler.handle((HttpServletRequest)request, (HttpServletResponse)response);
 		}
 		catch (EbMSProcessorException e)
 		{

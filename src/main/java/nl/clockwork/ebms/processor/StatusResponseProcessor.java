@@ -61,16 +61,20 @@ class StatusResponseProcessor
 	public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest) throws ValidatorException, EbMSProcessorException
 	{
 		val p = ebMSDAO.getEbMSMessageProperties(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
-		val result = createEbMSMessageStatusAndTimestamp(statusRequest,p);
-		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result._1,result._2);
+		val result = createEbMSMessageStatusAndTimestamp(statusRequest, p);
+		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest, result._1, result._2);
 	}
 
 	public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
 	{
 		val messageHeader = statusResponse.getMessageHeader();
-		val uri = cpaManager.getReceivingUri(messageHeader
-				.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
-		deliveryManager.sendResponseMessage(uri,statusResponse);
+		val uri = cpaManager.getReceivingUri(
+				messageHeader.getCPAId(),
+				messageHeader.getTo().getPartyId(),
+				messageHeader.getTo().getRole(),
+				CPAUtils.toString(messageHeader.getService()),
+				messageHeader.getAction());
+		deliveryManager.sendResponseMessage(uri, statusResponse);
 	}
 
 	public void processStatusResponse(EbMSStatusResponse statusResponse)
@@ -82,30 +86,32 @@ class StatusResponseProcessor
 		}
 		catch (ValidatorException e)
 		{
-			log.warn("Unable to process StatusResponse " + statusResponse.getMessageHeader().getMessageData().getMessageId(),e);
+			log.warn("Unable to process StatusResponse " + statusResponse.getMessageHeader().getMessageData().getMessageId(), e);
 		}
 	}
 
-	private Tuple2<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageProperties messageProperties)
+	private Tuple2<EbMSMessageStatus, Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageProperties messageProperties)
 	{
 		if (messageProperties == null || EbMSAction.EBMS_SERVICE_URI.equals(messageProperties.getService()))
-			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED, null);
 		else if (!messageProperties.getCpaId().equals(statusRequest.getMessageHeader().getCPAId()))
-			return Tuple.of(EbMSMessageStatus.UNAUTHORIZED,null);
+			return Tuple.of(EbMSMessageStatus.UNAUTHORIZED, null);
 		else
 		{
 			return Optional.ofNullable(messageProperties.getMessageStatus())
-					.map(s -> mapEbMSMessageStatusAndTimestamp(s,messageProperties.getTimestamp()))
+					.map(s -> mapEbMSMessageStatusAndTimestamp(s, messageProperties.getTimestamp()))
 					.orElseThrow(() -> new EbMSProcessingException("Not found message " + statusRequest.getStatusRequest().getRefToMessageId()));
 		}
 	}
 
-	private Tuple2<EbMSMessageStatus,Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
+	private Tuple2<EbMSMessageStatus, Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
 	{
-		if (status != null && (MessageStatusType.RECEIVED.equals(status.getStatusCode()) || MessageStatusType.PROCESSED.equals(status.getStatusCode())
-				|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
-			return Tuple.of(status,timestamp);
+		if (status != null
+				&& (MessageStatusType.RECEIVED.equals(status.getStatusCode())
+						|| MessageStatusType.PROCESSED.equals(status.getStatusCode())
+						|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
+			return Tuple.of(status, timestamp);
 		else
-			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED, null);
 	}
 }

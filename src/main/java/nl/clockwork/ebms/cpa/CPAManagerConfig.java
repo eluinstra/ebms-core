@@ -32,7 +32,7 @@ public class CPAManagerConfig
 	@Bean
 	public CPAManager cpaManager(DataSource dataSource, URLMapper urlMapper)
 	{
-		return new CPAManager(cpaDAO(dataSource),urlMapper);
+		return new CPAManager(cpaDAO(dataSource), urlMapper);
 	}
 
 	private CPADAO cpaDAO(DataSource dataSource)

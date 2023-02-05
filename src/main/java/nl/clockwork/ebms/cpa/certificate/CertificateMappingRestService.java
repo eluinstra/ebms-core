@@ -62,7 +62,7 @@ public class CertificateMappingRestService implements WithService
 		{
 			try
 			{
-				return new CertificateMapping(encodeBase64String(m.getSource().getEncoded()),encodeBase64String(m.getDestination().getEncoded()),m.getCpaId());
+				return new CertificateMapping(encodeBase64String(m.getSource().getEncoded()), encodeBase64String(m.getDestination().getEncoded()), m.getCpaId());
 			}
 			catch (CertificateEncodingException e)
 			{
@@ -74,7 +74,8 @@ public class CertificateMappingRestService implements WithService
 		{
 			try
 			{
-				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(parseCertificate(decodeBase64(source)),
+				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(
+						parseCertificate(decodeBase64(source)),
 						parseCertificate(decodeBase64(destination)),
 						cpaId);
 			}
@@ -98,7 +99,7 @@ public class CertificateMappingRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping " + certificateMapping,e);
+			log.error("SetCertificateMapping " + certificateMapping, e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -110,12 +111,12 @@ public class CertificateMappingRestService implements WithService
 	{
 		try
 		{
-			mappingService.deleteCertificateMappingImpl(parseCertificate(decodeBase64(source)),cpaId);
+			mappingService.deleteCertificateMappingImpl(parseCertificate(decodeBase64(source)), cpaId);
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCertificateMapping " + source,e);
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			log.error("DeleteCertificateMapping " + source, e);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -129,7 +130,7 @@ public class CertificateMappingRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("GetCertificateMappings",e);
+			log.error("GetCertificateMappings", e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -144,7 +145,7 @@ public class CertificateMappingRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCache",e);
+			log.error("DeleteCache", e);
 			throw toWebApplicationException(e);
 		}
 	}

@@ -48,13 +48,13 @@ public class CommonConfig
 	@Bean
 	public EbMSMessageFactory ebMSMessageFactory(CPAManager cpaManager, EbMSIdGenerator ebMSIdGenerator)
 	{
-		return new EbMSMessageFactory(cpaManager,ebMSIdGenerator);
+		return new EbMSMessageFactory(cpaManager, ebMSIdGenerator);
 	}
 
 	@Bean
 	public void ebMSAttachmentFactory()
 	{
-		EbMSAttachmentFactory.init(attachmentOutputDirectory,attachmentMemoryTreshold,attachmentCipherTransformation);
+		EbMSAttachmentFactory.init(attachmentOutputDirectory, attachmentMemoryTreshold, attachmentCipherTransformation);
 	}
 
 	@Bean

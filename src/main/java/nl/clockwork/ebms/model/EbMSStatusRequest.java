@@ -37,7 +37,7 @@ public class EbMSStatusRequest extends EbMSRequestMessage
 	@Builder
 	public EbMSStatusRequest(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply, @NonNull StatusRequest statusRequest)
 	{
-		super(messageHeader,signature,syncReply);
+		super(messageHeader, signature, syncReply);
 		this.statusRequest = statusRequest;
 	}
 }

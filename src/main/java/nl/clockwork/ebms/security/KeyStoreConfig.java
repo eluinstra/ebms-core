@@ -66,24 +66,24 @@ public class KeyStoreConfig
 	@Bean
 	public EbMSTrustStore trustStore() throws GeneralSecurityException, IOException
 	{
-		return EbMSTrustStore.of(trustStoretype,trustStorepath,trustStorepassword);
+		return EbMSTrustStore.of(trustStoretype, trustStorepath, trustStorepassword);
 	}
 
 	@Bean("clientKeyStore")
 	public EbMSKeyStore clientKeyStore() throws GeneralSecurityException, IOException
 	{
-		return EbMSKeyStore.of(clientKeyStoreType,clientKeyStorePath,clientKeyStorePassword,clientKeyStoreKeyPassword,clientKeyStoreDefaultAlias);
+		return EbMSKeyStore.of(clientKeyStoreType, clientKeyStorePath, clientKeyStorePassword, clientKeyStoreKeyPassword, clientKeyStoreDefaultAlias);
 	}
 
 	@Bean("signatureKeyStore")
 	public EbMSKeyStore signatureKeyStore() throws GeneralSecurityException, IOException
 	{
-		return EbMSKeyStore.of(signatureKeyStoreType,signatureKeyStorePath,signatureKeyStorePassword,signatureKeyStoreKeyPassword);
+		return EbMSKeyStore.of(signatureKeyStoreType, signatureKeyStorePath, signatureKeyStorePassword, signatureKeyStoreKeyPassword);
 	}
 
 	@Bean("encryptionKeyStore")
 	public EbMSKeyStore encryptionKeyStore() throws GeneralSecurityException, IOException
 	{
-		return EbMSKeyStore.of(encryptionKeyStoreType,encryptionKeyStorePath,encryptionKeyStorePassword,encryptionKeyStoreKeyPassword);
+		return EbMSKeyStore.of(encryptionKeyStoreType, encryptionKeyStorePath, encryptionKeyStorePassword, encryptionKeyStoreKeyPassword);
 	}
 }

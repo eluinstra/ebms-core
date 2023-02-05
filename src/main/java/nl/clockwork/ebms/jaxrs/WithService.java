@@ -47,17 +47,18 @@ public interface WithService
 
 	default WebApplicationException toWebApplicationException(Exception exception) throws CPAServiceException
 	{
-		return toWebApplicationException(exception,MediaType.APPLICATION_JSON);
+		return toWebApplicationException(exception, MediaType.APPLICATION_JSON);
 	}
 
 	default WebApplicationException toWebApplicationException(Exception exception, String responseType)
 	{
-		val response = Match(exception).of(Case($(instanceOf(NotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
-				Case($(instanceOf(CPANotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
-				Case($(instanceOf(CertificateNotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
-				Case($(instanceOf(URLNotFoundException.class)),o -> Response.status(NOT_FOUND).type(responseType).build()),
-				Case($(instanceOf(BadRequestException.class)),o -> Response.status(BAD_REQUEST).type(responseType).entity(exception.getMessage()).build()),
-				Case($(),o -> Response.status(INTERNAL_SERVER_ERROR).type(responseType).entity(exception.getMessage()).build()));
+		val response = Match(exception).of(
+				Case($(instanceOf(NotFoundException.class)), o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(CPANotFoundException.class)), o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(CertificateNotFoundException.class)), o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(URLNotFoundException.class)), o -> Response.status(NOT_FOUND).type(responseType).build()),
+				Case($(instanceOf(BadRequestException.class)), o -> Response.status(BAD_REQUEST).type(responseType).entity(exception.getMessage()).build()),
+				Case($(), o -> Response.status(INTERNAL_SERVER_ERROR).type(responseType).entity(exception.getMessage()).build()));
 		return new WebApplicationException(response);
 	}
 }

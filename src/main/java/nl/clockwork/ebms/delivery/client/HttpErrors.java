@@ -45,7 +45,8 @@ class HttpErrors
 			String recoverableClientHttpErrors,
 			String unrecoverableServerHttpErrors)
 	{
-		this(getIntegerList(recoverableInformationalHttpErrors),
+		this(
+				getIntegerList(recoverableInformationalHttpErrors),
 				getIntegerList(recoverableRedirectionHttpErrors),
 				getIntegerList(recoverableClientHttpErrors),
 				getIntegerList(unrecoverableServerHttpErrors));
@@ -67,6 +68,6 @@ class HttpErrors
 
 	private static List<Integer> getIntegerList(String input)
 	{
-		return Arrays.stream(StringUtils.split(input,',')).map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
+		return Arrays.stream(StringUtils.split(input, ',')).map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
 	}
 }

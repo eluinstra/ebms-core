@@ -56,12 +56,12 @@ public class CPARestService implements WithService
 		}
 		catch (SAXException | IllegalArgumentException e)
 		{
-			log.error("ValidateCPA\n" + cpa,e);
+			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(new BadRequestException(e));
 		}
 		catch (Exception e)
 		{
-			log.error("ValidateCPA\n" + cpa,e);
+			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -74,17 +74,17 @@ public class CPARestService implements WithService
 	{
 		try
 		{
-			return cpaService.insertCPAImpl(cpa,overwrite);
+			return cpaService.insertCPAImpl(cpa, overwrite);
 		}
 		catch (SAXException | IllegalArgumentException e)
 		{
-			log.error("InsertCPA\n" + cpa,e);
-			throw toWebApplicationException(new BadRequestException(e),MediaType.TEXT_PLAIN);
+			log.error("InsertCPA\n" + cpa, e);
+			throw toWebApplicationException(new BadRequestException(e), MediaType.TEXT_PLAIN);
 		}
 		catch (Exception e)
 		{
-			log.error("InsertCPA\n" + cpa,e);
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			log.error("InsertCPA\n" + cpa, e);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class CPARestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCPA " + cpaId,e);
+			log.error("DeleteCPA " + cpaId, e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -113,7 +113,7 @@ public class CPARestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("GetCPAIds",e);
+			log.error("GetCPAIds", e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -129,8 +129,8 @@ public class CPARestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("GetCPAId " + cpaId,e);
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			log.error("GetCPAId " + cpaId, e);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -144,8 +144,8 @@ public class CPARestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCache",e);
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			log.error("DeleteCache", e);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 }

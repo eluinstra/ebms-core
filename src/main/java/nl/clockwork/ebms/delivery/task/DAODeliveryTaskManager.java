@@ -44,26 +44,26 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void insertTask(DeliveryTask task)
 	{
-		deliveryTaskDAO.insertTask(task,serverId);
+		deliveryTaskDAO.insertTask(task, serverId);
 	}
 
 	@Override
 	public void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status)
 	{
-		updateTask(task,url,status,null);
+		updateTask(task, url, status, null);
 	}
 
 	@Override
 	public void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status, final String errorMessage)
 	{
-		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(),task.getReceiveDeliveryChannelId())
-				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
-		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
+		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
+		deliveryTaskDAO.insertLog(task.getMessageId(), task.getTimestamp(), url, status, errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
-			deliveryTaskDAO.updateTask(createNextTask(task,deliveryChannel));
-		else if (mustUpdate(task,reliableMessaging))
-			deliveryTaskDAO.updateTask(createNextTask(task,autoRetryInterval));
+			deliveryTaskDAO.updateTask(createNextTask(task, deliveryChannel));
+		else if (mustUpdate(task, reliableMessaging))
+			deliveryTaskDAO.updateTask(createNextTask(task, autoRetryInterval));
 		else
 			deliveryTaskDAO.deleteTask(task.getMessageId());
 	}

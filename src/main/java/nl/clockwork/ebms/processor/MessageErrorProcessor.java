@@ -84,13 +84,14 @@ class MessageErrorProcessor
 			final EbMSValidationException e) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException,
 			IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		val messageError = createMessageError(timestamp,message,e);
+		val messageError = createMessageError(timestamp, message, e);
 		val result = EbMSMessageUtils.getEbMSDocument(messageError);
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(messageError.getMessageHeader().getService());
 		val sendDeliveryChannel =
 				cpaManager
-						.getSendDeliveryChannel(messageHeader.getCPAId(),
+						.getSendDeliveryChannel(
+								messageHeader.getCPAId(),
 								messageError.getMessageHeader().getFrom().getPartyId(),
 								messageError.getMessageHeader().getFrom().getRole(),
 								service,
@@ -98,7 +99,8 @@ class MessageErrorProcessor
 						.orElse(null);
 		val receiveDeliveryChannel =
 				cpaManager
-						.getReceiveDeliveryChannel(messageHeader.getCPAId(),
+						.getReceiveDeliveryChannel(
+								messageHeader.getCPAId(),
 								messageError.getMessageHeader().getTo().getPartyId(),
 								messageError.getMessageHeader().getTo().getRole(),
 								service,
@@ -106,9 +108,9 @@ class MessageErrorProcessor
 						.orElse(null);
 		Runnable storeMessage = () ->
 		{
-			storeMessages(timestamp,messageDocument,message,result,messageError);
+			storeMessages(timestamp, messageDocument, message, result, messageError);
 			if (receiveDeliveryChannel != null)
-				storeDeliveryTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
+				storeDeliveryTask(messageHeader.getCPAId(), sendDeliveryChannel, receiveDeliveryChannel, messageError, isSyncReply);
 		};
 		ebMSDAO.executeTransaction(storeMessage);
 		if (!isSyncReply && receiveDeliveryChannel == null)
@@ -116,19 +118,24 @@ class MessageErrorProcessor
 		return result;
 	}
 
-	private void
+	private
+			void
 			storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
 	{
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(message.getMessageHeader().getService());
 		val deliveryChannel =
 				cpaManager
-						.getReceiveDeliveryChannel(messageHeader
-								.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
+						.getReceiveDeliveryChannel(
+								messageHeader.getCPAId(),
+								messageHeader.getTo().getPartyId(),
+								messageHeader.getTo().getRole(),
+								service,
+								messageHeader.getAction())
 						.orElse(null);
-		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
-		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
-		ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp, deliveryChannel) : null;
+		ebMSDAO.insertMessage(timestamp, persistTime, messageDocument.getMessage(), message, message.getAttachments(), EbMSMessageStatus.FAILED);
+		ebMSDAO.insertMessage(timestamp, persistTime, messageErrorDocument.getMessage(), messageError, Collections.emptyList(), null);
 	}
 
 	private void storeDeliveryTask(
@@ -140,13 +147,15 @@ class MessageErrorProcessor
 	{
 		if (!isSyncReply)
 		{
-			deliveryTaskManager.insertTask(deliveryTaskManager.createNewTask(cpaId,
-					sendDeliveryChannel.getChannelId(),
-					receiveDeliveryChannel.getChannelId(),
-					messageError.getMessageHeader().getMessageData().getMessageId(),
-					messageError.getMessageHeader().getMessageData().getTimeToLive(),
-					messageError.getMessageHeader().getMessageData().getTimestamp(),
-					false));
+			deliveryTaskManager.insertTask(
+					deliveryTaskManager.createNewTask(
+							cpaId,
+							sendDeliveryChannel.getChannelId(),
+							receiveDeliveryChannel.getChannelId(),
+							messageError.getMessageHeader().getMessageData().getMessageId(),
+							messageError.getMessageHeader().getMessageData().getTimeToLive(),
+							messageError.getMessageHeader().getMessageData().getTimestamp(),
+							false));
 		}
 	}
 
@@ -155,8 +164,8 @@ class MessageErrorProcessor
 	{
 		try
 		{
-			messageValidator.validateMessageError(requestMessage,messageError);
-			storeMessageError(timestamp,response,messageError);
+			messageValidator.validateMessageError(requestMessage, messageError);
+			storeMessageError(timestamp, response, messageError);
 		}
 		catch (DuplicateMessageException e)
 		{
@@ -165,8 +174,8 @@ class MessageErrorProcessor
 		catch (ValidationException e)
 		{
 			val persistTime = ebMSDAO.getPersistTime(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),response.getMessage(),messageError,Collections.emptyList(),null);
-			log.warn("Unable to process MessageError " + messageError.getMessageHeader().getMessageData().getMessageId(),e);
+			ebMSDAO.insertMessage(timestamp, persistTime.orElse(null), response.getMessage(), messageError, Collections.emptyList(), null);
+			log.warn("Unable to process MessageError " + messageError.getMessageHeader().getMessageData().getMessageId(), e);
 		}
 	}
 
@@ -175,7 +184,7 @@ class MessageErrorProcessor
 	{
 		val errorList = EbMSMessageUtils.createErrorList();
 		errorList.getError().add(e.getError());
-		return ebMSMessageFactory.createEbMSMessageError(message,errorList,timestamp);
+		return ebMSMessageFactory.createEbMSMessageError(message, errorList, timestamp);
 	}
 
 	public void storeMessageError(final Instant timestamp, final EbMSDocument messageErrorDocument, final EbMSMessageError messageError)
@@ -184,8 +193,8 @@ class MessageErrorProcessor
 		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
 		Runnable insertMessage = () ->
 		{
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
-			if (ebMSDAO.updateMessage(responseMessageHeader.getMessageData().getRefToMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+			ebMSDAO.insertMessage(timestamp, persistTime.orElse(null), messageErrorDocument.getMessage(), messageError, Collections.emptyList(), null);
+			if (ebMSDAO.updateMessage(responseMessageHeader.getMessageData().getRefToMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERY_FAILED) > 0)
 			{
 				messageEventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
 				if (deleteEbMSAttachmentsOnMessageProcessed)

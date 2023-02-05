@@ -27,7 +27,7 @@ public class AzureKeyStoreConfig implements Condition
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 	{
-		boolean useAzure = context.getEnvironment().getProperty("keystores.type",String.class,"").equals("AZURE");
+		boolean useAzure = context.getEnvironment().getProperty("keystores.type", String.class, "").equals("AZURE");
 		if (useAzure)
 			Security.addProvider(new KeyVaultJcaProvider());
 		return useAzure;

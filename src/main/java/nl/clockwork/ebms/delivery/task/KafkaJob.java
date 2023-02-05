@@ -38,7 +38,7 @@ public class KafkaJob extends QuartzJobBean
 	DeliveryTaskManager deliveryTaskManager;
 	@Autowired
 	@Qualifier("deliveryTaskKafkaTransactionManager")
-	KafkaTransactionManager<?,?> transactionManager;
+	KafkaTransactionManager<?, ?> transactionManager;
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException

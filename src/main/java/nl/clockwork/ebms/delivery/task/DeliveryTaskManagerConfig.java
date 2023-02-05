@@ -69,30 +69,37 @@ public class DeliveryTaskManagerConfig
 	@Conditional(JmsTaskManagerType.class)
 	public DeliveryTaskManager jmsDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
 	{
-		return new JMSDeliveryTaskManager(new JmsTemplate(connectionFactory),ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+		return new JMSDeliveryTaskManager(new JmsTemplate(connectionFactory), ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
 	}
 
 	@Bean
 	@Conditional(QuartzTaskManagerType.class)
 	public DeliveryTaskManager quartzDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
 	{
-		return new QuartzDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+		return new QuartzDeliveryTaskManager(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
 	}
 
 	@Bean
 	@Conditional(QuartzJMSTaskManagerType.class)
 	public DeliveryTaskManager quartzJMSDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
 	{
-		return new QuartzJMSDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval,new JmsTemplate(connectionFactory));
+		return new QuartzJMSDeliveryTaskManager(
+				scheduler,
+				ebMSDAO,
+				deliveryTaskDAO,
+				cpaManager,
+				nrAutoRetries,
+				autoRetryInterval,
+				new JmsTemplate(connectionFactory));
 	}
 
 	@Bean
 	@Conditional(QuartzKafkaTaskManagerType.class)
 	public DeliveryTaskManager quartzKafkaDeliveryTaskManager(
 			DeliveryTaskDAO deliveryTaskDAO,
-			@Autowired(required = false) @Qualifier("deliveryTaskKafkaTemplate") KafkaTemplate<String,DeliveryTask> kafkaTemplate)
+			@Autowired(required = false) @Qualifier("deliveryTaskKafkaTemplate") KafkaTemplate<String, DeliveryTask> kafkaTemplate)
 	{
-		return new QuartzKafkaDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval,kafkaTemplate);
+		return new QuartzKafkaDeliveryTaskManager(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval, kafkaTemplate);
 	}
 
 	@Bean
@@ -103,7 +110,7 @@ public class DeliveryTaskManagerConfig
 
 	private DAODeliveryTaskManager createDefaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
 	{
-		return new DAODeliveryTaskManager(ebMSDAO,deliveryTaskDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+		return new DAODeliveryTaskManager(ebMSDAO, deliveryTaskDAO, cpaManager, serverId, nrAutoRetries, autoRetryInterval);
 	}
 
 	public static class DefaultTaskManagerType implements Condition
@@ -111,8 +118,8 @@ public class DeliveryTaskManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment()
-					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+					== DeliveryTaskHandlerType.DEFAULT;
 		}
 	}
 
@@ -121,8 +128,8 @@ public class DeliveryTaskManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment()
-					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+					== DeliveryTaskHandlerType.JMS;
 		}
 	}
 
@@ -131,8 +138,8 @@ public class DeliveryTaskManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment()
-					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+					== DeliveryTaskHandlerType.QUARTZ;
 		}
 	}
 
@@ -141,8 +148,8 @@ public class DeliveryTaskManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment()
-					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS;
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+					== DeliveryTaskHandlerType.QUARTZ_JMS;
 		}
 	}
 
@@ -151,8 +158,8 @@ public class DeliveryTaskManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment()
-					.getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_KAFKA;
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+					== DeliveryTaskHandlerType.QUARTZ_KAFKA;
 		}
 	}
 }

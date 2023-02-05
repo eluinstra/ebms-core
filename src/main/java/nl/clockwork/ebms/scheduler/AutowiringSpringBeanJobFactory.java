@@ -38,7 +38,7 @@ public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 		val job = applicationContext.getBean(bundle.getJobDetail().getJobClass());
 		val beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(job);
 		val propertyValues = createPropertyValues(bundle);
-		beanWrapper.setPropertyValues(propertyValues,true);
+		beanWrapper.setPropertyValues(propertyValues, true);
 		return job;
 	}
 

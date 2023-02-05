@@ -52,7 +52,7 @@ public class URLMappingRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("SetURLMapping " + urlMapping,e);
+			log.error("SetURLMapping " + urlMapping, e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -67,7 +67,7 @@ public class URLMappingRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteURLMapping " + source,e);
+			log.error("DeleteURLMapping " + source, e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -82,7 +82,7 @@ public class URLMappingRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("GetURLMappings",e);
+			log.error("GetURLMappings", e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -97,7 +97,7 @@ public class URLMappingRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCache",e);
+			log.error("DeleteCache", e);
 			throw toWebApplicationException(e);
 		}
 	}

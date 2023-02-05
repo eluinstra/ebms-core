@@ -36,6 +36,6 @@ public class DAOConfig
 	{
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSDAOImpl(transactionTemplate,jdbcTemplate);
+		return new EbMSDAOImpl(transactionTemplate, jdbcTemplate);
 	}
 }

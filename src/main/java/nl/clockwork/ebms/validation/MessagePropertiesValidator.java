@@ -37,7 +37,7 @@ public class MessagePropertiesValidator
 	{
 		if (!cpaManager.existsCPA(cpaId))
 			throw new ValidationException("No CPA found for cpaId=" + cpaId);
-		if (!cpaManager.existsPartyId(cpaId,fromPartyId))
+		if (!cpaManager.existsPartyId(cpaId, fromPartyId))
 		{
 			val msg = new StringBuilder();
 			msg.append("No fromParty found for");
@@ -45,7 +45,7 @@ public class MessagePropertiesValidator
 			msg.append(", fromPartyId=").append(fromPartyId);
 			throw new ValidationException(msg.toString());
 		}
-		if (!cpaManager.existsPartyId(cpaId,toPartyId))
+		if (!cpaManager.existsPartyId(cpaId, toPartyId))
 		{
 			val msg = new StringBuilder();
 			msg.append("No toParty found for");
@@ -59,16 +59,20 @@ public class MessagePropertiesValidator
 	{
 		if (!cpaManager.existsCPA(properties.getCpaId()))
 			throw new ValidationException("No CPA found for message.cpaId=" + properties.getCpaId());
-		val fromPartyInfo = cpaManager
-				.getFromPartyInfo(properties.getCpaId(),Party.of(properties.getFromPartyId(),properties.getFromRole()),properties.getService(),properties.getAction());
+		val fromPartyInfo = cpaManager.getFromPartyInfo(
+				properties.getCpaId(),
+				Party.of(properties.getFromPartyId(), properties.getFromRole()),
+				properties.getService(),
+				properties.getAction());
 		if (!fromPartyInfo.isPresent())
 			throw new ValidationException("No CanSend action found for " + properties);
-		val toParty = properties.getToPartyId() != null ? Party.of(properties.getToPartyId(),properties.getToRole()) : null;
-		val toPartyInfo = cpaManager.getToPartyInfo(properties.getCpaId(),toParty,properties.getService(),properties.getAction());
+		val toParty = properties.getToPartyId() != null ? Party.of(properties.getToPartyId(), properties.getToRole()) : null;
+		val toPartyInfo = cpaManager.getToPartyInfo(properties.getCpaId(), toParty, properties.getService(), properties.getAction());
 		if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
 			throw new ValidationException("No CanReceive action found for " + properties);
-		else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && toPartyInfo.isPresent()
-				&& !equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding(),fromPartyInfo.get().getCanSend().getOtherPartyActionBinding()))
+		else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
+				&& toPartyInfo.isPresent()
+				&& !equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding(), fromPartyInfo.get().getCanSend().getOtherPartyActionBinding()))
 			throw new ValidationException("Action for to party does not match action for from party for " + properties);
 	}
 

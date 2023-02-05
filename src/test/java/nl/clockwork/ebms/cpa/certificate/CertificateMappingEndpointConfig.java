@@ -24,13 +24,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CertificateMappingEndpointConfig
 {
-	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/certificateMapping/2.18","CertificateMappingService");
-	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/certificateMapping/2.18","CertificateMappingPort");
+	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/certificateMapping/2.18", "CertificateMappingService");
+	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/certificateMapping/2.18", "CertificateMappingPort");
 	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/certificateMapping";
 
 	@Bean(name = "certificateMappingEndpoint")
 	Endpoint publishEndpoint(CertificateMappingService mappingService)
 	{
-		return Endpoint.publish(SERVICE_ENDPOINT,mappingService);
+		return Endpoint.publish(SERVICE_ENDPOINT, mappingService);
 	}
 }

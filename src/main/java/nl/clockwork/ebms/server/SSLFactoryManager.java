@@ -65,8 +65,8 @@ class SSLFactoryManager
 		this.requireClientAuthentication = requireClientAuthentication;
 		val kmf = createKeyManagerFactory(keyStore);
 		val tmf = createTrustManagerFactory(trustStore);
-		val sslContext = createSSLContext(kmf,tmf);
-		createEngine(requireClientAuthentication,sslContext);
+		val sslContext = createSSLContext(kmf, tmf);
+		createEngine(requireClientAuthentication, sslContext);
 		sslSocketFactory = sslContext.getSocketFactory();
 	}
 
@@ -74,7 +74,7 @@ class SSLFactoryManager
 	{
 		// KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		val result = KeyManagerFactory.getInstance("SunX509");
-		result.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
+		result.init(keyStore.getKeyStore(), keyStore.getKeyPassword().toCharArray());
 		return result;
 	}
 
@@ -89,7 +89,7 @@ class SSLFactoryManager
 	private SSLContext createSSLContext(final KeyManagerFactory kmf, final TrustManagerFactory tmf) throws NoSuchAlgorithmException, KeyManagementException
 	{
 		val result = SSLContext.getInstance("TLS");
-		result.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+		result.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 		return result;
 	}
 

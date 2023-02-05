@@ -44,7 +44,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class,URLMappingServiceConfig.class,DataSourceConfig.class,TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class, URLMappingServiceConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class URLMappingServiceImplTest implements WithFile
 {
 	@Container
@@ -65,7 +65,7 @@ class URLMappingServiceImplTest implements WithFile
 		return Stream.of(
 				// FIXME
 				// arguments(new URLMapping(null,null), "source is marked non-null but is null"),
-				arguments(new URLMapping("source","destination"),"Source invalid"));
+				arguments(new URLMapping("source", "destination"), "Source invalid"));
 	}
 
 	@ParameterizedTest
@@ -79,9 +79,9 @@ class URLMappingServiceImplTest implements WithFile
 	{
 		return Stream.of(
 				// FIXME
-				arguments(new URLMapping("","")),
-				arguments(new URLMapping("http://www.example.com:8080","http://localhost:8090")),
-				arguments(new URLMapping("http://www.example.com:8090","http://localhost:8090")));
+				arguments(new URLMapping("", "")),
+				arguments(new URLMapping("http://www.example.com:8080", "http://localhost:8090")),
+				arguments(new URLMapping("http://www.example.com:8090", "http://localhost:8090")));
 	}
 
 	@Test
@@ -89,8 +89,8 @@ class URLMappingServiceImplTest implements WithFile
 	{
 		validURLMappings().forEach(arg -> mappingService.setURLMapping((URLMapping)arg.get()[0]));
 		assertThat(mappingService.getURLMappings()).hasSize(2)
-				.contains(new URLMapping("http://www.example.com:8080","http://localhost:8090"))
-				.contains(new URLMapping("http://www.example.com:8090","http://localhost:8090"));
+				.contains(new URLMapping("http://www.example.com:8080", "http://localhost:8090"))
+				.contains(new URLMapping("http://www.example.com:8090", "http://localhost:8090"));
 	}
 
 	@Test

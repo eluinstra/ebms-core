@@ -56,10 +56,10 @@ public class DOMUtils
 	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
 	{
 		val dbf = DocumentBuilderFactory.newInstance();
-		dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
-		dbf.setFeature("http://xml.org/sax/features/external-general-entities",false);
-		dbf.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
-		dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+		dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+		dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		dbf.setXIncludeAware(false);
 		dbf.setExpandEntityReferences(false);
 		dbf.setNamespaceAware(true);
@@ -69,22 +69,22 @@ public class DOMUtils
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
 		val result = createTransformerFactory().newTransformer();
-		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
+		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		return result;
 	}
 
 	public static Transformer getTransformer(String xslFile) throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
 		val result = createTransformerFactory().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
-		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
+		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		return result;
 	}
 
 	private static javax.xml.transform.TransformerFactory createTransformerFactory() throws TransformerFactoryConfigurationError
 	{
 		val result = TransformerFactory.newInstance();
-		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
-		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"");
+		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 		return result;
 	}
 
@@ -128,7 +128,7 @@ public class DOMUtils
 	{
 		val writer = new StringWriter();
 		val transformer = getTransformer();
-		transformer.transform(new DOMSource(document),new StreamResult(writer));
+		transformer.transform(new DOMSource(document), new StreamResult(writer));
 		return writer.toString();
 	}
 
@@ -136,41 +136,41 @@ public class DOMUtils
 	{
 		val writer = new StringWriter();
 		val transformer = getTransformer();
-		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
-		transformer.transform(new DOMSource(document),new StreamResult(writer));
+		transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+		transformer.transform(new DOMSource(document), new StreamResult(writer));
 		return writer.toString();
 	}
 
 	public static void write(Document document, OutputStream outputStream) throws TransformerException
 	{
 		val transformer = getTransformer();
-		transformer.transform(new DOMSource(document),new StreamResult(outputStream));
+		transformer.transform(new DOMSource(document), new StreamResult(outputStream));
 	}
 
 	public static void write(Document document, OutputStream outputStream, String encoding) throws TransformerException
 	{
 		val transformer = getTransformer();
-		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
-		transformer.transform(new DOMSource(document),new StreamResult(outputStream));
+		transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+		transformer.transform(new DOMSource(document), new StreamResult(outputStream));
 	}
 
 	public static void write(Document document, Writer writer) throws TransformerException
 	{
 		val transformer = getTransformer();
-		transformer.transform(new DOMSource(document),new StreamResult(writer));
+		transformer.transform(new DOMSource(document), new StreamResult(writer));
 	}
 
 	public static void write(Document document, Writer writer, String encoding) throws TransformerException
 	{
 		val transformer = getTransformer();
-		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
-		transformer.transform(new DOMSource(document),new StreamResult(writer));
+		transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+		transformer.transform(new DOMSource(document), new StreamResult(writer));
 	}
 
 	public static Node executeXPathQuery(NamespaceContext namespaceContext, Document document, String query)
 			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-		return (Node)executeXPathQuery(namespaceContext,document,query,XPathConstants.NODE);
+		return (Node)executeXPathQuery(namespaceContext, document, query, XPathConstants.NODE);
 	}
 
 	public static Object executeXPathQuery(NamespaceContext namespaceContext, Document document, String query, QName returnType)
@@ -179,7 +179,7 @@ public class DOMUtils
 		val xpath = XPathFactory.newInstance().newXPath();
 		xpath.setNamespaceContext(namespaceContext);
 		val expr = xpath.compile(query);
-		return (Node)expr.evaluate(document,returnType);
+		return (Node)expr.evaluate(document, returnType);
 	}
 
 }

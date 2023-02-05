@@ -44,11 +44,11 @@ public class ValidationConfig
 		return EbMSMessageValidator.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.clientCertificateValidator(ClientCertificateValidator.of(cpaManager,clientCertificateValidatorEnabled))
+				.clientCertificateValidator(ClientCertificateValidator.of(cpaManager, clientCertificateValidatorEnabled))
 				.cpaValidator(cpaValidator)
-				.messageHeaderValidator(new MessageHeaderValidator(ebMSDAO,cpaManager))
+				.messageHeaderValidator(new MessageHeaderValidator(ebMSDAO, cpaManager))
 				.manifestValidator(new ManifestValidator())
-				.signatureValidator(new SignatureValidator(cpaManager,signatureValidator))
+				.signatureValidator(new SignatureValidator(cpaManager, signatureValidator))
 				.messageDecrypter(messageDecrypter)
 				.build();
 	}

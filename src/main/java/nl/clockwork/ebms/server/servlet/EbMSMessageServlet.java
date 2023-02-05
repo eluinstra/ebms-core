@@ -97,7 +97,7 @@ public class EbMSMessageServlet extends GenericServlet
 				if ("Content-Type".equals(name))
 					response.setContentType(value);
 				else
-					((HttpServletResponse)response).setHeader(name,value);
+					((HttpServletResponse)response).setHeader(name, value);
 			}
 
 			@Override

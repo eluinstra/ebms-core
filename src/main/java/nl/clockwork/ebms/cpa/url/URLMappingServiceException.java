@@ -27,7 +27,7 @@ public class URLMappingServiceException extends RuntimeException
 
 	public URLMappingServiceException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public URLMappingServiceException(String message)

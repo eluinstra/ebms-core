@@ -45,7 +45,7 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 		public Message createMessage(Session session) throws JMSException
 		{
 			val result = session.createMessage();
-			result.setStringProperty("messageId",messageId);
+			result.setStringProperty("messageId", messageId);
 			return result;
 		}
 	}
@@ -53,14 +53,14 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	@NonNull
 	JmsTemplate jmsTemplate;
 	@NonNull
-	Map<String,Destination> destinations;
+	Map<String, Destination> destinations;
 
 	@Override
 	public void onMessageReceived(String messageId) throws MessageEventException
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()), new EventMessageCreator(messageId));
 			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
@@ -74,7 +74,7 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()), new EventMessageCreator(messageId));
 			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
@@ -88,7 +88,7 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()), new EventMessageCreator(messageId));
 			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
@@ -102,7 +102,7 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()), new EventMessageCreator(messageId));
 			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)

@@ -25,7 +25,7 @@ public class EbMSProcessingException extends EbMSProcessorException
 
 	public EbMSProcessingException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public EbMSProcessingException(String message)

@@ -27,7 +27,7 @@ public class CPAServiceException extends RuntimeException
 
 	public CPAServiceException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public CPAServiceException(String message)

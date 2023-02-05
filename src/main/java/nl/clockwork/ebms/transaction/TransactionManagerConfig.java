@@ -55,11 +55,11 @@ public class TransactionManagerConfig
 		return new DataSourceTransactionManager(dataSource);
 	}
 
-	@Bean(name = {"dataSourceTransactionManager","jmsTransactionManager"})
+	@Bean(name = {"dataSourceTransactionManager", "jmsTransactionManager"})
 	@Conditional(AtomikosTransactionManagerType.class)
 	public JtaTransactionManager atomikosJtaTransactionManager() throws SystemException
 	{
-		return new JtaTransactionManager(createUserTransaction(),createTransactionManager());
+		return new JtaTransactionManager(createUserTransaction(), createTransactionManager());
 	}
 
 	private UserTransactionImp createUserTransaction() throws SystemException
@@ -82,8 +82,8 @@ public class TransactionManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment()
-					.getProperty("transactionManager.type",TransactionManagerType.class,TransactionManagerType.DEFAULT) == TransactionManagerType.DEFAULT;
+			return context.getEnvironment().getProperty("transactionManager.type", TransactionManagerType.class, TransactionManagerType.DEFAULT)
+					== TransactionManagerType.DEFAULT;
 		}
 	}
 
@@ -92,8 +92,8 @@ public class TransactionManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment()
-					.getProperty("transactionManager.type",TransactionManagerType.class,TransactionManagerType.DEFAULT) == TransactionManagerType.ATOMIKOS;
+			return context.getEnvironment().getProperty("transactionManager.type", TransactionManagerType.class, TransactionManagerType.DEFAULT)
+					== TransactionManagerType.ATOMIKOS;
 		}
 	}
 }

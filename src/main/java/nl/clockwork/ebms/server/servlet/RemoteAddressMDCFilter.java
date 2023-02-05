@@ -44,8 +44,8 @@ public class RemoteAddressMDCFilter implements Filter
 		try
 		{
 			val ip = getRemoteAddress((HttpServletRequest)request);
-			MDC.put("remoteAddress",ip);
-			chain.doFilter(request,response);
+			MDC.put("remoteAddress", ip);
+			chain.doFilter(request, response);
 		}
 		finally
 		{

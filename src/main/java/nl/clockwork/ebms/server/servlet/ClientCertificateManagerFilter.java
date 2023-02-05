@@ -64,12 +64,13 @@ public class ClientCertificateManagerFilter implements Filter
 			else
 			{
 				String header = ((HttpServletRequest)request).getHeader(x509CertificateHeader);
-				val certificate = decode(URLDecoder.decode(header,Charset.defaultCharset().toString()));
+				val certificate = decode(URLDecoder.decode(header, Charset.defaultCharset().toString()));
 				ClientCertificateManager.setCertificate(certificate);
 			}
-			log.info("Certificate "
-					+ (ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : " not found!"));
-			chain.doFilter(request,response);
+			log.info(
+					"Certificate "
+							+ (ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : " not found!"));
+			chain.doFilter(request, response);
 		}
 		catch (CertificateException e)
 		{

@@ -36,7 +36,7 @@ import org.apache.james.mime4j.stream.Field;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class EbMSContentHandler implements ContentHandler
 {
-	Map<String,String> headers = new HashMap<>();
+	Map<String, String> headers = new HashMap<>();
 	List<EbMSAttachment> attachments = new ArrayList<>();
 
 	@Override
@@ -72,7 +72,7 @@ class EbMSContentHandler implements ContentHandler
 	@Override
 	public void field(Field rawField) throws MimeException
 	{
-		headers.put(rawField.getName(),rawField.getBody());
+		headers.put(rawField.getName(), rawField.getBody());
 	}
 
 	@Override
@@ -113,9 +113,9 @@ class EbMSContentHandler implements ContentHandler
 		val contentType = getContentType();
 		val content = applyTransferEncoding(is);
 		if (attachments.isEmpty())
-			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,content));
+			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename, contentId, contentType, content));
 		else
-			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename,contentId,contentType,content));
+			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename, contentId, contentType, content));
 		headers.clear();
 	}
 
@@ -150,7 +150,7 @@ class EbMSContentHandler implements ContentHandler
 	{
 		var result = getHeader("Content-Disposition");
 		if (result != null && result.startsWith("attachment"))
-			result = result.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$","$1");
+			result = result.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$", "$1");
 		return result;
 	}
 
@@ -158,7 +158,7 @@ class EbMSContentHandler implements ContentHandler
 	{
 		var result = getHeader("Content-ID");
 		if (result != null)
-			result = result.replaceAll("^<(.*)>$|^(.*)$","$1$2");
+			result = result.replaceAll("^<(.*)>$|^(.*)$", "$1$2");
 		return result;
 	}
 

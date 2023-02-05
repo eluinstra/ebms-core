@@ -50,13 +50,13 @@ public class SchedulerConfig
 	@Getter
 	public enum DriverDelegate
 	{
-		DB2("jdbc:db2:","org.quartz.impl.jdbcjobstore.DB2v8Delegate"),
-		H2("jdbc:h2:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
-		HSQLDB("jdbc:hsqldb:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate"),
-		MARIADB("jdbc:mariadb:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
-		MSSQL("jdbc:sqlserver:","org.quartz.impl.jdbcjobstore.MSSQLDelegate"),
-		ORACLE("jdbc:oracle:","org.quartz.impl.jdbcjobstore.oracle.OracleDelegate"),
-		POSTGRES("jdbc:postgresql:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate");
+		DB2("jdbc:db2:", "org.quartz.impl.jdbcjobstore.DB2v8Delegate"),
+		H2("jdbc:h2:", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
+		HSQLDB("jdbc:hsqldb:", "org.quartz.impl.jdbcjobstore.HSQLDBDelegate"),
+		MARIADB("jdbc:mariadb:", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
+		MSSQL("jdbc:sqlserver:", "org.quartz.impl.jdbcjobstore.MSSQLDelegate"),
+		ORACLE("jdbc:oracle:", "org.quartz.impl.jdbcjobstore.oracle.OracleDelegate"),
+		POSTGRES("jdbc:postgresql:", "org.quartz.impl.jdbcjobstore.HSQLDBDelegate");
 
 		String jdbcUrl;
 		String driverDelegateClass;
@@ -129,13 +129,13 @@ public class SchedulerConfig
 	private Properties quartzProperties()
 	{
 		val result = new Properties();
-		result.put("org.quartz.scheduler.instanceId","AUTO");
-		result.put("org.quartz.threadPool.threadCount",threadCount);
-		result.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreCMT");
-		result.put("org.quartz.jobStore.driverDelegateClass",StringUtils.isEmpty(driverDelegateClass) ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
+		result.put("org.quartz.scheduler.instanceId", "AUTO");
+		result.put("org.quartz.threadPool.threadCount", threadCount);
+		result.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreCMT");
+		result.put("org.quartz.jobStore.driverDelegateClass", StringUtils.isEmpty(driverDelegateClass) ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
 		if (StringUtils.isNotEmpty(selectWithLockSQL))
-			result.put("org.quartz.jobStore.selectWithLockSQL",selectWithLockSQL);
-		result.put("org.quartz.jobStore.isClustered",isClustered);
+			result.put("org.quartz.jobStore.selectWithLockSQL", selectWithLockSQL);
+		result.put("org.quartz.jobStore.isClustered", isClustered);
 		return result;
 	}
 

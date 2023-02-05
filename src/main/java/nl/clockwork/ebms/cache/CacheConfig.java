@@ -70,7 +70,7 @@ public class CacheConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("cache.type",String.class,"").equals(CACHE_TYPE);
+			return context.getEnvironment().getProperty("cache.type", String.class, "").equals(CACHE_TYPE);
 		}
 	}
 }

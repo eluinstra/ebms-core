@@ -38,10 +38,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({PropertiesConfig.class,EmbeddedWebConfig.class,nl.clockwork.ebms.server.EbMSServerConfig.class,EbMSMessageServiceConfig.class,
-		EbMSProcessorConfig.class,MessageEventListenerConfig.class,CommonConfig.class,DeliveryManagerConfig.class,EbMSClientConfig.class,KeyStoreConfig.class,
-		CertificateMappingServiceConfig.class,DAOConfig.class,DeliveryTaskManagerConfig.class,JMSConfig.class,ValidationConfig.class,EncryptionConfig.class,
-		SigningConfig.class,CPAServiceConfig.class,CPAManagerConfig.class,URLMappingServiceConfig.class,DataSourceConfig.class,TransactionManagerConfig.class})
+@Import({PropertiesConfig.class, EmbeddedWebConfig.class, nl.clockwork.ebms.server.EbMSServerConfig.class, EbMSMessageServiceConfig.class,
+		EbMSProcessorConfig.class, MessageEventListenerConfig.class, CommonConfig.class, DeliveryManagerConfig.class, EbMSClientConfig.class, KeyStoreConfig.class,
+		CertificateMappingServiceConfig.class, DAOConfig.class, DeliveryTaskManagerConfig.class, JMSConfig.class, ValidationConfig.class, EncryptionConfig.class,
+		SigningConfig.class, CPAServiceConfig.class, CPAManagerConfig.class, URLMappingServiceConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 public class EbMSServerConfig
 {
 

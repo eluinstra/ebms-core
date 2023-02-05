@@ -24,13 +24,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CPAEndpointConfig
 {
-	public static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/2.18","CPAService");
-	public static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/2.18","CPAPort");
+	public static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/2.18", "CPAService");
+	public static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/2.18", "CPAPort");
 	public static final String SERVICE_ENDPOINT = "http://localhost:8080/service/cpa";
 
 	@Bean(name = "cpaEndpoint")
 	Endpoint publishEndpoint(CPAService cpaService)
 	{
-		return Endpoint.publish(SERVICE_ENDPOINT,cpaService);
+		return Endpoint.publish(SERVICE_ENDPOINT, cpaService);
 	}
 }

@@ -90,7 +90,7 @@ public class EncryptionTest
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		messageDecrypter.decrypt(message);
-		assertThat(IOUtils.toString(message.getAttachments().get(0).getInputStream(),Charset.forName("UTF-8"))).isEqualTo("Dit is een test.");
+		assertThat(IOUtils.toString(message.getAttachments().get(0).getInputStream(), Charset.forName("UTF-8"))).isEqualTo("Dit is een test.");
 	}
 
 	@Test
@@ -127,29 +127,31 @@ public class EncryptionTest
 	{
 		val attachment = message.getAttachments().get(0);
 		val d = DOMUtils.read(attachment.getInputStream());
-		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(0);
+		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "CipherValue").item(0);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		message.getAttachments().remove(0);
 		message.getAttachments()
-				.add(EbMSAttachmentFactory
-						.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
+				.add(
+						EbMSAttachmentFactory
+								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
 	private void changeAttachment1(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
 	{
 		val attachment = message.getAttachments().get(0);
 		val d = DOMUtils.read(attachment.getInputStream());
-		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(1);
+		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "CipherValue").item(1);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		message.getAttachments().remove(0);
 		message.getAttachments()
-				.add(EbMSAttachmentFactory
-						.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
+				.add(
+						EbMSAttachmentFactory
+								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
 	private CPAManager initCPAManager() throws IOException, JAXBException
 	{
-		return new CPAManager(initCPADAOMock(),new URLMapper(initURLMappingDAOMock()));
+		return new CPAManager(initCPADAOMock(), new URLMapper(initURLMappingDAOMock()));
 	}
 
 	private CPADAO initCPADAOMock() throws IOException, JAXBException
@@ -166,19 +168,19 @@ public class EncryptionTest
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
 	{
-		return new EbMSMessageFactory(cpaManager,new EbMSIdGenerator());
+		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
 	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager) throws Exception
 	{
-		val trustStore = EbMSTrustStore.of(keyStoreType,keyStorePath,keyStorePassword);
-		return new EbMSMessageEncrypter(cpaManager,trustStore);
+		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
+		return new EbMSMessageEncrypter(cpaManager, trustStore);
 	}
 
 	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager) throws Exception
 	{
-		val keyStore = EbMSKeyStore.of(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword);
-		return new EbMSMessageDecrypter(cpaManager,keyStore);
+		val keyStore = EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword);
+		return new EbMSMessageDecrypter(cpaManager, keyStore);
 	}
 
 	private EbMSMessage createMessage() throws EbMSProcessorException
@@ -197,31 +199,35 @@ public class EncryptionTest
 
 	private MessageRequestProperties createMessageProperties(String cpaId)
 	{
-		return new MessageRequestProperties(cpaId,new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"),"urn:osb:services:osb:afleveren:1.1$1.0","afleveren");
+		return new MessageRequestProperties(
+				cpaId,
+				new Party("urn:osb:oin:00000000000000000000", "DIGIPOORT"),
+				"urn:osb:services:osb:afleveren:1.1$1.0",
+				"afleveren");
 	}
 
 	private List<DataSource> createDataSources()
 	{
 		val result = new ArrayList<DataSource>();
-		result.add(new DataSource("test.txt",null,"plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
+		result.add(new DataSource("test.txt", null, "plain/text; charset=utf-8", "Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
 		val result = new ArrayList<EbMSAttachment>();
-		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId,1),createDataSource()));
+		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId, 1), createDataSource()));
 		return result;
 	}
 
 	private javax.activation.DataSource createDataSource()
 	{
-		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
+		return EbMSAttachmentFactory.createEbMSAttachment("test.txt", "plain/text; charset=utf-8", "Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
 	}
 
 	private String createContentId(String messageId, int i)
 	{
-		return messageId.replaceAll("^([^@]+)@(.+)$","$1-" + i + "@$2");
+		return messageId.replaceAll("^([^@]+)@(.+)$", "$1-" + i + "@$2");
 	}
 
 }

@@ -23,7 +23,7 @@ import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import lombok.val;
 
-public class InstantAdapter extends XmlAdapter<String,Instant>
+public class InstantAdapter extends XmlAdapter<String, Instant>
 {
 	@Override
 	public Instant unmarshal(String v) throws Exception

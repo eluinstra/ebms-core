@@ -47,16 +47,16 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 		public Message createMessage(Session session) throws JMSException
 		{
 			val result = session.createMessage();
-			result.setStringProperty("cpaId",messageProperties.getCpaId());
-			result.setStringProperty("fromPartyId",messageProperties.getFromParty().getPartyId());
-			result.setStringProperty("fromRole",messageProperties.getFromParty().getRole());
-			result.setStringProperty("toPartyId",messageProperties.getToParty().getPartyId());
-			result.setStringProperty("toRole",messageProperties.getToParty().getRole());
-			result.setStringProperty("service",messageProperties.getService());
-			result.setStringProperty("action",messageProperties.getAction());
-			result.setStringProperty("conversationId",messageProperties.getConversationId());
-			result.setStringProperty("messageId",messageProperties.getMessageId());
-			result.setStringProperty("refToMessageId",messageProperties.getRefToMessageId());
+			result.setStringProperty("cpaId", messageProperties.getCpaId());
+			result.setStringProperty("fromPartyId", messageProperties.getFromParty().getPartyId());
+			result.setStringProperty("fromRole", messageProperties.getFromParty().getRole());
+			result.setStringProperty("toPartyId", messageProperties.getToParty().getPartyId());
+			result.setStringProperty("toRole", messageProperties.getToParty().getRole());
+			result.setStringProperty("service", messageProperties.getService());
+			result.setStringProperty("action", messageProperties.getAction());
+			result.setStringProperty("conversationId", messageProperties.getConversationId());
+			result.setStringProperty("messageId", messageProperties.getMessageId());
+			result.setStringProperty("refToMessageId", messageProperties.getRefToMessageId());
 			return result;
 		}
 	}
@@ -66,7 +66,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 	@NonNull
 	JmsTemplate jmsTemplate;
 	@NonNull
-	Map<String,Destination> destinations;
+	Map<String, Destination> destinations;
 
 	@Override
 	public void onMessageReceived(String messageId) throws MessageEventException
@@ -74,7 +74,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 		try
 		{
 			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()),new EventMessageCreator(p)));
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()), new EventMessageCreator(p)));
 			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
@@ -89,7 +89,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 		try
 		{
 			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()),new EventMessageCreator(p)));
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()), new EventMessageCreator(p)));
 			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
@@ -103,7 +103,8 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()),new EventMessageCreator(p)));
+			ebMSDAO.getEbMSMessageProperties(messageId)
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()), new EventMessageCreator(p)));
 			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
@@ -118,7 +119,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 		try
 		{
 			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()),new EventMessageCreator(p)));
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()), new EventMessageCreator(p)));
 			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)

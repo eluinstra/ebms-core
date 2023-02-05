@@ -71,11 +71,11 @@ public class EbMSMessageUtilsTest
 		var partyId = new PartyId();
 		partyId.setType("B");
 		partyId.setValue("A");
-		assertEquals("B:A",EbMSMessageUtils.toString(partyId));
+		assertEquals("B:A", EbMSMessageUtils.toString(partyId));
 
 		partyId = new PartyId();
 		partyId.setValue("A");
-		assertEquals("A",EbMSMessageUtils.toString(partyId));
+		assertEquals("A", EbMSMessageUtils.toString(partyId));
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class EbMSMessageUtilsTest
 		val service = new Service();
 		service.setType("B");
 		service.setValue("A");
-		assertEquals("B:A",EbMSMessageUtils.toString(service));
+		assertEquals("B:A", EbMSMessageUtils.toString(service));
 	}
 
 	@Test
@@ -96,41 +96,41 @@ public class EbMSMessageUtilsTest
 		/* createStatusRequest */
 		var timestamp = Instant.now();
 		val statusRequest = EbMSMessageUtils.createStatusRequest(msgRef1);
-		assertEquals(Constants.EBMS_VERSION,statusRequest.getVersion());
-		assertEquals(msgRef1,statusRequest.getRefToMessageId());
+		assertEquals(Constants.EBMS_VERSION, statusRequest.getVersion());
+		assertEquals(msgRef1, statusRequest.getRefToMessageId());
 		assertNull(statusRequest.getId());
 		statusRequest.setId(msgRef2);
 
 		/* createStatusResponse 1 */
-		var createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest,EbMSMessageStatus.FAILED,timestamp);
-		assertEquals(msgRef1,createStatusResponse.getRefToMessageId());
-		assertEquals(EbMSMessageStatus.RECEIVED.getStatusCode(),createStatusResponse.getMessageStatus());
-		assertEquals(timestamp,createStatusResponse.getTimestamp());
-		assertEquals(Constants.EBMS_VERSION,createStatusResponse.getVersion());
+		var createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.FAILED, timestamp);
+		assertEquals(msgRef1, createStatusResponse.getRefToMessageId());
+		assertEquals(EbMSMessageStatus.RECEIVED.getStatusCode(), createStatusResponse.getMessageStatus());
+		assertEquals(timestamp, createStatusResponse.getTimestamp());
+		assertEquals(Constants.EBMS_VERSION, createStatusResponse.getVersion());
 
 		/* createStatusResponse 2 */
 		timestamp = Instant.now();
-		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest,null,timestamp);
+		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, null, timestamp);
 		assertNull(createStatusResponse.getTimestamp());
 		assertNull(createStatusResponse.getMessageStatus());
-		assertEquals(Constants.EBMS_VERSION,createStatusResponse.getVersion());
-		assertEquals(msgRef1,createStatusResponse.getRefToMessageId());
+		assertEquals(Constants.EBMS_VERSION, createStatusResponse.getVersion());
+		assertEquals(msgRef1, createStatusResponse.getRefToMessageId());
 		assertNull(createStatusResponse.getId());
 
 		/* createStatusResponse 3 */
 		timestamp = Instant.now();
-		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest,EbMSMessageStatus.RECEIVED,timestamp);
-		assertEquals(timestamp,createStatusResponse.getTimestamp());
-		assertEquals(MessageStatusType.RECEIVED.value(),createStatusResponse.getMessageStatus().value());
+		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.RECEIVED, timestamp);
+		assertEquals(timestamp, createStatusResponse.getTimestamp());
+		assertEquals(MessageStatusType.RECEIVED.value(), createStatusResponse.getMessageStatus().value());
 
 		/* createStatusResponse 4 */
 		timestamp = Instant.now();
-		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest,EbMSMessageStatus.PROCESSED,timestamp);
-		assertEquals(timestamp,createStatusResponse.getTimestamp());
-		assertEquals(MessageStatusType.PROCESSED.value(),createStatusResponse.getMessageStatus().value());
+		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.PROCESSED, timestamp);
+		assertEquals(timestamp, createStatusResponse.getTimestamp());
+		assertEquals(MessageStatusType.PROCESSED.value(), createStatusResponse.getMessageStatus().value());
 
 		/* createStatusResponse 5 */
-		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest,EbMSMessageStatus.CREATED,timestamp);
+		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.CREATED, timestamp);
 		assertNull(createStatusResponse.getTimestamp());
 		assertNull(createStatusResponse.getMessageStatus());
 	}
@@ -139,8 +139,8 @@ public class EbMSMessageUtilsTest
 	public void createErrorList()
 	{
 		val errorList = EbMSMessageUtils.createErrorList();
-		assertEquals(Constants.EBMS_VERSION,errorList.getVersion());
-		assertEquals(SeverityType.ERROR,errorList.getHighestSeverity());
+		assertEquals(Constants.EBMS_VERSION, errorList.getVersion());
+		assertEquals(SeverityType.ERROR, errorList.getHighestSeverity());
 		assertTrue(errorList.isMustUnderstand());
 	}
 
@@ -152,20 +152,20 @@ public class EbMSMessageUtilsTest
 		val errorCode = EbMSErrorCode.UNKNOWN;
 		val location = "location1";
 		String description = null;
-		var createError = EbMSMessageUtils.createError(location,errorCode,description,language,severity);
-		assertEquals(0,createError.getAny().size());
-		assertEquals(location,createError.getLocation());
+		var createError = EbMSMessageUtils.createError(location, errorCode, description, language, severity);
+		assertEquals(0, createError.getAny().size());
+		assertEquals(location, createError.getLocation());
 		assertNull(createError.getDescription());
-		assertEquals(severity,createError.getSeverity());
+		assertEquals(severity, createError.getSeverity());
 
 		description = "to err is human";
-		createError = EbMSMessageUtils.createError(location,errorCode,description,language,severity);
-		assertEquals(description,createError.getDescription().getValue());
-		assertEquals(language,createError.getDescription().getLang());
+		createError = EbMSMessageUtils.createError(location, errorCode, description, language, severity);
+		assertEquals(description, createError.getDescription().getValue());
+		assertEquals(language, createError.getDescription().getLang());
 
-		createError = EbMSMessageUtils.createError(location,errorCode,description);
-		assertEquals(Constants.EBMS_DEFAULT_LANGUAGE,createError.getDescription().getLang());
-		assertEquals(SeverityType.ERROR,createError.getSeverity());
+		createError = EbMSMessageUtils.createError(location, errorCode, description);
+		assertEquals(Constants.EBMS_DEFAULT_LANGUAGE, createError.getDescription().getLang());
+		assertEquals(SeverityType.ERROR, createError.getSeverity());
 	}
 
 	@Test
@@ -177,8 +177,8 @@ public class EbMSMessageUtilsTest
 		/* createSyncReply 1 */
 		dc.getMessagingCharacteristics().setSyncReplyMode(SyncReplyModeType.MSH_SIGNALS_ONLY);
 		var createSyncReply = EbMSMessageUtils.createSyncReply(dc);
-		assertEquals(Constants.EBMS_VERSION,createSyncReply.getVersion());
-		assertEquals(Constants.NSURI_SOAP_NEXT_ACTOR,createSyncReply.getActor());
+		assertEquals(Constants.EBMS_VERSION, createSyncReply.getVersion());
+		assertEquals(Constants.NSURI_SOAP_NEXT_ACTOR, createSyncReply.getActor());
 		assertTrue(createSyncReply.isMustUnderstand());
 
 		/* createSyncReply 2 */
@@ -200,8 +200,8 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void createSOAPFault() throws Exception
 	{
-		val fault = EbMSMessageUtils.createSOAPFault("Server","An unexpected error occurred!");
-		assertEquals("Envelope",fault.getDocumentElement().getLocalName());
+		val fault = EbMSMessageUtils.createSOAPFault("Server", "An unexpected error occurred!");
+		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
 		assertTrue(documentToString(fault).contains("An unexpected error occurred!"));
 	}
 
@@ -209,8 +209,8 @@ public class EbMSMessageUtilsTest
 	public void createSOAPFault1() throws Exception
 	{
 		val e = new ValidationException("soapfault test");
-		val fault = EbMSMessageUtils.createSOAPFault("Client",e.getMessage());
-		assertEquals("Envelope",fault.getDocumentElement().getLocalName());
+		val fault = EbMSMessageUtils.createSOAPFault("Client", e.getMessage());
+		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
 		assertTrue(documentToString(fault).contains(e.getMessage()));
 	}
 
@@ -218,7 +218,7 @@ public class EbMSMessageUtilsTest
 	{
 		val t = DOMUtils.getTransformer();
 		val sw = new StringWriter();
-		t.transform(new DOMSource(document),new StreamResult(sw));
+		t.transform(new DOMSource(document), new StreamResult(sw));
 		return sw.toString();
 	}
 
@@ -232,7 +232,7 @@ public class EbMSMessageUtilsTest
 		val doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 
 		val result = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(doc);
-		assertEquals("Actor1",result.getAckRequested().getActor());
+		assertEquals("Actor1", result.getAckRequested().getActor());
 
 		val builder2 = EbMSDocument.builder();
 		builder2.message(doc);
@@ -262,11 +262,11 @@ public class EbMSMessageUtilsTest
 				return null;
 			}
 		};
-		val attachment = EbMSAttachmentFactory.createEbMSAttachment("cid1",dataSource);
+		val attachment = EbMSAttachmentFactory.createEbMSAttachment("cid1", dataSource);
 		builder2.attachments(Arrays.asList(attachment));
 
 		val result2 = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(builder2.build());
-		assertEquals(1,result2.getAttachments().size());
+		assertEquals(1, result2.getAttachments().size());
 	}
 
 	@Test
@@ -343,7 +343,7 @@ public class EbMSMessageUtilsTest
 	public void createSOAPMessage() throws Exception
 	{
 		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
-		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest,EbMSMessageStatus.EXPIRED,Instant.now());
+		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.EXPIRED, Instant.now());
 		val builder = EbMSStatusResponse.builder().messageHeader(createMessageHeader()).signature(createSignature()).statusResponse(statusResponse);
 		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 

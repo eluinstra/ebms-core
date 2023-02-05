@@ -46,7 +46,7 @@ public class EbMSResponseException extends EbMSProcessingException
 
 	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 		this.repsonse = repsonse;
 	}
 

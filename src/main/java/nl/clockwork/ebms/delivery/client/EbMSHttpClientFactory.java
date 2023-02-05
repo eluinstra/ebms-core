@@ -52,7 +52,7 @@ public class EbMSHttpClientFactory
 	CertificateMapper certificateMapper;
 	boolean useClientCertificate;
 	@NonNull
-	Map<String,EbMSClient> clients = new ConcurrentHashMap<>();
+	Map<String, EbMSClient> clients = new ConcurrentHashMap<>();
 
 	@Builder
 	public EbMSHttpClientFactory(
@@ -76,13 +76,13 @@ public class EbMSHttpClientFactory
 		this.httpErrors = httpErrors;
 		this.certificateMapper = certificateMapper;
 		this.useClientCertificate = useClientCertificate;
-		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification",Boolean.toString(verifyHostnames));
+		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.toString(verifyHostnames));
 	}
 
 	public EbMSClient getEbMSClient(String clientAlias)
 	{
 		val key = clientAlias == null ? "" : clientAlias;
-		return clients.computeIfAbsent(key,k -> createEbMSClient(clientAlias));
+		return clients.computeIfAbsent(key, k -> createEbMSClient(clientAlias));
 	}
 
 	private EbMSClient createEbMSClient(String clientAlias)
@@ -90,7 +90,8 @@ public class EbMSHttpClientFactory
 		try
 		{
 			val sslContextFactory = createSslContextFactory(getClientAlias(clientAlias));
-			return new EbMSHttpClient(sslParameters,
+			return new EbMSHttpClient(
+					sslParameters,
 					sslContextFactory,
 					connectTimeout,
 					readTimeout,
@@ -119,7 +120,7 @@ public class EbMSHttpClientFactory
 	{
 		try
 		{
-			val clientCertificate = getClientCertificate(cpaId,sendDeliveryChannel);
+			val clientCertificate = getClientCertificate(cpaId, sendDeliveryChannel);
 			val clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
 			return getEbMSClient(clientAlias);
 		}
@@ -132,7 +133,7 @@ public class EbMSHttpClientFactory
 	private X509Certificate getClientCertificate(String cpaId, DeliveryChannel deliveryChannel)
 	{
 		return useClientCertificate && deliveryChannel != null
-				? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)),cpaId)
+				? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)), cpaId)
 				: null;
 	}
 }

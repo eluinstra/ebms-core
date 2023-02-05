@@ -51,17 +51,20 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 	public XMLSignatureInput engineResolveURI(ResourceResolverContext context) throws ResourceResolverException
 	{
 		if (!context.uriToResolve.startsWith(Constants.CID))
-			throw new ResourceResolverException(context.uriToResolve,
+			throw new ResourceResolverException(
+					context.uriToResolve,
 					new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},
 					context.uriToResolve,
 					context.baseUri);
 		val result = attachments.stream()
 				.filter(a -> context.uriToResolve.substring(Constants.CID.length()).equals(a.getContentId()))
 				.findFirst()
-				.orElseThrow(() -> new ResourceResolverException(context.uriToResolve,
-						new Object[]{"Reference URI = " + context.uriToResolve + " does not exist!"},
-						context.uriToResolve,
-						context.baseUri));
+				.orElseThrow(
+						() -> new ResourceResolverException(
+								context.uriToResolve,
+								new Object[]{"Reference URI = " + context.uriToResolve + " does not exist!"},
+								context.uriToResolve,
+								context.baseUri));
 		try
 		{
 			val input = new XMLSignatureInput(result.getInputStream());
@@ -71,7 +74,7 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 		}
 		catch (IOException e)
 		{
-			throw new ResourceResolverException(e,context.uriToResolve,context.baseUri,context.uriToResolve);
+			throw new ResourceResolverException(e, context.uriToResolve, context.baseUri, context.uriToResolve);
 		}
 	}
 }

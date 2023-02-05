@@ -42,7 +42,7 @@ import org.xml.sax.SAXNotSupportedException;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JAXBParser<T>
 {
-	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<>();
+	private static HashMap<Class<?>, JAXBParser<?>> xmlHandlers = new HashMap<>();
 	private static SAXParserFactory saxParserFactory;
 	JAXBContext context;
 
@@ -50,9 +50,9 @@ public class JAXBParser<T>
 		try
 		{
 			saxParserFactory = SAXParserFactory.newInstance();
-			saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities",false);
-			saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
-			saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+			saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		}
 		catch (SAXNotRecognizedException | SAXNotSupportedException | ParserConfigurationException e)
 		{
@@ -88,7 +88,7 @@ public class JAXBParser<T>
 			return null;
 		val parser = saxParserFactory.newSAXParser();
 		val is = new InputSource(new StringReader(xml));
-		val s = new SAXSource(parser.getXMLReader(),is);
+		val s = new SAXSource(parser.getXMLReader(), is);
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(s);
 		return o instanceof JAXBElement<?> ? ((JAXBElement<T>)o).getValue() : (T)o;
@@ -100,8 +100,8 @@ public class JAXBParser<T>
 			return null;
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.marshal(e,result);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.marshal(e, result);
 		result.flush();
 		return result.toString();
 	}
@@ -112,10 +112,10 @@ public class JAXBParser<T>
 			return null;
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		if (namespacePrefixMapper != null)
-			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
-		marshaller.marshal(e,result);
+			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", namespacePrefixMapper);
+		marshaller.marshal(e, result);
 		result.flush();
 		return result.toString();
 	}
@@ -126,8 +126,8 @@ public class JAXBParser<T>
 			return null;
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.marshal(object,result);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.marshal(object, result);
 		result.flush();
 		return result.toString();
 	}
@@ -135,14 +135,14 @@ public class JAXBParser<T>
 	@SuppressWarnings("unchecked")
 	public static <L> JAXBParser<L> getInstance(Class<L> clazz) throws JAXBException
 	{
-		xmlHandlers.putIfAbsent(clazz,new JAXBParser<>(JAXBContext.newInstance(clazz)));
+		xmlHandlers.putIfAbsent(clazz, new JAXBParser<>(JAXBContext.newInstance(clazz)));
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <L> JAXBParser<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
 	{
-		xmlHandlers.putIfAbsent(clazz,new JAXBParser<>(JAXBContext.newInstance(clazzes)));
+		xmlHandlers.putIfAbsent(clazz, new JAXBParser<>(JAXBContext.newInstance(clazzes)));
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 

@@ -27,7 +27,7 @@ public class EbMSMessageServiceException extends RuntimeException
 
 	public EbMSMessageServiceException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public EbMSMessageServiceException(String message)

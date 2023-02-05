@@ -71,14 +71,14 @@ class DAODeliveryTaskExecutor implements Runnable
 				try
 				{
 					val timestamp = Instant.now();
-					val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp,serverId,maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp,serverId);
+					val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp, serverId, maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp, serverId);
 					tasks.forEach(task -> futures.add(deliveryTaskHandler.handleAsync(task)));
 				}
 				catch (Exception e)
 				{
-					log.error("",e);
+					log.error("", e);
 				}
-				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
+				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("", e)));
 			};
 			try
 			{
@@ -86,7 +86,7 @@ class DAODeliveryTaskExecutor implements Runnable
 			}
 			catch (Exception e)
 			{
-				log.error("",e);
+				log.error("", e);
 			}
 		}
 	}

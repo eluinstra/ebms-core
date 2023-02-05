@@ -40,7 +40,7 @@ public interface DeliveryTaskManager
 			Instant timestamp,
 			boolean confidential)
 	{
-		return new DeliveryTask(cpaId,sendDeliveryChannelId,receiveDeliveryChannelId,messageId,timeToLive,timestamp,confidential,0);
+		return new DeliveryTask(cpaId, sendDeliveryChannelId, receiveDeliveryChannelId, messageId, timeToLive, timestamp, confidential, 0);
 	}
 
 	default DeliveryTask createNextTask(DeliveryTask task, DeliveryChannel deliveryChannel)

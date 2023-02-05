@@ -36,7 +36,7 @@ public class EbMSAcknowledgment extends EbMSMessageResponse
 	@Builder
 	public EbMSAcknowledgment(MessageHeader messageHeader, SignatureType signature, @NonNull Acknowledgment acknowledgment)
 	{
-		super(messageHeader,signature);
+		super(messageHeader, signature);
 		this.acknowledgment = acknowledgment;
 	}
 }

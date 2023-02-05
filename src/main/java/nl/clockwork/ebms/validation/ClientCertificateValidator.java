@@ -70,14 +70,20 @@ class ClientCertificateValidator
 	{
 		val service = CPAUtils.toString(messageHeader.getService());
 		val deliveryChannel = cpaManager
-				.getSendDeliveryChannel(messageHeader
-						.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",
+				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
 						service,
-						messageHeader.getAction()));
+						messageHeader.getAction())
+				.orElseThrow(
+						() -> StreamUtils.illegalStateException(
+								"SendDeliveryChannel",
+								messageHeader.getCPAId(),
+								messageHeader.getFrom().getPartyId(),
+								messageHeader.getFrom().getRole(),
+								service,
+								messageHeader.getAction()));
 		return CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel));
 	}
 

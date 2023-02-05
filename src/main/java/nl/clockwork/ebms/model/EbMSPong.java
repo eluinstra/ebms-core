@@ -28,6 +28,6 @@ public class EbMSPong extends EbMSResponseMessage
 	@Builder
 	public EbMSPong(@NonNull MessageHeader messageHeader, SignatureType signature)
 	{
-		super(messageHeader,signature);
+		super(messageHeader, signature);
 	}
 }

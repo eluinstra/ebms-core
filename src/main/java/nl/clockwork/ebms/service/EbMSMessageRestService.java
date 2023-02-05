@@ -69,7 +69,7 @@ public class EbMSMessageRestService implements WithService
 	{
 		try
 		{
-			serviceHandler.ping(cpaId,fromPartyId,toPartyId);
+			serviceHandler.ping(cpaId, fromPartyId, toPartyId);
 		}
 		catch (Exception e)
 		{
@@ -88,7 +88,7 @@ public class EbMSMessageRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -101,17 +101,17 @@ public class EbMSMessageRestService implements WithService
 		try
 		{
 			return serviceHandler
-					.sendMessageMTOM(new MTOMMessageRequest(requestProperties,attachments.stream().map(toMTOMDataSource()).collect(Collectors.toList())));
+					.sendMessageMTOM(new MTOMMessageRequest(requestProperties, attachments.stream().map(toMTOMDataSource()).collect(Collectors.toList())));
 		}
 		catch (Exception e)
 		{
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 
-	private Function<Attachment,MTOMDataSource> toMTOMDataSource()
+	private Function<Attachment, MTOMDataSource> toMTOMDataSource()
 	{
-		return attachment -> new MTOMDataSource(attachment.getContentId(),attachment.getDataHandler());
+		return attachment -> new MTOMDataSource(attachment.getContentId(), attachment.getDataHandler());
 	}
 
 	@PUT
@@ -125,7 +125,7 @@ public class EbMSMessageRestService implements WithService
 		}
 		catch (Exception e)
 		{
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -146,20 +146,22 @@ public class EbMSMessageRestService implements WithService
 	{
 		try
 		{
-			return serviceHandler.getUnprocessedMessageIds(MessageFilter.builder()
-					.cpaId(cpaId)
-					.fromParty(fromPartyId == null ? null : new Party(fromPartyId,fromRole))
-					.toParty(toPartyId == null ? null : new Party(toPartyId,toRole))
-					.service(service)
-					.action(action)
-					.conversationId(conversationId)
-					.messageId(messageId)
-					.refToMessageId(refToMessageId)
-					.build(),maxNr);
+			return serviceHandler.getUnprocessedMessageIds(
+					MessageFilter.builder()
+							.cpaId(cpaId)
+							.fromParty(fromPartyId == null ? null : new Party(fromPartyId, fromRole))
+							.toParty(toPartyId == null ? null : new Party(toPartyId, toRole))
+							.service(service)
+							.action(action)
+							.conversationId(conversationId)
+							.messageId(messageId)
+							.refToMessageId(refToMessageId)
+							.build(),
+					maxNr);
 		}
 		catch (Exception e)
 		{
-			throw toWebApplicationException(e,MediaType.TEXT_PLAIN);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -170,7 +172,7 @@ public class EbMSMessageRestService implements WithService
 	{
 		try
 		{
-			return serviceHandler.getMessage(messageId,process);
+			return serviceHandler.getMessage(messageId, process);
 		}
 		catch (Exception e)
 		{
@@ -186,11 +188,11 @@ public class EbMSMessageRestService implements WithService
 	{
 		try
 		{
-			return toMultipartBody(serviceHandler.getMessageMTOM(messageId,process));
+			return toMultipartBody(serviceHandler.getMessageMTOM(messageId, process));
 		}
 		catch (Exception e)
 		{
-			throw toWebApplicationException(e,MediaType.MULTIPART_FORM_DATA);
+			throw toWebApplicationException(e, MediaType.MULTIPART_FORM_DATA);
 		}
 	}
 
@@ -199,17 +201,17 @@ public class EbMSMessageRestService implements WithService
 		val attachments = new LinkedList<Attachment>();
 		attachments.add(toAttachment(message.getProperties()));
 		attachments.addAll(message.getDataSources().stream().map(this::toAttachment).collect(Collectors.toList()));
-		return new MultipartBody(attachments,true);
+		return new MultipartBody(attachments, true);
 	}
 
 	private Attachment toAttachment(MessageProperties messageProperties)
 	{
-		return new Attachment("properties","application/json",messageProperties);
+		return new Attachment("properties", "application/json", messageProperties);
 	}
 
 	private Attachment toAttachment(MTOMDataSource dataSource)
 	{
-		return new Attachment(dataSource.getContentId(),dataSource.getAttachment(),new MultivaluedHashMap<>());
+		return new Attachment(dataSource.getContentId(), dataSource.getAttachment(), new MultivaluedHashMap<>());
 	}
 
 	@PATCH
@@ -258,16 +260,19 @@ public class EbMSMessageRestService implements WithService
 	{
 		try
 		{
-			return serviceHandler.getUnprocessedMessageEvents(MessageFilter.builder()
-					.cpaId(cpaId)
-					.fromParty(fromPartyId == null ? null : new Party(fromPartyId,fromRole))
-					.toParty(toPartyId == null ? null : new Party(toPartyId,toRole))
-					.service(service)
-					.action(action)
-					.conversationId(conversationId)
-					.messageId(messageId)
-					.refToMessageId(refToMessageId)
-					.build(),eventTypes,maxNr);
+			return serviceHandler.getUnprocessedMessageEvents(
+					MessageFilter.builder()
+							.cpaId(cpaId)
+							.fromParty(fromPartyId == null ? null : new Party(fromPartyId, fromRole))
+							.toParty(toPartyId == null ? null : new Party(toPartyId, toRole))
+							.service(service)
+							.action(action)
+							.conversationId(conversationId)
+							.messageId(messageId)
+							.refToMessageId(refToMessageId)
+							.build(),
+					eventTypes,
+					maxNr);
 		}
 		catch (Exception e)
 		{

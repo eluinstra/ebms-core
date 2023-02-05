@@ -28,13 +28,13 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 
 public class CPATestUtils
 {
-	public static Function1<String,Optional<CollaborationProtocolAgreement>> cpaCache = Function1.of(CPATestUtils::loadCPA).memoized();
+	public static Function1<String, Optional<CollaborationProtocolAgreement>> cpaCache = Function1.of(CPATestUtils::loadCPA).memoized();
 
 	public static Optional<CollaborationProtocolAgreement> loadCPA(String cpaId)
 	{
 		try
 		{
-			val s = IOUtils.toString(CPAUtils.class.getResourceAsStream("/nl/clockwork/ebms/cpas/" + cpaId + ".xml"),Charset.forName("UTF-8"));
+			val s = IOUtils.toString(CPAUtils.class.getResourceAsStream("/nl/clockwork/ebms/cpas/" + cpaId + ".xml"), Charset.forName("UTF-8"));
 			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(s));
 		}
 		catch (IOException | JAXBException e)

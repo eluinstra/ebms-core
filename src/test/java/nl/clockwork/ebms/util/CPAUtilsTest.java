@@ -49,48 +49,48 @@ public class CPAUtilsTest
 		headerPartyIds.add(new MsgPartyId());
 		headerPartyIds.get(0).setType("TYPE1");
 		headerPartyIds.get(0).setValue("VALUE1");
-		assertTrue(CPAUtils.equals(cpaPartyIds,headerPartyIds));
+		assertTrue(CPAUtils.equals(cpaPartyIds, headerPartyIds));
 
 		headerPartyIds.get(0).setValue("VALUE2");
-		assertFalse(CPAUtils.equals(cpaPartyIds,headerPartyIds));
+		assertFalse(CPAUtils.equals(cpaPartyIds, headerPartyIds));
 
 		headerPartyIds.add(new MsgPartyId());
 		headerPartyIds.get(1).setType("TYPE3");
 		headerPartyIds.get(1).setValue("VALUE3");
-		assertFalse(CPAUtils.equals(cpaPartyIds,headerPartyIds));
+		assertFalse(CPAUtils.equals(cpaPartyIds, headerPartyIds));
 
 		cpaPartyIds.add(new PartyId());
 		cpaPartyIds.get(1).setType("TYPE3");
 		cpaPartyIds.get(1).setValue("VALUE3");
-		assertFalse(CPAUtils.equals(cpaPartyIds,headerPartyIds));
+		assertFalse(CPAUtils.equals(cpaPartyIds, headerPartyIds));
 
 		headerPartyIds.get(0).setValue("VALUE1");
-		assertTrue(CPAUtils.equals(cpaPartyIds,headerPartyIds));
+		assertTrue(CPAUtils.equals(cpaPartyIds, headerPartyIds));
 
 		cpaPartyIds.get(0).setType(null);
-		assertFalse(CPAUtils.equals(cpaPartyIds,headerPartyIds));
+		assertFalse(CPAUtils.equals(cpaPartyIds, headerPartyIds));
 	}
 
 	@Test
 	public void getHostname()
 	{
-		assertEquals("",CPAUtils.getHostname(null));
+		assertEquals("", CPAUtils.getHostname(null));
 
 		val dc = new DeliveryChannel();
-		assertEquals("",CPAUtils.getHostname(dc));
+		assertEquals("", CPAUtils.getHostname(dc));
 
 		val ep = new Endpoint();
 		dc.setTransportId(new Transport());
 		((Transport)dc.getTransportId()).setTransportId("test");
-		assertEquals("",CPAUtils.getHostname(dc));
+		assertEquals("", CPAUtils.getHostname(dc));
 
 		((Transport)dc.getTransportId()).setTransportReceiver(new TransportReceiver());
 		((Transport)dc.getTransportId()).getTransportReceiver().getEndpoint().add(ep);
 		ep.setUri("http://dummy.nl/test");
-		assertEquals("dummy.nl",CPAUtils.getHostname(dc));
+		assertEquals("dummy.nl", CPAUtils.getHostname(dc));
 
 		ep.setUri("DUMMMY");
-		assertEquals("",CPAUtils.getHostname(dc));
+		assertEquals("", CPAUtils.getHostname(dc));
 
 	}
 

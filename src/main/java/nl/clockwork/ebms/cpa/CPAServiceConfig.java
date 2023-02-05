@@ -35,7 +35,7 @@ public class CPAServiceConfig
 	@Bean
 	public CPAService cpaService(CPAManager cpaManager, CPAValidator cpaValidator)
 	{
-		return new CPAServiceImpl(cpaManager,cpaValidator);
+		return new CPAServiceImpl(cpaManager, cpaValidator);
 	}
 
 	@Bean

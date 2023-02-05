@@ -34,7 +34,7 @@ public class KeyStoreUtils
 		try (val in = getInputStream(location))
 		{
 			val result = KeyStore.getInstance(type.name());
-			result.load(in,password.toCharArray());
+			result.load(in, password.toCharArray());
 			return result;
 		}
 	}

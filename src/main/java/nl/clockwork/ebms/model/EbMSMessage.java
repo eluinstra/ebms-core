@@ -51,7 +51,7 @@ public class EbMSMessage extends EbMSRequestMessage
 			Manifest manifest,
 			List<EbMSAttachment> attachments)
 	{
-		super(messageHeader,signature,syncReply);
+		super(messageHeader, signature, syncReply);
 		this.messageOrder = messageOrder;
 		this.ackRequested = ackRequested;
 		this.manifest = manifest;

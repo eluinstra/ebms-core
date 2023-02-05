@@ -90,7 +90,7 @@ public class EbMSHttpHandler
 					if ("Content-Type".equals(name))
 						response.setContentType(value);
 					else
-						response.setHeader(name,value);
+						response.setHeader(name, value);
 				}
 
 				@Override

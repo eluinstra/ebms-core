@@ -43,17 +43,17 @@ public class MessageQueue<T>
 	private static final float LOAD_FACTOR = .75F;
 	int timeout;
 	@NonNull
-	LinkedHashMap<String,QueueEntry<T>> queue;
+	LinkedHashMap<String, QueueEntry<T>> queue;
 
 	public MessageQueue(int maxEntries, int timeout)
 	{
 		this.timeout = timeout;
-		this.queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1,LOAD_FACTOR,true)
+		this.queue = new LinkedHashMap<String, QueueEntry<T>>(maxEntries + 1, LOAD_FACTOR, true)
 		{
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected boolean removeEldestEntry(java.util.Map.Entry<String,QueueEntry<T>> eldest)
+			protected boolean removeEldestEntry(java.util.Map.Entry<String, QueueEntry<T>> eldest)
 			{
 				return size() > maxEntries;
 			}
@@ -66,13 +66,13 @@ public class MessageQueue<T>
 		{
 			if (queue.containsKey(correlationId))
 				throw new IllegalStateException("key " + correlationId + " already exists!");
-			queue.put(correlationId,new QueueEntry<>(Thread.currentThread()));
+			queue.put(correlationId, new QueueEntry<>(Thread.currentThread()));
 		}
 	}
 
 	public Optional<T> get(String correlationId)
 	{
-		return get(correlationId,timeout);
+		return get(correlationId, timeout);
 	}
 
 	public Optional<T> get(String correlationId, int timeout)

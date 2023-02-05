@@ -74,7 +74,7 @@ class EbMSResponseHandler
 		}
 		catch (IOException e)
 		{
-			throw new EbMSResponseException(response,e);
+			throw new EbMSResponseException(response, e);
 		}
 	}
 
@@ -83,7 +83,7 @@ class EbMSResponseHandler
 		logResponse(response);
 		try
 		{
-			return toEbMSDocument(response.headers().firstValue("Content-ID").orElse(null),response.body());
+			return toEbMSDocument(response.headers().firstValue("Content-ID").orElse(null), response.body());
 		}
 		catch (ParserConfigurationException e)
 		{
@@ -91,7 +91,7 @@ class EbMSResponseHandler
 		}
 		catch (SAXException e)
 		{
-			throw new EbMSResponseException(response,e);
+			throw new EbMSResponseException(response, e);
 		}
 	}
 
@@ -114,6 +114,6 @@ class EbMSResponseHandler
 
 	private void logResponse(HttpResponse<String> response)
 	{
-		messageLog.info("<<<<\nStatusCode={}\nHeaders={}{}",response.statusCode(),response.headers(),(response.body() != null ? "\n" + response.body() : ""));
+		messageLog.info("<<<<\nStatusCode={}\nHeaders={}{}", response.statusCode(), response.headers(), (response.body() != null ? "\n" + response.body() : ""));
 	}
 }

@@ -89,18 +89,18 @@ public class EbMSClientConfig
 
 	private HttpErrors httpErrors()
 	{
-		return new HttpErrors(recoverableInformationalHttpErrors,recoverableRedirectionHttpErrors,recoverableClientHttpErrors,unrecoverableServerHttpErrors);
+		return new HttpErrors(recoverableInformationalHttpErrors, recoverableRedirectionHttpErrors, recoverableClientHttpErrors, unrecoverableServerHttpErrors);
 	}
 
 	@Bean
 	public EbMSProxyFactory ebMSProxyFactory()
 	{
-		return new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts);
+		return new EbMSProxyFactory(proxyHost, poxyPort, proxyUsername, proxyPassword, nonProxyHosts);
 	}
 
 	@Bean
 	public SSLParametersFactory sslParametersFactory()
 	{
-		return new SSLParametersFactory(enabledProtocols,enabledCipherSuites);
+		return new SSLParametersFactory(enabledProtocols, enabledCipherSuites);
 	}
 }

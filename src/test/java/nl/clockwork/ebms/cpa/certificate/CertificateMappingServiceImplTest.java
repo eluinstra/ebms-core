@@ -47,7 +47,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class,CertificateMappingServiceConfig.class,DataSourceConfig.class,TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class, CertificateMappingServiceConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class CertificateMappingServiceImplTest
 {
 	@Container
@@ -66,15 +66,21 @@ class CertificateMappingServiceImplTest
 	static Stream<Arguments> validCertificateMappings() throws CertificateException
 	{
 		return Stream.of(
-				arguments(new CertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						null)),
-				arguments(new CertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						"")),
-				arguments(new CertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						"test")));
+				arguments(
+						new CertificateMapping(
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								null)),
+				arguments(
+						new CertificateMapping(
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								"")),
+				arguments(
+						new CertificateMapping(
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								"test")));
 	}
 
 	@Test
@@ -82,15 +88,21 @@ class CertificateMappingServiceImplTest
 	{
 		validCertificateMappings().forEach(arg -> mappingService.setCertificateMapping((CertificateMapping)arg.get()[0]));
 		assertThat(mappingService.getCertificateMappings()).hasSize(3)
-				.contains(new CertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						null))
-				.contains(new CertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						""))
-				.contains(new CertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
-						"test"));
+				.contains(
+						new CertificateMapping(
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								null))
+				.contains(
+						new CertificateMapping(
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								""))
+				.contains(
+						new CertificateMapping(
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),
+								"test"));
 	}
 
 	@Test
@@ -99,13 +111,13 @@ class CertificateMappingServiceImplTest
 		validCertificateMappings().forEach(arg -> mappingService.setCertificateMapping((CertificateMapping)arg.get()[0]));
 		assertThat(mappingService.getCertificateMappings()).hasSize(3);
 		assertThatCode(
-				() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),null))
+				() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))), null))
 						.doesNotThrowAnyException();
 		assertThat(mappingService.getCertificateMappings()).hasSize(2);
 		assertThatThrownBy(
-				() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),null))
+				() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))), null))
 						.hasMessageContaining("Certificate not found");
-		assertThatCode(() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))),""))
+		assertThatCode(() -> mappingService.deleteCertificateMapping(parseCertificate(decodeBase64(readFileS("nl/clockwork/ebms/certificates/localhost.pem"))), ""))
 				.doesNotThrowAnyException();
 		assertThat(mappingService.getCertificateMappings()).hasSize(1);
 	}

@@ -39,7 +39,8 @@ public class CertificateMapper
 
 	public X509Certificate getCertificate(X509Certificate certificate, String cpaId)
 	{
-		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getCertificateId(certificate),cpaId,false).orElse(certificate)
+		return certificate != null
+				? certificateMappingDAO.getCertificateMapping(CertificateMapping.getCertificateId(certificate), cpaId, false).orElse(certificate)
 				: null;
 	}
 
@@ -47,7 +48,7 @@ public class CertificateMapper
 	{
 		synchronized (certificateMonitor)
 		{
-			if (certificateMappingDAO.existsCertificateMapping(mapping.getId(),mapping.getCpaId()))
+			if (certificateMappingDAO.existsCertificateMapping(mapping.getId(), mapping.getCpaId()))
 				certificateMappingDAO.updateCertificateMapping(mapping);
 			else
 				certificateMappingDAO.insertCertificateMapping(mapping);
@@ -57,7 +58,7 @@ public class CertificateMapper
 	public int deleteCertificateMapping(X509Certificate source, String cpaId)
 	{
 		val key = CertificateMapping.getCertificateId(source);
-		return certificateMappingDAO.deleteCertificateMapping(key,cpaId);
+		return certificateMappingDAO.deleteCertificateMapping(key, cpaId);
 	}
 
 	public void deleteCache()

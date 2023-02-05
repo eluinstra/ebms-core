@@ -65,11 +65,11 @@ public class EbMSMessageValidator
 			throw new DuplicateMessageException();
 		clientCertificateValidator.validate(message);
 		cpaValidator.validate(message);
-		messageHeaderValidator.validate(message,timestamp);
+		messageHeaderValidator.validate(message, timestamp);
 		signatureValidator.validate(message);
 		manifestValidator.validate(message);
 		messageDecrypter.decrypt(message);
-		signatureValidator.validateSignature(document,message);
+		signatureValidator.validateSignature(document, message);
 	}
 
 	public void validateMessageError(EbMSMessage requestMessage, EbMSMessageError responseMessage) throws ValidatorException
@@ -77,7 +77,7 @@ public class EbMSMessageValidator
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
 		clientCertificateValidator.validate(responseMessage);
-		messageHeaderValidator.validate(requestMessage,responseMessage);
+		messageHeaderValidator.validate(requestMessage, responseMessage);
 		messageHeaderValidator.validate(responseMessage);
 	}
 
@@ -86,9 +86,9 @@ public class EbMSMessageValidator
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
 		clientCertificateValidator.validate(responseMessage);
-		messageHeaderValidator.validate(requestMessage,responseMessage);
+		messageHeaderValidator.validate(requestMessage, responseMessage);
 		messageHeaderValidator.validate(responseMessage);
-		signatureValidator.validate(responseDocument,requestMessage,responseMessage);
+		signatureValidator.validate(responseDocument, requestMessage, responseMessage);
 	}
 
 	public void validate(EbMSBaseMessage message) throws ValidatorException
@@ -105,13 +105,20 @@ public class EbMSMessageValidator
 			val messageHeader = message.getMessageHeader();
 			val service = CPAUtils.toString(messageHeader.getService());
 			val syncReply = cpaManager
-					.getSendSyncReply(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-					.orElseThrow(() -> StreamUtils.illegalStateException("SyncReply",
+					.getSendSyncReply(
 							messageHeader.getCPAId(),
 							messageHeader.getFrom().getPartyId(),
 							messageHeader.getFrom().getRole(),
 							service,
-							messageHeader.getAction()));
+							messageHeader.getAction())
+					.orElseThrow(
+							() -> StreamUtils.illegalStateException(
+									"SyncReply",
+									messageHeader.getCPAId(),
+									messageHeader.getFrom().getPartyId(),
+									messageHeader.getFrom().getRole(),
+									service,
+									messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}
 		catch (Exception e)

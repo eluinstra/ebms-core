@@ -33,7 +33,7 @@ public abstract class EbMSRequestMessage extends EbMSBaseMessage
 
 	protected EbMSRequestMessage(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply)
 	{
-		super(messageHeader,signature);
+		super(messageHeader, signature);
 		this.syncReply = syncReply;
 	}
 }

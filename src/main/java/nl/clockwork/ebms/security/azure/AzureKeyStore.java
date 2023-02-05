@@ -28,13 +28,14 @@ public class AzureKeyStore
 {
 	private static EbMSKeyStore keyStore = null;
 
-	public static EbMSKeyStore
+	public static
+			EbMSKeyStore
 			of(@NonNull String keyvaultURI, @NonNull String tennantID, @NonNull String clientID, @NonNull String clientSecret, String defaultAlias)
 					throws GeneralSecurityException, IOException
 	{
 		if (keyStore == null)
 		{
-			keyStore = new EbMSKeyStore("azure",KeyStoreUtils.loadKeyStore(keyvaultURI,tennantID,clientID,clientSecret),"",defaultAlias);
+			keyStore = new EbMSKeyStore("azure", KeyStoreUtils.loadKeyStore(keyvaultURI, tennantID, clientID, clientSecret), "", defaultAlias);
 		}
 		return keyStore;
 	}
@@ -44,7 +45,7 @@ public class AzureKeyStore
 	{
 		if (keyStore == null)
 		{
-			keyStore = new EbMSKeyStore("azure",KeyStoreUtils.loadKeyStore(keyvaultURI,tennantID,clientID,clientSecret),"","");
+			keyStore = new EbMSKeyStore("azure", KeyStoreUtils.loadKeyStore(keyvaultURI, tennantID, clientID, clientSecret), "", "");
 		}
 		return keyStore;
 	}

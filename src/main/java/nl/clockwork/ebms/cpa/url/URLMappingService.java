@@ -23,7 +23,11 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-@WebService(name = "UrlMappingService", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18", serviceName = "UrlMappingService", portName = "UrlMappingPort")
+@WebService(
+		name = "UrlMappingService",
+		targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18",
+		serviceName = "UrlMappingService",
+		portName = "UrlMappingPort")
 public interface URLMappingService
 {
 	/**

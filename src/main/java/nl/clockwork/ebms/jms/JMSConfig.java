@@ -61,7 +61,7 @@ public class JMSConfig
 	@Bean(name = "brokerFactory", destroyMethod = "destroy")
 	public EbMSBrokerFactoryBean brokerFactory() throws Exception
 	{
-		return new EbMSBrokerFactoryBean(jmsBrokerStart,jmsBrokerConfig);
+		return new EbMSBrokerFactoryBean(jmsBrokerStart, jmsBrokerConfig);
 	}
 
 	@Bean

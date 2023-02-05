@@ -63,16 +63,16 @@ public class CacheConfig
 		return configLocation == null ? new ClassPathResource(DEFAULT_CONFIG_LOCATION) : configLocation;
 	}
 
-	private NearCacheConfiguration<Object,Object> createDynamicNearCacheConfiguration()
+	private NearCacheConfiguration<Object, Object> createDynamicNearCacheConfiguration()
 	{
-		val result = new NearCacheConfiguration<Object,Object>();
+		val result = new NearCacheConfiguration<Object, Object>();
 		result.setNearEvictionPolicyFactory(createNearEvictPlcFactory());
 		return result;
 	}
 
-	private LruEvictionPolicyFactory<Object,Object> createNearEvictPlcFactory()
+	private LruEvictionPolicyFactory<Object, Object> createNearEvictPlcFactory()
 	{
-		val result = new LruEvictionPolicyFactory<Object,Object>();
+		val result = new LruEvictionPolicyFactory<Object, Object>();
 		result.setMaxSize(100000);
 		return result;
 	}
@@ -82,7 +82,7 @@ public class CacheConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("cache.type",String.class,"").equals(CACHE_TYPE);
+			return context.getEnvironment().getProperty("cache.type", String.class, "").equals(CACHE_TYPE);
 		}
 	}
 }

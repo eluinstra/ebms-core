@@ -51,12 +51,12 @@ public class CPAServiceImpl implements CPAService
 		}
 		catch (CPAServiceException e)
 		{
-			log.error("ValidateCPA\n" + cpa,e);
+			log.error("ValidateCPA\n" + cpa, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("ValidateCPA\n" + cpa,e);
+			log.error("ValidateCPA\n" + cpa, e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -75,16 +75,16 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			return insertCPAImpl(cpa,overwrite);
+			return insertCPAImpl(cpa, overwrite);
 		}
 		catch (CPAServiceException e)
 		{
-			log.error("InsertCPA\n" + cpa,e);
+			log.error("InsertCPA\n" + cpa, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("InsertCPA\n" + cpa,e);
+			log.error("InsertCPA\n" + cpa, e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -95,7 +95,7 @@ public class CPAServiceImpl implements CPAService
 		xsdValidator.validate(cpa);
 		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
 		new CPAValidator(cpaManager).validate(parsedCpa);
-		cpaManager.setCPA(parsedCpa,overwrite);
+		cpaManager.setCPA(parsedCpa, overwrite);
 		log.debug("InsertCPA done");
 		return parsedCpa.getCpaid();
 	}
@@ -109,12 +109,12 @@ public class CPAServiceImpl implements CPAService
 		}
 		catch (CPAServiceException e)
 		{
-			log.error("DeleteCPA " + cpaId,e);
+			log.error("DeleteCPA " + cpaId, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCPA " + cpaId,e);
+			log.error("DeleteCPA " + cpaId, e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -135,12 +135,12 @@ public class CPAServiceImpl implements CPAService
 		}
 		catch (CPAServiceException e)
 		{
-			log.error("GetCPAIds",e);
+			log.error("GetCPAIds", e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("GetCPAIds",e);
+			log.error("GetCPAIds", e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -160,12 +160,12 @@ public class CPAServiceImpl implements CPAService
 		}
 		catch (CPAServiceException e)
 		{
-			log.error("GetCPAId " + cpaId,e);
+			log.error("GetCPAId " + cpaId, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("GetCPAId " + cpaId,e);
+			log.error("GetCPAId " + cpaId, e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -185,7 +185,7 @@ public class CPAServiceImpl implements CPAService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCache",e);
+			log.error("DeleteCache", e);
 			throw new CPAServiceException(e);
 		}
 	}

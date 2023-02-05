@@ -48,7 +48,7 @@ public class EbMSMessageReader
 		if (contentType.startsWith("multipart"))
 		{
 			val handler = new EbMSContentHandler();
-			parseEbMSMessage(handler,contentType,in);
+			parseEbMSMessage(handler, contentType, in);
 			val attachments = handler.getAttachments();
 			return getEbMSMessage(attachments);
 		}

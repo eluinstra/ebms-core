@@ -36,7 +36,7 @@ public class EbMSMessageError extends EbMSMessageResponse
 	@Builder
 	public EbMSMessageError(MessageHeader messageHeader, SignatureType signature, @NonNull ErrorList errorList)
 	{
-		super(messageHeader,signature);
+		super(messageHeader, signature);
 		this.errorList = errorList;
 	}
 }

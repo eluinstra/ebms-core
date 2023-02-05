@@ -47,19 +47,29 @@ class SignatureValidator
 
 		val service = CPAUtils.toString(messageHeader.getService());
 		val deliveryChannel = cpaManager
-				.getSendDeliveryChannel(messageHeader
-						.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",
+				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
 						service,
-						messageHeader.getAction()));
-		if (cpaManager.isSendingNonRepudiationRequired(messageHeader
-				.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+						messageHeader.getAction())
+				.orElseThrow(
+						() -> StreamUtils.illegalStateException(
+								"SendDeliveryChannel",
+								messageHeader.getCPAId(),
+								messageHeader.getFrom().getPartyId(),
+								messageHeader.getFrom().getRole(),
+								service,
+								messageHeader.getAction()));
+		if (cpaManager.isSendingNonRepudiationRequired(
+				messageHeader.getCPAId(),
+				messageHeader.getFrom().getPartyId(),
+				messageHeader.getFrom().getRole(),
+				service,
+				messageHeader.getAction()))
 		{
 			if (signature == null)
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",EbMSErrorCode.SECURITY_FAILURE,"Signature not found."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature", EbMSErrorCode.SECURITY_FAILURE, "Signature not found."));
 			val reference = signature.getSignedInfo()
 					.getReference()
 					.stream()
@@ -67,12 +77,14 @@ class SignatureValidator
 					.findFirst();
 			if (reference.isPresent())
 				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.get().getURI() + "']/DigestMethod/@Algorithm",
+						EbMSMessageUtils.createError(
+								"//Header/Signature/SignedInfo/Reference[@URI='" + reference.get().getURI() + "']/DigestMethod/@Algorithm",
 								EbMSErrorCode.SECURITY_FAILURE,
 								"Invalid DigestMethod."));
 			if (!CPAUtils.getSignatureAlgorithm(deliveryChannel).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
 				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/SignatureMethod/@Algorithm",EbMSErrorCode.SECURITY_FAILURE,"Invalid SignatureMethod."));
+						EbMSMessageUtils
+								.createError("//Header/Signature/SignedInfo/SignatureMethod/@Algorithm", EbMSErrorCode.SECURITY_FAILURE, "Invalid SignatureMethod."));
 		}
 	}
 
@@ -80,17 +92,17 @@ class SignatureValidator
 	{
 		try
 		{
-			ebMSSignatureValidator.validate(document,message);
+			ebMSSignatureValidator.validate(document, message);
 		}
 		catch (ValidationException e)
 		{
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature", EbMSErrorCode.SECURITY_FAILURE, e.getMessage()));
 		}
 	}
 
 	public void validate(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage)
 			throws ValidationException, ValidatorException
 	{
-		ebMSSignatureValidator.validate(responseDocument,requestMessage,responseMessage);
+		ebMSSignatureValidator.validate(responseDocument, requestMessage, responseMessage);
 	}
 }

@@ -38,7 +38,7 @@ import lombok.experimental.FieldDefaults;
 @ToString(onlyExplicitlyIncluded = true)
 public class EbMSKeyStore
 {
-	private static Map<String,EbMSKeyStore> keyStores = new ConcurrentHashMap<>();
+	private static Map<String, EbMSKeyStore> keyStores = new ConcurrentHashMap<>();
 	@NonNull
 	@ToString.Include
 	String path;
@@ -52,17 +52,18 @@ public class EbMSKeyStore
 			throws GeneralSecurityException, IOException
 	{
 		if (!keyStores.containsKey(path))
-			keyStores.put(path,new EbMSKeyStore(path,KeyStoreUtils.loadKeyStore(type,path,password),keyPassword,null));
+			keyStores.put(path, new EbMSKeyStore(path, KeyStoreUtils.loadKeyStore(type, path, password), keyPassword, null));
 		return keyStores.get(path);
 	}
 
-	public static EbMSKeyStore
+	public static
+			EbMSKeyStore
 			of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, @NonNull String defaultAlias)
 					throws GeneralSecurityException, IOException
 	{
 		String key = path + defaultAlias;
 		if (!keyStores.containsKey(key))
-			keyStores.put(key,new EbMSKeyStore(path,KeyStoreUtils.loadKeyStore(type,path,password),keyPassword,defaultAlias));
+			keyStores.put(key, new EbMSKeyStore(path, KeyStoreUtils.loadKeyStore(type, path, password), keyPassword, defaultAlias));
 		return keyStores.get(key);
 	}
 
@@ -91,6 +92,6 @@ public class EbMSKeyStore
 
 	public Key getKey(String alias, char[] password) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException
 	{
-		return keyStore.getKey(alias,password);
+		return keyStore.getKey(alias, password);
 	}
 }

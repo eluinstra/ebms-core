@@ -31,26 +31,26 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusTy
 @Getter
 public enum EbMSMessageStatus
 {
-	UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED),
-	NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED),
-	RECEIVED(2,MessageStatusType.RECEIVED),
-	PROCESSED(3,MessageStatusType.PROCESSED),
-	FORWARDED(4,MessageStatusType.FORWARDED),
-	FAILED(5,MessageStatusType.RECEIVED),
+	UNAUTHORIZED(0, MessageStatusType.UN_AUTHORIZED),
+	NOT_RECOGNIZED(1, MessageStatusType.NOT_RECOGNIZED),
+	RECEIVED(2, MessageStatusType.RECEIVED),
+	PROCESSED(3, MessageStatusType.PROCESSED),
+	FORWARDED(4, MessageStatusType.FORWARDED),
+	FAILED(5, MessageStatusType.RECEIVED),
 	/* WAITING(6,MessageStatusType.RECEIVED), */
 	CREATED(10),
 	DELIVERY_FAILED(11),
 	DELIVERED(12),
 	EXPIRED(13);
 
-	private static final Set<EbMSMessageStatus> RECEIVE_STATUS = EnumSet.of(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED);
-	private static final Set<EbMSMessageStatus> SEND_STATUS = EnumSet.of(CREATED,DELIVERY_FAILED,DELIVERED,EXPIRED);
+	private static final Set<EbMSMessageStatus> RECEIVE_STATUS = EnumSet.of(UNAUTHORIZED, NOT_RECOGNIZED, RECEIVED, PROCESSED, FORWARDED, FAILED);
+	private static final Set<EbMSMessageStatus> SEND_STATUS = EnumSet.of(CREATED, DELIVERY_FAILED, DELIVERED, EXPIRED);
 	int id;
 	MessageStatusType statusCode;
 
 	private EbMSMessageStatus(int id)
 	{
-		this(id,null);
+		this(id, null);
 	}
 
 	public static Stream<EbMSMessageStatus> stream()

@@ -40,12 +40,12 @@ public class URLMappingServiceImpl implements URLMappingService
 		}
 		catch (URLMappingServiceException e)
 		{
-			log.error("SetURLMapping " + urlMapping,e);
+			log.error("SetURLMapping " + urlMapping, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("SetURLMapping " + urlMapping,e);
+			log.error("SetURLMapping " + urlMapping, e);
 			throw new URLMappingServiceException(e);
 		}
 	}
@@ -66,12 +66,12 @@ public class URLMappingServiceImpl implements URLMappingService
 		}
 		catch (URLMappingServiceException e)
 		{
-			log.error("DeleteURLMapping " + source,e);
+			log.error("DeleteURLMapping " + source, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteURLMapping " + source,e);
+			log.error("DeleteURLMapping " + source, e);
 			throw new URLMappingServiceException(e);
 		}
 	}
@@ -92,12 +92,12 @@ public class URLMappingServiceImpl implements URLMappingService
 		}
 		catch (URLMappingServiceException e)
 		{
-			log.error("GetURLMappings",e);
+			log.error("GetURLMappings", e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("GetURLMappings",e);
+			log.error("GetURLMappings", e);
 			throw new URLMappingServiceException(e);
 		}
 	}
@@ -117,7 +117,7 @@ public class URLMappingServiceImpl implements URLMappingService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCache",e);
+			log.error("DeleteCache", e);
 			throw new URLMappingServiceException(e);
 		}
 	}

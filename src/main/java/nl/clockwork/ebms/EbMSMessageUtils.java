@@ -82,20 +82,21 @@ public class EbMSMessageUtils
 	public static EbMSBaseMessage getEbMSMessage(Document document)
 			throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		return getEbMSMessage(document,Collections.emptyList());
+		return getEbMSMessage(document, Collections.emptyList());
 	}
 
 	public static EbMSBaseMessage getEbMSMessage(EbMSDocument document)
 			throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		return getEbMSMessage(document.getMessage(),document.getAttachments());
+		return getEbMSMessage(document.getMessage(), document.getAttachments());
 	}
 
 	private static EbMSBaseMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments)
 			throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		val builder = new EbMSMessageBuilder();
-		JAXBParser<Envelope> jaxbParser = JAXBParser.getInstance(Envelope.class,
+		JAXBParser<Envelope> jaxbParser = JAXBParser.getInstance(
+				Envelope.class,
 				Envelope.class,
 				MessageHeader.class,
 				SyncReply.class,
@@ -108,8 +109,8 @@ public class EbMSMessageUtils
 				StatusRequest.class,
 				StatusResponse.class);
 		val envelope = jaxbParser.handleUnsafe(document);
-		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilderHeader(builder,e));
-		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilderBody(builder,e));
+		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilderHeader(builder, e));
+		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilderBody(builder, e));
 		builder.attachments(attachments);
 		return builder.build();
 	}
@@ -117,13 +118,14 @@ public class EbMSMessageUtils
 	@SuppressWarnings("unchecked")
 	private static void setEbMSMessageBuilderHeader(EbMSMessageBuilder result, Object o)
 	{
-		Match(o).of(Case($(instanceOf(MessageHeader.class)),result::messageHeader),
-				Case($(instanceOf(AckRequested.class)),result::ackRequested),
-				Case($(instanceOf(Acknowledgment.class)),result::acknowledgment),
-				Case($(instanceOf(ErrorList.class)),result::errorList),
-				Case($(instanceOf(SyncReply.class)),result::syncReply),
-				Case($(instanceOf(MessageOrder.class)),result::messageOrder),
-				Case($(instanceOf(JAXBElement.class)),p -> run(() ->
+		Match(o).of(
+				Case($(instanceOf(MessageHeader.class)), result::messageHeader),
+				Case($(instanceOf(AckRequested.class)), result::ackRequested),
+				Case($(instanceOf(Acknowledgment.class)), result::acknowledgment),
+				Case($(instanceOf(ErrorList.class)), result::errorList),
+				Case($(instanceOf(SyncReply.class)), result::syncReply),
+				Case($(instanceOf(MessageOrder.class)), result::messageOrder),
+				Case($(instanceOf(JAXBElement.class)), p -> run(() ->
 				{
 					if (((JAXBElement<?>)p).getValue() instanceof SignatureType)
 						result.signature(((JAXBElement<SignatureType>)p).getValue());
@@ -132,9 +134,10 @@ public class EbMSMessageUtils
 
 	private static void setEbMSMessageBuilderBody(EbMSMessageBuilder result, Object o)
 	{
-		Match(o).of(Case($(instanceOf(Manifest.class)),result::manifest),
-				Case($(instanceOf(StatusRequest.class)),result::statusRequest),
-				Case($(instanceOf(StatusResponse.class)),result::statusResponse));
+		Match(o).of(
+				Case($(instanceOf(Manifest.class)), result::manifest),
+				Case($(instanceOf(StatusRequest.class)), result::statusRequest),
+				Case($(instanceOf(StatusResponse.class)), result::statusResponse));
 	}
 
 	public static String toString(PartyId partyId)
@@ -149,7 +152,7 @@ public class EbMSMessageUtils
 
 	public static String toString(Service service)
 	{
-		return CPAUtils.toString(service.getType(),service.getValue());
+		return CPAUtils.toString(service.getType(), service.getValue());
 	}
 
 	public static EbMSDocument getEbMSDocument(EbMSBaseMessage message)
@@ -204,7 +207,7 @@ public class EbMSMessageUtils
 
 	public static Error createError(String location, EbMSErrorCode errorCode, String description)
 	{
-		return createError(location,errorCode,description,Constants.EBMS_DEFAULT_LANGUAGE,SeverityType.ERROR);
+		return createError(location, errorCode, description, Constants.EBMS_DEFAULT_LANGUAGE, SeverityType.ERROR);
 	}
 
 	public static Error createError(String location, EbMSErrorCode errorCode, String description, String language, SeverityType severity)
@@ -277,7 +280,8 @@ public class EbMSMessageUtils
 			envelope.getBody().getAny().add(((EbMSStatusRequest)ebMSMessage).getStatusRequest());
 		else if (ebMSMessage instanceof EbMSStatusResponse)
 			envelope.getBody().getAny().add(((EbMSStatusResponse)ebMSMessage).getStatusResponse());
-		val parser = JAXBParser.getInstance(Envelope.class,
+		val parser = JAXBParser.getInstance(
+				Envelope.class,
 				Envelope.class,
 				MessageHeader.class,
 				SyncReply.class,
@@ -288,8 +292,8 @@ public class EbMSMessageUtils
 				Manifest.class,
 				StatusRequest.class,
 				StatusResponse.class);
-		val e = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
-		val is = new ByteArrayInputStream(parser.handle(e,new EbMSNamespaceMapper()).getBytes());
+		val e = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope"), Envelope.class, envelope);
+		val is = new ByteArrayInputStream(parser.handle(e, new EbMSNamespaceMapper()).getBytes());
 		return DOMUtils.getDocumentBuilder().parse(is);
 	}
 
@@ -298,14 +302,16 @@ public class EbMSMessageUtils
 		val envelope = new Envelope();
 		envelope.setBody(new Body());
 		val fault = new Fault();
-		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/",faultCode));
+		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/", faultCode));
 		fault.setFaultstring(faultString);
-		val f = new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
+		val f = new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Fault"), Fault.class, fault);
 		envelope.getBody().getAny().add(f);
 		return DOMUtils.getDocumentBuilder()
-				.parse(new ByteArrayInputStream(JAXBParser.getInstance(Envelope.class)
-						.handle(new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope))
-						.getBytes()));
+				.parse(
+						new ByteArrayInputStream(
+								JAXBParser.getInstance(Envelope.class)
+										.handle(new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope"), Envelope.class, envelope))
+										.getBytes()));
 	}
 
 }

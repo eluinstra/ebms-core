@@ -38,7 +38,7 @@ class TimedTask
 			val start = Instant.now();
 			task.run();
 			val end = Instant.now();
-			val sleep = executionInterval - ChronoUnit.MILLIS.between(start,end);
+			val sleep = executionInterval - ChronoUnit.MILLIS.between(start, end);
 			sleep(sleep);
 		}
 		else
@@ -54,7 +54,7 @@ class TimedTask
 		}
 		catch (InterruptedException e)
 		{
-			log.trace("",e);
+			log.trace("", e);
 		}
 	}
 }

@@ -38,27 +38,27 @@ class EbMSMessageWriter
 
 	public Builder write(Builder request, EbMSDocument document) throws TransformerException
 	{
-		return document.getAttachments().isEmpty() ? writeMessage(request,document) : writeMimeMessage(request,document);
+		return document.getAttachments().isEmpty() ? writeMessage(request, document) : writeMimeMessage(request, document);
 	}
 
 	protected Builder writeMessage(Builder request, EbMSDocument document) throws TransformerException
 	{
-		val message = DOMUtils.toString(document.getMessage(),"UTF-8");
+		val message = DOMUtils.toString(document.getMessage(), "UTF-8");
 		if (messageLog.isInfoEnabled())
-			messageLog.info(">>>>\n{}",message);
-		return request.setHeader("Content-Type","text/xml; charset=UTF-8")
-				.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION)
-				.POST(BodyPublishers.ofString(message,StandardCharsets.UTF_8));
+			messageLog.info(">>>>\n{}", message);
+		return request.setHeader("Content-Type", "text/xml; charset=UTF-8")
+				.setHeader("SOAPAction", Constants.EBMS_SOAP_ACTION)
+				.POST(BodyPublishers.ofString(message, StandardCharsets.UTF_8));
 	}
 
 	protected Builder writeMimeMessage(Builder request, EbMSDocument document) throws TransformerException
 	{
-		val message = DOMUtils.toString(document.getMessage(),"UTF-8");
+		val message = DOMUtils.toString(document.getMessage(), "UTF-8");
 		if (messageLog.isInfoEnabled())
-			messageLog.info(">>>>\n{}",message);
+			messageLog.info(">>>>\n{}", message);
 
-		val publisher = new MultipartBodyPublisher(document.getContentId()).addXml(document.getContentId(),message);
+		val publisher = new MultipartBodyPublisher(document.getContentId()).addXml(document.getContentId(), message);
 		document.getAttachments().stream().forEach(publisher::addAttachment);
-		return request.setHeader("Content-Type",publisher.contentType()).setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION).POST(publisher);
+		return request.setHeader("Content-Type", publisher.contentType()).setHeader("SOAPAction", Constants.EBMS_SOAP_ACTION).POST(publisher);
 	}
 }

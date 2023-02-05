@@ -60,19 +60,20 @@ public class EmbeddedWebConfig
 	@Bean
 	public Endpoint cpaServiceEndpoint()
 	{
-		return publishEndpoint(cpaService,"/cpa","http://www.ordina.nl/cpa/2.18","CPAService","CPAPort");
+		return publishEndpoint(cpaService, "/cpa", "http://www.ordina.nl/cpa/2.18", "CPAService", "CPAPort");
 	}
 
 	@Bean
 	public Endpoint urlMappingServiceEndpoint()
 	{
-		return publishEndpoint(urlMappingService,"/urlMapping","http://www.ordina.nl/cpa/urlMapping/2.18","URLMappingService","URLMappingPort");
+		return publishEndpoint(urlMappingService, "/urlMapping", "http://www.ordina.nl/cpa/urlMapping/2.18", "URLMappingService", "URLMappingPort");
 	}
 
 	@Bean
 	public Endpoint certificateMappingServiceEndpoint()
 	{
-		return publishEndpoint(certificateMappingService,
+		return publishEndpoint(
+				certificateMappingService,
 				"/certificateMapping",
 				"http://www.ordina.nl/cpa/certificateMapping/2.18",
 				"CertificateMappingService",
@@ -82,16 +83,16 @@ public class EmbeddedWebConfig
 	@Bean
 	public Endpoint ebMSMessageServiceEndpoint()
 	{
-		return publishEndpoint(ebMSMessageService,"/ebms","http://www.ordina.nl/ebms/2.18","EbMSMessageService","EbMSMessagePort");
+		return publishEndpoint(ebMSMessageService, "/ebms", "http://www.ordina.nl/ebms/2.18", "EbMSMessageService", "EbMSMessagePort");
 	}
 
 	@Bean
 	public Endpoint ebMSMessageServiceMTOMEndpoint()
 	{
-		val result = new EndpointImpl(cxf(),ebMSMessageServiceMTOM);
+		val result = new EndpointImpl(cxf(), ebMSMessageServiceMTOM);
 		result.setAddress("/ebmsMTOM");
-		result.setServiceName(new QName("http://www.ordina.nl/ebms/2.18","EbMSMessageService"));
-		result.setEndpointName(new QName("http://www.ordina.nl/ebms/2.18","EbMSMessagePort"));
+		result.setServiceName(new QName("http://www.ordina.nl/ebms/2.18", "EbMSMessageService"));
+		result.setEndpointName(new QName("http://www.ordina.nl/ebms/2.18", "EbMSMessagePort"));
 		result.publish();
 		enableMTOM(result);
 		return result;
@@ -120,10 +121,10 @@ public class EmbeddedWebConfig
 
 	private Endpoint publishEndpoint(Object service, String address, String namespaceUri, String serviceName, String endpointName)
 	{
-		val result = new EndpointImpl(cxf(),service);
+		val result = new EndpointImpl(cxf(), service);
 		result.setAddress(address);
-		result.setServiceName(new QName(namespaceUri,serviceName));
-		result.setEndpointName(new QName(namespaceUri,endpointName));
+		result.setServiceName(new QName(namespaceUri, serviceName));
+		result.setEndpointName(new QName(namespaceUri, endpointName));
 		result.publish();
 		return result;
 	}

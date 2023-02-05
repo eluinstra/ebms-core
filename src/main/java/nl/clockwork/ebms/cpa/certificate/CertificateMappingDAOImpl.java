@@ -41,15 +41,15 @@ import org.springframework.jdbc.core.RowMapper;
 @RequiredArgsConstructor
 class CertificateMappingDAOImpl implements CertificateMappingDAO
 {
-	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate,String>>
+	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>
 	{
 		@Override
-		public Tuple2<X509Certificate,String> mapRow(ResultSet rs, int rowNum) throws SQLException
+		public Tuple2<X509Certificate, String> mapRow(ResultSet rs, int rowNum) throws SQLException
 		{
 			try
 			{
 				CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-				return Tuple.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination")),rs.getString("cpa_id"));
+				return Tuple.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination")), rs.getString("cpa_id"));
 			}
 			catch (CertificateException e)
 			{
@@ -72,8 +72,9 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
-		return cpaId == null ? jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id is null",Integer.class,id) > 0
-				: jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id = ?",Integer.class,id,cpaId) > 0;
+		return cpaId == null
+				? jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id is null", Integer.class, id) > 0
+				: jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id = ?", Integer.class, id, cpaId) > 0;
 	}
 
 	@Override
@@ -83,9 +84,12 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 		try
 		{
 			val result = cpaId == null
-					? jdbcTemplate.query("select destination, cpa_id from certificate_mapping where id = ? and cpa_id is null",new CertificateRowMapper(),id)
-					: jdbcTemplate.query("select destination, cpa_id from certificate_mapping where id = ?"
-							+ (getSpecific ? " and cpa_id = ?" : " and (cpa_id = ? or cpa_id is null)"),new CertificateRowMapper(),id,cpaId);
+					? jdbcTemplate.query("select destination, cpa_id from certificate_mapping where id = ? and cpa_id is null", new CertificateRowMapper(), id)
+					: jdbcTemplate.query(
+							"select destination, cpa_id from certificate_mapping where id = ?" + (getSpecific ? " and cpa_id = ?" : " and (cpa_id = ? or cpa_id is null)"),
+							new CertificateRowMapper(),
+							id,
+							cpaId);
 			if (result.size() == 0)
 				return Optional.empty();
 			else if (result.size() == 1)
@@ -103,7 +107,7 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<CertificateMapping> getCertificateMappings()
 	{
-		return jdbcTemplate.query("select source, destination, cpa_id from certificate_mapping",new RowMapper<CertificateMapping>()
+		return jdbcTemplate.query("select source, destination, cpa_id from certificate_mapping", new RowMapper<CertificateMapping>()
 		{
 			@Override
 			public CertificateMapping mapRow(ResultSet rs, int nr) throws SQLException
@@ -114,7 +118,7 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 					val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
 					val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
 					val cpaId = rs.getString("cpa_id");
-					return new CertificateMapping(source,destination,cpaId);
+					return new CertificateMapping(source, destination, cpaId);
 				}
 				catch (CertificateException e)
 				{
@@ -130,7 +134,8 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	{
 		try
 		{
-			jdbcTemplate.update("insert into certificate_mapping (id,source,destination,cpa_id) values (?,?,?,?)",
+			jdbcTemplate.update(
+					"insert into certificate_mapping (id,source,destination,cpa_id) values (?,?,?,?)",
 					mapping.getId(),
 					mapping.getSource().getEncoded(),
 					mapping.getDestination().getEncoded(),
@@ -151,9 +156,12 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 		{
 			return cpaId == null
 					? jdbcTemplate
-							.update("update certificate_mapping set destination = ? where id = ? and cpa_id is null",mapping.getDestination().getEncoded(),mapping.getId())
-					: jdbcTemplate
-							.update("update certificate_mapping set destination = ? where id = ? and cpa_id = ?",mapping.getDestination().getEncoded(),mapping.getId(),cpaId);
+							.update("update certificate_mapping set destination = ? where id = ? and cpa_id is null", mapping.getDestination().getEncoded(), mapping.getId())
+					: jdbcTemplate.update(
+							"update certificate_mapping set destination = ? where id = ? and cpa_id = ?",
+							mapping.getDestination().getEncoded(),
+							mapping.getId(),
+							cpaId);
 		}
 		catch (CertificateEncodingException e)
 		{
@@ -165,7 +173,8 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int deleteCertificateMapping(String id, String cpaId)
 	{
-		return cpaId == null ? jdbcTemplate.update("delete from certificate_mapping where id = ? and cpa_id is null",id)
-				: jdbcTemplate.update("delete from certificate_mapping where id = ? and cpa_id = ?",id,cpaId);
+		return cpaId == null
+				? jdbcTemplate.update("delete from certificate_mapping where id = ? and cpa_id is null", id)
+				: jdbcTemplate.update("delete from certificate_mapping where id = ? and cpa_id = ?", id, cpaId);
 	}
 }

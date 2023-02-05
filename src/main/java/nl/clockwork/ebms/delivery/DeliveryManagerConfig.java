@@ -70,7 +70,11 @@ public class DeliveryManagerConfig
 	@Conditional(DefaultDeliveryManagerType.class)
 	public DeliveryManager defaultDeliveryManager()
 	{
-		return DeliveryManager.builder().messageQueue(new EbMSMessageQueue(maxEntries,timeout)).cpaManager(cpaManager).ebMSClientFactory(ebMSClientFactory).build();
+		return DeliveryManager.builder()
+				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
+				.cpaManager(cpaManager)
+				.ebMSClientFactory(ebMSClientFactory)
+				.build();
 	}
 
 	@Bean
@@ -78,7 +82,7 @@ public class DeliveryManagerConfig
 	public DeliveryManager jmsDeliveryManager(ConnectionFactory connectionFactory)
 	{
 		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
-				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
+				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
 				.jmsTemplate(new JmsTemplate(connectionFactory))
@@ -90,7 +94,8 @@ public class DeliveryManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.DEFAULT;
+			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT)
+					== DeliveryManagerType.DEFAULT;
 		}
 	}
 
@@ -99,7 +104,7 @@ public class DeliveryManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
+			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
 		}
 	}
 }

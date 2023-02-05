@@ -19,7 +19,7 @@ package nl.clockwork.ebms.jaxb;
 import java.security.cert.X509Certificate;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class X509CertificateAdapter extends XmlAdapter<byte[],X509Certificate>
+public class X509CertificateAdapter extends XmlAdapter<byte[], X509Certificate>
 {
 	@Override
 	public X509Certificate unmarshal(byte[] v) throws Exception

@@ -63,7 +63,7 @@ public class PlainEbMSAttachment implements EbMSAttachment
 	@Override
 	public void writeTo(OutputStream outputStream) throws IOException
 	{
-		IOUtils.copy(getInputStream(),outputStream);
+		IOUtils.copy(getInputStream(), outputStream);
 	}
 
 	@Override

@@ -59,10 +59,10 @@ public class URLMapper
 		}
 	}
 
-	private Either<IllegalArgumentException,URLMapping> validate(URLMapping urlMapping)
+	private Either<IllegalArgumentException, URLMapping> validate(URLMapping urlMapping)
 	{
-		return isValid(urlMapping.getSource()).map(e -> new IllegalArgumentException("Source invalid",e))
-				.orElse(() -> isValid(urlMapping.getDestination()).map(e -> new IllegalArgumentException("Destination invalid",e)))
+		return isValid(urlMapping.getSource()).map(e -> new IllegalArgumentException("Source invalid", e))
+				.orElse(() -> isValid(urlMapping.getDestination()).map(e -> new IllegalArgumentException("Destination invalid", e)))
 				.toEither(urlMapping)
 				.swap();
 	}

@@ -29,7 +29,7 @@ public class EbMSUnrecoverableResponseException extends EbMSResponseException
 
 	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse, String message)
 	{
-		super(repsonse,message);
+		super(repsonse, message);
 	}
 
 }

@@ -25,6 +25,6 @@ public abstract class EbMSResponseMessage extends EbMSBaseMessage
 
 	protected EbMSResponseMessage(MessageHeader messageHeader, SignatureType signature)
 	{
-		super(messageHeader,signature);
+		super(messageHeader, signature);
 	}
 }

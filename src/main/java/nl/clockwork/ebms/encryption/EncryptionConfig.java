@@ -36,12 +36,12 @@ public class EncryptionConfig
 	@Bean
 	public EbMSMessageEncrypter messageEncrypter(EbMSTrustStore trustStore)
 	{
-		return new EbMSMessageEncrypter(cpaManager,trustStore);
+		return new EbMSMessageEncrypter(cpaManager, trustStore);
 	}
 
 	@Bean
 	public EbMSMessageDecrypter messageDecrypter(@Qualifier("encryptionKeyStore") EbMSKeyStore keyStore)
 	{
-		return new EbMSMessageDecrypter(cpaManager,keyStore);
+		return new EbMSMessageDecrypter(cpaManager, keyStore);
 	}
 }

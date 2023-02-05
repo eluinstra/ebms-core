@@ -25,6 +25,6 @@ public class EbMSKeyGenerator implements KeyGenerator
 	@Override
 	public Object generate(Object target, Method method, Object...params)
 	{
-		return method.getName() + "[" + StringUtils.join(params,",") + "]";
+		return method.getName() + "[" + StringUtils.join(params, ",") + "]";
 	}
 }

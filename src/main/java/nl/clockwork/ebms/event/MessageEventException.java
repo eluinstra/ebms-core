@@ -25,7 +25,7 @@ public class MessageEventException extends RuntimeException
 
 	public MessageEventException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public MessageEventException(String message)

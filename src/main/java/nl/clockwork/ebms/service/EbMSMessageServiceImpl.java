@@ -42,11 +42,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			serviceHandler.ping(cpaId,fromPartyId,toPartyId);
+			serviceHandler.ping(cpaId, fromPartyId, toPartyId);
 		}
 		catch (Exception e)
 		{
-			log.error("Ping " + cpaId,e);
+			log.error("Ping " + cpaId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -60,7 +60,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		}
 		catch (Exception e)
 		{
-			log.error("SendMessage " + messageRequest,e);
+			log.error("SendMessage " + messageRequest, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -74,7 +74,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		}
 		catch (Exception e)
 		{
-			log.error("ResendMessage {}",messageId);
+			log.error("ResendMessage {}", messageId);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -84,11 +84,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			return serviceHandler.getUnprocessedMessageIds(messageFilter,maxNr);
+			return serviceHandler.getUnprocessedMessageIds(messageFilter, maxNr);
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessageIds " + messageFilter,e);
+			log.error("GetMessageIds " + messageFilter, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -98,11 +98,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			return serviceHandler.getMessage(messageId,process);
+			return serviceHandler.getMessage(messageId, process);
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessage " + messageId,e);
+			log.error("GetMessage " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -116,7 +116,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		}
 		catch (Exception e)
 		{
-			log.error("ProcessMessage " + messageId,e);
+			log.error("ProcessMessage " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -130,7 +130,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessageStatus " + messageId,e);
+			log.error("GetMessageStatus " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -141,11 +141,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
+			return serviceHandler.getUnprocessedMessageEvents(messageFilter, eventTypes, maxNr);
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessageEvents" + messageFilter,e);
+			log.error("GetMessageEvents" + messageFilter, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -159,7 +159,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		}
 		catch (Exception e)
 		{
-			log.error("ProcessMessageEvent " + messageId,e);
+			log.error("ProcessMessageEvent " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}

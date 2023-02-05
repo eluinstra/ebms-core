@@ -22,6 +22,6 @@ class EbMSMessageQueue extends MessageQueue<EbMSResponseMessage>
 {
 	public EbMSMessageQueue(int maxEntries, int timeout)
 	{
-		super(maxEntries,timeout);
+		super(maxEntries, timeout);
 	}
 }

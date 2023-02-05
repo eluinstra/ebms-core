@@ -36,7 +36,7 @@ public class EbMSStatusResponse extends EbMSResponseMessage
 	@Builder
 	public EbMSStatusResponse(MessageHeader messageHeader, SignatureType signature, @NonNull StatusResponse statusResponse)
 	{
-		super(messageHeader,signature);
+		super(messageHeader, signature);
 		this.statusResponse = statusResponse;
 	}
 }

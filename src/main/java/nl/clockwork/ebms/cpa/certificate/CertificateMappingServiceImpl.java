@@ -39,12 +39,12 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		}
 		catch (CertificateMappingServiceException e)
 		{
-			log.error("SetCertificateMapping",e);
+			log.error("SetCertificateMapping", e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping " + certificateMapping,e);
+			log.error("SetCertificateMapping " + certificateMapping, e);
 			throw new CertificateMappingServiceException(e);
 		}
 	}
@@ -61,16 +61,16 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	{
 		try
 		{
-			deleteCertificateMappingImpl(source,cpaId);
+			deleteCertificateMappingImpl(source, cpaId);
 		}
 		catch (CertificateMappingServiceException e)
 		{
-			log.error("DeleteCertificateMapping",e);
+			log.error("DeleteCertificateMapping", e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCertificateMapping " + source,e);
+			log.error("DeleteCertificateMapping " + source, e);
 			throw new CertificateMappingServiceException(e);
 		}
 	}
@@ -79,7 +79,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	{
 		if (log.isDebugEnabled())
 			log.debug("DeleteCertificateMapping " + source);
-		if (certificateMapper.deleteCertificateMapping(source,cpaId) == 0)
+		if (certificateMapper.deleteCertificateMapping(source, cpaId) == 0)
 			throw new CertificateNotFoundException();
 	}
 
@@ -92,12 +92,12 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		}
 		catch (CertificateMappingServiceException e)
 		{
-			log.error("GetCertificateMappings",e);
+			log.error("GetCertificateMappings", e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("GetCertificateMappings",e);
+			log.error("GetCertificateMappings", e);
 			throw new CertificateMappingServiceException(e);
 		}
 	}
@@ -117,7 +117,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCache",e);
+			log.error("DeleteCache", e);
 			throw new CertificateMappingServiceException(e);
 		}
 	}

@@ -22,7 +22,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-public class DurationAdapter extends XmlAdapter<String,java.time.Duration>
+public class DurationAdapter extends XmlAdapter<String, java.time.Duration>
 {
 	private static DatatypeFactory datatypeFactory;
 

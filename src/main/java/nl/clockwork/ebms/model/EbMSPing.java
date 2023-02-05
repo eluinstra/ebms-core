@@ -29,6 +29,6 @@ public class EbMSPing extends EbMSRequestMessage
 	@Builder
 	public EbMSPing(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply)
 	{
-		super(messageHeader,signature,syncReply);
+		super(messageHeader, signature, syncReply);
 	}
 }

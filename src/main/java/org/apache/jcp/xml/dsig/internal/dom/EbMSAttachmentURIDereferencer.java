@@ -57,7 +57,7 @@ public class EbMSAttachmentURIDereferencer implements URIDereferencer
 					return new ApacheNodeSetData(in);
 			}
 			else
-				return DOMURIDereferencer.INSTANCE.dereference(uriReference,context);
+				return DOMURIDereferencer.INSTANCE.dereference(uriReference, context);
 		}
 		catch (IOException e)
 		{

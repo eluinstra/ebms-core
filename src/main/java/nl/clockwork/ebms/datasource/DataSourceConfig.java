@@ -56,18 +56,18 @@ public class DataSourceConfig
 	@Getter
 	public enum Location
 	{
-		DB2("jdbc:db2:",BASEPATH + "db2",false),
-		DB2_STRICT("jdbc:db2:",BASEPATH + "db2.strict",true),
-		H2("jdbc:h2:",BASEPATH + "h2",false),
-		H2_STRICT("jdbc:h2:",BASEPATH + "h2.strict",true),
-		HSQLDB("jdbc:hsqldb:",BASEPATH + "hsqldb",false),
-		HSQLDB_STRICT("jdbc:hsqldb:",BASEPATH + "hsqldb.strict",true),
-		MARIADB("jdbc:mariadb:",BASEPATH + "mariadb",false),
-		MSSQL("jdbc:sqlserver:",BASEPATH + "mssql",false),
-		ORACLE("jdbc:oracle:",BASEPATH + "oracle",false),
-		ORACLE_STRICT("jdbc:oracle:",BASEPATH + "oracle.strict",true),
-		POSTGRES("jdbc:postgresql:",BASEPATH + "postgresql",false),
-		POSTGRES_STRICT("jdbc:postgresql:",BASEPATH + "postgresql.strict",true);
+		DB2("jdbc:db2:", BASEPATH + "db2", false),
+		DB2_STRICT("jdbc:db2:", BASEPATH + "db2.strict", true),
+		H2("jdbc:h2:", BASEPATH + "h2", false),
+		H2_STRICT("jdbc:h2:", BASEPATH + "h2.strict", true),
+		HSQLDB("jdbc:hsqldb:", BASEPATH + "hsqldb", false),
+		HSQLDB_STRICT("jdbc:hsqldb:", BASEPATH + "hsqldb.strict", true),
+		MARIADB("jdbc:mariadb:", BASEPATH + "mariadb", false),
+		MSSQL("jdbc:sqlserver:", BASEPATH + "mssql", false),
+		ORACLE("jdbc:oracle:", BASEPATH + "oracle", false),
+		ORACLE_STRICT("jdbc:oracle:", BASEPATH + "oracle.strict", true),
+		POSTGRES("jdbc:postgresql:", BASEPATH + "postgresql", false),
+		POSTGRES_STRICT("jdbc:postgresql:", BASEPATH + "postgresql.strict", true);
 
 		String jdbcUrl;
 		String location;
@@ -136,7 +136,7 @@ public class DataSourceConfig
 		val result = new AtomikosDataSourceBean();
 		result.setUniqueResourceName(UUID.randomUUID().toString());
 		if (jdbcUrl.contains("db2"))
-			createDB2XADataSource().ifPresentOrElse(result::setXaDataSource,() ->
+			createDB2XADataSource().ifPresentOrElse(result::setXaDataSource, () ->
 			{
 				throw new IllegalStateException("Error creating DB2XADataSource");
 			});
@@ -192,10 +192,10 @@ public class DataSourceConfig
 	{
 		if (updateDb)
 		{
-			val locations = Location.getLocation(jdbcUrl,updateDbStrict);
+			val locations = Location.getLocation(jdbcUrl, updateDbStrict);
 			locations.ifPresent(l ->
 			{
-				val config = Flyway.configure().dataSource(jdbcUrl,username,password).locations(l).ignoreMigrationPatterns("*:missing").outOfOrder(true);
+				val config = Flyway.configure().dataSource(jdbcUrl, username, password).locations(l).ignoreMigrationPatterns("*:missing").outOfOrder(true);
 				config.load().migrate();
 			});
 		}
@@ -205,13 +205,13 @@ public class DataSourceConfig
 	{
 		val result = new Properties();
 		if (driverClassName.contains("sqlserver"))
-			result.put("URL",jdbcUrl);
+			result.put("URL", jdbcUrl);
 		else if (driverClassName.contains("oracle") && driverClassName.contains("xa"))
-			result.put("URL",jdbcUrl);
+			result.put("URL", jdbcUrl);
 		else
-			result.put("url",jdbcUrl);
-		result.put("user",username);
-		result.put("password",password);
+			result.put("url", jdbcUrl);
+		result.put("user", username);
+		result.put("password", password);
 		return result;
 	}
 }

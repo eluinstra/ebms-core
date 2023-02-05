@@ -40,10 +40,10 @@ public class EbMSServer
 		{
 			context.register(EbMSServerConfig.class);
 			val contextLoaderListener = new ContextLoaderListener(context);
-			result.addConnector(createConnector(result,"web",8080));
-			handlerCollection.addHandler(webEndpointHandler("web",contextLoaderListener));
-			result.addConnector(createConnector(result,"ebms",8888));
-			handlerCollection.addHandler(ebMSEndpointHandler("ebms",contextLoaderListener));
+			result.addConnector(createConnector(result, "web", 8080));
+			handlerCollection.addHandler(webEndpointHandler("web", contextLoaderListener));
+			result.addConnector(createConnector(result, "ebms", 8888));
+			handlerCollection.addHandler(ebMSEndpointHandler("ebms", contextLoaderListener));
 		}
 		return result;
 	}
@@ -61,7 +61,7 @@ public class EbMSServer
 		val result = new ServletContextHandler();
 		result.setVirtualHosts(new String[]{"@" + name});
 		result.setContextPath("/");
-		result.addServlet(CXFServlet.class,"/service/*");
+		result.addServlet(CXFServlet.class, "/service/*");
 		result.addEventListener(contextLoaderListener);
 		return result;
 	}
@@ -71,7 +71,7 @@ public class EbMSServer
 		val result = new ServletContextHandler();
 		result.setVirtualHosts(new String[]{"@" + name});
 		result.setContextPath("/");
-		result.addServlet(EbMSServlet.class,"/ebms");
+		result.addServlet(EbMSServlet.class, "/ebms");
 		result.addEventListener(contextLoaderListener);
 		return result;
 	}

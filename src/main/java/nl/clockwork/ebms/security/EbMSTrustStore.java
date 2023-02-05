@@ -37,14 +37,14 @@ import lombok.experimental.FieldDefaults;
 @ToString
 public class EbMSTrustStore
 {
-	private static Map<String,EbMSTrustStore> trustStores = new ConcurrentHashMap<>();
+	private static Map<String, EbMSTrustStore> trustStores = new ConcurrentHashMap<>();
 	@NonNull
 	KeyStore keyStore;
 
 	public static EbMSTrustStore of(KeyStoreType type, String path, String password) throws GeneralSecurityException, IOException
 	{
 		if (!trustStores.containsKey(path))
-			trustStores.put(path,new EbMSTrustStore(KeyStoreUtils.loadKeyStore(type,path,password)));
+			trustStores.put(path, new EbMSTrustStore(KeyStoreUtils.loadKeyStore(type, path, password)));
 		return trustStores.get(path);
 	}
 

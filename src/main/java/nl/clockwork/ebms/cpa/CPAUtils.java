@@ -60,7 +60,7 @@ public class CPAUtils
 {
 	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
-		return !headerPartyIds.isEmpty() && headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
+		return !headerPartyIds.isEmpty() && headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds, headerPartyIds);
 	}
 
 	public static String toString(PartyId partyId)
@@ -80,12 +80,12 @@ public class CPAUtils
 
 	public static String toString(ServiceType service)
 	{
-		return toString(service.getType(),service.getValue());
+		return toString(service.getType(), service.getValue());
 	}
 
 	public static String toString(Service service)
 	{
-		return toString(service.getType(),service.getValue());
+		return toString(service.getType(), service.getValue());
 	}
 
 	public static String toString(String type, String service)
@@ -214,7 +214,8 @@ public class CPAUtils
 	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
 	{
 		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
+		if (docExchange.getEbXMLSenderBinding() != null
+				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
 				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
 			return (Certificate)docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
 		return null;
@@ -223,7 +224,8 @@ public class CPAUtils
 	public static Certificate getEncryptionCertificate(DeliveryChannel deliveryChannel)
 	{
 		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null
+		if (docExchange.getEbXMLReceiverBinding() != null
+				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null
 				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionCertificateRef() != null)
 			return (Certificate)docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionCertificateRef().getCertId();
 		return null;
@@ -232,7 +234,8 @@ public class CPAUtils
 	public static String getNonRepudiationProtocol(DeliveryChannel deliveryChannel)
 	{
 		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
+		if (docExchange.getEbXMLSenderBinding() != null
+				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
 				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getNonRepudiationProtocol().getValue();
 		return null;
@@ -241,7 +244,8 @@ public class CPAUtils
 	public static String getHashFunction(DeliveryChannel deliveryChannel)
 	{
 		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
+		if (docExchange.getEbXMLSenderBinding() != null
+				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
 				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction();
 		return null;
@@ -250,12 +254,14 @@ public class CPAUtils
 	public static String getSignatureAlgorithm(DeliveryChannel deliveryChannel)
 	{
 		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
+		if (docExchange.getEbXMLSenderBinding() != null
+				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
 				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null
 				&& !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
 		{
 			val senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
-			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C()
+			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null
+					? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C()
 					: senderNonRepudiation.getSignatureAlgorithm().get(0).getValue();
 		}
 		return null;
@@ -264,12 +270,14 @@ public class CPAUtils
 	public static String getEncryptionAlgorithm(DeliveryChannel deliveryChannel)
 	{
 		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null
+		if (docExchange.getEbXMLReceiverBinding() != null
+				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null
 				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm() != null
 				&& !docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm().isEmpty())
 		{
 			val receiverDigitalEnvelope = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope();
-			return receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() != null ? receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C()
+			return receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() != null
+					? receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C()
 					: receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getValue();
 		}
 		return null;
@@ -301,20 +309,22 @@ public class CPAUtils
 	private static Predicate<Object> isJaxbElement = o -> o instanceof JAXBElement<?>;
 	private static Predicate<Object> isX509DataType = o -> ((JAXBElement<?>)o).getValue() instanceof X509DataType;
 	private static Predicate<Object> isX509Certificate = o -> "X509Certificate".equals(((JAXBElement<?>)o).getName().getLocalPart());
-	private static Function<Object,List<Object>> toX509IssuerSerialOrX509SKIOrX509SubjectName =
+	private static Function<Object, List<Object>> toX509IssuerSerialOrX509SKIOrX509SubjectName =
 			o -> ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName();
-	private static Function<Object,byte[]> toByteArray = o -> (byte[])((JAXBElement<?>)o).getValue();
+	private static Function<Object, byte[]> toByteArray = o -> (byte[])((JAXBElement<?>)o).getValue();
 
 	public static X509Certificate getX509Certificate(Certificate certificate)
 	{
 		return Optional.ofNullable(certificate)
-				.flatMap(c -> c.getKeyInfo()
-						.getContent()
-						.stream()
-						.filter(isJaxbElement.and(isX509DataType))
-						.map(toX509IssuerSerialOrX509SKIOrX509SubjectName)
-						.flatMap(l -> l.stream().filter(isJaxbElement.and(isX509Certificate)).map(toByteArray).map(ByteArrayInputStream::new).map(CPAUtils::toCertificate))
-						.findFirst())
+				.flatMap(
+						c -> c.getKeyInfo()
+								.getContent()
+								.stream()
+								.filter(isJaxbElement.and(isX509DataType))
+								.map(toX509IssuerSerialOrX509SKIOrX509SubjectName)
+								.flatMap(
+										l -> l.stream().filter(isJaxbElement.and(isX509Certificate)).map(toByteArray).map(ByteArrayInputStream::new).map(CPAUtils::toCertificate))
+								.findFirst())
 				.orElse(null);
 	}
 

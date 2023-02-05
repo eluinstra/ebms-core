@@ -55,12 +55,13 @@ class PongProcessor
 	public void sendPong(final nl.clockwork.ebms.model.EbMSPong pong)
 	{
 		val responseMessageHeader = pong.getMessageHeader();
-		val uri = cpaManager.getReceivingUri(responseMessageHeader.getCPAId(),
+		val uri = cpaManager.getReceivingUri(
+				responseMessageHeader.getCPAId(),
 				responseMessageHeader.getTo().getPartyId(),
 				responseMessageHeader.getTo().getRole(),
 				CPAUtils.toString(responseMessageHeader.getService()),
 				responseMessageHeader.getAction());
-		deliveryManager.sendResponseMessage(uri,pong);
+		deliveryManager.sendResponseMessage(uri, pong);
 	}
 
 	public void processPong(EbMSPong pong)
@@ -72,7 +73,7 @@ class PongProcessor
 		}
 		catch (ValidatorException e)
 		{
-			log.warn("Unable to process Pong " + pong.getMessageHeader().getMessageData().getMessageId(),e);
+			log.warn("Unable to process Pong " + pong.getMessageHeader().getMessageData().getMessageId(), e);
 		}
 	}
 }

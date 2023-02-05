@@ -57,7 +57,8 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 
 	public static DeliveryTask createDeliveryTask(final JobDataMap properties)
 	{
-		return new DeliveryTask(properties.getString("cpaId"),
+		return new DeliveryTask(
+				properties.getString("cpaId"),
 				properties.getString("sendDeliveryChannel"),
 				properties.getString("receiveDeliveryChannel"),
 				properties.getString("messageId"),
@@ -74,7 +75,7 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 		{
 			val job = createJob(task);
 			val trigger = newTrigger().withIdentity(TriggerKey.triggerKey(task.getMessageId())).startNow().build();
-			scheduler.scheduleJob(job,trigger);
+			scheduler.scheduleJob(job, trigger);
 		}
 		catch (SchedulerException e)
 		{
@@ -85,18 +86,18 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status)
 	{
-		updateTask(task,url,status,null);
+		updateTask(task, url, status, null);
 	}
 
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage)
 	{
-		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(),task.getReceiveDeliveryChannelId())
-				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
-		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
+		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
+		deliveryTaskDAO.insertLog(task.getMessageId(), task.getTimestamp(), url, status, errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
-			scheduleNextTask(task,deliveryChannel);
+			scheduleNextTask(task, deliveryChannel);
 		else
 		{
 			ebMSDAO.getMessageAction(task.getMessageId())
@@ -111,11 +112,11 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 
 	private void scheduleNextTask(DeliveryTask task, final DeliveryChannel deliveryChannel)
 	{
-		val nextTask = createNextTask(task,deliveryChannel);
+		val nextTask = createNextTask(task, deliveryChannel);
 		val trigger = newTrigger().withIdentity(TriggerKey.triggerKey(nextTask.getMessageId())).startAt(Date.from(nextTask.getTimestamp())).build();
 		try
 		{
-			scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
+			scheduler.scheduleJob(createJob(nextTask), Collections.singleton(trigger), true);
 		}
 		catch (SchedulerException e)
 		{
@@ -125,11 +126,11 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 
 	private void scheduleNextTask(DeliveryTask task)
 	{
-		val nextTask = createNextTask(task,autoRetryInterval);
+		val nextTask = createNextTask(task, autoRetryInterval);
 		val trigger = newTrigger().startAt(Date.from(nextTask.getTimestamp())).build();
 		try
 		{
-			scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
+			scheduler.scheduleJob(createJob(nextTask), Collections.singleton(trigger), true);
 		}
 		catch (SchedulerException e)
 		{
@@ -151,14 +152,14 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	private JobDetail createJob(DeliveryTask task)
 	{
 		return newJob(getJobClass()).withIdentity(JobKey.jobKey(task.getMessageId()))
-				.usingJobData("cpaId",task.getCpaId())
-				.usingJobData("sendDeliveryChannel",task.getSendDeliveryChannelId())
-				.usingJobData("receiveDeliveryChannel",task.getReceiveDeliveryChannelId())
-				.usingJobData("messageId",task.getMessageId())
-				.usingJobData("timeToLive",task.getTimeToLive() != null ? task.getTimeToLive().toEpochMilli() : null)
-				.usingJobData("timestamp",task.getTimestamp().toEpochMilli())
-				.usingJobData("isConfidential",task.isConfidential())
-				.usingJobData("retries",task.getRetries())
+				.usingJobData("cpaId", task.getCpaId())
+				.usingJobData("sendDeliveryChannel", task.getSendDeliveryChannelId())
+				.usingJobData("receiveDeliveryChannel", task.getReceiveDeliveryChannelId())
+				.usingJobData("messageId", task.getMessageId())
+				.usingJobData("timeToLive", task.getTimeToLive() != null ? task.getTimeToLive().toEpochMilli() : null)
+				.usingJobData("timestamp", task.getTimestamp().toEpochMilli())
+				.usingJobData("isConfidential", task.isConfidential())
+				.usingJobData("retries", task.getRetries())
 				.build();
 	}
 }

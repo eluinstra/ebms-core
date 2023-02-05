@@ -27,7 +27,7 @@ public class CertificateMappingServiceException extends RuntimeException
 
 	public CertificateMappingServiceException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public CertificateMappingServiceException(String message)

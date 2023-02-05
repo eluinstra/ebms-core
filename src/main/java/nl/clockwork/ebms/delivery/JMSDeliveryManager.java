@@ -58,7 +58,7 @@ public class JMSDeliveryManager extends DeliveryManager
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,
 			@NonNull JmsTemplate jmsTemplate)
 	{
-		super(messageQueue,cpaManager,ebMSClientFactory);
+		super(messageQueue, cpaManager, ebMSClientFactory);
 		this.jmsTemplate = jmsTemplate;
 	}
 
@@ -70,14 +70,15 @@ public class JMSDeliveryManager extends DeliveryManager
 			val messageHeader = message.getMessageHeader();
 			val uri = getUri(messageHeader);
 			log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-			val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+			val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
 			if (response != null)
 				return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
 			else if (message.getSyncReply() == null)
 			{
 				jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
-				return Optional.ofNullable((EbMSResponseMessage)jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME,
-						"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
+				return Optional.ofNullable(
+						(EbMSResponseMessage)jmsTemplate
+								.receiveSelectedAndConvert(JMS_DESTINATION_NAME, "JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
 			}
 			return Optional.empty();
 		}
@@ -96,7 +97,7 @@ public class JMSDeliveryManager extends DeliveryManager
 	{
 		jmsTemplate.setExplicitQosEnabled(true);
 		jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
-		jmsTemplate.convertAndSend(JMS_DESTINATION_NAME,message,m ->
+		jmsTemplate.convertAndSend(JMS_DESTINATION_NAME, message, m ->
 		{
 			m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
 			// m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
@@ -111,7 +112,7 @@ public class JMSDeliveryManager extends DeliveryManager
 		try
 		{
 			log.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-			createClient(response.getMessageHeader()).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+			createClient(response.getMessageHeader()).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(response));
 		}
 		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError
 				| TransformerException e)

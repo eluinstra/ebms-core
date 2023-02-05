@@ -36,12 +36,12 @@ public class SigningConfig
 	@Bean
 	public EbMSSignatureGenerator signatureGenerator(@Qualifier("signatureKeyStore") EbMSKeyStore keyStore)
 	{
-		return new EbMSSignatureGenerator(cpaManager,keyStore);
+		return new EbMSSignatureGenerator(cpaManager, keyStore);
 	}
 
 	@Bean
 	public EbMSSignatureValidator signatureValidator(EbMSTrustStore trustStore)
 	{
-		return new EbMSSignatureValidator(cpaManager,trustStore);
+		return new EbMSSignatureValidator(cpaManager, trustStore);
 	}
 }

@@ -47,7 +47,7 @@ public class ClientCertificateAuthenticationFilter implements Filter
 			val trustStoreType = config.getInitParameter("trustStoreType");
 			val trustStorePath = config.getInitParameter("trustStorePath");
 			val trustStorePassword = config.getInitParameter("trustStorePassword");
-			trustStore = EbMSTrustStore.of(KeyStoreType.valueOf(trustStoreType),trustStorePath,trustStorePassword);
+			trustStore = EbMSTrustStore.of(KeyStoreType.valueOf(trustStoreType), trustStorePath, trustStorePassword);
 		}
 		catch (GeneralSecurityException | IOException e)
 		{
@@ -61,8 +61,8 @@ public class ClientCertificateAuthenticationFilter implements Filter
 		try
 		{
 			val certificate = ClientCertificateManager.getCertificate();
-			if (validate(trustStore,certificate))
-				chain.doFilter(request,response);
+			if (validate(trustStore, certificate))
+				chain.doFilter(request, response);
 			else
 				((HttpServletResponse)response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}

@@ -53,24 +53,24 @@ public class KeyStoreConfig
 	@Bean
 	public EbMSTrustStore trustStore() throws GeneralSecurityException, IOException
 	{
-		return EbMSTrustStore.of(trustStoretype,trustStorepath,trustStorepassword);
+		return EbMSTrustStore.of(trustStoretype, trustStorepath, trustStorepassword);
 	}
 
 	@Bean("clientKeyStore")
 	public EbMSKeyStore clientKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of(keyvaultURI,tennantID,clientID,clientSecret,clientKeyStoreDefaultAlias);
+		return AzureKeyStore.of(keyvaultURI, tennantID, clientID, clientSecret, clientKeyStoreDefaultAlias);
 	}
 
 	@Bean("signatureKeyStore")
 	public EbMSKeyStore signatureKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of(keyvaultURI,tennantID,clientID,clientSecret);
+		return AzureKeyStore.of(keyvaultURI, tennantID, clientID, clientSecret);
 	}
 
 	@Bean("encryptionKeyStore")
 	public EbMSKeyStore encryptionKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of(keyvaultURI,tennantID,clientID,clientSecret);
+		return AzureKeyStore.of(keyvaultURI, tennantID, clientID, clientSecret);
 	}
 }

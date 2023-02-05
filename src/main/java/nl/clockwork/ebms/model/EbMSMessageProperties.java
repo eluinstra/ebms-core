@@ -58,8 +58,8 @@ public class EbMSMessageProperties implements Serializable
 			EbMSMessageStatus messageStatus)
 	{
 		this.cpaId = cpaId;
-		this.fromParty = Party.of(fromPartyId,fromRole);
-		this.toParty = Party.of(toPartyId,toRole);
+		this.fromParty = Party.of(fromPartyId, fromRole);
+		this.toParty = Party.of(toPartyId, toRole);
 		this.service = service;
 		this.action = action;
 		this.timestamp = timestamp;

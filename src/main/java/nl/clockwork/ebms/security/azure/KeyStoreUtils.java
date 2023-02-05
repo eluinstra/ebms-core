@@ -35,7 +35,7 @@ public class KeyStoreUtils
 			Security.addProvider(new KeyVaultJcaProvider());
 		val result = KeyStore.getInstance("AzureKeyVault");
 		// aadUri is niet verplicht, deze is alleen nodig voor de afwijkende security zones de speciale germany zone + ..
-		val parameter = new KeyVaultLoadStoreParameter(keyvaultURI,tennantID,clientID,clientSecret);
+		val parameter = new KeyVaultLoadStoreParameter(keyvaultURI, tennantID, clientID, clientSecret);
 		result.load(parameter);
 		return result;
 	}

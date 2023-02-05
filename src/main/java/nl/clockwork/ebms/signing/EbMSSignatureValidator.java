@@ -62,21 +62,22 @@ public class EbMSSignatureValidator
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			if (cpaManager.isSendingNonRepudiationRequired(messageHeader.getCPAId(),
+			if (cpaManager.isSendingNonRepudiationRequired(
+					messageHeader.getCPAId(),
 					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
 					CPAUtils.toString(messageHeader.getService()),
 					messageHeader.getAction()))
 			{
-				val signatureNodeList = document.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS,Constants._TAG_SIGNATURE);
+				val signatureNodeList = document.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
 					val certificate = getCertificate(messageHeader);
 					if (certificate != null)
 					{
 						val timestamp = messageHeader.getMessageData().getTimestamp() == null ? Instant.now() : messageHeader.getMessageData().getTimestamp();
-						SecurityUtils.validateCertificate(trustStore,certificate,timestamp);
-						if (!verify(certificate,(Element)signatureNodeList.item(0),message.getAttachments()))
+						SecurityUtils.validateCertificate(trustStore, certificate, timestamp);
+						if (!verify(certificate, (Element)signatureNodeList.item(0), message.getAttachments()))
 							throw new ValidationException("Invalid Signature!");
 					}
 					else
@@ -103,18 +104,19 @@ public class EbMSSignatureValidator
 		{
 			if (requestMessage.getAckRequested().isSigned())
 			{
-				val signatureNodeList = responseDocument.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS,Constants._TAG_SIGNATURE);
+				val signatureNodeList = responseDocument.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
 					val certificate = getCertificate(responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
-						val date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? Instant.now()
+						val date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null
+								? Instant.now()
 								: responseMessage.getMessageHeader().getMessageData().getTimestamp();
-						SecurityUtils.validateCertificate(trustStore,certificate,date);
-						if (!verify(certificate,(Element)signatureNodeList.item(0),Collections.emptyList()))
+						SecurityUtils.validateCertificate(trustStore, certificate, date);
+						if (!verify(certificate, (Element)signatureNodeList.item(0), Collections.emptyList()))
 							throw new ValidationException("Invalid Signature!");
-						validateSignatureReferences(requestMessage,responseMessage);
+						validateSignatureReferences(requestMessage, responseMessage);
 					}
 					else
 						throw new ValidationException("Certificate not found!");
@@ -135,7 +137,7 @@ public class EbMSSignatureValidator
 
 	private boolean verify(X509Certificate certificate, Element signatureElement, List<EbMSAttachment> attachments) throws XMLSecurityException
 	{
-		val signature = new XMLSignature(signatureElement,org.apache.xml.security.utils.Constants.SignatureSpecNS);
+		val signature = new XMLSignature(signatureElement, org.apache.xml.security.utils.Constants.SignatureSpecNS);
 		val resolver = new EbMSAttachmentResolver(attachments);
 		signature.addResourceResolver(resolver);
 		return signature.checkSignatureValue(certificate);
@@ -145,14 +147,20 @@ public class EbMSSignatureValidator
 	{
 		val service = CPAUtils.toString(messageHeader.getService());
 		val deliveryChannel = cpaManager
-				.getSendDeliveryChannel(messageHeader
-						.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",
+				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
 						service,
-						messageHeader.getAction()));
+						messageHeader.getAction())
+				.orElseThrow(
+						() -> StreamUtils.illegalStateException(
+								"SendDeliveryChannel",
+								messageHeader.getCPAId(),
+								messageHeader.getFrom().getPartyId(),
+								messageHeader.getFrom().getRole(),
+								service,
+								messageHeader.getAction()));
 		if (deliveryChannel != null)
 			return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		return null;
@@ -165,10 +173,12 @@ public class EbMSSignatureValidator
 		if (responseMessage.getAcknowledgment().getReference() == null || responseMessage.getAcknowledgment().getReference().isEmpty())
 			throw new ValidationException("No signature references found in response message " + responseMessage.getMessageHeader().getMessageData().getMessageId());
 		if (requestMessage.getSignature().getSignedInfo().getReference().size() != responseMessage.getAcknowledgment().getReference().size())
-			throw new ValidationException("Nr of signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId()
-					+ " and response message "
-					+ responseMessage.getMessageHeader().getMessageData().getMessageId()
-					+ " do not match");
+			throw new ValidationException(
+					"Nr of signature references found in request message "
+							+ requestMessage.getMessageHeader().getMessageData().getMessageId()
+							+ " and response message "
+							+ responseMessage.getMessageHeader().getMessageData().getMessageId()
+							+ " do not match");
 		// if (responseMessage.getAcknowledgment().getReference().stream()
 		// .distinct()
 		// .filter(r -> requestMessage.getSignature().getSignedInfo().getReference().contains(r))
@@ -179,18 +189,20 @@ public class EbMSSignatureValidator
 				.getSignedInfo()
 				.getReference()
 				.stream()
-				.filter(r -> !contains(responseMessage.getAcknowledgment().getReference(),r))
+				.filter(r -> !contains(responseMessage.getAcknowledgment().getReference(), r))
 				.collect(Collectors.toSet())
 				.isEmpty())
-			throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId()
-					+ " and response message "
-					+ responseMessage.getMessageHeader().getMessageData().getMessageId()
-					+ " do not match");
+			throw new ValidationException(
+					"Signature references found in request message "
+							+ requestMessage.getMessageHeader().getMessageData().getMessageId()
+							+ " and response message "
+							+ responseMessage.getMessageHeader().getMessageData().getMessageId()
+							+ " do not match");
 	}
 
 	private boolean contains(List<ReferenceType> requestReferences, ReferenceType responseReference)
 	{
 		return requestReferences.stream()
-				.anyMatch(r -> responseReference.getURI().equals(r.getURI()) && Arrays.equals(r.getDigestValue(),responseReference.getDigestValue()));
+				.anyMatch(r -> responseReference.getURI().equals(r.getURI()) && Arrays.equals(r.getDigestValue(), responseReference.getDigestValue()));
 	}
 }

@@ -24,13 +24,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class URLMappingEndpointConfig
 {
-	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/urlMapping/2.18","UrlMappingService");
-	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/urlMapping/2.18","UrlMappingPort");
+	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/urlMapping/2.18", "UrlMappingService");
+	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/urlMapping/2.18", "UrlMappingPort");
 	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/urlMapping";
 
 	@Bean(name = "urlMappingEndpoint")
 	Endpoint publishEndpoint(URLMappingService mappingService)
 	{
-		return Endpoint.publish(SERVICE_ENDPOINT,mappingService);
+		return Endpoint.publish(SERVICE_ENDPOINT, mappingService);
 	}
 }

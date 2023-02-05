@@ -46,7 +46,7 @@ public class MultipartBodyPublisher implements BodyPublisher
 {
 	private static String nextBoundary()
 	{
-		return String.format("-=%s=-",UUID.randomUUID());
+		return String.format("-=%s=-", UUID.randomUUID());
 	}
 
 	String contentId;
@@ -57,14 +57,14 @@ public class MultipartBodyPublisher implements BodyPublisher
 
 	public MultipartBodyPublisher(String contentId)
 	{
-		this(contentId,StandardCharsets.UTF_8);
+		this(contentId, StandardCharsets.UTF_8);
 	}
 
 	public MultipartBodyPublisher(String contentId, Charset charset)
 	{
 		this.contentId = contentId;
 		this.charset = charset;
-		delegate = BodyPublishers.ofInputStream(() -> Channels.newInputStream(new MultipartChannel(this.boundary,this.parts,this.charset)));
+		delegate = BodyPublishers.ofInputStream(() -> Channels.newInputStream(new MultipartChannel(this.boundary, this.parts, this.charset)));
 	}
 
 	private MultipartBodyPublisher add(Part part)
@@ -75,12 +75,12 @@ public class MultipartBodyPublisher implements BodyPublisher
 
 	public MultipartBodyPublisher addXml(String contentId, String value)
 	{
-		return add(new XmlPart(contentId,value,charset));
+		return add(new XmlPart(contentId, value, charset));
 	}
 
 	public MultipartBodyPublisher addAttachment(EbMSAttachment attachment)
 	{
-		return add(new AttachmentPart(attachment.getContentId(),attachment.getName(),() -> channel(attachment),attachment.getContentType()));
+		return add(new AttachmentPart(attachment.getContentId(), attachment.getName(), () -> channel(attachment), attachment.getContentType()));
 	}
 
 	private ReadableByteChannel channel(EbMSAttachment attachment)
@@ -97,7 +97,7 @@ public class MultipartBodyPublisher implements BodyPublisher
 
 	public String contentType()
 	{
-		return String.format("multipart/related; boundary=\"%s\"; type=\"text/xml\"; start=\"<%s>\"; start-info=\"text/xml\"",boundary,contentId);
+		return String.format("multipart/related; boundary=\"%s\"; type=\"text/xml\"; start=\"<%s>\"; start-info=\"text/xml\"", boundary, contentId);
 	}
 
 	@Override
@@ -130,7 +130,7 @@ class XmlPart implements Part
 
 	public XmlPart(String contentId, String value)
 	{
-		this(contentId,value,StandardCharsets.UTF_8);
+		this(contentId, value, StandardCharsets.UTF_8);
 	}
 
 	@Override
@@ -205,7 +205,7 @@ class MultipartChannel implements ReadableByteChannel
 		{
 			if (this.buf.hasRemaining())
 			{
-				val n = Math.min(this.buf.remaining(),buf.remaining());
+				val n = Math.min(this.buf.remaining(), buf.remaining());
 				val slice = this.buf.slice();
 				slice.limit(n);
 				buf.put(slice);
@@ -254,7 +254,7 @@ class MultipartChannel implements ReadableByteChannel
 
 	String currentHeaders()
 	{
-		return Match(current).of(Case($(instanceOf(XmlPart.class)),this::headers),Case($(instanceOf(AttachmentPart.class)),this::headers),Case($(),() ->
+		return Match(current).of(Case($(instanceOf(XmlPart.class)), this::headers), Case($(instanceOf(AttachmentPart.class)), this::headers), Case($(), () ->
 		{
 			throw new IllegalStateException();
 		}));
@@ -262,14 +262,14 @@ class MultipartChannel implements ReadableByteChannel
 
 	private String headers(XmlPart part)
 	{
-		val format = new StringJoiner("\r\n","","\r\n").add("Content-Type: text/xml; charset=UTF-8").add("Content-ID: <%s>").toString();
-		return String.format(format,part.getContentId()) + "\r\n";
+		val format = new StringJoiner("\r\n", "", "\r\n").add("Content-Type: text/xml; charset=UTF-8").add("Content-ID: <%s>").toString();
+		return String.format(format, part.getContentId()) + "\r\n";
 	}
 
 	private String headers(AttachmentPart part)
 	{
-		val joiner = new StringJoiner("\r\n","","\r\n").add("Content-Type: %s").add("Content-ID: <%s>").add("Content-Disposition: attachment; filename=\"%s\"");
+		val joiner = new StringJoiner("\r\n", "", "\r\n").add("Content-Type: %s").add("Content-ID: <%s>").add("Content-Disposition: attachment; filename=\"%s\"");
 		val format = part.getContentType().matches("^(text/.*|.*/xml)$") ? joiner.toString() : joiner.add("Content-Transfer-Encoding: binary").toString();
-		return String.format(format,part.getContentType(),part.getContentId(),part.getFilename()) + "\r\n";
+		return String.format(format, part.getContentType(), part.getContentId(), part.getFilename()) + "\r\n";
 	}
 }

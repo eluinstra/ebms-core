@@ -52,12 +52,12 @@ public class SecurityUtils
 
 	public static KeyPair getKeyPair(EbMSKeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
-		val key = keyStore.getKey(alias,password.toCharArray());
+		val key = keyStore.getKey(alias, password.toCharArray());
 		if (key instanceof PrivateKey)
 		{
 			val cert = keyStore.getCertificate(alias);
 			val publicKey = cert.getPublicKey();
-			return new KeyPair(publicKey,(PrivateKey)key);
+			return new KeyPair(publicKey, (PrivateKey)key);
 		}
 		return null;
 	}
@@ -82,7 +82,7 @@ public class SecurityUtils
 		}
 	}
 
-	private static Function<String,Optional<Certificate>> findCertificate(EbMSTrustStore trustStore)
+	private static Function<String, Optional<Certificate>> findCertificate(EbMSTrustStore trustStore)
 	{
 		return alias ->
 		{
@@ -113,7 +113,7 @@ public class SecurityUtils
 			}
 			catch (GeneralSecurityException e)
 			{
-				log.warn("",e);
+				log.warn("", e);
 				return false;
 			}
 		};
@@ -124,13 +124,13 @@ public class SecurityUtils
 		switch (encryptionAlgorithm)
 		{
 			case XMLCipher.AES_128:
-				return generateKey("AES",KEYSIZE_128);
+				return generateKey("AES", KEYSIZE_128);
 			case XMLCipher.AES_192:
-				return generateKey("AES",KEYSIZE_192);
+				return generateKey("AES", KEYSIZE_192);
 			case XMLCipher.AES_256:
-				return generateKey("AES",KEYSIZE_256);
+				return generateKey("AES", KEYSIZE_256);
 			case XMLCipher.TRIPLEDES:
-				return generateKey("DESede",KEYSIZE_192);
+				return generateKey("DESede", KEYSIZE_192);
 			default:
 				throw new NoSuchAlgorithmException(encryptionAlgorithm);
 		}

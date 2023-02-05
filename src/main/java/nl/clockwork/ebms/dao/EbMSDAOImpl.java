@@ -71,7 +71,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@AllArgsConstructor
 	private static class EbMSMessageContextRowMapper implements RowMapper<EbMSMessageProperties>
 	{
-		public static final String SELECT = "select cpa_id," + " from_party_id,"
+		public static final String SELECT = "select cpa_id,"
+				+ " from_party_id,"
 				+ " from_role,"
 				+ " to_party_id,"
 				+ " to_role,"
@@ -88,8 +89,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		{
 			return EbMSMessageProperties.builder()
 					.cpaId(rs.getString("cpa_id"))
-					.fromParty(Party.of(rs.getString("from_party_id"),rs.getString("from_role")))
-					.toParty(Party.of(rs.getString("to_party_id"),rs.getString("to_role")))
+					.fromParty(Party.of(rs.getString("from_party_id"), rs.getString("from_role")))
+					.toParty(Party.of(rs.getString("to_party_id"), rs.getString("to_role")))
 					.service(rs.getString("service"))
 					.action(rs.getString("action"))
 					.timestamp(rs.getTimestamp("time_stamp").toInstant())
@@ -105,7 +106,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@AllArgsConstructor
 	private static class MessageContextRowMapper implements RowMapper<MessageProperties>
 	{
-		public static final String SELECT = "select cpa_id," + " from_party_id,"
+		public static final String SELECT = "select cpa_id,"
+				+ " from_party_id,"
 				+ " from_role,"
 				+ " to_party_id,"
 				+ " to_role,"
@@ -122,8 +124,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		{
 			return MessageProperties.builder()
 					.cpaId(rs.getString("cpa_id"))
-					.fromParty(new nl.clockwork.ebms.service.model.Party(rs.getString("from_party_id"),rs.getString("from_role")))
-					.toParty(new nl.clockwork.ebms.service.model.Party(rs.getString("to_party_id"),rs.getString("to_role")))
+					.fromParty(new nl.clockwork.ebms.service.model.Party(rs.getString("from_party_id"), rs.getString("from_role")))
+					.toParty(new nl.clockwork.ebms.service.model.Party(rs.getString("to_party_id"), rs.getString("to_role")))
 					.service(rs.getString("service"))
 					.action(rs.getString("action"))
 					.timestamp(rs.getTimestamp("time_stamp").toInstant())
@@ -145,22 +147,22 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		try
 		{
 			return EbMSAttachmentFactory
-					.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
+					.createCachedEbMSAttachment(rs.getString("name"), rs.getString("content_id"), rs.getString("content_type"), rs.getBinaryStream("content"));
 		}
 		catch (IOException e)
 		{
-			throw new DataRetrievalFailureException("",e);
+			throw new DataRetrievalFailureException("", e);
 		}
 	};
 	RowMapper<DataSource> ebMSDataSourceRowMapper = (rs, rowNum) ->
 	{
 		try
 		{
-			return new DataSource(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),IOUtils.toByteArray(rs.getBinaryStream("content")));
+			return new DataSource(rs.getString("name"), rs.getString("content_id"), rs.getString("content_type"), IOUtils.toByteArray(rs.getBinaryStream("content")));
 		}
 		catch (IOException e)
 		{
-			throw new DataRetrievalFailureException("",e);
+			throw new DataRetrievalFailureException("", e);
 		}
 	};
 	RowMapper<MTOMDataSource> ebMSDataSourceMTOMRowMapper = (rs, rowNum) ->
@@ -168,12 +170,12 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		try
 		{
 			val a = EbMSAttachmentFactory
-					.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
-			return new MTOMDataSource(a.getContentId(),new DataHandler(a));
+					.createCachedEbMSAttachment(rs.getString("name"), rs.getString("content_id"), rs.getString("content_type"), rs.getBinaryStream("content"));
+			return new MTOMDataSource(a.getContentId(), new DataHandler(a));
 		}
 		catch (IOException e)
 		{
-			throw new DataRetrievalFailureException("",e);
+			throw new DataRetrievalFailureException("", e);
 		}
 	};
 
@@ -186,17 +188,17 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@Override
 	public boolean existsMessage(String messageId)
 	{
-		return jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ?",Integer.class,messageId) > 0;
+		return jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ?", Integer.class, messageId) > 0;
 	}
 
 	@Override
 	public boolean existsIdenticalMessage(EbMSBaseMessage message)
 	{
-		return jdbcTemplate.queryForObject("select count(message_id)" + " from ebms_message"
-				+ " where message_id = ?"
-				+ " and cpa_id = ?" /*
-														 * + " and from_role =?" + " and to_role = ?" + " and service = ?" + " and action = ?"
-														 */,
+		return jdbcTemplate.queryForObject(
+				"select count(message_id)" + " from ebms_message" + " where message_id = ?" + " and cpa_id = ?" /*
+																																																				 * + " and from_role =?" + " and to_role = ?" +
+																																																				 * " and service = ?" + " and action = ?"
+																																																				 */,
 				Integer.class,
 				message.getMessageHeader().getMessageData().getMessageId(),
 				message.getMessageHeader().getCPAId()/*
@@ -209,23 +211,23 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@Override
 	public Optional<Message> getMessage(String messageId)
 	{
-		val dataSources = getAttachments(messageId,ebMSDataSourceRowMapper);
-		return getMessageProperties(messageId).map(p -> new Message(p,dataSources));
+		val dataSources = getAttachments(messageId, ebMSDataSourceRowMapper);
+		return getMessageProperties(messageId).map(p -> new Message(p, dataSources));
 	}
 
 	@Override
 	public Optional<MTOMMessage> getMTOMMessage(String messageId)
 	{
-		val dataSources = getAttachments(messageId,ebMSDataSourceMTOMRowMapper);
-		return getMessageProperties(messageId).map(p -> new MTOMMessage(p,dataSources));
+		val dataSources = getAttachments(messageId, ebMSDataSourceMTOMRowMapper);
+		return getMessageProperties(messageId).map(p -> new MTOMMessage(p, dataSources));
 	}
 
 	protected Optional<MessageProperties> getMessageProperties(String messageId)
 	{
 		try
 		{
-			return Optional
-					.of(jdbcTemplate.queryForObject(MessageContextRowMapper.SELECT + " from ebms_message where message_id = ?",new MessageContextRowMapper(),messageId));
+			return Optional.of(
+					jdbcTemplate.queryForObject(MessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new MessageContextRowMapper(), messageId));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -238,8 +240,9 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			return Optional.of(jdbcTemplate
-					.queryForObject(EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ?",new EbMSMessageContextRowMapper(),messageId));
+			return Optional.of(
+					jdbcTemplate
+							.queryForObject(EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new EbMSMessageContextRowMapper(), messageId));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -252,13 +255,16 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			return Optional.of(jdbcTemplate
-					.queryForObject(
-							EbMSMessageContextRowMapper.SELECT + " from ebms_message"
+			return Optional.of(
+					jdbcTemplate.queryForObject(
+							EbMSMessageContextRowMapper.SELECT
+									+ " from ebms_message"
 									+ " where cpa_id = ?"
 									+ " and ref_to_message_id = ?"
-									+ (actions.length == 0 ? ""
-											: " and service = '" + EbMSAction.EBMS_SERVICE_URI
+									+ (actions.length == 0
+											? ""
+											: " and service = '"
+													+ EbMSAction.EBMS_SERVICE_URI
 													+ "' and action in ('"
 													+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
 													+ "')"),
@@ -277,7 +283,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			return Optional.of(DOMUtils.read(jdbcTemplate.queryForObject("select content" + " from ebms_message" + " where message_id = ?",String.class,messageId)));
+			return Optional
+					.of(DOMUtils.read(jdbcTemplate.queryForObject("select content" + " from ebms_message" + " where message_id = ?", String.class, messageId)));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -285,7 +292,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		}
 		catch (ParserConfigurationException | SAXException | IOException e)
 		{
-			throw new DataRetrievalFailureException("",e);
+			throw new DataRetrievalFailureException("", e);
 		}
 	}
 
@@ -298,7 +305,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 					"select content" + " from ebms_message" + " where message_id = ?" + " and (status is null or status = " + EbMSMessageStatus.CREATED.getId() + ")",
 					String.class,
 					messageId);
-			val builder = EbMSDocument.builder().contentId(messageId).message(DOMUtils.read(content)).attachments(getAttachments(messageId,ebMSAttachmentRowMapper));
+			val builder = EbMSDocument.builder().contentId(messageId).message(DOMUtils.read(content)).attachments(getAttachments(messageId, ebMSAttachmentRowMapper));
 			return Optional.of(builder.build());
 		}
 		catch (EmptyResultDataAccessException e)
@@ -307,7 +314,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		}
 		catch (ParserConfigurationException | SAXException | IOException e)
 		{
-			throw new DataRetrievalFailureException("",e);
+			throw new DataRetrievalFailureException("", e);
 		}
 	}
 
@@ -316,37 +323,39 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			val document = jdbcTemplate
-					.queryForObject(
-							"select message_id, content" + " from ebms_message"
-									+ " where cpa_id = ?"
-									+ " and ref_to_message_id = ?"
-									+ (actions.length == 0 ? ""
-											: " and service = '" + EbMSAction.EBMS_SERVICE_URI
-													+ "' and action in ('"
-													+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
-													+ "')"),
-							new RowMapper<EbMSDocument>()
+			val document = jdbcTemplate.queryForObject(
+					"select message_id, content"
+							+ " from ebms_message"
+							+ " where cpa_id = ?"
+							+ " and ref_to_message_id = ?"
+							+ (actions.length == 0
+									? ""
+									: " and service = '"
+											+ EbMSAction.EBMS_SERVICE_URI
+											+ "' and action in ('"
+											+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
+											+ "')"),
+					new RowMapper<EbMSDocument>()
+					{
+						@Override
+						public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
+						{
+							try
 							{
-								@Override
-								public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
-								{
-									try
-									{
-										return EbMSDocument.builder().contentId(rs.getString("message_id")).message(DOMUtils.read(rs.getString("content"))).build();
-									}
-									catch (ParserConfigurationException | SAXException | IOException e)
-									{
-										throw new SQLException(e);
-									}
-								}
-							},
-							cpaId,
-							refToMessageId);
+								return EbMSDocument.builder().contentId(rs.getString("message_id")).message(DOMUtils.read(rs.getString("content"))).build();
+							}
+							catch (ParserConfigurationException | SAXException | IOException e)
+							{
+								throw new SQLException(e);
+							}
+						}
+					},
+					cpaId,
+					refToMessageId);
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())
-					.attachments(getAttachments(refToMessageId,ebMSAttachmentRowMapper));
+					.attachments(getAttachments(refToMessageId, ebMSAttachmentRowMapper));
 			return Optional.of(builder.build());
 		}
 		catch (EmptyResultDataAccessException e)
@@ -358,7 +367,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
-		return Optional.ofNullable(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ?",Timestamp.class,messageId))
+		return Optional.ofNullable(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ?", Timestamp.class, messageId))
 				.map(Timestamp::toInstant);
 	}
 
@@ -367,7 +376,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			return EbMSAction.get(jdbcTemplate.queryForObject("select action from ebms_message where message_id = ?",String.class,messageId));
+			return EbMSAction.get(jdbcTemplate.queryForObject("select action from ebms_message where message_id = ?", String.class, messageId));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -379,26 +388,34 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	public List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status)
 	{
 		val parameters = new ArrayList<Object>();
-		return jdbcTemplate.queryForList("select message_id" + " from ebms_message"
-				+ " where status = "
-				+ status.getId()
-				+ getMessageFilter(messageFilter,parameters)
-				+ " order by time_stamp asc",String.class,parameters.toArray(new Object[0]));
+		return jdbcTemplate.queryForList(
+				"select message_id"
+						+ " from ebms_message"
+						+ " where status = "
+						+ status.getId()
+						+ getMessageFilter(messageFilter, parameters)
+						+ " order by time_stamp asc",
+				String.class,
+				parameters.toArray(new Object[0]));
 	}
 
 	@Override
 	public List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status, int maxNr)
 	{
 		val parameters = new ArrayList<Object>();
-		val messageContextFilter = getMessageFilter(messageFilter,parameters);
+		val messageContextFilter = getMessageFilter(messageFilter, parameters);
 		parameters.add(maxNr);
-		return jdbcTemplate.queryForList("select message_id" + " from ebms_message"
-				+ " where status = "
-				+ status.getId()
-				+ messageContextFilter
-				+ " order by time_stamp asc"
-				+ " offset 0 rows"
-				+ " fetch first ? rows only",String.class,parameters.toArray(new Object[0]));
+		return jdbcTemplate.queryForList(
+				"select message_id"
+						+ " from ebms_message"
+						+ " where status = "
+						+ status.getId()
+						+ messageContextFilter
+						+ " order by time_stamp asc"
+						+ " offset 0 rows"
+						+ " fetch first ? rows only",
+				String.class,
+				parameters.toArray(new Object[0]));
 	}
 
 	@Override
@@ -415,39 +432,41 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		{
 			try
 			{
-				val ps = c.prepareStatement("insert into ebms_message (" + "time_stamp,"
-						+ "cpa_id,"
-						+ "conversation_id,"
-						+ "message_id,"
-						+ "ref_to_message_id,"
-						+ "time_to_live,"
-						+ "from_party_id,"
-						+ "from_role,"
-						+ "to_party_id,"
-						+ "to_role,"
-						+ "service,"
-						+ "action,"
-						+ "content,"
-						+ "status,"
-						+ "status_time,"
-						+ "persist_time"
-						+ ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-				ps.setTimestamp(1,Timestamp.from(timestamp));
-				ps.setString(2,messageHeader.getCPAId());
-				ps.setString(3,messageHeader.getConversationId());
-				ps.setString(4,messageHeader.getMessageData().getMessageId());
-				ps.setString(5,messageHeader.getMessageData().getRefToMessageId());
-				ps.setTimestamp(6,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
-				ps.setString(7,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
-				ps.setString(8,messageHeader.getFrom().getRole());
-				ps.setString(9,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
-				ps.setString(10,messageHeader.getTo().getRole());
-				ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
-				ps.setString(12,messageHeader.getAction());
-				ps.setString(13,DOMUtils.toString(document,"UTF-8"));
-				ps.setObject(14,status != null ? status.getId() : null,java.sql.Types.INTEGER);
-				ps.setTimestamp(15,status != null ? Timestamp.from(timestamp) : null);
-				ps.setTimestamp(16,persistTime != null ? Timestamp.from(persistTime) : null);
+				val ps = c.prepareStatement(
+						"insert into ebms_message ("
+								+ "time_stamp,"
+								+ "cpa_id,"
+								+ "conversation_id,"
+								+ "message_id,"
+								+ "ref_to_message_id,"
+								+ "time_to_live,"
+								+ "from_party_id,"
+								+ "from_role,"
+								+ "to_party_id,"
+								+ "to_role,"
+								+ "service,"
+								+ "action,"
+								+ "content,"
+								+ "status,"
+								+ "status_time,"
+								+ "persist_time"
+								+ ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+				ps.setTimestamp(1, Timestamp.from(timestamp));
+				ps.setString(2, messageHeader.getCPAId());
+				ps.setString(3, messageHeader.getConversationId());
+				ps.setString(4, messageHeader.getMessageData().getMessageId());
+				ps.setString(5, messageHeader.getMessageData().getRefToMessageId());
+				ps.setTimestamp(6, messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
+				ps.setString(7, EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
+				ps.setString(8, messageHeader.getFrom().getRole());
+				ps.setString(9, EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
+				ps.setString(10, messageHeader.getTo().getRole());
+				ps.setString(11, EbMSMessageUtils.toString(messageHeader.getService()));
+				ps.setString(12, messageHeader.getAction());
+				ps.setString(13, DOMUtils.toString(document, "UTF-8"));
+				ps.setObject(14, status != null ? status.getId() : null, java.sql.Types.INTEGER);
+				ps.setTimestamp(15, status != null ? Timestamp.from(timestamp) : null);
+				ps.setTimestamp(16, persistTime != null ? Timestamp.from(persistTime) : null);
 				return ps;
 			}
 			catch (TransformerException e)
@@ -455,14 +474,15 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 				throw new SQLException(e);
 			}
 		});
-		insertAttachments(messageHeader.getMessageData().getMessageId(),attachments);
+		insertAttachments(messageHeader.getMessageData().getMessageId(), attachments);
 		return messageHeader.getMessageData().getMessageId();
 	}
 
 	protected void insertAttachments(String messageId, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException
 	{
 		val orderNr = new AtomicInteger();
-		jdbcTemplate.batchUpdate("insert into ebms_attachment (message_id,order_nr,name,content_id,content_type,content) values (?,?,?,?,?,?)",
+		jdbcTemplate.batchUpdate(
+				"insert into ebms_attachment (message_id,order_nr,name,content_id,content_type,content) values (?,?,?,?,?,?)",
 				new BatchPreparedStatementSetter()
 				{
 					@Override
@@ -470,12 +490,12 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 					{
 						try
 						{
-							ps.setObject(1,messageId);
-							ps.setInt(2,orderNr.getAndIncrement());
-							ps.setString(3,attachments.get(i).getName());
-							ps.setString(4,attachments.get(i).getContentId());
-							ps.setString(5,attachments.get(i).getContentType());
-							ps.setBinaryStream(6,attachments.get(i).getInputStream());
+							ps.setObject(1, messageId);
+							ps.setInt(2, orderNr.getAndIncrement());
+							ps.setString(3, attachments.get(i).getName());
+							ps.setString(4, attachments.get(i).getContentId());
+							ps.setString(5, attachments.get(i).getContentType());
+							ps.setBinaryStream(6, attachments.get(i).getInputStream());
 						}
 						catch (IOException e)
 						{
@@ -494,7 +514,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@Override
 	public int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus)
 	{
-		return jdbcTemplate.update("update ebms_message" + " set status = ?," + " status_time = ?" + " where message_id = ?" + " and status = ?",
+		return jdbcTemplate.update(
+				"update ebms_message" + " set status = ?," + " status_time = ?" + " where message_id = ?" + " and status = ?",
 				newStatus.getId(),
 				Timestamp.from(Instant.now()),
 				messageId,
@@ -504,12 +525,14 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@Override
 	public int deleteAttachments(String messageId)
 	{
-		return jdbcTemplate.update("delete from ebms_attachment" + " where message_id = ?",messageId);
+		return jdbcTemplate.update("delete from ebms_attachment" + " where message_id = ?", messageId);
 	}
 
 	protected <T> List<T> getAttachments(String messageId, RowMapper<T> rowMapper)
 	{
-		return jdbcTemplate
-				.query("select name, content_id, content_type, content" + " from ebms_attachment" + " where message_id = ?" + " order by order_nr",rowMapper,messageId);
+		return jdbcTemplate.query(
+				"select name, content_id, content_type, content" + " from ebms_attachment" + " where message_id = ?" + " order by order_nr",
+				rowMapper,
+				messageId);
 	}
 }

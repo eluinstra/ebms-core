@@ -76,22 +76,28 @@ public class EbMSMessageEncrypter
 		{
 			val messageHeader = message.getMessageHeader();
 			val service = CPAUtils.toString(messageHeader.getService());
-			if (cpaManager.isSendingConfidential(messageHeader
-					.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+			if (cpaManager.isSendingConfidential(
+					messageHeader.getCPAId(),
+					messageHeader.getFrom().getPartyId(),
+					messageHeader.getFrom().getRole(),
+					service,
+					messageHeader.getAction()))
 			{
 				val toPartyId = messageHeader.getTo().getPartyId();
 				val deliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
-								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",
-										messageHeader.getCPAId(),
-										toPartyId,
-										messageHeader.getTo().getRole(),
-										service,
-										messageHeader.getAction()));
+						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(), toPartyId, messageHeader.getTo().getRole(), service, messageHeader.getAction())
+								.orElseThrow(
+										() -> StreamUtils.illegalStateException(
+												"ReceiveDeliveryChannel",
+												messageHeader.getCPAId(),
+												toPartyId,
+												messageHeader.getTo().getRole(),
+												service,
+												messageHeader.getAction()));
 				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
-				SecurityUtils.validateCertificate(trustStore,certificate,Instant.now());
+				SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
 				val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-				message.getAttachments().replaceAll(a -> encrypt(createDocument(),certificate,encryptionAlgorithm,a));
+				message.getAttachments().replaceAll(a -> encrypt(createDocument(), certificate, encryptionAlgorithm, a));
 			}
 		}
 		catch (KeyStoreException e)
@@ -109,10 +115,10 @@ public class EbMSMessageEncrypter
 		try
 		{
 			val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
-			SecurityUtils.validateCertificate(trustStore,certificate,Instant.now());
+			SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
 			val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			val attachments = new ArrayList<EbMSAttachment>();
-			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a)));
+			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(), certificate, encryptionAlgorithm, a)));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}
@@ -129,7 +135,7 @@ public class EbMSMessageEncrypter
 	private XMLCipher createXmlCipher(String encryptionAlgorithm, SecretKey secretKey) throws XMLEncryptionException
 	{
 		val result = XMLCipher.getInstance(encryptionAlgorithm);
-		result.init(XMLCipher.ENCRYPT_MODE,secretKey);
+		result.init(XMLCipher.ENCRYPT_MODE, secretKey);
 		return result;
 	}
 
@@ -139,15 +145,15 @@ public class EbMSMessageEncrypter
 		try
 		{
 			val secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
-			val xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
-			val encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
-			setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
-			val encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
+			val xmlCipher = createXmlCipher(encryptionAlgorithm, secretKey);
+			val encryptedKey = createEncryptedKey(document, certificate.getPublicKey(), secretKey);
+			setEncryptedData(document, xmlCipher, encryptedKey, certificate, attachment);
+			val encryptedData = xmlCipher.encryptData(document, null, attachment.getInputStream());
 			val content = new CachedOutputStream();
 			val transformer = DOMUtils.getTransformer();
-			transformer.transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
+			transformer.transform(new DOMSource(xmlCipher.martial(document, encryptedData)), new StreamResult(content));
 			content.lockOutputStream();
-			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",content);
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", content);
 		}
 		catch (NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException | TransformerFactoryConfigurationError e)
 		{
@@ -162,8 +168,8 @@ public class EbMSMessageEncrypter
 	private EncryptedKey createEncryptedKey(Document document, Key publicKey, SecretKey secretKey) throws XMLEncryptionException
 	{
 		val keyCipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
-		keyCipher.init(XMLCipher.WRAP_MODE,publicKey);
-		return keyCipher.encryptKey(document,secretKey);
+		keyCipher.init(XMLCipher.WRAP_MODE, publicKey);
+		return keyCipher.encryptKey(document, secretKey);
 	}
 
 	private void setEncryptedData(Document document, XMLCipher xmlCipher, EncryptedKey encryptedKey, X509Certificate certificate, EbMSAttachment attachment)
@@ -171,7 +177,7 @@ public class EbMSMessageEncrypter
 	{
 		val encryptedData = xmlCipher.getEncryptedData();
 		val encryptedKeyInfo = new KeyInfo(document);
-		encryptedKeyInfo.add(new KeyName(document,certificate.getSubjectDN().getName()));
+		encryptedKeyInfo.add(new KeyName(document, certificate.getSubjectDN().getName()));
 		encryptedKey.setKeyInfo(encryptedKeyInfo);
 		val keyInfo = new KeyInfo(document);
 		keyInfo.add(encryptedKey);

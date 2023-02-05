@@ -45,8 +45,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class,CPAServiceConfig.class,CPAManagerConfig.class,URLMappingServiceConfig.class,DataSourceConfig.class,
-		TransactionManagerConfig.class})
+@ContextConfiguration(
+		classes = {PropertiesConfig.class, CPAServiceConfig.class, CPAManagerConfig.class, URLMappingServiceConfig.class, DataSourceConfig.class,
+				TransactionManagerConfig.class})
 class CPAServiceImplTest implements WithFile
 {
 	@Container
@@ -64,15 +65,16 @@ class CPAServiceImplTest implements WithFile
 
 	private static Stream<Arguments> invalidCPAs()
 	{
-		return Stream.of(arguments(null,"java.lang.NullPointerException"),
-				arguments("","Premature end of file."),
-				arguments("<","XML document structures must start and end within the same entity."),
-				arguments("<xml","XML document structures must start and end within the same entity."),
-				arguments("x<xml/>","Content is not allowed in prolog."),
-				arguments("<>","The markup in the document preceding the root element must be well-formed."),
-				arguments("<<xml/>","The markup in the document preceding the root element must be well-formed."),
-				arguments("<xml/>","Cannot find the declaration of element 'xml'"),
-				arguments(" <xml/> ","Cannot find the declaration of element 'xml'"));
+		return Stream.of(
+				arguments(null, "java.lang.NullPointerException"),
+				arguments("", "Premature end of file."),
+				arguments("<", "XML document structures must start and end within the same entity."),
+				arguments("<xml", "XML document structures must start and end within the same entity."),
+				arguments("x<xml/>", "Content is not allowed in prolog."),
+				arguments("<>", "The markup in the document preceding the root element must be well-formed."),
+				arguments("<<xml/>", "The markup in the document preceding the root element must be well-formed."),
+				arguments("<xml/>", "Cannot find the declaration of element 'xml'"),
+				arguments(" <xml/> ", "Cannot find the declaration of element 'xml'"));
 	}
 
 	@ParameterizedTest
@@ -84,7 +86,8 @@ class CPAServiceImplTest implements WithFile
 
 	private static Stream<Arguments> validCPAs()
 	{
-		return Stream.of(arguments("nl/clockwork/ebms/cpas/cpa-cv-http.xml"),
+		return Stream.of(
+				arguments("nl/clockwork/ebms/cpas/cpa-cv-http.xml"),
 				arguments("nl/clockwork/ebms/cpas/cpa-cv-https.xml"),
 				arguments("nl/clockwork/ebms/cpas/cpaStubEBF.be.http.signed.xml"),
 				arguments("nl/clockwork/ebms/cpas/cpaStubEBF.be.http.unsigned.sync.xml"),
@@ -106,13 +109,13 @@ class CPAServiceImplTest implements WithFile
 	@MethodSource("validCPAs")
 	void insertValidXML(String path)
 	{
-		assertThatCode(() -> cpaService.insertCPA(readFile(path),true)).doesNotThrowAnyException();
+		assertThatCode(() -> cpaService.insertCPA(readFile(path), true)).doesNotThrowAnyException();
 	}
 
 	@Test
 	void getCPAIds()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]),true));
+		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]), true));
 		assertThat(cpaService.getCPAIds()).hasSize(15)
 				.contains("CPAID_EchoService-1-0")
 				.contains("cpaStubEBF.be.http.signed")
@@ -134,7 +137,7 @@ class CPAServiceImplTest implements WithFile
 	@Test
 	void getCPA()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]),true));
+		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]), true));
 		assertThat(cpaService.getCPAIds()).hasSizeGreaterThan(0);
 		assertThat(cpaService.getCPA("cpaStubEBF.rm.https.signed")).contains("cpaid=\"cpaStubEBF.rm.https.signed\"");
 	}
@@ -142,7 +145,7 @@ class CPAServiceImplTest implements WithFile
 	@Test
 	void deleteCPA()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]),true));
+		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]), true));
 		assertThat(cpaService.getCPAIds()).hasSize(15);
 		assertThatCode(() -> cpaService.deleteCPA("CPAID_EchoService-1-0")).doesNotThrowAnyException();
 		assertThat(cpaService.getCPAIds()).hasSize(14);

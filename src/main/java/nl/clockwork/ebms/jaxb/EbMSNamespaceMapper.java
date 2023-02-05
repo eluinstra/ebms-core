@@ -22,16 +22,17 @@ public class EbMSNamespaceMapper extends com.sun.xml.bind.marshaller.NamespacePr
 	@Override
 	public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix)
 	{
-		return Match(namespaceUri).of(Case($("http://schemas.xmlsoap.org/soap/envelope/"),"soap"),
-				Case($("http://www.w3.org/1999/xlink"),"xlink"),
-				Case($("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"),"eb"),
-				Case($(),suggestion));
+		return Match(namespaceUri).of(
+				Case($("http://schemas.xmlsoap.org/soap/envelope/"), "soap"),
+				Case($("http://www.w3.org/1999/xlink"), "xlink"),
+				Case($("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"), "eb"),
+				Case($(), suggestion));
 	}
 
 	@Override
 	public String[] getPreDeclaredNamespaceUris()
 	{
-		return new String[]{"http://schemas.xmlsoap.org/soap/envelope/","http://www.w3.org/1999/xlink",
+		return new String[]{"http://schemas.xmlsoap.org/soap/envelope/", "http://www.w3.org/1999/xlink",
 				"http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"};
 	}
 }

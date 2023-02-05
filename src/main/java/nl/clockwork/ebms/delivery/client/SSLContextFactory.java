@@ -53,25 +53,25 @@ public class SSLContextFactory
 		@Override
 		public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
 		{
-			return standardKeyManager.chooseServerAlias(keyType,issuers,socket);
+			return standardKeyManager.chooseServerAlias(keyType, issuers, socket);
 		}
 
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 		{
-			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType,issuers,socket) : clientAlias;
+			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType, issuers, socket) : clientAlias;
 		}
 
 		@Override
 		public String[] getServerAliases(String keyType, Principal[] issuers)
 		{
-			return standardKeyManager.getServerAliases(keyType,issuers);
+			return standardKeyManager.getServerAliases(keyType, issuers);
 		}
 
 		@Override
 		public String[] getClientAliases(String keyType, Principal[] issuers)
 		{
-			return standardKeyManager.getClientAliases(keyType,issuers);
+			return standardKeyManager.getClientAliases(keyType, issuers);
 		}
 
 		@Override
@@ -101,16 +101,16 @@ public class SSLContextFactory
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
 		val kmf = createKeyManagerFactory(keyStore);
-		setClientAlias(kmf,clientAlias);
+		setClientAlias(kmf, clientAlias);
 		val tmf = createTrustManagerFactory(trustStore);
-		sslContext = createSSLContext(kmf,tmf);
+		sslContext = createSSLContext(kmf, tmf);
 		createEngine(sslContext);
 	}
 
 	private KeyManagerFactory createKeyManagerFactory(EbMSKeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException
 	{
 		val result = KeyManagerFactory.getInstance("SunX509");
-		result.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
+		result.init(keyStore.getKeyStore(), keyStore.getKeyPassword().toCharArray());
 		return result;
 	}
 
@@ -119,7 +119,7 @@ public class SSLContextFactory
 		val keyManagers = kmf.getKeyManagers();
 		for (var i = 0; i < keyManagers.length; i++)
 			if (keyManagers[i] instanceof X509KeyManager)
-				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
+				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i], clientAlias);
 		return kmf;
 	}
 
@@ -133,7 +133,7 @@ public class SSLContextFactory
 	private SSLContext createSSLContext(final KeyManagerFactory kmf, final TrustManagerFactory tmf) throws NoSuchAlgorithmException, KeyManagementException
 	{
 		val result = SSLContext.getInstance("TLS");
-		result.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+		result.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 		return result;
 	}
 

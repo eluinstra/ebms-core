@@ -60,23 +60,31 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId)
 	{
-		return jdbcTemplate.query(EbMSEventRowMapper.SELECT + " from delivery_task"
-				+ " where time_stamp <= ?"
-				+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
-				+ " order by time_stamp asc",new EbMSEventRowMapper(),Timestamp.from(timestamp));
+		return jdbcTemplate.query(
+				EbMSEventRowMapper.SELECT
+						+ " from delivery_task"
+						+ " where time_stamp <= ?"
+						+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+						+ " order by time_stamp asc",
+				new EbMSEventRowMapper(),
+				Timestamp.from(timestamp));
 	}
 
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return jdbcTemplate.query(EbMSEventRowMapper.SELECT + " from delivery_task"
-				+ " where time_stamp <= ?"
-				+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
-				+ " order by time_stamp asc"
-				+ " offset 0 rows"
-				+ " fetch first "
-				+ maxNr
-				+ " rows only",new EbMSEventRowMapper(),Timestamp.from(timestamp));
+		return jdbcTemplate.query(
+				EbMSEventRowMapper.SELECT
+						+ " from delivery_task"
+						+ " where time_stamp <= ?"
+						+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+						+ " order by time_stamp asc"
+						+ " offset 0 rows"
+						+ " fetch first "
+						+ maxNr
+						+ " rows only",
+				new EbMSEventRowMapper(),
+				Timestamp.from(timestamp));
 	}
 
 	@Override
@@ -99,7 +107,8 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public int updateTask(DeliveryTask task)
 	{
-		return jdbcTemplate.update("update delivery_task set time_stamp = ?, retries = ? where message_id = ?",
+		return jdbcTemplate.update(
+				"update delivery_task set time_stamp = ?, retries = ? where message_id = ?",
 				Timestamp.from(task.getTimestamp()),
 				task.getRetries(),
 				task.getMessageId());
@@ -108,13 +117,14 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public int deleteTask(String messageId)
 	{
-		return jdbcTemplate.update("delete from delivery_task where message_id = ?",messageId);
+		return jdbcTemplate.update("delete from delivery_task where message_id = ?", messageId);
 	}
 
 	@Override
 	public void insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage)
 	{
-		jdbcTemplate.update("insert into delivery_log (message_id,time_stamp,uri,status,error_message) values (?,?,?,?,?)",
+		jdbcTemplate.update(
+				"insert into delivery_log (message_id,time_stamp,uri,status,error_message) values (?,?,?,?,?)",
 				messageId,
 				Timestamp.from(timestamp),
 				uri,
