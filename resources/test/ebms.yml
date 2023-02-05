@@ -3,8 +3,8 @@ info:
   title: EbMS Service
   version: '18'
 servers:
-  - url: http://localhost:8080/service/rest/v18
-  - url: https://localhost:8443/service/rest/v18
+  - url: http://localhost:8080/service/rest/v19
+  - url: https://localhost:8443/service/rest/v19
 
 components:
   schemas:
