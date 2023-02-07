@@ -220,7 +220,7 @@ public class EncryptionTest
 		return result;
 	}
 
-	private javax.activation.DataSource createDataSource()
+	private jakarta.activation.DataSource createDataSource()
 	{
 		return EbMSAttachmentFactory.createEbMSAttachment("test.txt", "plain/text; charset=utf-8", "Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
 	}

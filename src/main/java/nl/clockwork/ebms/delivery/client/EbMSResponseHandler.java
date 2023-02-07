@@ -16,11 +16,11 @@
 package nl.clockwork.ebms.delivery.client;
 
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

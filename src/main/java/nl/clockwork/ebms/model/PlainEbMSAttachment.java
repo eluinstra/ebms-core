@@ -16,10 +16,10 @@
 package nl.clockwork.ebms.model;
 
 
+import jakarta.activation.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.activation.DataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

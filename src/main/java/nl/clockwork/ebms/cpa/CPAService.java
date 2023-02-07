@@ -16,11 +16,11 @@
 package nl.clockwork.ebms.cpa;
 
 
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 import java.util.List;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
 @WebService(name = "CPAService", targetNamespace = "http://www.ordina.nl/cpa/2.18", serviceName = "CPAService", portName = "CPAPort")

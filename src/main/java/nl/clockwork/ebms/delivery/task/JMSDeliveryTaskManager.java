@@ -16,10 +16,10 @@
 package nl.clockwork.ebms.delivery.task;
 
 
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
 import java.time.Instant;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

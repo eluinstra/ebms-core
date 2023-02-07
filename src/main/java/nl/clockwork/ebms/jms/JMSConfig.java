@@ -16,18 +16,14 @@
 package nl.clockwork.ebms.jms;
 
 
-import com.atomikos.jms.AtomikosConnectionFactoryBean;
-import java.util.UUID;
-import javax.jms.ConnectionFactory;
-import javax.jms.XAConnectionFactory;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.XAConnectionFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
-import org.apache.activemq.ActiveMQXAConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -67,10 +63,13 @@ public class JMSConfig
 	@Bean
 	@Conditional(DefaultTransactionManagerType.class)
 	@DependsOn("brokerFactory")
-	public ConnectionFactory pooledConnectionFactor()
+	public ConnectionFactory pooledConnectionFactor() throws Exception
 	{
-		val result = new PooledConnectionFactory(jmsBrokerUrl);
-		result.setMaxConnections(maxPoolSize);
+		// TransportConfiguration transportConfiguration = new TransportConfiguration(NettyConnectorFactory.class.getName());
+		// return ActiveMQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF,transportConfiguration);
+		// return ActiveMQJMSClient.createConnectionFactory(jmsBrokerUrl, username);
+		var result = new ActiveMQConnectionFactory(jmsBrokerUrl);
+		result.setThreadPoolMaxSize(maxPoolSize);
 		return result;
 	}
 
@@ -81,33 +80,33 @@ public class JMSConfig
 		return new JmsTransactionManager(connectionFactory);
 	}
 
-	@Bean(initMethod = "init", destroyMethod = "close")
-	@Conditional(AtomikosTransactionManagerType.class)
-	@DependsOn("brokerFactory")
-	public ConnectionFactory atomikosConnectionFactoryBean()
-	{
-		val result = new AtomikosConnectionFactoryBean();
-		result.setUniqueResourceName(UUID.randomUUID().toString());
-		result.setXaConnectionFactory(createXAConnectionFactory());
-		result.setLocalTransactionMode(false);
-		result.setIgnoreSessionTransactedFlag(true);
-		result.setMinPoolSize(minPoolSize);
-		result.setMaxPoolSize(maxPoolSize);
-		result.setBorrowConnectionTimeout(30);
-		result.setIgnoreSessionTransactedFlag(true);
-		result.setMaintenanceInterval(60);
-		result.setMaxIdleTime(60);
-		result.setMaxLifetime(0);
-		result.setReapTimeout(0);
-		return result;
-	}
+	// @Bean(initMethod = "init", destroyMethod = "close")
+	// @Conditional(AtomikosTransactionManagerType.class)
+	// @DependsOn("brokerFactory")
+	// public ConnectionFactory atomikosConnectionFactoryBean()
+	// {
+	// val result = new AtomikosConnectionFactoryBean();
+	// result.setUniqueResourceName(UUID.randomUUID().toString());
+	// result.setXaConnectionFactory(createXAConnectionFactory());
+	// result.setLocalTransactionMode(false);
+	// result.setIgnoreSessionTransactedFlag(true);
+	// result.setMinPoolSize(minPoolSize);
+	// result.setMaxPoolSize(maxPoolSize);
+	// result.setBorrowConnectionTimeout(30);
+	// result.setIgnoreSessionTransactedFlag(true);
+	// result.setMaintenanceInterval(60);
+	// result.setMaxIdleTime(60);
+	// result.setMaxLifetime(0);
+	// result.setReapTimeout(0);
+	// return result;
+	// }
 
 	private XAConnectionFactory createXAConnectionFactory()
 	{
-		val result = new ActiveMQXAConnectionFactory(jmsBrokerUrl);
+		val result = new ActiveMQConnectionFactory(jmsBrokerUrl);
 		if (StringUtils.isNotEmpty(username))
 		{
-			result.setUserName(username);
+			result.setUser(username);
 			result.setPassword(password);
 		}
 		return result;

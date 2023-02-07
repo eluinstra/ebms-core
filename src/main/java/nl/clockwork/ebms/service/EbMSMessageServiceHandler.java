@@ -16,12 +16,12 @@
 package nl.clockwork.ebms.service;
 
 
+import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import lombok.AccessLevel;

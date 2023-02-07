@@ -16,7 +16,7 @@
 package nl.clockwork.ebms.cpa.url;
 
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 
 @WebFault(name = "URLMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18")

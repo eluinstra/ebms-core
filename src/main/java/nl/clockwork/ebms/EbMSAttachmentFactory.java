@@ -16,11 +16,11 @@
 package nl.clockwork.ebms;
 
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
@@ -55,7 +55,7 @@ public class EbMSAttachmentFactory
 
 	public static EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, byte[] content)
 	{
-		val result = new ByteArrayDataSource(content, contentType);
+		val result = new jakarta.mail.util.ByteArrayDataSource(content, contentType);
 		if (!StringUtils.isEmpty(filename))
 			result.setName(filename);
 		return createEbMSAttachment(contentId, result);

@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.clockwork.ebms</groupId>
   <artifactId>ebms-core</artifactId>
-  <version>2.19.1-SNAPSHOT</version>
+  <version>2.20.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>EbMS Core</name>
   <description>This library implements the ebXML Message Specification version 2.0, which defines a communications-protocol neutral method for exchanging electronic business messages through the exchange of XML based messages.</description>
@@ -86,7 +86,7 @@
     <checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <jdk.version>11</jdk.version>
+    <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencyManagement>
@@ -114,7 +114,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.36</version>
+        <version>2.0.6</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
@@ -149,17 +149,17 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.12.0</version>
     </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
+    <!-- <dependency>
+      <groupId>org.ehcache</groupId>
       <artifactId>ehcache</artifactId>
-      <version>2.10.9.2</version>
-    </dependency>
+      <version>3.10.8</version>
+    </dependency> -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>31.1-jre</version>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-spring</artifactId>
       <version>2.14.0</version>
@@ -174,7 +174,7 @@
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-spring-cache-ext</artifactId>
       <version>1.0.0</version>
-    </dependency>
+    </dependency> -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
@@ -192,9 +192,44 @@
       <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.jms</groupId>
+      <artifactId>jakarta.jms-api</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.jws</groupId>
+      <artifactId>jakarta.jws-api</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
       <groupId>com.sun.mail</groupId>
-      <artifactId>javax.mail</artifactId>
-      <version>1.6.2</version>
+      <artifactId>jakarta.mail</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.soap</groupId>
+      <artifactId>jakarta.xml.soap-api</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
+      <version>3.0.1</version>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
@@ -231,9 +266,9 @@
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
-      <version>2.9.5</version>
+      <version>3.0.2</version>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>com.atomikos</groupId>
       <artifactId>transactions-jdbc</artifactId>
       <version>5.0.9</version>
@@ -242,7 +277,7 @@
       <groupId>com.atomikos</groupId>
       <artifactId>transactions-jms</artifactId>
       <version>5.0.9</version>
-    </dependency>
+    </dependency> -->
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
@@ -261,12 +296,6 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-client</artifactId>
-      <version>5.17.3</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-kahadb-store</artifactId>
       <version>5.17.3</version>
       <scope>provided</scope>
@@ -278,15 +307,21 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-jakarta-client</artifactId>
+      <version>2.28.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-core</artifactId>
-      <version>3.5.5</version>
+      <version>4.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-      <version>3.5.5</version>
+      <version>4.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -320,9 +355,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>4.0.1</version>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>5.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -334,7 +369,7 @@
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>11.2.3.jre11</version>
+      <version>11.2.3.jre17</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -352,25 +387,25 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
-      <version>5.3.25</version>
+      <version>6.0.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>5.3.25</version>
+      <version>6.0.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jms</artifactId>
-      <version>5.3.25</version>
+      <version>6.0.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>5.3.25</version>
+      <version>6.0.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -386,33 +421,27 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-vavr</artifactId>
-      <version>0.4.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-features-logging</artifactId>
-      <version>3.5.5</version>
+      <version>4.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxws</artifactId>
-      <version>3.5.5</version>
+      <version>4.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-transports-http-jetty</artifactId>
-      <version>3.5.5</version>
+      <version>4.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>9.4.49.v20220914</version>
+      <version>11.0.13</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -424,7 +453,7 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>9.4.49.v20220914</version>
+      <version>11.0.13</version>
       <scope>test</scope>
     </dependency>
     <!-- <dependency>
@@ -490,13 +519,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
-      <version>1.7.36</version>
+      <version>2.0.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>5.3.25</version>
+      <version>6.0.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -527,7 +556,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
+      <!-- <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
         <version>1.5</version>
@@ -548,7 +577,58 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin> -->
+      <!-- <plugin>
+ 				<groupId>org.codehaus.mojo</groupId>
+ 				<artifactId>jaxb2-maven-plugin</artifactId>
+ 				<version>2.5.0</version>
+ 				<executions>
+ 					<execution>
+ 						<goals>
+ 							<goal>xjc</goal>
+ 						</goals>
+ 						<configuration>
+ 							<target>2.1</target>
+ 							<sources>
+ 								<source>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</source>
+ 								<source>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xsd</source>
+ 							</sources>
+ 							<xjbSources>
+ 								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjb</xjbSource>
+ 								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xjb</xjbSource>
+ 							</xjbSources>
+ 							<extension>true</extension>
+ 							<clearOutputDir>false</clearOutputDir>
+ 							<verbose>false</verbose>
+ 						</configuration>
+ 					</execution>
+ 				</executions>
+ 			</plugin> -->
+      <!-- <plugin>
+ 				<groupId>org.jvnet.jaxb2.maven2</groupId>
+ 				<artifactId>maven-jaxb2-plugin</artifactId>
+ 				<version>0.14.0</version>
+ 				<executions>
+ 					<execution>
+ 						<goals>
+ 							<goal>generate</goal>
+ 						</goals>
+ 						<configuration>
+ 							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</schemaDirectory>
+ 							<schemaIncludes>
+ 								<include>*.xsd</include>
+ 							</schemaIncludes>
+ 							<bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</bindingDirectory>
+ 							<bindingIncludes>
+ 								<include>*.xjb</include>
+ 							</bindingIncludes>
+ 							<extension>true</extension>
+ 							<clearOutputDir>false</clearOutputDir>
+ 							<verbose>false</verbose>
+ 						</configuration>
+ 					</execution>
+ 				</executions>
+ 			</plugin> -->
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
@@ -652,8 +732,8 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <packageName>nl.clockwork.ebms</packageName>
               <addClasspath>true</addClasspath>
-              <addExtensions />
-              <classpathPrefix />
+              <addExtensions/>
+              <classpathPrefix/>
             </manifest>
             <manifestEntries>
               <mode>development</mode>
@@ -739,8 +819,8 @@
                 <include>.gitignore</include>
                 <include>src/*/resources/**/*.properties</include>
               </includes>
-              <trimTrailingWhitespace />
-              <endWithNewline />
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
               <indent>
                 <tabs>true</tabs>
                 <spacesPerTab>2</spacesPerTab>
@@ -776,8 +856,8 @@
             <eclipse>
               <file>${basedir}/.eclipse-formatter.xml</file>
             </eclipse>
-            <removeUnusedImports />
-            <importOrder />
+            <removeUnusedImports/>
+            <importOrder/>
             <licenseHeader>
               <file>${basedir}/resources/license/java-header.txt</file>
             </licenseHeader>
@@ -786,7 +866,7 @@
             <includes>
               <include>**/*.md</include>
             </includes>
-            <flexmark />
+            <flexmark/>
           </markdown>
           <pom>
             <sortPom>
@@ -799,7 +879,7 @@
               <indentBlankLines>false</indentBlankLines>
               <indentSchemaLocation>false</indentSchemaLocation>
               <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
-              <sortOrderFile />
+              <sortOrderFile/>
               <sortDependencies>scope,artifactId,groupId</sortDependencies>
               <sortDependencyExclusions>scope,artifactId,groupId</sortDependencyExclusions>
               <sortPlugins>scope,artifactId,groupId</sortPlugins>

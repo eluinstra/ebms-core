@@ -16,6 +16,13 @@
 package nl.clockwork.ebms.server.servlet;
 
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -23,13 +30,6 @@ import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class ClientCertificateManagerFilter implements Filter
 		{
 			if (useX509CertificateHeader)
 			{
-				val certificates = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
+				val certificates = (X509Certificate[])request.getAttribute("jakarta.servlet.request.X509Certificate");
 				ClientCertificateManager.setCertificate(certificates != null && certificates.length > 0 ? certificates[0] : null);
 			}
 			else

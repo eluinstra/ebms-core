@@ -20,19 +20,18 @@ import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 
 import com.google.common.base.Splitter;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Destination;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
-import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.activemq.artemis.api.jms.ActiveMQJMSClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,6 +99,6 @@ public class MessageEventListenerConfig
 
 	private Destination createDestination(JMSDestinationType jmsDestinationType, MessageEventType e)
 	{
-		return jmsDestinationType == JMSDestinationType.QUEUE ? new ActiveMQQueue(e.name()) : new ActiveMQTopic("VirtualTopic." + e.name());
+		return jmsDestinationType == JMSDestinationType.QUEUE ? ActiveMQJMSClient.createQueue(e.name()) : ActiveMQJMSClient.createTopic("VirtualTopic." + e.name());
 	}
 }

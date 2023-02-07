@@ -16,11 +16,11 @@
 package nl.clockwork.ebms;
 
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.soap.SOAPBinding;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;

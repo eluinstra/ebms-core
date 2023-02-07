@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.dao;
 
 
+import jakarta.activation.DataHandler;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import javax.activation.DataHandler;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
