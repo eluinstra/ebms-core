@@ -25,6 +25,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.Executors;
 import javax.net.ssl.SSLParameters;
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
@@ -49,6 +50,7 @@ class EbMSHttpClient implements EbMSClient
 			@NonNull SSLContextFactory sslFactoryManager,
 			int connectTimeout,
 			int readTimeout,
+			int maxThreads,
 			EbMSProxy proxy,
 			List<Integer> recoverableHttpErrors,
 			List<Integer> unrecoverableHttpErrors)
@@ -58,6 +60,7 @@ class EbMSHttpClient implements EbMSClient
 		this.recoverableHttpErrors = recoverableHttpErrors;
 		this.unrecoverableHttpErrors = unrecoverableHttpErrors;
 		this.httpClient = HttpClient.newBuilder()
+				.executor(Executors.newFixedThreadPool(maxThreads))
 				.connectTimeout(Duration.ofMillis(connectTimeout))
 				.sslContext(sslFactoryManager.getSslContext())
 				.sslParameters(sslParameters)
