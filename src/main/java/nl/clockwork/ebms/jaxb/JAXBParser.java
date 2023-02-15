@@ -135,14 +135,16 @@ public class JAXBParser<T>
 	@SuppressWarnings("unchecked")
 	public static <L> JAXBParser<L> getInstance(Class<L> clazz) throws JAXBException
 	{
-		xmlHandlers.putIfAbsent(clazz, new JAXBParser<>(JAXBContext.newInstance(clazz)));
+		if (!xmlHandlers.containsKey(clazz))
+			xmlHandlers.put(clazz, new JAXBParser<>(JAXBContext.newInstance(clazz)));
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <L> JAXBParser<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
 	{
-		xmlHandlers.putIfAbsent(clazz, new JAXBParser<>(JAXBContext.newInstance(clazzes)));
+		if (!xmlHandlers.containsKey(clazz))
+			xmlHandlers.put(clazz, new JAXBParser<>(JAXBContext.newInstance(clazzes)));
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 
