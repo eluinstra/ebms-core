@@ -30,12 +30,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CPAManagerConfig
 {
 	@Bean
-	public CPAManager cpaManager(DataSource dataSource, URLMapper urlMapper)
+	public CPAManager cpaManager(CPADAO cpaDAO, DataSource dataSource, URLMapper urlMapper)
 	{
-		return new CPAManager(cpaDAO(dataSource), urlMapper);
+		return new CPAManager(cpaDAO, urlMapper);
 	}
 
-	private CPADAO cpaDAO(DataSource dataSource)
+	@Bean
+	public CPADAO cpaDAO(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new CPADAOImpl(jdbcTemplate);
