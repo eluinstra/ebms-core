@@ -80,7 +80,7 @@ public class EbMSMessageFactory
 			throws DatatypeConfigurationException, JAXBException
 	{
 		val messageHeader = createResponseMessageHeader(message.getMessageHeader(), timestamp, EbMSAction.MESSAGE_ERROR);
-		if (errorList.getError().size() == 0)
+		if (errorList.getError().isEmpty())
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(), EbMSErrorCode.UNKNOWN, "An unknown error occurred!"));
 			errorList.setHighestSeverity(SeverityType.ERROR);
@@ -92,7 +92,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val messageHeader = createResponseMessageHeader(message.getMessageHeader(), timestamp, EbMSAction.ACKNOWLEDGMENT);
+			val messageHeader = createAcknowledgmentResponseMessageHeader(message.getMessageHeader(), timestamp);
 			val acknowledgment = new Acknowledgment();
 			acknowledgment.setVersion(Constants.EBMS_VERSION);
 			acknowledgment.setMustUnderstand(true);
@@ -191,7 +191,7 @@ public class EbMSMessageFactory
 					.messageHeader(createMessageHeader(messageRequest.getProperties()))
 					.ackRequested(createAckRequested(messageRequest.getProperties()))
 					.syncReply(createSyncReply(messageRequest.getProperties()));
-			if (messageRequest.getDataSources() != null && messageRequest.getDataSources().size() > 0)
+			if (messageRequest.getDataSources() != null && !messageRequest.getDataSources().isEmpty())
 			{
 				val manifest = EbMSMessageUtils.createManifest();
 				val attachments = messageRequest.getDataSources().stream().map(ds -> createEbMSAttachment(manifest, ds)).collect(Collectors.toList());
@@ -221,7 +221,7 @@ public class EbMSMessageFactory
 					.messageHeader(createMessageHeader(message.getProperties()))
 					.ackRequested(createAckRequested(message.getProperties()))
 					.syncReply(createSyncReply(message.getProperties()));
-			if (message.getDataSources() != null && message.getDataSources().size() > 0)
+			if (message.getDataSources() != null && !message.getDataSources().isEmpty())
 			{
 				val manifest = EbMSMessageUtils.createManifest();
 				val attachments = message.getDataSources().stream().map(ds -> createEbMSAttachmentMTOM(manifest, ds)).collect(Collectors.toList());
@@ -338,6 +338,21 @@ public class EbMSMessageFactory
 		return createMessageHeader(messageHeader.getCPAId(), messageHeader.getConversationId(), from, to, service, action.getAction(), messageData, null);
 	}
 
+	private MessageHeader createAcknowledgmentResponseMessageHeader(MessageHeader messageHeader, Instant timestamp)
+			throws DatatypeConfigurationException, JAXBException
+	{
+		val cpaId = messageHeader.getCPAId();
+		val action = EbMSAction.ACKNOWLEDGMENT;
+		val deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId, messageHeader.getTo().getPartyId(), action.getAction()).orElse(null);
+		val hostname = CPAUtils.getHostname(deliveryChannel);
+		val from = createForm(messageHeader.getTo().getPartyId(), messageHeader.getTo().getRole());
+		val to = createTo(messageHeader.getFrom().getPartyId(), messageHeader.getFrom().getRole());
+		val service = createService(null, action.getServiceUri());
+		val messageId = ebMSIdGenerator.generateMessageId(hostname);
+		val messageData = createMessageData(messageId, messageHeader.getMessageData().getMessageId(), timestamp, null);
+		return createMessageHeader(messageHeader.getCPAId(), messageHeader.getConversationId(), from, to, service, action.getAction(), messageData, null);
+	}
+
 	private From createForm(Collection<? extends PartyId> partyIds, String role)
 	{
 		val result = new From();
@@ -378,7 +393,7 @@ public class EbMSMessageFactory
 		{
 			val duration = CPAUtils.getSenderReliableMessaging(deliveryChannel)
 					.getRetryInterval()
-					.multipliedBy(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
+					.multipliedBy(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1L);
 			return date.plus(duration);
 		}
 		else
