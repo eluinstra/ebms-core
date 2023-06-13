@@ -92,7 +92,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val messageHeader = createResponseMessageHeader(message.getMessageHeader(), timestamp, EbMSAction.ACKNOWLEDGMENT);
+			val messageHeader = createAcknowledgmentResponseMessageHeader(message.getMessageHeader(), timestamp);
 			val acknowledgment = new Acknowledgment();
 			acknowledgment.setVersion(Constants.EBMS_VERSION);
 			acknowledgment.setMustUnderstand(true);
@@ -338,6 +338,21 @@ public class EbMSMessageFactory
 		return createMessageHeader(messageHeader.getCPAId(), messageHeader.getConversationId(), from, to, service, action.getAction(), messageData, null);
 	}
 
+	private MessageHeader createAcknowledgmentResponseMessageHeader(MessageHeader messageHeader, Instant timestamp)
+			throws DatatypeConfigurationException, JAXBException
+	{
+		val cpaId = messageHeader.getCPAId();
+		val action = EbMSAction.ACKNOWLEDGMENT;
+		val deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId, messageHeader.getTo().getPartyId(), action.getAction()).orElse(null);
+		val hostname = CPAUtils.getHostname(deliveryChannel);
+		val from = createForm(messageHeader.getTo().getPartyId(), messageHeader.getTo().getRole());
+		val to = createTo(messageHeader.getFrom().getPartyId(), messageHeader.getFrom().getRole());
+		val service = createService(null, action.getServiceUri());
+		val messageId = ebMSIdGenerator.generateMessageId(hostname);
+		val messageData = createMessageData(messageId, messageHeader.getMessageData().getMessageId(), timestamp, null);
+		return createMessageHeader(messageHeader.getCPAId(), messageHeader.getConversationId(), from, to, service, action.getAction(), messageData, null);
+	}
+
 	private From createForm(Collection<? extends PartyId> partyIds, String role)
 	{
 		val result = new From();
@@ -378,7 +393,7 @@ public class EbMSMessageFactory
 		{
 			val duration = CPAUtils.getSenderReliableMessaging(deliveryChannel)
 					.getRetryInterval()
-					.multipliedBy(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
+					.multipliedBy(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1L);
 			return date.plus(duration);
 		}
 		else
