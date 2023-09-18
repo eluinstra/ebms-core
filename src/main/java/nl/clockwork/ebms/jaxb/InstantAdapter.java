@@ -17,25 +17,20 @@ package nl.clockwork.ebms.jaxb;
 
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import javax.xml.bind.DatatypeConverter;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import lombok.val;
 
 public class InstantAdapter extends XmlAdapter<String, Instant>
 {
 	@Override
-	public Instant unmarshal(String v) throws Exception
+	public Instant unmarshal(String date) throws Exception
 	{
-		return DatatypeConverter.parseDateTime(v).getTime().toInstant();
+		return InstantConverter.parseDateTime(date);
 	}
 
 	@Override
-	public String marshal(Instant v) throws Exception
+	public String marshal(Instant date) throws Exception
 	{
-		val calendar = new GregorianCalendar();
-		calendar.setTime(Date.from(v));
-		return DatatypeConverter.printDateTime(calendar);
+		return InstantConverter.printDateTime(date);
 	}
 }
