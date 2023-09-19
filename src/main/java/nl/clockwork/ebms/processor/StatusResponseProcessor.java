@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import java.time.Instant;

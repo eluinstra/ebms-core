@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cache;
 
-
 import nl.clockwork.ebms.cache.CacheConfig.CacheType;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;

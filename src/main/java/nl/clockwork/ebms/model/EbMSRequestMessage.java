@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.model;
 
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;

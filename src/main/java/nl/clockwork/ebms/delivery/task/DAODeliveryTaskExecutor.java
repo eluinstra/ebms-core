@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-
 import io.vavr.control.Try;
 import java.time.Instant;
 import java.util.ArrayList;

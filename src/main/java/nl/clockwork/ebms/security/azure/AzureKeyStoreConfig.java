@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.security.azure;
 
-
 import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 import java.security.Security;
 import org.springframework.context.annotation.Condition;

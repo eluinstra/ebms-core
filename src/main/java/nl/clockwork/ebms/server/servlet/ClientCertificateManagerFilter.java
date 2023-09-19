@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.jms;
 
-
 import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import com.atomikos.jms.AtomikosConnectionFactoryBean;
 import java.util.Properties;

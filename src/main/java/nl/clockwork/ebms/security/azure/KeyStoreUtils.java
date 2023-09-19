@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.security.azure;
 
-
 import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 import com.azure.security.keyvault.jca.KeyVaultLoadStoreParameter;
 import java.io.IOException;

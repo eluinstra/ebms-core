@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

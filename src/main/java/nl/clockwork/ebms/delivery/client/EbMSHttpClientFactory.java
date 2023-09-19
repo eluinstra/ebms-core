@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;

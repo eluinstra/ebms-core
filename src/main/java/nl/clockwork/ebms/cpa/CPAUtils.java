@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;

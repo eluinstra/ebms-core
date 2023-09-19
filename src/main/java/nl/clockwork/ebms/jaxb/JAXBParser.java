@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;

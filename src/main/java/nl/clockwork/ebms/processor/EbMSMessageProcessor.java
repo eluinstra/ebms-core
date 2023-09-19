@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-
 import java.io.IOException;
 import java.time.Instant;
 import javax.xml.bind.JAXBException;

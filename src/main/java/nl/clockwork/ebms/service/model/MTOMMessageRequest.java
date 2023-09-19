@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service.model;
 
-
 import java.io.Serializable;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;

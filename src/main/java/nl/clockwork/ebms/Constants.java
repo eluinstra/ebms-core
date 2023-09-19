@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

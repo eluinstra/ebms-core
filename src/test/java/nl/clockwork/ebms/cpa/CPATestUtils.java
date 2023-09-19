@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-
 import io.vavr.Function1;
 import java.io.IOException;
 import java.nio.charset.Charset;

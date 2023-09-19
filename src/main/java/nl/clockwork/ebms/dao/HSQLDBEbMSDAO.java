@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.dao;
 
-
 import nl.clockwork.ebms.EbMSMessageStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;

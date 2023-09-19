@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

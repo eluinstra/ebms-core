@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.NonNull;

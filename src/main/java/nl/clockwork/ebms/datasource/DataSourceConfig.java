@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.datasource;
 
-
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.ibm.db2.jcc.DB2XADataSource;

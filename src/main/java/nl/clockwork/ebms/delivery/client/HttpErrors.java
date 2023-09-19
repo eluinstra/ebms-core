@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

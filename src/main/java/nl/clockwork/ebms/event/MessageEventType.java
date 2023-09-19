@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.AccessLevel;

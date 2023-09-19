@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

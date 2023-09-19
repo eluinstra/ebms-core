@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;

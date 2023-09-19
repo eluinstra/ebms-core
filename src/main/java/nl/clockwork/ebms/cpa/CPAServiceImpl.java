@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-
 import java.util.List;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;

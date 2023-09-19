@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;

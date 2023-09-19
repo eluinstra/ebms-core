@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-
 import java.util.Date;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.datatype.DatatypeConfigurationException;

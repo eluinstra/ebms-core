@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client.apache;
 
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;

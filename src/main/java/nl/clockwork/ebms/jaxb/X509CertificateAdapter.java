@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-
 import java.security.cert.X509Certificate;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

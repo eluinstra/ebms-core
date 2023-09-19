@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.util.List;
 import java.util.Map;
 

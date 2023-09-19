@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.security.azure;
 
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import lombok.NonNull;

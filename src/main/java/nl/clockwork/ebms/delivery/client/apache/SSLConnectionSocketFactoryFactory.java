@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client.apache;
 
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import lombok.AccessLevel;

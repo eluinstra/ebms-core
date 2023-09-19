@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.dao;
 
-
 import io.vavr.Tuple2;
 import java.time.Instant;
 import java.util.List;

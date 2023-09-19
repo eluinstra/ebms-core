@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.signing;
 
-
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;

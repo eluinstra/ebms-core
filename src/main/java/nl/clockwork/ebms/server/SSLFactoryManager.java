@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server;
 
-
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;

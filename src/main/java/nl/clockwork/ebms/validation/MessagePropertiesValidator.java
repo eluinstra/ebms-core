@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

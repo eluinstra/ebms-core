@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.model;
 
-
 import lombok.Builder;
 import lombok.NonNull;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;

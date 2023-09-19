@@ -82,41 +82,41 @@
     </snapshotRepository>
   </distributionManagement>
   <properties>
-    <activemq.version>5.16.5</activemq.version>
+    <activemq.version>5.16.6</activemq.version>
     <checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
     <checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <httpclient.version>4.5.14</httpclient.version>
     <jdk.version>1.8</jdk.version>
-    <junit.jupiter.version>5.9.3</junit.jupiter.version>
-    <lombok.version>1.18.26</lombok.version>
+    <junit.jupiter.version>5.10.0</junit.jupiter.version>
+    <lombok.version>1.18.28</lombok.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring.version>5.3.27</spring.version>
-    <surefire.version>3.0.0-M9</surefire.version>
+    <spring.version>5.3.30</spring.version>
+    <surefire.version>3.1.2</surefire.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
-        <version>2.15.0</version>
+        <version>2.15.2</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.15.0</version>
+        <version>2.15.2</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.15.0</version>
+        <version>2.15.2</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jsr310</artifactId>
-        <version>2.15.0</version>
+        <version>2.15.2</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -169,7 +169,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>31.1-jre</version>
+      <version>32.1.2-jre</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -254,7 +254,7 @@
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
-      <version>2.9.8</version>
+      <version>2.9.12</version>
     </dependency>
     <dependency>
       <groupId>com.atomikos</groupId>
@@ -327,7 +327,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>2.1.214</version>
+      <version>2.2.224</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -357,12 +357,12 @@
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>11.2.3.jre8</version>
+      <version>12.4.1.jre8</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
       <version>8.0.33</version>
       <scope>provided</scope>
     </dependency>
@@ -405,7 +405,7 @@
     <dependency>
       <groupId>org.apache.xbean</groupId>
       <artifactId>xbean-spring</artifactId>
-      <version>4.22</version>
+      <version>4.23</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -417,7 +417,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-vavr</artifactId>
-      <version>0.4.2</version>
+      <version>0.4.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -450,7 +450,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.8</version>
+        <version>0.8.10</version>
         <executions>
           <execution>
             <goals>
@@ -491,7 +491,7 @@
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>4.1</version>
+        <version>4.2</version>
         <configuration>
           <strictCheck>true</strictCheck>
           <header>${project.basedir}/resources/license/header.txt</header>
@@ -523,7 +523,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>3.11.0</version>
         <configuration>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
@@ -549,7 +549,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.1</version>
         <executions>
           <execution>
             <id>default-deploy</id>
@@ -562,7 +562,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.4.1</version>
         <executions>
           <execution>
             <id>enforce-versions</id>
@@ -591,8 +591,8 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <packageName>nl.clockwork.ebms</packageName>
               <addClasspath>true</addClasspath>
-              <addExtensions />
-              <classpathPrefix />
+              <addExtensions/>
+              <classpathPrefix/>
             </manifest>
             <manifestEntries>
               <mode>development</mode>
@@ -603,7 +603,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.4.1</version>
+        <version>3.6.0</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <doclint>none</doclint>
@@ -644,7 +644,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -672,7 +672,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>2.22.8</version>
+        <version>2.30.0</version>
         <configuration>
           <formats>
             <format>
@@ -680,8 +680,8 @@
                 <include>.gitignore</include>
                 <include>src/*/resources/**/*.properties</include>
               </includes>
-              <trimTrailingWhitespace />
-              <endWithNewline />
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
               <indent>
                 <tabs>true</tabs>
                 <spacesPerTab>2</spacesPerTab>
@@ -717,8 +717,8 @@
             <eclipse>
               <file>${basedir}/.eclipse-formatter.xml</file>
             </eclipse>
-            <removeUnusedImports />
-            <importOrder />
+            <removeUnusedImports/>
+            <importOrder/>
             <licenseHeader>
               <file>${basedir}/resources/license/java-header.txt</file>
             </licenseHeader>
@@ -727,7 +727,7 @@
             <includes>
               <include>**/*.md</include>
             </includes>
-            <flexmark />
+            <flexmark/>
           </markdown>
           <pom>
             <sortPom>
@@ -740,7 +740,7 @@
               <indentBlankLines>false</indentBlankLines>
               <indentSchemaLocation>false</indentSchemaLocation>
               <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
-              <sortOrderFile />
+              <sortOrderFile/>
               <sortDependencies>scope,artifactId,groupId</sortDependencies>
               <sortDependencyExclusions>scope,artifactId,groupId</sortDependencyExclusions>
               <sortPlugins>scope,artifactId,groupId</sortPlugins>
@@ -754,7 +754,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
-        <version>2.13.0</version>
+        <version>2.16.0</version>
         <configuration>
           <excludes>
             <exclude>com.microsoft.sqlserver:mssql-jdbc</exclude>
@@ -797,7 +797,7 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>7.3.0</version>
+        <version>7.4.4</version>
         <reportSets>
           <reportSet>
             <reports>
@@ -832,7 +832,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.4.1</version>
+        <version>3.6.0</version>
         <configuration>
           <source>${jdk.version}</source>
           <doclint>none</doclint>
@@ -844,7 +844,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.19.0</version>
+        <version>3.21.0</version>
         <configuration>
           <linkXref>true</linkXref>
           <targetJdk>${jdk.version}</targetJdk>

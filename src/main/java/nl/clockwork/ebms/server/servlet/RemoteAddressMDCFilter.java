@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
-
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

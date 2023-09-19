@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;

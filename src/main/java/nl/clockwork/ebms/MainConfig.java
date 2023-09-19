@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import nl.clockwork.ebms.cache.CacheConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
 import nl.clockwork.ebms.cpa.CPAServiceConfig;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

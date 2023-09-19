@@ -15,7 +15,6 @@
  */
 package org.apache.jcp.xml.dsig.internal.dom;
 
-
 import java.io.IOException;
 import java.util.List;
 import javax.xml.crypto.Data;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.model;
 
-
 import java.io.Serializable;
 import java.time.Instant;
 import lombok.AccessLevel;

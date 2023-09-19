@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.scheduler;
 
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.quartz.Job;

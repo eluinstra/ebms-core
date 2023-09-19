@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.xml.dsig;
 
-
 import java.io.IOException;
 import java.util.List;
 import lombok.AccessLevel;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client.apache;
 
-
 import java.io.IOException;
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
