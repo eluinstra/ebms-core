@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.kafka;
 
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

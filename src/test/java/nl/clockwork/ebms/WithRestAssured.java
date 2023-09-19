@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import io.restassured.internal.multipart.MultiPartSpecificationImpl;
 import io.restassured.specification.MultiPartSpecification;
 import java.util.Map;

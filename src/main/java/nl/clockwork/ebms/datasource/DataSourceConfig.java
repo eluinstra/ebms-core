@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.datasource;
 
-
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.ibm.db2.jcc.DB2XADataSource;
 import com.zaxxer.hikari.HikariConfig;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.util;
 
-
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Spliterator;

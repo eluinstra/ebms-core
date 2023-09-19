@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import javax.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 

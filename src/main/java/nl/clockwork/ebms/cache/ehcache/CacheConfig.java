@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cache.ehcache;
 
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.dao;
 
-
 import java.util.List;
 import lombok.val;
 import nl.clockwork.ebms.service.model.MessageFilter;

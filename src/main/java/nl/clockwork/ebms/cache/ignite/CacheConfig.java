@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cache.ignite;
 
-
 import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

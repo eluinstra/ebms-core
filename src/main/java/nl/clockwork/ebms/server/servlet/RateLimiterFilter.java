@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
-
 import com.google.common.util.concurrent.RateLimiter;
 import java.io.IOException;
 import javax.servlet.Filter;

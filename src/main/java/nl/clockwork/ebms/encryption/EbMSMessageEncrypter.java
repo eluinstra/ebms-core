@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.encryption;
 
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.Key;

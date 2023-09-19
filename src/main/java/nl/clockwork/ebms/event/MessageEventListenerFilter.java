@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import java.util.EnumSet;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

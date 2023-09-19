@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

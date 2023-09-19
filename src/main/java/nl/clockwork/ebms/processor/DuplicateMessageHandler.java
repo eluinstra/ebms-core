@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

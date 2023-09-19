@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-
 import java.util.List;
 import java.util.Optional;
 import javax.xml.bind.JAXBException;

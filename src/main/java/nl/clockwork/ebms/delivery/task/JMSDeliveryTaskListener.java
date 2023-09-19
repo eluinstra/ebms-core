@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-
 import java.time.Instant;
 import javax.jms.JMSException;
 import javax.jms.Message;

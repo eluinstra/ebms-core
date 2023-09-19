@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-
 import java.security.cert.X509Certificate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

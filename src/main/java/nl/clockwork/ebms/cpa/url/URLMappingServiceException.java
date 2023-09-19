@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-
 import javax.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 

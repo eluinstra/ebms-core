@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;

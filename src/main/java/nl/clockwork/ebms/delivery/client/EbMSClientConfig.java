@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.util.Set;
 import javax.net.ssl.SSLParameters;
 import lombok.AccessLevel;

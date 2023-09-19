@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import java.util.Map;
 import javax.jms.Destination;
 import javax.jms.JMSException;

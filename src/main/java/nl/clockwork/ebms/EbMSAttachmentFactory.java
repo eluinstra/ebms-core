@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import javax.activation.DataHandler;

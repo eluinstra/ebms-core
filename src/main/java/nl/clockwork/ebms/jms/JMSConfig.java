@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.jms;
 
-
 import com.atomikos.jms.AtomikosConnectionFactoryBean;
 import java.util.UUID;
 import javax.jms.ConnectionFactory;

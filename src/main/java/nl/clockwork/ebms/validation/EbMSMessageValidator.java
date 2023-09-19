@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

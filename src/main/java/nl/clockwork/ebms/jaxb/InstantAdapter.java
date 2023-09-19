@@ -15,9 +15,7 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-
 import java.time.Instant;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class InstantAdapter extends XmlAdapter<String, Instant>

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;

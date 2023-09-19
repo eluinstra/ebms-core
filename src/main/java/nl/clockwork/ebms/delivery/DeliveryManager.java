@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery;
 
-
 import java.io.IOException;
 import java.util.Optional;
 import javax.xml.bind.JAXBException;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.transaction;
 
-
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import javax.sql.DataSource;

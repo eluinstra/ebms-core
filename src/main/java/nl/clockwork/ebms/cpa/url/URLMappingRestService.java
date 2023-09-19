@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;

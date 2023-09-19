@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-
 import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;

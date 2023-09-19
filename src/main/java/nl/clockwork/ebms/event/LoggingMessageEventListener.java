@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public class FixedPostgreSQLContainer extends PostgreSQLContainer<FixedPostgreSQLContainer>
