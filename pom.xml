@@ -682,6 +682,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
+        <version>3.0.1</version>
         <configuration>
           <localCheckout>true</localCheckout>
           <pushChanges>false</pushChanges>
