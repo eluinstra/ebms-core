@@ -16,13 +16,17 @@
 package nl.clockwork.ebms.datasource;
 
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.ibm.db2.jcc.DB2XADataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.util.IsolationLevel;
+
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -32,8 +36,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -124,41 +131,40 @@ public class DataSourceConfig
 		return new HikariDataSource(config);
 	}
 
-	// @Bean(destroyMethod = "close")
-	// @Conditional(AtomikosTransactionManagerType.class)
-	// public DataSource atomikosDataSourceBean() throws SQLException
-	// {
-	// val result = new AtomikosDataSourceBean();
-	// result.setUniqueResourceName(UUID.randomUUID().toString());
-	// if (jdbcUrl.contains("db2"))
-	// createDB2XADataSource().ifPresentOrElse(result::setXaDataSource, () ->
-	// {
-	// throw new IllegalStateException("Error creating DB2XADataSource");
-	// });
-	// else
-	// {
-	// result.setXaDataSourceClassName(driverClassName);
-	// result.setXaProperties(createDriverProperties());
-	// }
-	// if (isolationLevel != null)
-	// result.setDefaultIsolationLevel(isolationLevel.getLevelId());
-	// result.setLocalTransactionMode(true);
-	// result.setMaxIdleTime(maxIdleTime);
-	// result.setMaxLifetime(maxLifetime);
-	// result.setMinPoolSize(minPoolSize);
-	// result.setMaxPoolSize(maxPoolSize);
-	// if (StringUtils.isNotEmpty(testQuery))
-	// result.setTestQuery(testQuery);
-	// result.setBorrowConnectionTimeout(30);
-	// result.setConcurrentConnectionValidation(true);
-	// result.setLoginTimeout(0);
-	// result.setMaintenanceInterval(60);
-	// result.setMaxIdleTime(60);
-	// result.setMaxLifetime(0);
-	// result.setReapTimeout(0);
-	// result.init();
-	// return result;
-	// }
+	@Bean(destroyMethod = "close")
+	@Conditional(AtomikosTransactionManagerType.class)
+	public DataSource atomikosDataSourceBean() throws SQLException
+	{
+		val result = new AtomikosDataSourceBean();
+		result.setUniqueResourceName(UUID.randomUUID().toString());
+		if (jdbcUrl.contains("db2"))
+			createDB2XADataSource().ifPresentOrElse(result::setXaDataSource, () ->
+			{
+				throw new IllegalStateException("Error creating DB2XADataSource");
+			});
+		else
+		{
+			result.setXaDataSourceClassName(driverClassName);
+			result.setXaProperties(createDriverProperties());
+		}
+		if (isolationLevel != null)
+			result.setDefaultIsolationLevel(isolationLevel.getLevelId());
+		result.setLocalTransactionMode(true);
+		result.setMaxIdleTime(maxIdleTime);
+		result.setMaxLifetime(maxLifetime);
+		result.setMinPoolSize(minPoolSize);
+		result.setMaxPoolSize(maxPoolSize);
+		if (StringUtils.isNotEmpty(testQuery))
+			result.setTestQuery(testQuery);
+		result.setBorrowConnectionTimeout(30);
+		result.setConcurrentConnectionValidation(true);
+		result.setLoginTimeout(0);
+		result.setMaintenanceInterval(60);
+		result.setMaxIdleTime(60);
+		result.setMaxLifetime(0);
+		result.init();
+		return result;
+	}
 
 	private Optional<XADataSource> createDB2XADataSource()
 	{

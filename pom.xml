@@ -268,16 +268,24 @@
       <artifactId>spring-kafka</artifactId>
       <version>3.0.2</version>
     </dependency>
-    <!-- <dependency>
+    <dependency>
       <groupId>com.atomikos</groupId>
       <artifactId>transactions-jdbc</artifactId>
-      <version>5.0.9</version>
+      <version>6.0.0</version>
+      <classifier>jakarta</classifier>
     </dependency>
     <dependency>
       <groupId>com.atomikos</groupId>
       <artifactId>transactions-jms</artifactId>
-      <version>5.0.9</version>
-    </dependency> -->
+      <version>6.0.0</version>
+      <classifier>jakarta</classifier>
+    </dependency>
+    <dependency>
+      <groupId>com.atomikos</groupId>
+      <artifactId>transactions-jta</artifactId>
+      <version>6.0.0</version>
+      <classifier>jakarta</classifier>
+    </dependency>
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>

@@ -18,6 +18,7 @@ package nl.clockwork.ebms.transaction;
 
 import javax.sql.DataSource;
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,12 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.jta.JtaTransactionManager;
+
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.icatch.jta.UserTransactionManager;
+
+import jakarta.transaction.SystemException;
 
 @Configuration
 @EnableTransactionManagement
@@ -50,27 +57,27 @@ public class TransactionManagerConfig
 		return new DataSourceTransactionManager(dataSource);
 	}
 
-	// @Bean(name = {"dataSourceTransactionManager", "jmsTransactionManager"})
-	// @Conditional(AtomikosTransactionManagerType.class)
-	// public JtaTransactionManager atomikosJtaTransactionManager() throws SystemException
-	// {
-	// return new JtaTransactionManager(createUserTransaction(), createTransactionManager());
-	// }
+	@Bean(name = {"dataSourceTransactionManager", "jmsTransactionManager"})
+	@Conditional(AtomikosTransactionManagerType.class)
+	public JtaTransactionManager atomikosJtaTransactionManager() throws SystemException
+	{
+		return new JtaTransactionManager(createUserTransaction(), createTransactionManager());
+	}
 
-	// private UserTransactionImp createUserTransaction() throws SystemException
-	// {
-	// val result = new UserTransactionImp();
-	// result.setTransactionTimeout(transactionTimeout);
-	// return result;
-	// }
+	private UserTransactionImp createUserTransaction() throws SystemException
+	{
+		val result = new UserTransactionImp();
+		result.setTransactionTimeout(transactionTimeout);
+		return result;
+	}
 
-	// private UserTransactionManager createTransactionManager() throws SystemException
-	// {
-	// val result = new UserTransactionManager();
-	// result.setTransactionTimeout(transactionTimeout);
-	// result.setForceShutdown(false);
-	// return result;
-	// }
+	private UserTransactionManager createTransactionManager() throws SystemException
+	{
+		val result = new UserTransactionManager();
+		result.setTransactionTimeout(transactionTimeout);
+		result.setForceShutdown(false);
+		return result;
+	}
 
 	public static class DefaultTransactionManagerType implements Condition
 	{
