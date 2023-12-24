@@ -15,11 +15,10 @@
  */
 package nl.clockwork.ebms.kafka;
 
-
+import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import lombok.val;
 import nl.clockwork.ebms.delivery.task.DeliveryTask;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig;

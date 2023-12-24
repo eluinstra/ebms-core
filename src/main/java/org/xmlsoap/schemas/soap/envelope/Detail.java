@@ -15,7 +15,6 @@
  */
 package org.xmlsoap.schemas.soap.envelope;
 
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

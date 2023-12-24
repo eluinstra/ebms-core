@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import java.util.List;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;

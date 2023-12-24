@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;

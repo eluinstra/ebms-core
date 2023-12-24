@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cache;
 
-
 import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

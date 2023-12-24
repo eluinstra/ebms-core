@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery;
 
-
 import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.util.Optional;

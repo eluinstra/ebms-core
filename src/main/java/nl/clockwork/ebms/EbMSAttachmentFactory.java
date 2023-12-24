@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.util.ByteArrayDataSource;

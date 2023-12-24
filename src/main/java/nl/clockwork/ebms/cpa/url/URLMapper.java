@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import java.net.MalformedURLException;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.dao;
 
-
 import jakarta.activation.DataHandler;
 import java.io.IOException;
 import java.sql.PreparedStatement;

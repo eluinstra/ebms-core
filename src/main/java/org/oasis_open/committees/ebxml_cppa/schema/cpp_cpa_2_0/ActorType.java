@@ -15,7 +15,6 @@
  */
 package org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0;
 
-
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;

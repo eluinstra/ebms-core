@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import lombok.val;

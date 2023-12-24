@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.encryption;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;

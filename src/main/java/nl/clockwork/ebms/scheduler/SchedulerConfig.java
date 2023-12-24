@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.scheduler;
 
-
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.Arrays;

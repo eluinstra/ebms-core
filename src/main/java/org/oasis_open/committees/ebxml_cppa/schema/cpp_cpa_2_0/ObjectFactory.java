@@ -15,7 +15,6 @@
  */
 package org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0;
 
-
 import java.time.Duration;
 import java.time.Instant;
 import javax.xml.bind.JAXBElement;

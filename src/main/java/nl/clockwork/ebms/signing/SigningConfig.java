@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.signing;
 
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;

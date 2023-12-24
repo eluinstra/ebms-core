@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;

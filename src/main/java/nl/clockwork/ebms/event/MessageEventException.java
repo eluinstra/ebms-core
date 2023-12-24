@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor

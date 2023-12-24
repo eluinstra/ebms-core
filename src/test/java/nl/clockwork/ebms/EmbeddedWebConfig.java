@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import jakarta.xml.ws.Endpoint;
 import jakarta.xml.ws.soap.SOAPBinding;
 import java.util.Collections;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
-
 import jakarta.servlet.GenericServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

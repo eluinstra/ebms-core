@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.net.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

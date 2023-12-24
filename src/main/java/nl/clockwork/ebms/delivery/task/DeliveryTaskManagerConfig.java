@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-
 import jakarta.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import lombok.AccessLevel;

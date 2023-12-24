@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;

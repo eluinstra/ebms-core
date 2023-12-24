@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

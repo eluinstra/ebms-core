@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;

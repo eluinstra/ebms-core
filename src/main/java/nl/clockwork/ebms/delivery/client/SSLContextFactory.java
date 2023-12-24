@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;

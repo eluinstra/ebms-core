@@ -15,13 +15,11 @@
  */
 package nl.clockwork.ebms.datasource;
 
-
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.ibm.db2.jcc.DB2XADataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.util.IsolationLevel;
-
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
@@ -39,7 +37,6 @@ import lombok.val;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;

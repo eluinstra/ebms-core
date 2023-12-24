@@ -15,7 +15,6 @@
  */
 package org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0;
 
-
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

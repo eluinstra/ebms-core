@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;

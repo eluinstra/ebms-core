@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;

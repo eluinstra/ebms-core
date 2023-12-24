@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery;
 
-
 import jakarta.jms.ConnectionFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

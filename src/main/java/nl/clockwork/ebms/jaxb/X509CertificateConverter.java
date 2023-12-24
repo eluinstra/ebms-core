@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;

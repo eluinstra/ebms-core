@@ -15,7 +15,6 @@
  */
 package org.w3._2000._09.xmldsig;
 
-
 import java.math.BigInteger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;

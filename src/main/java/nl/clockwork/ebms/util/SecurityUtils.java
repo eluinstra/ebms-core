@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.util;
 
-
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;

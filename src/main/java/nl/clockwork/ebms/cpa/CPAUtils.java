@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-
 import io.vavr.control.Try;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

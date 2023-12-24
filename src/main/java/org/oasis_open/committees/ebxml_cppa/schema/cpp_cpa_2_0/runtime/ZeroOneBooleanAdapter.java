@@ -15,7 +15,6 @@
  */
 package org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.runtime;
 
-
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

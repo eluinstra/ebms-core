@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-
 import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.time.Instant;

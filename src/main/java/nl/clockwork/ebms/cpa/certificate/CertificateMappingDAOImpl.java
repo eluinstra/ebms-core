@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import java.security.cert.CertificateEncodingException;

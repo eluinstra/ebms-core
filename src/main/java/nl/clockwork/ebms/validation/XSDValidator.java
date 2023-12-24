@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-
 import java.io.IOException;
 import java.io.StringReader;
 import javax.xml.XMLConstants;

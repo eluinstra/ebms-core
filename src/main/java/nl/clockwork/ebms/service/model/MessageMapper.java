@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service.model;
 
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

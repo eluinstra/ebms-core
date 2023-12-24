@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server;
 
-
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.IOException;

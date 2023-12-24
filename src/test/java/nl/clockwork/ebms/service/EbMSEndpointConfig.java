@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import jakarta.xml.ws.Endpoint;
 import javax.xml.namespace.QName;
 import org.springframework.context.annotation.Bean;

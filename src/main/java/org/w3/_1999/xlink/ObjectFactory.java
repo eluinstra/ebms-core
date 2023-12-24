@@ -15,7 +15,6 @@
  */
 package org.w3._1999.xlink;
 
-
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.event;
 
-
 import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;

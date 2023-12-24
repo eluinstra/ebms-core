@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.model;
 
-
 import jakarta.activation.DataSource;
 import java.io.IOException;
 import java.io.InputStream;

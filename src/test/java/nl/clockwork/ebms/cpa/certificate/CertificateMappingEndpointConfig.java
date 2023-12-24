@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-
 import jakarta.xml.ws.Endpoint;
 import javax.xml.namespace.QName;
 import org.springframework.context.annotation.Bean;

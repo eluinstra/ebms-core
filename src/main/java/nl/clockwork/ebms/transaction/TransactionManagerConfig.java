@@ -15,11 +15,13 @@
  */
 package nl.clockwork.ebms.transaction;
 
-
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.icatch.jta.UserTransactionManager;
+import jakarta.transaction.SystemException;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
@@ -31,11 +33,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
-
-import com.atomikos.icatch.jta.UserTransactionImp;
-import com.atomikos.icatch.jta.UserTransactionManager;
-
-import jakarta.transaction.SystemException;
 
 @Configuration
 @EnableTransactionManagement

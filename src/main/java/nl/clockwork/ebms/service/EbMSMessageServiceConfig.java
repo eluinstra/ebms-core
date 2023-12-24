@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;

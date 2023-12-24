@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery;
 
-
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 
 class EbMSMessageQueue extends MessageQueue<EbMSResponseMessage>

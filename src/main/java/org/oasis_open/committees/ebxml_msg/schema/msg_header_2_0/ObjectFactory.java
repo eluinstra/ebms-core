@@ -15,7 +15,6 @@
  */
 package org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0;
 
-
 import java.time.Instant;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;

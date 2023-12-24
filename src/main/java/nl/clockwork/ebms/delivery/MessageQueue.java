@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery;
 
-
 import java.util.LinkedHashMap;
 import java.util.Optional;
 import lombok.AccessLevel;

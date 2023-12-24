@@ -15,7 +15,6 @@
  */
 package org.w3._2000._09.xmldsig;
 
-
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
