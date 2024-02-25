@@ -15,13 +15,13 @@
  */
 package org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlIDREF;
+import jakarta.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.Duration;
 import java.time.Instant;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlIDREF;
-import javax.xml.bind.annotation.XmlRegistry;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import nl.clockwork.ebms.jaxb.DurationAdapter;
 import nl.clockwork.ebms.jaxb.InstantAdapter;

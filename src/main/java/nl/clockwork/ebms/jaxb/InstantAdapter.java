@@ -15,11 +15,11 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+import jakarta.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.time.Instant;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import lombok.val;
 
 public class InstantAdapter extends XmlAdapter<String, Instant>

@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.cpa;
 
 import io.vavr.control.Try;
+import jakarta.xml.bind.JAXBElement;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -30,7 +31,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.xml.bind.JAXBElement;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;

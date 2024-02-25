@@ -15,14 +15,13 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -100,20 +99,6 @@ public class JAXBParser<T>
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		marshaller.marshal(e, result);
-		result.flush();
-		return result.toString();
-	}
-
-	public String handle(JAXBElement<T> e, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
-	{
-		if (e == null)
-			return null;
-		val result = new StringWriter();
-		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		if (namespacePrefixMapper != null)
-			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", namespacePrefixMapper);
 		marshaller.marshal(e, result);
 		result.flush();
 		return result.toString();

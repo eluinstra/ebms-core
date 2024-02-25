@@ -15,9 +15,9 @@
  */
 package nl.clockwork.ebms.cpa;
 
+import jakarta.xml.bind.JAXBException;
 import java.util.List;
 import java.util.Optional;
-import javax.xml.bind.JAXBException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -21,14 +21,14 @@ import static io.vavr.API.Match;
 import static io.vavr.API.run;
 import static io.vavr.Predicates.instanceOf;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,7 +39,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.jaxb.EbMSNamespaceMapper;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -293,7 +292,7 @@ public class EbMSMessageUtils
 				StatusRequest.class,
 				StatusResponse.class);
 		val e = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope"), Envelope.class, envelope);
-		val is = new ByteArrayInputStream(parser.handle(e, new EbMSNamespaceMapper()).getBytes());
+		val is = new ByteArrayInputStream(parser.handle(e).getBytes());
 		return DOMUtils.getDocumentBuilder().parse(is);
 	}
 

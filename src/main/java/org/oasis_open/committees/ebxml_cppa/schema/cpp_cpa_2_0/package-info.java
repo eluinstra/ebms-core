@@ -20,7 +20,7 @@
 // Generated on: 2023.02.07 at 10:26:37 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(
+@jakarta.xml.bind.annotation.XmlSchema(
 		namespace = "http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd",
-		elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+		elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0;

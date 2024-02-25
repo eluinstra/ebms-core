@@ -25,12 +25,12 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.xml.bind.JAXBException;
 import lombok.val;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.cpa.url.URLMappingDAO;

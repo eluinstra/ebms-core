@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.validation;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -20,5 +20,7 @@
 // Generated on: 2023.02.07 at 10:26:37 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://schemas.xmlsoap.org/soap/envelope/")
+@jakarta.xml.bind.annotation.XmlSchema(
+		namespace = "http://schemas.xmlsoap.org/soap/envelope/",
+		xmlns = {@jakarta.xml.bind.annotation.XmlNs(prefix = "soap", namespaceURI = "http://schemas.xmlsoap.org/soap/envelope/")})
 package org.xmlsoap.schemas.soap.envelope;

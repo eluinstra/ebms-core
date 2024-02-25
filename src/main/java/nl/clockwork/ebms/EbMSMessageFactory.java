@@ -15,12 +15,12 @@
  */
 package nl.clockwork.ebms;
 
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import lombok.AccessLevel;

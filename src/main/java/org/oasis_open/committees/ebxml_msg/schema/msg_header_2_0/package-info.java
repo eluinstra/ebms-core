@@ -20,7 +20,8 @@
 // Generated on: 2023.02.07 at 10:26:37 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(
+@jakarta.xml.bind.annotation.XmlSchema(
 		namespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd",
-		elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+		xmlns = {@jakarta.xml.bind.annotation.XmlNs(prefix = "eb", namespaceURI = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")},
+		elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0;

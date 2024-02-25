@@ -15,10 +15,10 @@
  */
 package nl.clockwork.ebms.delivery;
 
+import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.util.Optional;
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;

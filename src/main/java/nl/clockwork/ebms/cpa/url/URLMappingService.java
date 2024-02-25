@@ -19,8 +19,8 @@ import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlElement;
 import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
 
 @WebService(
 		name = "UrlMappingService",

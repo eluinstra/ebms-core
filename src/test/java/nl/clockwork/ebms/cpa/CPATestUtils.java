@@ -16,10 +16,10 @@
 package nl.clockwork.ebms.cpa;
 
 import io.vavr.Function1;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
-import javax.xml.bind.JAXBException;
 import lombok.val;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import org.apache.commons.io.IOUtils;
