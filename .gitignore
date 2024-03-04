@@ -2,6 +2,7 @@
 .factorypath
 .project
 .settings
+effective-pom.xml
 target
 
 .vscode
