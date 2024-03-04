@@ -21,7 +21,7 @@
   <parent>
     <groupId>nl.clockwork.ebms</groupId>
     <artifactId>ebms</artifactId>
-    <version>2.20.0-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
   <groupId>nl.clockwork.ebms.cache.ehcache</groupId>
   <artifactId>ebms-ehcache</artifactId>

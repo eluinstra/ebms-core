@@ -1,5 +1,6 @@
 .classpath
 .factorypath
+.flattened-pom.xml
 .project
 .settings
 effective-pom.xml

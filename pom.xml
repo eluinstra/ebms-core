@@ -22,7 +22,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.clockwork.ebms</groupId>
   <artifactId>ebms</artifactId>
-  <version>2.20.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
   <name>EbMS 2.0</name>
   <description>This library implements the ebXML Message Specification version 2.0, which defines a communications-protocol neutral method for exchanging electronic business messages through the exchange of XML based messages.</description>
@@ -89,6 +89,7 @@
     <module>ignite</module>
   </modules>
   <properties>
+    <revision>2.20.0-SNAPSHOT</revision>
     <checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
     <checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
@@ -138,6 +139,31 @@
                     </project>
                 </configuration>
             </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
       <plugin>
