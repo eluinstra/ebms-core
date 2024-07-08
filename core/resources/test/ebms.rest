@@ -1,6 +1,6 @@
 ### validateCPA
 
-POST http://localhost:8080/service/rest/v19/cpas/validate
+POST https://localhost:8443/service/rest/v19/cpas/validate
 Content-Type: text/plain
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -447,7 +447,7 @@ Content-Type: text/plain
 
 ### insertCPA
 
-POST http://localhost:8080/service/rest/v19/cpas?overwrite=true
+POST https://localhost:8443/service/rest/v19/cpas?overwrite=true
 Content-Type: text/plain
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -894,23 +894,23 @@ Content-Type: text/plain
 
 ### getCPAIds
 
-GET http://localhost:8080/service/rest/v19/cpas
+GET https://localhost:8443/service/rest/v19/cpas
 
 ### getCPA
 
-GET http://localhost:8080/service/rest/v19/cpas/cpaStubEBF.rm.https.signed
+GET https://localhost:8443/service/rest/v19/cpas/cpaStubEBF.rm.https.signed
 
 ### deleteCPA
 
-DELETE http://localhost:8080/service/rest/v19/cpas/cpaStubEBF.rm.https.signed
+DELETE https://localhost:8443/service/rest/v19/cpas/cpaStubEBF.rm.https.signed
 
 ### deleteCache
 
-DELETE http://localhost:8080/service/rest/v19/cpas/cache
+DELETE https://localhost:8443/service/rest/v19/cpas/cache
 
 ### setURLMapping
 
-POST http://localhost:8080/service/rest/v19/urlMappings
+POST https://localhost:8443/service/rest/v19/urlMappings
 Content-Type: application/json
 
 {
@@ -920,19 +920,19 @@ Content-Type: application/json
 
 ### getURLMappings
 
-GET http://localhost:8080/service/rest/v19/urlMappings
+GET https://localhost:8443/service/rest/v19/urlMappings
 
 ### deleteURLMapping
 
-DELETE http://localhost:8080/service/rest/v19/urlMappings/http%3A%2F%2Fwww.a.com
+DELETE https://localhost:8443/service/rest/v19/urlMappings/http%3A%2F%2Fwww.a.com
 
 ### deleteCache
 
-DELETE http://localhost:8080/service/rest/v19/urlMappings/cache
+DELETE https://localhost:8443/service/rest/v19/urlMappings/cache
 
 ### setCertificateMapping
 
-POST http://localhost:8080/service/rest/v19/certificateMappings
+POST https://localhost:8443/service/rest/v19/certificateMappings
 Content-Type: application/json
 
 {
@@ -942,27 +942,27 @@ Content-Type: application/json
 
 ### getCertificateMappings
 
-GET http://localhost:8080/service/rest/v19/certificateMappings
+GET https://localhost:8443/service/rest/v19/certificateMappings
 
 ### deleteCertificateMapping
 
-DELETE http://localhost:8080/service/rest/v19/certificateMappings
+DELETE https://localhost:8443/service/rest/v19/certificateMappings
 Content-Type: text/plain
 
 MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
 
 ### deleteCache
 
-DELETE http://localhost:8080/service/rest/v19/certificateMappings/cache
+DELETE https://localhost:8443/service/rest/v19/certificateMappings/cache
 
 ### ping
 
-POST http://localhost:8080/service/rest/v19/ebms/ping/cpaStubEBF.rm.https.signed/from/urn:osb:oin:00000000000000000000/to/urn:osb:oin:00000000000000000001
+POST https://localhost:8443/service/rest/v19/ebms/ping/cpaStubEBF.rm.https.signed/from/urn:osb:oin:00000000000000000000/to/urn:osb:oin:00000000000000000001
 Content-Type: application/json
 
 ### sendMessage
 
-POST http://localhost:8080/service/rest/v19/ebms/messages
+POST https://localhost:8443/service/rest/v19/ebms/messages
 Content-Type: application/json
 
 {
@@ -980,7 +980,7 @@ Content-Type: application/json
 
 ### sendMessage
 
-POST http://localhost:8080/service/rest/v19/ebms/messages
+POST https://localhost:8443/service/rest/v19/ebms/messages
 Content-Type: application/json
 
 {
@@ -1002,7 +1002,7 @@ Content-Type: application/json
 
 ### sendMessageMTOM
 
-POST http://localhost:8080/service/rest/v19/ebms/messages/mtom
+POST https://localhost:8443/service/rest/v19/ebms/messages/mtom
 Content-Type: multipart/form-data; boundary=-=cTIBJ6SPK7J5=-
 
 ---=cTIBJ6SPK7J5=-
@@ -1034,35 +1034,35 @@ U2FtcGxlIG1lc3NhZ2Uu
 
 ### resendMessage
 
-PUT http://localhost:8080/service/rest/v19/ebms/messages/?
+PUT https://localhost:8443/service/rest/v19/ebms/messages/?
 Content-Type: application/json
 
 ### getUnprocessedMessageIds
 
-GET http://localhost:8080/service/rest/v19/ebms/messages/unprocessed
+GET https://localhost:8443/service/rest/v19/ebms/messages/unprocessed
 Content-Type: application/json
 
 ### getMessage
 
-GET http://localhost:8080/service/rest/v19/ebms/messages/?
+GET https://localhost:8443/service/rest/v19/ebms/messages/?
 
 ### getMessageMTOM
 
-GET http://localhost:8080/service/rest/v19/ebms/messages/mtom/?
+GET https://localhost:8443/service/rest/v19/ebms/messages/mtom/?
 
 ### processMessage
 
-PATCH http://localhost:8080/service/rest/v19/ebms/messages/?
+PATCH https://localhost:8443/service/rest/v19/ebms/messages/?
 
 ### getMessageStatus
 
-GET http://localhost:8080/service/rest/v19/ebms/messages/?/status
+GET https://localhost:8443/service/rest/v19/ebms/messages/?/status
 
 ### getUnprocessedMessageEvents
 
-GET http://localhost:8080/service/rest/v19/ebms/events/unprocessed
+GET https://localhost:8443/service/rest/v19/ebms/events/unprocessed
 Content-Type: application/json
 
 ### processMessageEvent
 
-PATCH  http://localhost:8080/service/rest/v19/ebms/events/?
+PATCH  https://localhost:8443/service/rest/v19/ebms/events/?

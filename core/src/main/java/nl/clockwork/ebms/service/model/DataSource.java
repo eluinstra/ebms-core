@@ -19,12 +19,13 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -32,7 +33,6 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class DataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -46,11 +46,4 @@ public class DataSource implements Serializable
 	@NonNull
 	@ToString.Exclude
 	byte[] content;
-
-	public DataSource(String name, String contentType, byte[] content)
-	{
-		this.name = name;
-		this.contentType = contentType;
-		this.content = content;
-	}
 }
