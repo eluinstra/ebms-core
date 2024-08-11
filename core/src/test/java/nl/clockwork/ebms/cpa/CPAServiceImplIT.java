@@ -48,7 +48,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ContextConfiguration(
 		classes = {PropertiesConfig.class, CPAServiceConfig.class, CPAManagerConfig.class, URLMappingServiceConfig.class, DataSourceConfig.class,
 				TransactionManagerConfig.class})
-class CPAServiceImplTest implements WithFile
+class CPAServiceImplIT implements WithFile
 {
 	@Container
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();

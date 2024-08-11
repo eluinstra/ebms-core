@@ -51,7 +51,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
-public class CPAManagerTests
+public class CPAManagerTest
 {
 	private static final String DEFAULT_CPA_ID = "cpaStubEBF.rm.https.signed";
 	private static final String ENCRYPTED_CPA_ID = "cpaStubEBF.rm.https.signed.encrypted";

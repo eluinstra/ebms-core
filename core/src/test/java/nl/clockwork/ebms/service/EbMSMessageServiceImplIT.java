@@ -50,7 +50,7 @@ import org.thymeleaf.TemplateEngine;
 @TestInstance(Lifecycle.PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
 @Testcontainers
-class EbMSMessageServiceImplTest implements WithFile, WithTemplate, WithRestAssured
+class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssured
 {
 	@Container
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();

@@ -48,7 +48,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {PropertiesConfig.class, CertificateMappingServiceConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
-class CertificateMappingServiceImplTest
+class CertificateMappingServiceImplIT
 {
 	@Container
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
