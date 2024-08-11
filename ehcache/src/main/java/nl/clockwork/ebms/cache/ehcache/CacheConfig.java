@@ -16,15 +16,14 @@
 package nl.clockwork.ebms.cache.ehcache;
 
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import lombok.val;
-import nl.clockwork.ebms.cache.SomeCacheType;
+import java.io.IOException;
+
+import org.ehcache.jsr107.Eh107Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
+import org.springframework.cache.jcache.JCacheCacheManager;
+import org.springframework.cache.jcache.JCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -33,6 +32,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cache.SomeCacheType;
 
 @Configuration
 @EnableCaching
@@ -48,28 +51,18 @@ public class CacheConfig
 
 	@Bean
 	@Conditional(EhCacheCacheType.class)
-	public CacheManager ehcacheCacheManager()
-	{
-		val result = new EhCacheCacheManager();
-		result.setCacheManager(createCacheManager());
-		return result;
+	public JCacheManagerFactoryBean cacheManagerFactoryBean() throws IOException {
+			JCacheManagerFactoryBean jCacheManagerFactoryBean = new JCacheManagerFactoryBean();
+			jCacheManagerFactoryBean.setCacheManagerUri(getConfigLocation().getURI());
+			return jCacheManagerFactoryBean;
 	}
 
-	private net.sf.ehcache.CacheManager createCacheManager()
-	{
-		val result = createEhCacheManager(getConfigLocation());
-		result.addCache("CPA");
-		result.addCache("URLMapping");
-		result.addCache("CertificateMapping");
-		return result;
-	}
-
-	private net.sf.ehcache.CacheManager createEhCacheManager(Resource configLocation)
-	{
-		val ehCacheManagerFactory = new EhCacheManagerFactoryBean();
-		ehCacheManagerFactory.setConfigLocation(configLocation);
-		ehCacheManagerFactory.afterPropertiesSet();
-		return ehCacheManagerFactory.getObject();
+	@Bean
+	@Conditional(EhCacheCacheType.class)
+	public CacheManager cacheManager() throws IOException {
+			final JCacheCacheManager jCacheCacheManager = new JCacheCacheManager();
+			jCacheCacheManager.setCacheManager(cacheManagerFactoryBean().getObject());
+			return jCacheCacheManager;
 	}
 
 	private Resource getConfigLocation()

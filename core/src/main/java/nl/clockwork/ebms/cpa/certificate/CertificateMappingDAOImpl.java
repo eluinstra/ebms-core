@@ -30,6 +30,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -38,6 +40,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@CacheConfig(cacheNames={"CertificateMapping"})
 class CertificateMappingDAOImpl implements CertificateMappingDAO
 {
 	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>

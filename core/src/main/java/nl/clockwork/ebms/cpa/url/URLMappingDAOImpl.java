@@ -23,6 +23,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -31,6 +33,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@CacheConfig(cacheNames={"URLMapping"})
 class URLMappingDAOImpl implements URLMappingDAO
 {
 	@NonNull
