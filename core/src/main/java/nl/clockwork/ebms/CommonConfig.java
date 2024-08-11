@@ -24,6 +24,8 @@ import org.apache.xml.security.Init;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -38,33 +40,23 @@ public class CommonConfig
 	@Value("${logging.mdc}")
 	Status mdc;
 
-	@Bean
-	public void initXMLSecurity()
+	@EventListener(ContextRefreshedEvent.class)
+	public void init()
 	{
 		Init.init();
+		EbMSAttachmentFactory.init(attachmentOutputDirectory,attachmentMemoryTreshold,attachmentCipherTransformation);
+		LoggingUtils.mdc = mdc;
 	}
 
 	@Bean
 	public EbMSMessageFactory ebMSMessageFactory(CPAManager cpaManager, EbMSIdGenerator ebMSIdGenerator)
 	{
-		return new EbMSMessageFactory(cpaManager, ebMSIdGenerator);
-	}
-
-	@Bean
-	public void ebMSAttachmentFactory()
-	{
-		EbMSAttachmentFactory.init(attachmentOutputDirectory, attachmentMemoryTreshold, attachmentCipherTransformation);
+		return new EbMSMessageFactory(cpaManager,ebMSIdGenerator);
 	}
 
 	@Bean
 	public EbMSIdGenerator ebMSIdGenerator()
 	{
 		return new EbMSIdGenerator();
-	}
-
-	@Bean
-	public void configureLoggingUtils()
-	{
-		LoggingUtils.mdc = mdc;
 	}
 }

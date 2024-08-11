@@ -39,10 +39,13 @@ import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransaction
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -185,8 +188,8 @@ public class DataSourceConfig
 		return m.find() ? Optional.of(m) : Optional.empty();
 	}
 
-	@Bean
-	public void flyway()
+	@EventListener(ContextRefreshedEvent.class)
+	public void init()
 	{
 		if (updateDb)
 		{
