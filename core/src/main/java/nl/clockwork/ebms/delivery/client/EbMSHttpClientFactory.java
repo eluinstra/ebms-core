@@ -78,7 +78,7 @@ public class EbMSHttpClientFactory
 		this.httpErrors = httpErrors;
 		this.certificateMapper = certificateMapper;
 		this.useClientCertificate = useClientCertificate;
-		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.toString(verifyHostnames));
+		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.toString(!verifyHostnames));
 	}
 
 	public EbMSClient getEbMSClient(String clientAlias)
