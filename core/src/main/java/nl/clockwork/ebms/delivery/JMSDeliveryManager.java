@@ -38,8 +38,10 @@ import nl.clockwork.ebms.model.EbMSRequestMessage;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.xml.sax.SAXException;
 
 @Slf4j
@@ -48,6 +50,8 @@ public class JMSDeliveryManager extends DeliveryManager
 {
 	private static final String JMS_DESTINATION_NAME = "MESSAGE";
 	@NonNull
+	PlatformTransactionManager transactionManager;
+	@NonNull
 	JmsTemplate jmsTemplate;
 
 	@Builder(builderMethodName = "jmsDeliveryManagerBuilder")
@@ -55,9 +59,11 @@ public class JMSDeliveryManager extends DeliveryManager
 			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
 			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,
+			@NonNull PlatformTransactionManager transactionManager,
 			@NonNull JmsTemplate jmsTemplate)
 	{
 		super(messageQueue, cpaManager, ebMSClientFactory);
+		this.transactionManager = transactionManager;
 		this.jmsTemplate = jmsTemplate;
 	}
 
@@ -74,10 +80,7 @@ public class JMSDeliveryManager extends DeliveryManager
 				return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
 			else if (message.getSyncReply() == null)
 			{
-				jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
-				return Optional.ofNullable(
-						(EbMSResponseMessage)jmsTemplate
-								.receiveSelectedAndConvert(JMS_DESTINATION_NAME, "JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
+				return receiveMessage(messageHeader);
 			}
 			return Optional.empty();
 		}
@@ -91,17 +94,44 @@ public class JMSDeliveryManager extends DeliveryManager
 		}
 	}
 
+	private Optional<EbMSResponseMessage> receiveMessage(final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
+	{
+		val status = transactionManager.getTransaction(null);
+		try
+		{
+			jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
+			val result = jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME, "JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'");
+			transactionManager.commit(status);
+			return Optional.ofNullable((EbMSResponseMessage)result);
+		}
+		catch (JmsException e)
+		{
+			transactionManager.rollback(status);
+			throw new EbMSProcessorException(e);
+		}
+	}
+
 	@Override
 	public void handleResponseMessage(final EbMSResponseMessage message) throws EbMSProcessorException
 	{
-		jmsTemplate.setExplicitQosEnabled(true);
-		jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
-		jmsTemplate.convertAndSend(JMS_DESTINATION_NAME, message, m ->
+		val status = transactionManager.getTransaction(null);
+		try
 		{
-			m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
-			// m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
-			return m;
-		});
+			jmsTemplate.setExplicitQosEnabled(true);
+			jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
+			jmsTemplate.convertAndSend(JMS_DESTINATION_NAME, message, m ->
+			{
+				m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
+				// m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
+				return m;
+			});
+			transactionManager.commit(status);
+		}
+		catch (JmsException e)
+		{
+			transactionManager.commit(status);
+			throw new EbMSProcessorException(e);
+		}
 	}
 
 	@Async("deliveryManagerTaskExecutor")

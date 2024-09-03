@@ -14,7 +14,7 @@
 -- limitations under the License.
 --
 
-RENAME TABLE url TO url_mapping; 
+ALTER TABLE url RENAME TO url_mapping; 
 
 CREATE TABLE certificate_mapping
 (
