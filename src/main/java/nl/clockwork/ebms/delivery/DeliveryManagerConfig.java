@@ -22,6 +22,7 @@ import lombok.val;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -52,7 +54,10 @@ public class DeliveryManagerConfig
 	@Autowired
 	CPAManager cpaManager;
 	@Autowired
-	EbMSHttpClientFactory ebMSClientFactory;;
+	EbMSHttpClientFactory ebMSClientFactory;
+	@Autowired
+	@Qualifier("jmsTransactionManager")
+	PlatformTransactionManager transactionManager;
 
 	@Bean("deliveryManagerTaskExecutor")
 	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor()
@@ -84,6 +89,7 @@ public class DeliveryManagerConfig
 				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
+				.transactionManager(transactionManager)
 				.jmsTemplate(new JmsTemplate(connectionFactory))
 				.build();
 	}

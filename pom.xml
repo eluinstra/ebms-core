@@ -652,8 +652,8 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <packageName>nl.clockwork.ebms</packageName>
               <addClasspath>true</addClasspath>
-              <addExtensions />
-              <classpathPrefix />
+              <addExtensions/>
+              <classpathPrefix/>
             </manifest>
             <manifestEntries>
               <mode>development</mode>
@@ -740,8 +740,8 @@
                 <include>.gitignore</include>
                 <include>src/*/resources/**/*.properties</include>
               </includes>
-              <trimTrailingWhitespace />
-              <endWithNewline />
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
               <indent>
                 <tabs>true</tabs>
                 <spacesPerTab>2</spacesPerTab>
@@ -776,8 +776,8 @@
             <eclipse>
               <file>${basedir}/.eclipse-formatter.xml</file>
             </eclipse>
-            <removeUnusedImports />
-            <importOrder />
+            <removeUnusedImports/>
+            <importOrder/>
             <licenseHeader>
               <file>${basedir}/resources/license/java-header.txt</file>
             </licenseHeader>
@@ -786,7 +786,7 @@
             <includes>
               <include>**/*.md</include>
             </includes>
-            <flexmark />
+            <flexmark/>
           </markdown>
           <pom>
             <sortPom>
@@ -799,7 +799,7 @@
               <indentBlankLines>false</indentBlankLines>
               <indentSchemaLocation>false</indentSchemaLocation>
               <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
-              <sortOrderFile />
+              <sortOrderFile/>
               <sortDependencies>scope,artifactId,groupId</sortDependencies>
               <sortDependencyExclusions>scope,artifactId,groupId</sortDependencyExclusions>
               <sortPlugins>scope,artifactId,groupId</sortPlugins>
