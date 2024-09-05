@@ -22,7 +22,6 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource(value = {"classpath:nl/clockwork/ebms/default.properties"}, ignoreResourceNotFound = false)
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PropertiesConfig
 {
 }

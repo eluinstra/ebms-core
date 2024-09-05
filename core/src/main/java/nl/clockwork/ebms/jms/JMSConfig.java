@@ -25,7 +25,8 @@ import lombok.val;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
-import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQXAConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -67,11 +68,8 @@ public class JMSConfig
 	@DependsOn("brokerFactory")
 	public ConnectionFactory pooledConnectionFactor() throws Exception
 	{
-		// TransportConfiguration transportConfiguration = new TransportConfiguration(NettyConnectorFactory.class.getName());
-		// return ActiveMQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF,transportConfiguration);
-		// return ActiveMQJMSClient.createConnectionFactory(jmsBrokerUrl, username);
-		var result = new ActiveMQConnectionFactory(jmsBrokerUrl);
-		result.setThreadPoolMaxSize(maxPoolSize);
+		val result = new PooledConnectionFactory(jmsBrokerUrl);
+		result.setMaxConnections(maxPoolSize);
 		return result;
 	}
 
@@ -104,10 +102,10 @@ public class JMSConfig
 
 	private XAConnectionFactory createXAConnectionFactory()
 	{
-		val result = new ActiveMQConnectionFactory(jmsBrokerUrl);
+		val result = new ActiveMQXAConnectionFactory(jmsBrokerUrl);
 		if (StringUtils.isNotEmpty(username))
 		{
-			result.setUser(username);
+			result.setUserName(username);
 			result.setPassword(password);
 		}
 		return result;
