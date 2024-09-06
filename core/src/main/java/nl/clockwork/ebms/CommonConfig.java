@@ -44,14 +44,14 @@ public class CommonConfig
 	public void init()
 	{
 		Init.init();
-		EbMSAttachmentFactory.init(attachmentOutputDirectory,attachmentMemoryTreshold,attachmentCipherTransformation);
+		EbMSAttachmentFactory.init(attachmentOutputDirectory, attachmentMemoryTreshold, attachmentCipherTransformation);
 		LoggingUtils.mdc = mdc;
 	}
 
 	@Bean
 	public EbMSMessageFactory ebMSMessageFactory(CPAManager cpaManager, EbMSIdGenerator ebMSIdGenerator)
 	{
-		return new EbMSMessageFactory(cpaManager,ebMSIdGenerator);
+		return new EbMSMessageFactory(cpaManager, ebMSIdGenerator);
 	}
 
 	@Bean

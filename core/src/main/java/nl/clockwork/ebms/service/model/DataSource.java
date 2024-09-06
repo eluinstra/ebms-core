@@ -19,8 +19,6 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
-
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

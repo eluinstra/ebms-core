@@ -44,7 +44,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@CacheConfig(cacheNames={"CPA"})
+@CacheConfig(cacheNames = {"CPA"})
 public class CPAManager
 {
 	@NonNull

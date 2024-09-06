@@ -15,10 +15,10 @@
  */
 package nl.clockwork.ebms.cache.ehcache;
 
-
 import java.io.IOException;
-
-import org.ehcache.jsr107.Eh107Configuration;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cache.SomeCacheType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -32,10 +32,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cache.SomeCacheType;
 
 @Configuration
 @EnableCaching
@@ -51,18 +47,20 @@ public class CacheConfig
 
 	@Bean
 	@Conditional(EhCacheCacheType.class)
-	public JCacheManagerFactoryBean cacheManagerFactoryBean() throws IOException {
-			JCacheManagerFactoryBean jCacheManagerFactoryBean = new JCacheManagerFactoryBean();
-			jCacheManagerFactoryBean.setCacheManagerUri(getConfigLocation().getURI());
-			return jCacheManagerFactoryBean;
+	public JCacheManagerFactoryBean cacheManagerFactoryBean() throws IOException
+	{
+		JCacheManagerFactoryBean jCacheManagerFactoryBean = new JCacheManagerFactoryBean();
+		jCacheManagerFactoryBean.setCacheManagerUri(getConfigLocation().getURI());
+		return jCacheManagerFactoryBean;
 	}
 
 	@Bean
 	@Conditional(EhCacheCacheType.class)
-	public CacheManager cacheManager() throws IOException {
-			final JCacheCacheManager jCacheCacheManager = new JCacheCacheManager();
-			jCacheCacheManager.setCacheManager(cacheManagerFactoryBean().getObject());
-			return jCacheCacheManager;
+	public CacheManager cacheManager() throws IOException
+	{
+		final JCacheCacheManager jCacheCacheManager = new JCacheCacheManager();
+		jCacheCacheManager.setCacheManager(cacheManagerFactoryBean().getObject());
+		return jCacheCacheManager;
 	}
 
 	private Resource getConfigLocation()

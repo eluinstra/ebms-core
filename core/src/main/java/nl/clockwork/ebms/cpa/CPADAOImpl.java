@@ -33,7 +33,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-@CacheConfig(cacheNames={"CPA"})
+@CacheConfig(cacheNames = {"CPA"})
 class CPADAOImpl implements CPADAO
 {
 	JdbcTemplate jdbcTemplate;

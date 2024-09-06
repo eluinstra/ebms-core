@@ -16,9 +16,7 @@
     limitations under the License.
 
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.clockwork.ebms</groupId>
   <artifactId>ebms</artifactId>
@@ -63,6 +61,11 @@
       <timezone>1</timezone>
     </developer>
   </developers>
+  <modules>
+    <module>core</module>
+    <module>ehcache</module>
+    <module>ignite</module>
+  </modules>
   <scm>
     <connection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</connection>
     <developerConnection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</developerConnection>
@@ -83,24 +86,64 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  <modules>
-    <module>core</module>
-    <module>ehcache</module>
-    <module>ignite</module>
-  </modules>
   <properties>
-    <revision>2.20.0-SNAPSHOT</revision>
     <checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
     <checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <revision>2.20.0-SNAPSHOT</revision>
   </properties>
-  <dependencies>
-  </dependencies>
+  <dependencies/>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>directory-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>directories</id>
+            <goals>
+              <goal>directory-of</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <property>maven-parent.basedir</property>
+              <project>
+                <groupId>nl.clockwork.ebms</groupId>
+                <artifactId>ebms</artifactId>
+              </project>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten.clean</id>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <phase>clean</phase>
+          </execution>
+          <execution>
+            <id>flatten</id>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+            <phase>process-resources</phase>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
@@ -117,52 +160,6 @@
               <goal>report</goal>
             </goals>
             <phase>test</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.commonjava.maven.plugins</groupId>
-        <artifactId>directory-maven-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-            <execution>
-                <id>directories</id>
-                <goals>
-                    <goal>directory-of</goal>
-                </goals>
-                <phase>initialize</phase>
-                <configuration>
-                    <property>maven-parent.basedir</property>
-                    <project>
-                        <groupId>nl.clockwork.ebms</groupId>
-                        <artifactId>ebms</artifactId>
-                    </project>
-                </configuration>
-            </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.6.0</version>
-        <configuration>
-          <updatePomFile>true</updatePomFile>
-          <flattenMode>resolveCiFriendliesOnly</flattenMode>
-        </configuration>
-        <executions>
-          <execution>
-            <id>flatten</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>flatten</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>flatten.clean</id>
-            <phase>clean</phase>
-            <goals>
-              <goal>clean</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
@@ -196,18 +193,6 @@
               <goal>format</goal>
             </goals>
             <phase>package</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.3.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
@@ -269,6 +254,18 @@
                 </requireJavaVersion>
               </rules>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -395,19 +392,19 @@
               <eclipseWtp>
                 <type>XML</type>
                 <files>
-                  <file>${project.basedir}/.spotless.xml.prefs</file>
+                  <file>${maven.multiModuleProjectDirectory}/.spotless.xml.prefs</file>
                 </files>
               </eclipseWtp>
             </format> -->
           </formats>
           <java>
             <eclipse>
-              <file>${basedir}/.eclipse-formatter.xml</file>
+              <file>${maven.multiModuleProjectDirectory}/.eclipse-formatter.xml</file>
             </eclipse>
             <removeUnusedImports/>
             <importOrder/>
             <licenseHeader>
-              <file>${basedir}/resources/license/java-header.txt</file>
+              <file>${maven.multiModuleProjectDirectory}/resources/license/java-header.txt</file>
             </licenseHeader>
           </java>
           <markdown>
