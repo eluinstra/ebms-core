@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -38,11 +39,12 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 @Configuration
 @EnableCaching
 @Conditional(SomeCacheType.class)
+@PropertySource(value = {"classpath:nl/clockwork/ebms/cache/ignite/default.properties"}, ignoreResourceNotFound = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CacheConfig
+public class IgniteConfig
 {
 	private static final String CACHE_TYPE = "IGNITE";
-	private static final String DEFAULT_CONFIG_LOCATION = "nl/clockwork/ebms/ignite.xml";
+	private static final String DEFAULT_CONFIG_LOCATION = "nl/clockwork/ebms/cache/ignite/ignite.xml";
 
 	@Value("${cache.configLocation}")
 	Resource configLocation;

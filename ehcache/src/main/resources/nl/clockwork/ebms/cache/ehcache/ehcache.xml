@@ -15,17 +15,36 @@
     limitations under the License.
 
 -->
-<ehcache>
-  <diskStore path="java.io.tmpdir"/>
-	<defaultCache
-		maxEntriesLocalHeap="10000"
-		eternal="false"
-		timeToIdleSeconds="120"
-		timeToLiveSeconds="120"
-		overflowToDisk="true"
-		maxEntriesLocalDisk="100000"
-		diskPersistent="true"
-		diskExpiryThreadIntervalSeconds="120"
-		memoryStoreEvictionPolicy="LRU"
-	/>
-</ehcache>
+<config
+  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+  xmlns='http://www.ehcache.org/v3'
+  xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+  xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.10.xsd
+                      http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.10.xsd">
+
+  <persistence directory="/tmp/cache" />
+
+  <thread-pools> 
+    <thread-pool alias="defaultDiskPool" min-size="1" max-size="3" default="true" />
+  </thread-pools>
+
+  <heap-store>
+    <max-object-size>1000</max-object-size>
+  </heap-store>
+
+  <disk-store thread-pool="defaultDiskPool" />
+
+  <cache-template name="defaultCache">
+    <expiry>
+      <none />
+    </expiry>
+    <heap unit="entries">100</heap>
+  </cache-template>
+
+  <cache alias="CPA" uses-template="defaultCache"/>
+  <cache alias="URLMapping" uses-template="defaultCache">
+    <heap unit="entries">250</heap>
+  </cache>
+  <cache alias="CertificateMapping" uses-template="defaultCache"/>
+
+</config>

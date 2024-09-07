@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -36,11 +37,12 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 @Configuration
 @EnableCaching
 @Conditional(SomeCacheType.class)
+@PropertySource(value = {"classpath:nl/clockwork/ebms/cache/ehcache/default.properties"}, ignoreResourceNotFound = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CacheConfig
+public class EhCacheConfig
 {
 	private static final String CACHE_TYPE = "EHCACHE";
-	private static final String DEFAULT_CONFIG_LOCATION = "nl/clockwork/ebms/ehcache.xml";
+	private static final String DEFAULT_CONFIG_LOCATION = "nl/clockwork/ebms/cache/ehcache/ehcache.xml";
 
 	@Value("${cache.configLocation}")
 	Resource configLocation;
@@ -56,10 +58,10 @@ public class CacheConfig
 
 	@Bean
 	@Conditional(EhCacheCacheType.class)
-	public CacheManager cacheManager() throws IOException
+	public CacheManager cacheManager(JCacheManagerFactoryBean jCacheManagerFactoryBean)
 	{
 		final JCacheCacheManager jCacheCacheManager = new JCacheCacheManager();
-		jCacheCacheManager.setCacheManager(cacheManagerFactoryBean().getObject());
+		jCacheCacheManager.setCacheManager(jCacheManagerFactoryBean.getObject());
 		return jCacheCacheManager;
 	}
 

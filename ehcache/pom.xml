@@ -108,7 +108,6 @@
                 <exclude>META-INF/*.RSA</exclude>
                 <exclude>META-INF/LICENSE</exclude>
                 <exclude>module-info.class</exclude>
-                <exclude>**/Log4j2Plugins.dat</exclude>
               </excludes>
             </filter>
           </filters>
