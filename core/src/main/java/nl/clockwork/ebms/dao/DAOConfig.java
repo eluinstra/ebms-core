@@ -20,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,10 +32,14 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class DAOConfig
 {
 	@Bean
-	public EbMSDAOImpl ebMSDAO(@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager, DataSource dataSource)
+	public EbMSDAOImpl ebMSDAO(
+			@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager,
+			DataSource dataSource,
+			@Value("${ebms.dao.maxAttempts}") int maxAttempts,
+			@Value("${ebms.dao.intervalInMillis}") long interval)
 	{
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSDAOImpl(transactionTemplate, jdbcTemplate);
+		return new EbMSDAOImpl(transactionTemplate, jdbcTemplate, maxAttempts, interval);
 	}
 }
