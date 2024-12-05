@@ -180,7 +180,10 @@ class AcknowledgmentProcessor
 		catch (ValidatorException e)
 		{
 			val persistTime = ebMSDAO.getPersistTime(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp, persistTime.orElse(null), acknowledgmentDocument.getMessage(), acknowledgment, Collections.emptyList(), null);
+			ebMSDAO.getRetryTemplate()
+					.execute(
+							ctx -> ebMSDAO
+									.insertMessage(timestamp, persistTime.orElse(null), acknowledgmentDocument.getMessage(), acknowledgment, Collections.emptyList(), null));
 			log.warn("Unable to process Acknowledgment " + acknowledgment.getMessageHeader().getMessageData().getMessageId(), e);
 		}
 	}
@@ -205,6 +208,10 @@ class AcknowledgmentProcessor
 					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 			}
 		};
-		ebMSDAO.executeTransaction(storeMessage);
+		ebMSDAO.getRetryTemplate().execute(ctx ->
+		{
+			ebMSDAO.executeTransaction(storeMessage);
+			return null;
+		});
 	}
 }

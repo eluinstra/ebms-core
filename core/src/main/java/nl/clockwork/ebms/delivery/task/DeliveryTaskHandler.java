@@ -118,7 +118,7 @@ class DeliveryTaskHandler
 		val receiveDeliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
 		val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
-		val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId());
+		val requestDocument = ebMSDAO.getRetryTemplate().execute(ctx -> ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId()));
 		StreamUtils.ifPresentOrElse(requestDocument, d -> sendTask(task, receiveDeliveryChannel, url, d), () ->
 		{
 			log.info("Finished task " + task);
@@ -166,7 +166,11 @@ class DeliveryTaskHandler
 						ebMSDAO.deleteAttachments(task.getMessageId());
 				}
 		};
-		ebMSDAO.executeTransaction(runnable);
+		ebMSDAO.getRetryTemplate().execute(ctx ->
+		{
+			ebMSDAO.executeTransaction(runnable);
+			return null;
+		});
 	}
 
 	private void sendMessage(final DeliveryTask task, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument)

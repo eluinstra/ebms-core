@@ -27,11 +27,14 @@ import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageFilter;
+import org.springframework.retry.support.RetryTemplate;
 import org.w3c.dom.Document;
 
 public interface EbMSDAO
 {
 	void executeTransaction(Runnable runnable);
+
+	RetryTemplate getRetryTemplate();
 
 	boolean existsMessage(String messageId);
 

@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -144,6 +145,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	JdbcTemplate jdbcTemplate;
 	int maxAttempts;
 	long interval;
+	@Getter
 	RetryTemplate retryTemplate;
 	@NonNull
 	RowMapper<EbMSAttachment> ebMSAttachmentRowMapper = (rs, rowNum) ->
@@ -189,7 +191,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		this.jdbcTemplate = jdbcTemplate;
 		this.maxAttempts = maxAttempts;
 		this.interval = interval;
-		this.retryTemplate = RetryTemplate.builder().maxAttempts(maxAttempts).fixedBackoff(interval).retryOn(CannotAcquireLockException.class).build();
+		this.retryTemplate =
+				RetryTemplate.builder().maxAttempts(maxAttempts).fixedBackoff(interval).retryOn(CannotAcquireLockException.class).traversingCauses().build();
 	}
 
 	@Override
@@ -201,20 +204,17 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@Override
 	public boolean existsMessage(String messageId)
 	{
-		return retryTemplate.execute(
-				ctx -> jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ?", Integer.class, messageId)) > 0;
+		return jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ?", Integer.class, messageId) > 0;
 	}
 
 	@Override
 	public boolean existsIdenticalMessage(EbMSBaseMessage message)
 	{
-		return retryTemplate.execute(
-				ctx -> jdbcTemplate.queryForObject(
-						"select count(message_id) from ebms_message where message_id = ? and cpa_id = ?",
-						Integer.class,
-						message.getMessageHeader().getMessageData().getMessageId(),
-						message.getMessageHeader().getCPAId()))
-				> 0;
+		return jdbcTemplate.queryForObject(
+				"select count(message_id) from ebms_message where message_id = ? and cpa_id = ?",
+				Integer.class,
+				message.getMessageHeader().getMessageData().getMessageId(),
+				message.getMessageHeader().getCPAId()) > 0;
 	}
 
 	@Override
@@ -236,9 +236,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		try
 		{
 			return Optional.of(
-					retryTemplate.execute(
-							ctx -> jdbcTemplate
-									.queryForObject(MessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new MessageContextRowMapper(), messageId)));
+					jdbcTemplate.queryForObject(MessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new MessageContextRowMapper(), messageId));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -252,11 +250,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		try
 		{
 			return Optional.of(
-					retryTemplate.execute(
-							ctx -> jdbcTemplate.queryForObject(
-									EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ?",
-									new EbMSMessageContextRowMapper(),
-									messageId)));
+					jdbcTemplate
+							.queryForObject(EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new EbMSMessageContextRowMapper(), messageId));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -270,22 +265,21 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		try
 		{
 			return Optional.of(
-					retryTemplate.execute(
-							ctx -> jdbcTemplate.queryForObject(
-									EbMSMessageContextRowMapper.SELECT
-											+ " from ebms_message"
-											+ " where cpa_id = ?"
-											+ " and ref_to_message_id = ?"
-											+ (actions.length == 0
-													? ""
-													: " and service = '"
-															+ EbMSAction.EBMS_SERVICE_URI
-															+ "' and action in ('"
-															+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
-															+ "')"),
-									new EbMSMessageContextRowMapper(),
-									cpaId,
-									refToMessageId)));
+					jdbcTemplate.queryForObject(
+							EbMSMessageContextRowMapper.SELECT
+									+ " from ebms_message"
+									+ " where cpa_id = ?"
+									+ " and ref_to_message_id = ?"
+									+ (actions.length == 0
+											? ""
+											: " and service = '"
+													+ EbMSAction.EBMS_SERVICE_URI
+													+ "' and action in ('"
+													+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
+													+ "')"),
+							new EbMSMessageContextRowMapper(),
+							cpaId,
+							refToMessageId));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -318,11 +312,10 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			val content = retryTemplate.execute(
-					ctx -> jdbcTemplate.queryForObject(
-							"select content from ebms_message where message_id = ? and (status is null or status = " + EbMSMessageStatus.CREATED.getId() + ")",
-							String.class,
-							messageId));
+			val content = jdbcTemplate.queryForObject(
+					"select content from ebms_message where message_id = ? and (status is null or status = " + EbMSMessageStatus.CREATED.getId() + ")",
+					String.class,
+					messageId);
 			val builder = EbMSDocument.builder().contentId(messageId).message(DOMUtils.read(content)).attachments(getAttachments(messageId, ebMSAttachmentRowMapper));
 			return Optional.of(builder.build());
 		}
@@ -341,36 +334,35 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			val document = retryTemplate.execute(
-					ctx -> jdbcTemplate.queryForObject(
-							"select message_id, content"
-									+ " from ebms_message"
-									+ " where cpa_id = ?"
-									+ " and ref_to_message_id = ?"
-									+ (actions.length == 0
-											? ""
-											: " and service = '"
-													+ EbMSAction.EBMS_SERVICE_URI
-													+ "' and action in ('"
-													+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
-													+ "')"),
-							new RowMapper<EbMSDocument>()
+			val document = jdbcTemplate.queryForObject(
+					"select message_id, content"
+							+ " from ebms_message"
+							+ " where cpa_id = ?"
+							+ " and ref_to_message_id = ?"
+							+ (actions.length == 0
+									? ""
+									: " and service = '"
+											+ EbMSAction.EBMS_SERVICE_URI
+											+ "' and action in ('"
+											+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
+											+ "')"),
+					new RowMapper<EbMSDocument>()
+					{
+						@Override
+						public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
+						{
+							try
 							{
-								@Override
-								public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
-								{
-									try
-									{
-										return EbMSDocument.builder().contentId(rs.getString("message_id")).message(DOMUtils.read(rs.getString("content"))).build();
-									}
-									catch (ParserConfigurationException | SAXException | IOException e)
-									{
-										throw new SQLException(e);
-									}
-								}
-							},
-							cpaId,
-							refToMessageId));
+								return EbMSDocument.builder().contentId(rs.getString("message_id")).message(DOMUtils.read(rs.getString("content"))).build();
+							}
+							catch (ParserConfigurationException | SAXException | IOException e)
+							{
+								throw new SQLException(e);
+							}
+						}
+					},
+					cpaId,
+					refToMessageId);
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())
@@ -386,9 +378,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
-		return Optional
-				.ofNullable(
-						retryTemplate.execute(ctx -> jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ?", Timestamp.class, messageId)))
+		return Optional.ofNullable(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ?", Timestamp.class, messageId))
 				.map(Timestamp::toInstant);
 	}
 
@@ -397,8 +387,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			return EbMSAction
-					.get(retryTemplate.execute(ctx -> jdbcTemplate.queryForObject("select action from ebms_message where message_id = ?", String.class, messageId)));
+			return EbMSAction.get(jdbcTemplate.queryForObject("select action from ebms_message where message_id = ?", String.class, messageId));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -410,16 +399,15 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	public List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status)
 	{
 		val parameters = new ArrayList<Object>();
-		return retryTemplate.execute(
-				ctx -> jdbcTemplate.queryForList(
-						"select message_id"
-								+ " from ebms_message"
-								+ " where status = "
-								+ status.getId()
-								+ getMessageFilter(messageFilter, parameters)
-								+ " order by time_stamp asc",
-						String.class,
-						parameters.toArray(new Object[0])));
+		return jdbcTemplate.queryForList(
+				"select message_id"
+						+ " from ebms_message"
+						+ " where status = "
+						+ status.getId()
+						+ getMessageFilter(messageFilter, parameters)
+						+ " order by time_stamp asc",
+				String.class,
+				parameters.toArray(new Object[0]));
 	}
 
 	@Override
@@ -428,18 +416,17 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		val parameters = new ArrayList<Object>();
 		val messageContextFilter = getMessageFilter(messageFilter, parameters);
 		parameters.add(maxNr);
-		return retryTemplate.execute(
-				ctx -> jdbcTemplate.queryForList(
-						"select message_id"
-								+ " from ebms_message"
-								+ " where status = "
-								+ status.getId()
-								+ messageContextFilter
-								+ " order by time_stamp asc"
-								+ " offset 0 rows"
-								+ " fetch first ? rows only",
-						String.class,
-						parameters.toArray(new Object[0])));
+		return jdbcTemplate.queryForList(
+				"select message_id"
+						+ " from ebms_message"
+						+ " where status = "
+						+ status.getId()
+						+ messageContextFilter
+						+ " order by time_stamp asc"
+						+ " offset 0 rows"
+						+ " fetch first ? rows only",
+				String.class,
+				parameters.toArray(new Object[0]));
 	}
 
 	@Override
@@ -452,7 +439,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 			final EbMSMessageStatus status)
 	{
 		val messageHeader = message.getMessageHeader();
-		retryTemplate.execute(ctx -> jdbcTemplate.update(c ->
+		jdbcTemplate.update(c ->
 		{
 			try
 			{
@@ -497,7 +484,7 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 			{
 				throw new SQLException(e);
 			}
-		}));
+		});
 		insertAttachments(messageHeader.getMessageData().getMessageId(), attachments);
 		return messageHeader.getMessageData().getMessageId();
 	}
@@ -505,59 +492,56 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 	protected void insertAttachments(String messageId, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException
 	{
 		val orderNr = new AtomicInteger();
-		retryTemplate.execute(
-				ctx -> jdbcTemplate.batchUpdate(
-						"insert into ebms_attachment (message_id,order_nr,name,content_id,content_type,content) values (?,?,?,?,?,?)",
-						new BatchPreparedStatementSetter()
+		jdbcTemplate.batchUpdate(
+				"insert into ebms_attachment (message_id,order_nr,name,content_id,content_type,content) values (?,?,?,?,?,?)",
+				new BatchPreparedStatementSetter()
+				{
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException
+					{
+						try
 						{
-							@Override
-							public void setValues(PreparedStatement ps, int i) throws SQLException
-							{
-								try
-								{
-									ps.setObject(1, messageId);
-									ps.setInt(2, orderNr.getAndIncrement());
-									ps.setString(3, attachments.get(i).getName());
-									ps.setString(4, attachments.get(i).getContentId());
-									ps.setString(5, attachments.get(i).getContentType());
-									ps.setBinaryStream(6, attachments.get(i).getInputStream());
-								}
-								catch (IOException e)
-								{
-									throw new SQLException(e);
-								}
-							}
+							ps.setObject(1, messageId);
+							ps.setInt(2, orderNr.getAndIncrement());
+							ps.setString(3, attachments.get(i).getName());
+							ps.setString(4, attachments.get(i).getContentId());
+							ps.setString(5, attachments.get(i).getContentType());
+							ps.setBinaryStream(6, attachments.get(i).getInputStream());
+						}
+						catch (IOException e)
+						{
+							throw new SQLException(e);
+						}
+					}
 
-							@Override
-							public int getBatchSize()
-							{
-								return attachments.size();
-							}
-						}));
+					@Override
+					public int getBatchSize()
+					{
+						return attachments.size();
+					}
+				});
 	}
 
 	@Override
 	public int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus)
 	{
-		return retryTemplate.execute(
-				ctx -> jdbcTemplate.update(
-						"update ebms_message set status = ?, status_time = ? where message_id = ? and status = ?",
-						newStatus.getId(),
-						Timestamp.from(Instant.now()),
-						messageId,
-						oldStatus != null ? oldStatus.getId() : null));
+		return jdbcTemplate.update(
+				"update ebms_message set status = ?, status_time = ? where message_id = ? and status = ?",
+				newStatus.getId(),
+				Timestamp.from(Instant.now()),
+				messageId,
+				oldStatus != null ? oldStatus.getId() : null);
 	}
 
 	@Override
 	public int deleteAttachments(String messageId)
 	{
-		return retryTemplate.execute(ctx -> jdbcTemplate.update("delete from ebms_attachment where message_id = ?", messageId));
+		return jdbcTemplate.update("delete from ebms_attachment where message_id = ?", messageId);
 	}
 
 	protected <T> List<T> getAttachments(String messageId, RowMapper<T> rowMapper)
 	{
-		return retryTemplate.execute(
-				ctx -> jdbcTemplate
-						.query("select name, content_id, content_type, content from ebms_attachment where message_id = ? order by order_nr", rowMapper, messageId));
+		return jdbcTemplate
+				.query("select name, content_id, content_type, content from ebms_attachment where message_id = ? order by order_nr", rowMapper, messageId);
 	}
 }

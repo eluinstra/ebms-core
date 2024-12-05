@@ -173,7 +173,8 @@ class MessageErrorProcessor
 		catch (ValidationException e)
 		{
 			val persistTime = ebMSDAO.getPersistTime(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp, persistTime.orElse(null), response.getMessage(), messageError, Collections.emptyList(), null);
+			ebMSDAO.getRetryTemplate()
+					.execute(ctx -> ebMSDAO.insertMessage(timestamp, persistTime.orElse(null), response.getMessage(), messageError, Collections.emptyList(), null));
 			log.warn("Unable to process MessageError " + messageError.getMessageHeader().getMessageData().getMessageId(), e);
 		}
 	}
@@ -200,6 +201,10 @@ class MessageErrorProcessor
 					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 			}
 		};
-		ebMSDAO.executeTransaction(insertMessage);
+		ebMSDAO.getRetryTemplate().execute(ctx ->
+		{
+			ebMSDAO.executeTransaction(insertMessage);
+			return null;
+		});
 	}
 }
