@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
-      <version>6.0.23</version>
+      <version>6.1.17</version>
     </dependency>
     <dependency>
       <groupId>nl.clockwork.ebms</groupId>
@@ -61,7 +61,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.3</version>
+        <version>3.6.0</version>
         <configuration>
           <createDependencyReducedPom>false</createDependencyReducedPom>
           <transformers>
@@ -116,7 +116,7 @@
           <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-transform-maven-shade-plugin-extensions</artifactId>
-            <version>0.1.0</version>
+            <version>0.2.0</version>
           </dependency>
         </dependencies>
         <executions>

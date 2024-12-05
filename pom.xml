@@ -166,7 +166,7 @@
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>4.5</version>
+        <version>4.6</version>
         <configuration>
           <strictCheck>true</strictCheck>
           <header>${maven-parent.basedir}/resources/license/header.txt</header>
@@ -207,7 +207,7 @@
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-              <version>1.18.34</version>
+              <version>1.18.36</version>
             </path>
             <path>
               <groupId>org.projectlombok</groupId>
@@ -217,14 +217,14 @@
             <path>
               <groupId>org.mapstruct</groupId>
               <artifactId>mapstruct-processor</artifactId>
-              <version>1.5.5.Final</version>
+              <version>1.6.3</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.3</version>
         <executions>
           <execution>
             <id>default-deploy</id>
@@ -259,7 +259,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.5.2</version>
         <executions>
           <execution>
             <goals>
@@ -290,7 +290,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.11.2</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <doclint>none</doclint>
@@ -318,12 +318,12 @@
           <dependency>
             <groupId>org.apache.maven.scm</groupId>
             <artifactId>maven-scm-api</artifactId>
-            <version>2.0.1</version>
+            <version>2.1.0</version>
           </dependency>
           <dependency>
             <groupId>org.apache.maven.scm</groupId>
             <artifactId>maven-scm-provider-gitexe</artifactId>
-            <version>2.0.1</version>
+            <version>2.1.0</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -341,12 +341,12 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.5.2</version>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.13</version>
+        <version>1.6.14</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -438,7 +438,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
-        <version>2.17.1</version>
+        <version>2.18.0</version>
         <configuration>
           <excludes>
             <exclude>com.microsoft.sqlserver:mssql-jdbc</exclude>
@@ -478,7 +478,7 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>10.0.3</version>
+        <version>11.1.1</version>
         <reportSets>
           <reportSet>
             <reports>
@@ -490,7 +490,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jdepend-maven-plugin</artifactId>
-        <version>2.0</version>
+        <version>2.1</version>
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -513,7 +513,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.11.2</version>
         <configuration>
           <source>${jdk.version}</source>
           <doclint>none</doclint>
@@ -521,11 +521,11 @@
       </plugin>
       <plugin>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>3.4.0</version>
+        <version>3.6.0</version>
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.24.0</version>
+        <version>3.26.0</version>
         <configuration>
           <linkXref>true</linkXref>
           <targetJdk>${jdk.version}</targetJdk>
@@ -540,7 +540,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.5.2</version>
       </plugin>
       <plugin>
         <groupId>com.github.spotbugs</groupId>
@@ -566,7 +566,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.1</version>
         <configuration>
           <tags>
             <tag>TODO</tag>
