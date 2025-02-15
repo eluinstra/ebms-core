@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -99,6 +100,20 @@ public class JAXBParser<T>
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.marshal(e, result);
+		result.flush();
+		return result.toString();
+	}
+
+	public String handle(JAXBElement<T> e, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
+	{
+		if (e == null)
+			return null;
+		val result = new StringWriter();
+		val marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		if (namespacePrefixMapper != null)
+			marshaller.setProperty("org.glassfish.jaxb.namespacePrefixMapper", namespacePrefixMapper);
 		marshaller.marshal(e, result);
 		result.flush();
 		return result.toString();
