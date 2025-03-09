@@ -21,7 +21,8 @@
 //
 
 @jakarta.xml.bind.annotation.XmlSchema(
-        namespace = "http://www.w3.org/2000/09/xmldsig#",
-		xmlns = {@jakarta.xml.bind.annotation.XmlNs(prefix = "ds", namespaceURI = "http://www.w3.org/2000/09/xmldsig#"), @jakarta.xml.bind.annotation.XmlNs(prefix = "xlink", namespaceURI = "http://www.w3.org/1999/xlink")},
-        elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
+		namespace = "http://www.w3.org/2000/09/xmldsig#",
+		xmlns = {@jakarta.xml.bind.annotation.XmlNs(prefix = "ds", namespaceURI = "http://www.w3.org/2000/09/xmldsig#"),
+				@jakarta.xml.bind.annotation.XmlNs(prefix = "xlink", namespaceURI = "http://www.w3.org/1999/xlink")},
+		elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.w3._2000._09.xmldsig;
