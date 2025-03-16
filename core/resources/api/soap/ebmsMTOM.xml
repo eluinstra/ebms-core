@@ -1,0 +1,488 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/ebms/2.18" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="EbMSMessageService" targetNamespace="http://www.ordina.nl/ebms/2.18">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:tns="http://www.ordina.nl/ebms/2.18" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/ebms/2.18" version="1.0">
+  <xs:import namespace="http://www.w3.org/2005/05/xmlmime"/>
+  <xs:element name="getMessage" type="tns:getMessage"/>
+  <xs:element name="getMessageResponse" type="tns:getMessageResponse"/>
+  <xs:element name="getMessageStatus" type="tns:getMessageStatus"/>
+  <xs:element name="getMessageStatusResponse" type="tns:getMessageStatusResponse"/>
+  <xs:element name="getUnprocessedMessageEvents" type="tns:getUnprocessedMessageEvents"/>
+  <xs:element name="getUnprocessedMessageEventsResponse" type="tns:getUnprocessedMessageEventsResponse"/>
+  <xs:element name="getUnprocessedMessageIds" type="tns:getUnprocessedMessageIds"/>
+  <xs:element name="getUnprocessedMessageIdsResponse" type="tns:getUnprocessedMessageIdsResponse"/>
+  <xs:element name="ping" type="tns:ping"/>
+  <xs:element name="pingResponse" type="tns:pingResponse"/>
+  <xs:element name="processMessage" type="tns:processMessage"/>
+  <xs:element name="processMessageEvent" type="tns:processMessageEvent"/>
+  <xs:element name="processMessageEventResponse" type="tns:processMessageEventResponse"/>
+  <xs:element name="processMessageResponse" type="tns:processMessageResponse"/>
+  <xs:element name="resendMessage" type="tns:resendMessage"/>
+  <xs:element name="resendMessageResponse" type="tns:resendMessageResponse"/>
+  <xs:element name="sendMessage" type="tns:sendMessage"/>
+  <xs:element name="sendMessageResponse" type="tns:sendMessageResponse"/>
+  <xs:complexType name="getMessageStatus">
+    <xs:sequence>
+      <xs:element name="messageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getMessageStatusResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="messageStatus" type="tns:messageStatus"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="messageStatus">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="timestamp" type="tns:instant"/>
+      <xs:element name="status" type="tns:ebMSMessageStatus"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType final="extension restriction" name="instant">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getUnprocessedMessageEvents">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="messageFilter" type="tns:messageFilter"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="eventType" type="tns:messageEventType"/>
+      <xs:element minOccurs="0" name="maxNr" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="messageFilter">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+      <xs:element minOccurs="0" name="fromParty" type="tns:party"/>
+      <xs:element minOccurs="0" name="toParty" type="tns:party"/>
+      <xs:element minOccurs="0" name="service" type="xs:string"/>
+      <xs:element minOccurs="0" name="action" type="xs:string"/>
+      <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
+      <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+      <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="party">
+    <xs:sequence>
+      <xs:element name="partyId" type="xs:string"/>
+      <xs:element minOccurs="0" name="role" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getUnprocessedMessageEventsResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="messageEvents" type="tns:messageEvent"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="messageEvent">
+    <xs:sequence>
+      <xs:element name="messageId" type="xs:string"/>
+      <xs:element name="type" type="tns:messageEventType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getMessage">
+    <xs:sequence>
+      <xs:element name="messageId" type="xs:string"/>
+      <xs:element minOccurs="0" name="process" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getMessageResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="message" type="tns:Message"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Message">
+    <xs:sequence>
+      <xs:element name="properties" type="tns:messageProperties"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="dataSource" type="tns:DataSource"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="messageProperties">
+    <xs:sequence>
+      <xs:element name="cpaId" type="xs:string"/>
+      <xs:element name="fromParty" type="tns:party"/>
+      <xs:element name="toParty" type="tns:party"/>
+      <xs:element name="service" type="xs:string"/>
+      <xs:element name="action" type="xs:string"/>
+      <xs:element name="timestamp" type="xs:dateTime"/>
+      <xs:element name="conversationId" type="xs:string"/>
+      <xs:element name="messageId" type="xs:string"/>
+      <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+      <xs:element name="messageStatus" type="tns:ebMSMessageStatus"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DataSource">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contentId" type="xs:string"/>
+      <xs:element name="attachment" type="xs:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="resendMessage">
+    <xs:sequence>
+      <xs:element name="messageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="resendMessageResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="sendMessage">
+    <xs:sequence>
+      <xs:element name="message" type="tns:MessageRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MessageRequest">
+    <xs:sequence>
+      <xs:element name="properties" type="tns:messageRequestProperties"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="dataSource" type="tns:DataSource"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="messageRequestProperties">
+    <xs:sequence>
+      <xs:element name="cpaId" type="xs:string"/>
+      <xs:element name="fromPartyId" type="xs:string"/>
+      <xs:element name="fromRole" type="xs:string"/>
+      <xs:element minOccurs="0" name="toPartyId" type="xs:string"/>
+      <xs:element minOccurs="0" name="toRole" type="xs:string"/>
+      <xs:element name="service" type="xs:string"/>
+      <xs:element name="action" type="xs:string"/>
+      <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
+      <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+      <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="sendMessageResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ping">
+    <xs:sequence>
+      <xs:element name="cpaId" type="xs:string"/>
+      <xs:element name="fromPartyId" type="xs:string"/>
+      <xs:element name="toPartyId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="pingResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="processMessageEvent">
+    <xs:sequence>
+      <xs:element name="messageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="processMessageEventResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getUnprocessedMessageIds">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="messageFilter" type="tns:messageFilter"/>
+      <xs:element minOccurs="0" name="maxNr" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getUnprocessedMessageIdsResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="messageIds" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="processMessage">
+    <xs:sequence>
+      <xs:element name="messageId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="processMessageResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:simpleType name="ebMSMessageStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="UNAUTHORIZED"/>
+      <xs:enumeration value="NOT_RECOGNIZED"/>
+      <xs:enumeration value="RECEIVED"/>
+      <xs:enumeration value="PROCESSED"/>
+      <xs:enumeration value="FORWARDED"/>
+      <xs:enumeration value="FAILED"/>
+      <xs:enumeration value="CREATED"/>
+      <xs:enumeration value="DELIVERY_FAILED"/>
+      <xs:enumeration value="DELIVERED"/>
+      <xs:enumeration value="EXPIRED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="messageEventType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RECEIVED"/>
+      <xs:enumeration value="DELIVERED"/>
+      <xs:enumeration value="FAILED"/>
+      <xs:enumeration value="EXPIRED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="EbMSMessageServiceException" type="tns:EbMSMessageServiceException"/>
+  <xs:complexType name="EbMSMessageServiceException">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getMessageResponse">
+    <wsdl:part element="tns:getMessageResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessageStatus">
+    <wsdl:part element="tns:getMessageStatus" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessageStatusResponse">
+    <wsdl:part element="tns:getMessageStatusResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessage">
+    <wsdl:part element="tns:getMessage" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="resendMessage">
+    <wsdl:part element="tns:resendMessage" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendMessage">
+    <wsdl:part element="tns:sendMessage" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ping">
+    <wsdl:part element="tns:ping" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnprocessedMessageIds">
+    <wsdl:part element="tns:getUnprocessedMessageIds" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnprocessedMessageEventsResponse">
+    <wsdl:part element="tns:getUnprocessedMessageEventsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMessage">
+    <wsdl:part element="tns:processMessage" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="EbMSMessageServiceException">
+    <wsdl:part element="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendMessageResponse">
+    <wsdl:part element="tns:sendMessageResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMessageEventResponse">
+    <wsdl:part element="tns:processMessageEventResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnprocessedMessageIdsResponse">
+    <wsdl:part element="tns:getUnprocessedMessageIdsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="pingResponse">
+    <wsdl:part element="tns:pingResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnprocessedMessageEvents">
+    <wsdl:part element="tns:getUnprocessedMessageEvents" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="resendMessageResponse">
+    <wsdl:part element="tns:resendMessageResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMessageResponse">
+    <wsdl:part element="tns:processMessageResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMessageEvent">
+    <wsdl:part element="tns:processMessageEvent" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="EbMSMessageService">
+    <wsdl:operation name="getMessageStatus">
+      <wsdl:input message="tns:getMessageStatus" name="getMessageStatus">
+    </wsdl:input>
+      <wsdl:output message="tns:getMessageStatusResponse" name="getMessageStatusResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUnprocessedMessageEvents">
+      <wsdl:input message="tns:getUnprocessedMessageEvents" name="getUnprocessedMessageEvents">
+    </wsdl:input>
+      <wsdl:output message="tns:getUnprocessedMessageEventsResponse" name="getUnprocessedMessageEventsResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getMessage">
+      <wsdl:input message="tns:getMessage" name="getMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:getMessageResponse" name="getMessageResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="resendMessage">
+      <wsdl:input message="tns:resendMessage" name="resendMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:resendMessageResponse" name="resendMessageResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="sendMessage">
+      <wsdl:input message="tns:sendMessage" name="sendMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:sendMessageResponse" name="sendMessageResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ping">
+      <wsdl:input message="tns:ping" name="ping">
+    </wsdl:input>
+      <wsdl:output message="tns:pingResponse" name="pingResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processMessageEvent">
+      <wsdl:input message="tns:processMessageEvent" name="processMessageEvent">
+    </wsdl:input>
+      <wsdl:output message="tns:processMessageEventResponse" name="processMessageEventResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUnprocessedMessageIds">
+      <wsdl:input message="tns:getUnprocessedMessageIds" name="getUnprocessedMessageIds">
+    </wsdl:input>
+      <wsdl:output message="tns:getUnprocessedMessageIdsResponse" name="getUnprocessedMessageIdsResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processMessage">
+      <wsdl:input message="tns:processMessage" name="processMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:processMessageResponse" name="processMessageResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="EbMSMessageServiceSoapBinding" type="tns:EbMSMessageService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getMessageStatus">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMessageStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMessageStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUnprocessedMessageEvents">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getUnprocessedMessageEvents">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getUnprocessedMessageEventsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="resendMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="resendMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="resendMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="sendMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="pingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processMessageEvent">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processMessageEvent">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processMessageEventResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUnprocessedMessageIds">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getUnprocessedMessageIds">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getUnprocessedMessageIdsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EbMSMessageService">
+    <wsdl:port binding="tns:EbMSMessageServiceSoapBinding" name="EbMSMessagePort">
+      <soap:address location="http://localhost:8080/service/ebmsMTOM"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

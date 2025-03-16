@@ -1,0 +1,165 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "contact" : { },
+    "license" : {
+      "name" : "Apache 2.0 License",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "paths" : {
+    "/{cpaId}" : {
+      "get" : {
+        "operationId" : "getCPA",
+        "parameters" : [ {
+          "name" : "cpaId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "operationId" : "deleteCPA",
+        "parameters" : [ {
+          "name" : "cpaId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/cache" : {
+      "delete" : {
+        "operationId" : "deleteCache",
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/" : {
+      "get" : {
+        "operationId" : "getCPAIds",
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "operationId" : "insertCPA",
+        "parameters" : [ {
+          "name" : "overwrite",
+          "in" : "query",
+          "schema" : {
+            "type" : "boolean",
+            "default" : false
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "text/plain" : {
+              "schema" : {
+                "type" : "string"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validate" : {
+      "post" : {
+        "operationId" : "validateCPA",
+        "requestBody" : {
+          "content" : {
+            "text/plain" : {
+              "schema" : {
+                "type" : "string"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/api-docs/{resource}" : {
+      "get" : {
+        "operationId" : "getResource",
+        "parameters" : [ {
+          "name" : "resource",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "pattern" : ".*",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "*/*" : { }
+            }
+          }
+        }
+      }
+    }
+  }
+}

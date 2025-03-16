@@ -1,0 +1,819 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "contact" : { },
+    "license" : {
+      "name" : "Apache 2.0 License",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "paths" : {
+    "/messages/{messageId}" : {
+      "get" : {
+        "operationId" : "getMessage",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "process",
+          "in" : "query",
+          "schema" : {
+            "type" : "boolean",
+            "default" : false
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "operationId" : "resendMessage",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "operationId" : "processMessage",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/messages/mtom/{messageId}" : {
+      "get" : {
+        "operationId" : "getMessageRest",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "process",
+          "in" : "query",
+          "schema" : {
+            "type" : "boolean",
+            "default" : false
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "multipart/form-data" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MultipartBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/{messageId}/status" : {
+      "get" : {
+        "operationId" : "getMessageStatus",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/unprocessed" : {
+      "get" : {
+        "operationId" : "getUnprocessedMessageEvents",
+        "parameters" : [ {
+          "name" : "cpaId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fromPartyId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fromRole",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "toPartyId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "toRole",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "service",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "conversationId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "messageId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "refToMessageId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "eventTypes",
+          "in" : "query",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "RECEIVED", "DELIVERED", "FAILED", "EXPIRED" ]
+            }
+          }
+        }, {
+          "name" : "maxNr",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/MessageEvent"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/unprocessed" : {
+      "get" : {
+        "operationId" : "getUnprocessedMessageIds",
+        "parameters" : [ {
+          "name" : "cpaId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fromPartyId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fromRole",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "toPartyId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "toRole",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "service",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "conversationId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "messageId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "refToMessageId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "maxNr",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping/{cpaId}/from/{fromPartyId}/to/{toPartyId}" : {
+      "post" : {
+        "operationId" : "ping",
+        "parameters" : [ {
+          "name" : "cpaId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fromPartyId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "toPartyId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/events/{messageId}" : {
+      "patch" : {
+        "operationId" : "processMessageEvent",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/messages" : {
+      "post" : {
+        "operationId" : "sendMessage",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MessageRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/mtom" : {
+      "post" : {
+        "operationId" : "sendMessage_1",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MessageRequestProperties"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api-docs/{resource}" : {
+      "get" : {
+        "operationId" : "getResource",
+        "parameters" : [ {
+          "name" : "resource",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "pattern" : ".*",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "*/*" : { }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "DataSource" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "inputStream" : {
+            "type" : "object"
+          },
+          "contentType" : {
+            "type" : "string"
+          },
+          "outputStream" : {
+            "type" : "object"
+          }
+        }
+      },
+      "Message" : {
+        "required" : [ "properties" ],
+        "type" : "object",
+        "properties" : {
+          "properties" : {
+            "$ref" : "#/components/schemas/MessageProperties"
+          },
+          "dataSources" : {
+            "type" : "array",
+            "xml" : {
+              "name" : "dataSource"
+            },
+            "items" : {
+              "$ref" : "#/components/schemas/DataSource"
+            }
+          }
+        }
+      },
+      "MessageProperties" : {
+        "required" : [ "action", "conversationId", "cpaId", "fromParty", "messageId", "messageStatus", "service", "timestamp", "toParty" ],
+        "type" : "object",
+        "properties" : {
+          "cpaId" : {
+            "type" : "string"
+          },
+          "fromParty" : {
+            "$ref" : "#/components/schemas/Party"
+          },
+          "toParty" : {
+            "$ref" : "#/components/schemas/Party"
+          },
+          "service" : {
+            "type" : "string"
+          },
+          "action" : {
+            "type" : "string"
+          },
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "conversationId" : {
+            "type" : "string"
+          },
+          "messageId" : {
+            "type" : "string"
+          },
+          "refToMessageId" : {
+            "type" : "string"
+          },
+          "messageStatus" : {
+            "type" : "string",
+            "enum" : [ "UNAUTHORIZED", "NOT_RECOGNIZED", "RECEIVED", "PROCESSED", "FORWARDED", "FAILED", "CREATED", "DELIVERY_FAILED", "DELIVERED", "EXPIRED" ]
+          }
+        }
+      },
+      "Party" : {
+        "required" : [ "partyId" ],
+        "type" : "object",
+        "properties" : {
+          "partyId" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ActivationDataFlavor" : {
+        "type" : "object",
+        "properties" : {
+          "mimeType" : {
+            "type" : "string"
+          },
+          "humanPresentableName" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Attachment" : {
+        "type" : "object",
+        "properties" : {
+          "headers" : {
+            "type" : "object",
+            "properties" : {
+              "empty" : {
+                "type" : "boolean"
+              }
+            },
+            "additionalProperties" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
+          },
+          "object" : {
+            "type" : "object"
+          },
+          "dataHandler" : {
+            "$ref" : "#/components/schemas/DataHandler"
+          },
+          "contentId" : {
+            "type" : "string"
+          },
+          "contentDisposition" : {
+            "$ref" : "#/components/schemas/ContentDisposition"
+          },
+          "contentType" : {
+            "$ref" : "#/components/schemas/MediaType"
+          }
+        }
+      },
+      "CommandInfo" : {
+        "type" : "object",
+        "properties" : {
+          "commandName" : {
+            "type" : "string"
+          },
+          "commandClass" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CommandMap" : {
+        "type" : "object",
+        "properties" : {
+          "mimeTypes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "ContentDisposition" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "parameters" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "filename" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DataHandler" : {
+        "type" : "object",
+        "properties" : {
+          "dataSource" : {
+            "$ref" : "#/components/schemas/DataSource"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "inputStream" : {
+            "type" : "object"
+          },
+          "content" : {
+            "type" : "object"
+          },
+          "commandMap" : {
+            "$ref" : "#/components/schemas/CommandMap"
+          },
+          "transferDataFlavors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ActivationDataFlavor"
+            }
+          },
+          "preferredCommands" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CommandInfo"
+            }
+          },
+          "allCommands" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CommandInfo"
+            }
+          },
+          "contentType" : {
+            "type" : "string"
+          },
+          "outputStream" : {
+            "type" : "object"
+          }
+        }
+      },
+      "MediaType" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "subtype" : {
+            "type" : "string"
+          },
+          "parameters" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "wildcardType" : {
+            "type" : "boolean"
+          },
+          "wildcardSubtype" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "MultipartBody" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/MediaType"
+          },
+          "rootAttachment" : {
+            "$ref" : "#/components/schemas/Attachment"
+          },
+          "allAttachments" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Attachment"
+            }
+          },
+          "childAttachments" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Attachment"
+            }
+          }
+        }
+      },
+      "MultivaluedMapStringString" : {
+        "type" : "object",
+        "properties" : {
+          "empty" : {
+            "type" : "boolean"
+          }
+        },
+        "additionalProperties" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MessageStatus" : {
+        "required" : [ "status" ],
+        "type" : "object",
+        "properties" : {
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "UNAUTHORIZED", "NOT_RECOGNIZED", "RECEIVED", "PROCESSED", "FORWARDED", "FAILED", "CREATED", "DELIVERY_FAILED", "DELIVERED", "EXPIRED" ]
+          }
+        }
+      },
+      "MessageEvent" : {
+        "required" : [ "messageId", "type" ],
+        "type" : "object",
+        "properties" : {
+          "messageId" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "RECEIVED", "DELIVERED", "FAILED", "EXPIRED" ]
+          }
+        }
+      },
+      "MessageRequest" : {
+        "required" : [ "properties" ],
+        "type" : "object",
+        "properties" : {
+          "properties" : {
+            "$ref" : "#/components/schemas/MessageRequestProperties"
+          },
+          "dataSources" : {
+            "type" : "array",
+            "xml" : {
+              "name" : "dataSource"
+            },
+            "items" : {
+              "$ref" : "#/components/schemas/DataSource"
+            }
+          }
+        }
+      },
+      "MessageRequestProperties" : {
+        "required" : [ "action", "cpaId", "fromPartyId", "fromRole", "service" ],
+        "type" : "object",
+        "properties" : {
+          "cpaId" : {
+            "type" : "string"
+          },
+          "fromPartyId" : {
+            "type" : "string"
+          },
+          "fromRole" : {
+            "type" : "string"
+          },
+          "toPartyId" : {
+            "type" : "string"
+          },
+          "toRole" : {
+            "type" : "string"
+          },
+          "service" : {
+            "type" : "string"
+          },
+          "action" : {
+            "type" : "string"
+          },
+          "conversationId" : {
+            "type" : "string"
+          },
+          "messageId" : {
+            "type" : "string"
+          },
+          "refToMessageId" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}

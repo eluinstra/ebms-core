@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/cpa/urlMapping/2.18" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="URLMappingService" targetNamespace="http://www.ordina.nl/cpa/urlMapping/2.18">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.ordina.nl/cpa/urlMapping/2.18" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/cpa/urlMapping/2.18" version="1.0">
+  <xs:element name="deleteCache" type="tns:deleteCache"/>
+  <xs:element name="deleteCacheResponse" type="tns:deleteCacheResponse"/>
+  <xs:element name="deleteURLMapping" type="tns:deleteURLMapping"/>
+  <xs:element name="deleteURLMappingResponse" type="tns:deleteURLMappingResponse"/>
+  <xs:element name="getURLMappings" type="tns:getURLMappings"/>
+  <xs:element name="getURLMappingsResponse" type="tns:getURLMappingsResponse"/>
+  <xs:element name="setURLMapping" type="tns:setURLMapping"/>
+  <xs:element name="setURLMappingResponse" type="tns:setURLMappingResponse"/>
+  <xs:complexType name="setURLMapping">
+    <xs:sequence>
+      <xs:element name="urlMapping" type="tns:urlMapping"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="urlMapping">
+    <xs:sequence>
+      <xs:element name="source" type="xs:string"/>
+      <xs:element name="destination" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="setURLMappingResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getURLMappings">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getURLMappingsResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="url" type="tns:urlMapping"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="deleteCache">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="deleteCacheResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="deleteURLMapping">
+    <xs:sequence>
+      <xs:element name="sourceURL" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="deleteURLMappingResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:element name="URLMappingServiceException" type="tns:URLMappingServiceException"/>
+  <xs:complexType name="URLMappingServiceException">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="setURLMappingResponse">
+    <wsdl:part element="tns:setURLMappingResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="URLMappingServiceException">
+    <wsdl:part element="tns:URLMappingServiceException" name="URLMappingServiceException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteURLMappingResponse">
+    <wsdl:part element="tns:deleteURLMappingResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setURLMapping">
+    <wsdl:part element="tns:setURLMapping" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getURLMappingsResponse">
+    <wsdl:part element="tns:getURLMappingsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getURLMappings">
+    <wsdl:part element="tns:getURLMappings" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCache">
+    <wsdl:part element="tns:deleteCache" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCacheResponse">
+    <wsdl:part element="tns:deleteCacheResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteURLMapping">
+    <wsdl:part element="tns:deleteURLMapping" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="UrlMappingService">
+    <wsdl:operation name="setURLMapping">
+      <wsdl:input message="tns:setURLMapping" name="setURLMapping">
+    </wsdl:input>
+      <wsdl:output message="tns:setURLMappingResponse" name="setURLMappingResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:URLMappingServiceException" name="URLMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getURLMappings">
+      <wsdl:input message="tns:getURLMappings" name="getURLMappings">
+    </wsdl:input>
+      <wsdl:output message="tns:getURLMappingsResponse" name="getURLMappingsResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:URLMappingServiceException" name="URLMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteCache">
+      <wsdl:input message="tns:deleteCache" name="deleteCache">
+    </wsdl:input>
+      <wsdl:output message="tns:deleteCacheResponse" name="deleteCacheResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:URLMappingServiceException" name="URLMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteURLMapping">
+      <wsdl:input message="tns:deleteURLMapping" name="deleteURLMapping">
+    </wsdl:input>
+      <wsdl:output message="tns:deleteURLMappingResponse" name="deleteURLMappingResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:URLMappingServiceException" name="URLMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="URLMappingServiceSoapBinding" type="tns:UrlMappingService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="setURLMapping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="setURLMapping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="setURLMappingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="URLMappingServiceException">
+        <soap:fault name="URLMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getURLMappings">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getURLMappings">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getURLMappingsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="URLMappingServiceException">
+        <soap:fault name="URLMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteCache">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteCache">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteCacheResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="URLMappingServiceException">
+        <soap:fault name="URLMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteURLMapping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteURLMapping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteURLMappingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="URLMappingServiceException">
+        <soap:fault name="URLMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="URLMappingService">
+    <wsdl:port binding="tns:URLMappingServiceSoapBinding" name="URLMappingPort">
+      <soap:address location="http://localhost:8080/service/urlMapping"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

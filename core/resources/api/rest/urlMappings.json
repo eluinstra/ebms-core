@@ -1,0 +1,124 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "contact" : { },
+    "license" : {
+      "name" : "Apache 2.0 License",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "paths" : {
+    "/cache" : {
+      "delete" : {
+        "operationId" : "deleteCache",
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/{id}" : {
+      "delete" : {
+        "operationId" : "deleteURLMapping",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/" : {
+      "get" : {
+        "operationId" : "getURLMappings",
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/URLMapping"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "operationId" : "setURLMapping",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/URLMapping"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/api-docs/{resource}" : {
+      "get" : {
+        "operationId" : "getResource",
+        "parameters" : [ {
+          "name" : "resource",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "pattern" : ".*",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "*/*" : { }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "URLMapping" : {
+        "required" : [ "destination", "source" ],
+        "type" : "object",
+        "properties" : {
+          "source" : {
+            "type" : "string"
+          },
+          "destination" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}

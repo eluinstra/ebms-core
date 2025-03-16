@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/cpa/certificateMapping/2.18" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="CertificateMappingService" targetNamespace="http://www.ordina.nl/cpa/certificateMapping/2.18">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.ordina.nl/cpa/certificateMapping/2.18" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/cpa/certificateMapping/2.18" version="1.0">
+  <xs:element name="deleteCache" type="tns:deleteCache"/>
+  <xs:element name="deleteCacheResponse" type="tns:deleteCacheResponse"/>
+  <xs:element name="deleteCertificateMapping" type="tns:deleteCertificateMapping"/>
+  <xs:element name="deleteCertificateMappingResponse" type="tns:deleteCertificateMappingResponse"/>
+  <xs:element name="getCertificateMappings" type="tns:getCertificateMappings"/>
+  <xs:element name="getCertificateMappingsResponse" type="tns:getCertificateMappingsResponse"/>
+  <xs:element name="setCertificateMapping" type="tns:setCertificateMapping"/>
+  <xs:element name="setCertificateMappingResponse" type="tns:setCertificateMappingResponse"/>
+  <xs:complexType name="deleteCertificateMapping">
+    <xs:sequence>
+      <xs:element name="sourceCertificate" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="deleteCertificateMappingResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getCertificateMappings">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getCertificateMappingsResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="certificate" type="tns:certificateMapping"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="certificateMapping">
+    <xs:sequence>
+      <xs:element name="source" type="xs:base64Binary"/>
+      <xs:element name="destination" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="setCertificateMapping">
+    <xs:sequence>
+      <xs:element name="certificateMapping" type="tns:certificateMapping"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="setCertificateMappingResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="deleteCache">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="deleteCacheResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:element name="CertificateMappingServiceException" type="tns:CertificateMappingServiceException"/>
+  <xs:complexType name="CertificateMappingServiceException">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="deleteCertificateMapping">
+    <wsdl:part element="tns:deleteCertificateMapping" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setCertificateMappingResponse">
+    <wsdl:part element="tns:setCertificateMappingResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCertificateMappings">
+    <wsdl:part element="tns:getCertificateMappings" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setCertificateMapping">
+    <wsdl:part element="tns:setCertificateMapping" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCache">
+    <wsdl:part element="tns:deleteCache" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCertificateMappingsResponse">
+    <wsdl:part element="tns:getCertificateMappingsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCacheResponse">
+    <wsdl:part element="tns:deleteCacheResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCertificateMappingResponse">
+    <wsdl:part element="tns:deleteCertificateMappingResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CertificateMappingServiceException">
+    <wsdl:part element="tns:CertificateMappingServiceException" name="CertificateMappingServiceException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="CertificateMappingService">
+    <wsdl:operation name="deleteCertificateMapping">
+      <wsdl:input message="tns:deleteCertificateMapping" name="deleteCertificateMapping">
+    </wsdl:input>
+      <wsdl:output message="tns:deleteCertificateMappingResponse" name="deleteCertificateMappingResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CertificateMappingServiceException" name="CertificateMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getCertificateMappings">
+      <wsdl:input message="tns:getCertificateMappings" name="getCertificateMappings">
+    </wsdl:input>
+      <wsdl:output message="tns:getCertificateMappingsResponse" name="getCertificateMappingsResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CertificateMappingServiceException" name="CertificateMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="setCertificateMapping">
+      <wsdl:input message="tns:setCertificateMapping" name="setCertificateMapping">
+    </wsdl:input>
+      <wsdl:output message="tns:setCertificateMappingResponse" name="setCertificateMappingResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CertificateMappingServiceException" name="CertificateMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteCache">
+      <wsdl:input message="tns:deleteCache" name="deleteCache">
+    </wsdl:input>
+      <wsdl:output message="tns:deleteCacheResponse" name="deleteCacheResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CertificateMappingServiceException" name="CertificateMappingServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CertificateMappingServiceSoapBinding" type="tns:CertificateMappingService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="deleteCertificateMapping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteCertificateMapping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteCertificateMappingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CertificateMappingServiceException">
+        <soap:fault name="CertificateMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getCertificateMappings">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCertificateMappings">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCertificateMappingsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CertificateMappingServiceException">
+        <soap:fault name="CertificateMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="setCertificateMapping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="setCertificateMapping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="setCertificateMappingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CertificateMappingServiceException">
+        <soap:fault name="CertificateMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteCache">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteCache">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteCacheResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CertificateMappingServiceException">
+        <soap:fault name="CertificateMappingServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CertificateMappingService">
+    <wsdl:port binding="tns:CertificateMappingServiceSoapBinding" name="CertificateMappingPort">
+      <soap:address location="http://localhost:8080/service/certificateMapping"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/cpa/2.18" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="CPAService" targetNamespace="http://www.ordina.nl/cpa/2.18">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.ordina.nl/cpa/2.18" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/cpa/2.18" version="1.0">
+  <xs:element name="deleteCPA" type="tns:deleteCPA"/>
+  <xs:element name="deleteCPAResponse" type="tns:deleteCPAResponse"/>
+  <xs:element name="deleteCache" type="tns:deleteCache"/>
+  <xs:element name="deleteCacheResponse" type="tns:deleteCacheResponse"/>
+  <xs:element name="getCPA" type="tns:getCPA"/>
+  <xs:element name="getCPAIds" type="tns:getCPAIds"/>
+  <xs:element name="getCPAIdsResponse" type="tns:getCPAIdsResponse"/>
+  <xs:element name="getCPAResponse" type="tns:getCPAResponse"/>
+  <xs:element name="insertCPA" type="tns:insertCPA"/>
+  <xs:element name="insertCPAResponse" type="tns:insertCPAResponse"/>
+  <xs:element name="validateCPA" type="tns:validateCPA"/>
+  <xs:element name="validateCPAResponse" type="tns:validateCPAResponse"/>
+  <xs:complexType name="deleteCache">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="deleteCacheResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="insertCPA">
+    <xs:sequence>
+      <xs:element name="cpa" type="xs:string"/>
+      <xs:element minOccurs="0" name="overwrite" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="insertCPAResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="validateCPA">
+    <xs:sequence>
+      <xs:element name="cpa" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="validateCPAResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="deleteCPA">
+    <xs:sequence>
+      <xs:element name="cpaId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="deleteCPAResponse">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getCPAIds">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getCPAIdsResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="cpaId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getCPA">
+    <xs:sequence>
+      <xs:element name="cpaId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getCPAResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="cpa" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CPAServiceException" type="tns:CPAServiceException"/>
+  <xs:complexType name="CPAServiceException">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getCPAIdsResponse">
+    <wsdl:part element="tns:getCPAIdsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCache">
+    <wsdl:part element="tns:deleteCache" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertCPAResponse">
+    <wsdl:part element="tns:insertCPAResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="validateCPAResponse">
+    <wsdl:part element="tns:validateCPAResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CPAServiceException">
+    <wsdl:part element="tns:CPAServiceException" name="CPAServiceException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCPAResponse">
+    <wsdl:part element="tns:getCPAResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCPA">
+    <wsdl:part element="tns:deleteCPA" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCPAIds">
+    <wsdl:part element="tns:getCPAIds" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCPA">
+    <wsdl:part element="tns:getCPA" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCacheResponse">
+    <wsdl:part element="tns:deleteCacheResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertCPA">
+    <wsdl:part element="tns:insertCPA" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="validateCPA">
+    <wsdl:part element="tns:validateCPA" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteCPAResponse">
+    <wsdl:part element="tns:deleteCPAResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="CPAService">
+    <wsdl:operation name="deleteCache">
+      <wsdl:input message="tns:deleteCache" name="deleteCache">
+    </wsdl:input>
+      <wsdl:output message="tns:deleteCacheResponse" name="deleteCacheResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="insertCPA">
+      <wsdl:input message="tns:insertCPA" name="insertCPA">
+    </wsdl:input>
+      <wsdl:output message="tns:insertCPAResponse" name="insertCPAResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="validateCPA">
+      <wsdl:input message="tns:validateCPA" name="validateCPA">
+    </wsdl:input>
+      <wsdl:output message="tns:validateCPAResponse" name="validateCPAResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteCPA">
+      <wsdl:input message="tns:deleteCPA" name="deleteCPA">
+    </wsdl:input>
+      <wsdl:output message="tns:deleteCPAResponse" name="deleteCPAResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getCPAIds">
+      <wsdl:input message="tns:getCPAIds" name="getCPAIds">
+    </wsdl:input>
+      <wsdl:output message="tns:getCPAIdsResponse" name="getCPAIdsResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getCPA">
+      <wsdl:input message="tns:getCPA" name="getCPA">
+    </wsdl:input>
+      <wsdl:output message="tns:getCPAResponse" name="getCPAResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CPAServiceSoapBinding" type="tns:CPAService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="deleteCache">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteCache">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteCacheResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="insertCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="insertCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="insertCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="validateCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="validateCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="validateCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getCPAIds">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCPAIds">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCPAIdsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CPAService">
+    <wsdl:port binding="tns:CPAServiceSoapBinding" name="CPAPort">
+      <soap:address location="http://localhost:8080/service/cpa"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
