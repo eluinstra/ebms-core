@@ -102,6 +102,8 @@ public class DataSourceConfig
 	int maxIdleTime;
 	@Value("${ebms.pool.maxLifetime}")
 	int maxLifetime;
+	@Value("${ebms.pool.reapTimeout}")
+	int reapTimeout;
 	@Value("${ebms.pool.testQuery}")
 	String testQuery;
 	@Value("${ebms.pool.minPoolSize}")
@@ -149,6 +151,7 @@ public class DataSourceConfig
 		result.setLocalTransactionMode(true);
 		result.setMaxIdleTime(maxIdleTime);
 		result.setMaxLifetime(maxLifetime);
+		result.setReapTimeout(reapTimeout);
 		result.setMinPoolSize(minPoolSize);
 		result.setMaxPoolSize(maxPoolSize);
 		if (StringUtils.isNotEmpty(testQuery))
@@ -157,9 +160,6 @@ public class DataSourceConfig
 		result.setConcurrentConnectionValidation(true);
 		result.setLoginTimeout(0);
 		result.setMaintenanceInterval(60);
-		result.setMaxIdleTime(60);
-		result.setMaxLifetime(0);
-		result.setReapTimeout(0);
 		result.init();
 		return result;
 	}
