@@ -130,7 +130,6 @@ public class SchedulerConfig
 		val result = new Properties();
 		result.put("org.quartz.scheduler.instanceId", "AUTO");
 		result.put("org.quartz.threadPool.threadCount", threadCount);
-		result.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreCMT");
 		result.put("org.quartz.jobStore.driverDelegateClass", StringUtils.isEmpty(driverDelegateClass) ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
 		if (StringUtils.isNotEmpty(selectWithLockSQL))
 			result.put("org.quartz.jobStore.selectWithLockSQL", selectWithLockSQL);
