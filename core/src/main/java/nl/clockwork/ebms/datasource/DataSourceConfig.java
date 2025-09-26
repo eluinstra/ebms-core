@@ -159,8 +159,6 @@ public class DataSourceConfig
 		result.setConcurrentConnectionValidation(true);
 		result.setLoginTimeout(0);
 		result.setMaintenanceInterval(60);
-		result.setMaxIdleTime(60);
-		result.setMaxLifetime(0);
 		result.init();
 		return result;
 	}
