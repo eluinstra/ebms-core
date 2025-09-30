@@ -34,9 +34,9 @@ public class URLMappingServiceConfig
 	}
 
 	@Bean
-	public URLMappingRestService urlMappingRestService(URLMappingService mappingService)
+	public URLMappingRestService urlMappingRestService(URLMapper urlMapper)
 	{
-		return new URLMappingRestService((URLMappingServiceImpl)mappingService);
+		return new URLMappingRestService(new URLMappingServiceImpl(urlMapper));
 	}
 
 	@Bean

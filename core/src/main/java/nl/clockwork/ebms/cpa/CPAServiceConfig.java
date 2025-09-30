@@ -38,8 +38,8 @@ public class CPAServiceConfig
 	}
 
 	@Bean
-	public CPARestService cpaRestService(CPAService cpaService)
+	public CPARestService cpaRestService(CPAManager cpaManager, CPAValidator cpaValidator)
 	{
-		return new CPARestService((CPAServiceImpl)cpaService);
+		return new CPARestService(new CPAServiceImpl(cpaManager, cpaValidator));
 	}
 }

@@ -15,8 +15,14 @@
  */
 package nl.clockwork.ebms.cache;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+
 import java.lang.reflect.Method;
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
+import java.util.stream.Collectors;
+import nl.clockwork.ebms.cpa.CPAUtils;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.springframework.cache.interceptor.KeyGenerator;
 
 public class EbMSKeyGenerator implements KeyGenerator
@@ -24,6 +30,36 @@ public class EbMSKeyGenerator implements KeyGenerator
 	@Override
 	public Object generate(Object target, Method method, Object...params)
 	{
-		return method.getName() + "[" + StringUtils.join(params, ",") + "]";
+		return method.getName() + "[" + join(params, ",") + "]";
+	}
+
+	private String join(Object[] objects, String delimiter)
+	{
+		return stream(objects).map(o -> toString(o)).collect(joining(delimiter));
+	}
+
+	private String toString(Object o)
+	{
+		if (o == null)
+		{
+			return "";
+		}
+		else if (o instanceof String s)
+		{
+			return s;
+		}
+		else if (o instanceof List)
+		{
+			return toString((List<PartyId>)o);
+		}
+		else
+		{
+			return "";
+		}
+	}
+
+	private String toString(List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyId)
+	{
+		return partyId.stream().map(CPAUtils::toString).collect(Collectors.joining(","));
 	}
 }

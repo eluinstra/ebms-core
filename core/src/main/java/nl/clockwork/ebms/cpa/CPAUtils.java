@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
@@ -70,11 +69,6 @@ public class CPAUtils
 	public static String toString(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
 	{
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
-	}
-
-	public static String toString(List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyId)
-	{
-		return partyId.stream().map(CPAUtils::toString).collect(Collectors.joining(","));
 	}
 
 	public static String toString(ServiceType service)

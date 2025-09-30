@@ -576,6 +576,9 @@
           "object" : {
             "type" : "object"
           },
+          "contentType" : {
+            "$ref" : "#/components/schemas/MediaType"
+          },
           "dataHandler" : {
             "$ref" : "#/components/schemas/DataHandler"
           },
@@ -584,19 +587,16 @@
           },
           "contentDisposition" : {
             "$ref" : "#/components/schemas/ContentDisposition"
-          },
-          "contentType" : {
-            "$ref" : "#/components/schemas/MediaType"
           }
         }
       },
       "CommandInfo" : {
         "type" : "object",
         "properties" : {
-          "commandName" : {
+          "commandClass" : {
             "type" : "string"
           },
-          "commandClass" : {
+          "commandName" : {
             "type" : "string"
           }
         }
@@ -644,6 +644,12 @@
           "content" : {
             "type" : "object"
           },
+          "contentType" : {
+            "type" : "string"
+          },
+          "outputStream" : {
+            "type" : "object"
+          },
           "commandMap" : {
             "$ref" : "#/components/schemas/CommandMap"
           },
@@ -664,12 +670,6 @@
             "items" : {
               "$ref" : "#/components/schemas/CommandInfo"
             }
-          },
-          "contentType" : {
-            "type" : "string"
-          },
-          "outputStream" : {
-            "type" : "object"
           }
         }
       },
