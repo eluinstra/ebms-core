@@ -22,6 +22,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
 import java.io.Serializable;
+import lombok.ToString;
 
 /**
  * <p>
@@ -42,6 +43,7 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"value"})
 @XmlRootElement(name = "PartyId")
+@ToString
 public class PartyId implements Serializable
 {
 
