@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -71,4 +72,10 @@ public class LoggingUtils
 		}
 		return result;
 	}
+
+	public static List<String> getProperties()
+	{
+		return List.of("cpaId", "fromPartyId", "fromRole", "toPartyId", "toRole", "service", "action", "messageId", "conversationId", "refToMessageId");
+	}
+
 }

@@ -163,7 +163,8 @@ public class EbMSMessageProcessor
 		}
 		finally
 		{
-			MDC.clear();
+			if (LoggingUtils.mdc == Status.ENABLED)
+				LoggingUtils.getProperties().forEach(MDC::remove);
 		}
 	}
 

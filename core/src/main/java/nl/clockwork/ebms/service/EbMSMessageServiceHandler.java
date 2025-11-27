@@ -107,33 +107,47 @@ class EbMSMessageServiceHandler
 	public String sendMessage(MessageRequest messageRequest)
 			throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		log.debug("SendMessage");
-		messagePropertiesValidator.validate(messageRequest.getProperties());
-		val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
-		if (LoggingUtils.mdc == Status.ENABLED)
-			MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
-		val document = EbMSMessageUtils.getEbMSDocument(message);
-		signatureGenerator.generate(document, message);
-		storeMessage(document.getMessage(), message);
-		val result = message.getMessageHeader().getMessageData().getMessageId();
-		log.info("Created message {}", result);
-		return result;
+		try
+		{
+			log.debug("SendMessage");
+			messagePropertiesValidator.validate(messageRequest.getProperties());
+			val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
+			if (LoggingUtils.mdc == Status.ENABLED)
+				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+			val document = EbMSMessageUtils.getEbMSDocument(message);
+			signatureGenerator.generate(document, message);
+			storeMessage(document.getMessage(), message);
+			val result = message.getMessageHeader().getMessageData().getMessageId();
+			log.info("Created message {}", result);
+			return result;
+		}
+		finally
+		{
+			MDC.clear();
+		}
 	}
 
 	public String sendMessageMTOM(MTOMMessageRequest messageRequest)
 			throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		log.debug("SendMessage");
-		messagePropertiesValidator.validate(messageRequest.getProperties());
-		val message = ebMSMessageFactory.createEbMSMessageMTOM(messageRequest);
-		if (LoggingUtils.mdc == Status.ENABLED)
-			MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
-		val document = EbMSMessageUtils.getEbMSDocument(message);
-		signatureGenerator.generate(document, message);
-		storeMessage(document.getMessage(), message);
-		String result = message.getMessageHeader().getMessageData().getMessageId();
-		log.info("Created message {}", result);
-		return result;
+		try
+		{
+			log.debug("SendMessage");
+			messagePropertiesValidator.validate(messageRequest.getProperties());
+			val message = ebMSMessageFactory.createEbMSMessageMTOM(messageRequest);
+			if (LoggingUtils.mdc == Status.ENABLED)
+				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+			val document = EbMSMessageUtils.getEbMSDocument(message);
+			signatureGenerator.generate(document, message);
+			storeMessage(document.getMessage(), message);
+			String result = message.getMessageHeader().getMessageData().getMessageId();
+			log.info("Created message {}", result);
+			return result;
+		}
+		finally
+		{
+			MDC.clear();
+		}
 	}
 
 	public String resendMessage(String messageId)
@@ -159,6 +173,10 @@ class EbMSMessageServiceHandler
 					| TransformerException e)
 			{
 				throw new EbMSProcessorException(e);
+			}
+			finally
+			{
+				MDC.clear();
 			}
 		}).orElseThrow(() -> new NotFoundException("Not found message " + messageId));
 	}
