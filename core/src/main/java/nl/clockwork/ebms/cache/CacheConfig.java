@@ -34,7 +34,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
 @EnableCaching
-@Conditional(SomeCacheType.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {
