@@ -94,7 +94,7 @@
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <revision>2.20.4-SNAPSHOT</revision>
+    <revision>2.20.4-M4</revision>
   </properties>
   <dependencyManagement>
     <dependencies>
