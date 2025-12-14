@@ -66,6 +66,7 @@
     <module>core</module>
     <module>plugin/cache/ehcache</module>
     <module>plugin/cache/hazelcast</module>
+    <module>plugin/messaging/jms</module>
   </modules>
   <scm>
     <connection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</connection>
