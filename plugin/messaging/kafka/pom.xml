@@ -24,7 +24,7 @@
     <version>${revision}</version>
     <relativePath>../../..</relativePath>
   </parent>
-  <groupId>nl.clockwork.ebms.plugin.messaging.kafka</groupId>
+  <groupId>nl.clockwork.ebms.plugin.messaging</groupId>
   <artifactId>ebms-kafka-messaging-plugin</artifactId>
   <version>${project.parent.version}</version>
   <packaging>jar</packaging>
@@ -46,6 +46,7 @@
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
+      <version>3.3.7</version>
     </dependency>
   </dependencies>
   <build>

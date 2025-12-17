@@ -24,22 +24,26 @@
     <version>${revision}</version>
     <relativePath>../../..</relativePath>
   </parent>
-  <groupId>nl.clockwork.ebms.plugin.cache</groupId>
-  <artifactId>ebms-ehcache-cache-plugin</artifactId>
+  <groupId>nl.clockwork.ebms.plugin.db</groupId>
+  <artifactId>ebms-mssql-db-plugin</artifactId>
   <version>${project.parent.version}</version>
   <packaging>jar</packaging>
-  <name>EbMS EhCache Cache Plugin</name>
+  <name>EbMS MS SQLServer Database Plugin</name>
   <dependencies>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>mssql-jdbc</artifactId>
+      <version>12.10.0.jre11</version>
+    </dependency>
     <dependency>
       <groupId>nl.clockwork.ebms.common</groupId>
       <artifactId>ebms-common</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>3.10.8</version>
-      <classifier>jakarta</classifier>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-sqlserver</artifactId>
+      <version>${flyway.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

@@ -66,6 +66,12 @@
     <module>core</module>
     <module>plugin/cache/ehcache</module>
     <module>plugin/cache/hazelcast</module>
+    <module>plugin/db/db2</module>
+    <module>plugin/db/hsqldb</module>
+    <module>plugin/db/mariadb</module>
+    <module>plugin/db/mssql</module>
+    <module>plugin/db/oracle</module>
+    <module>plugin/db/postgres</module>
     <module>plugin/messaging/jms</module>
     <module>plugin/messaging/kafka</module>
   </modules>
@@ -96,15 +102,12 @@
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spring.version>6.2.8</spring.version>
+    <flyway.version>11.8.2</flyway.version>
     <revision>2.20.4-SNAPSHOT</revision>
   </properties>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>6.1.8</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.james</groupId>
         <artifactId>apache-mime4j-core</artifactId>
@@ -149,11 +152,6 @@
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jsr310</artifactId>
         <version>2.18.4</version>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.jms</groupId>
-        <artifactId>jakarta.jms-api</artifactId>
-        <version>3.1.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.jws</groupId>
@@ -216,35 +214,11 @@
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
         <version>2.5.0</version>
-        <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>1.7.36</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.kafka</groupId>
-        <artifactId>spring-kafka</artifactId>
-        <version>3.3.7</version>
-      </dependency>
-      <dependency>
-        <groupId>com.atomikos</groupId>
-        <artifactId>transactions-jdbc</artifactId>
-        <version>6.0.0</version>
-        <classifier>jakarta</classifier>
-      </dependency>
-      <dependency>
-        <groupId>com.atomikos</groupId>
-        <artifactId>transactions-jms</artifactId>
-        <version>6.0.0</version>
-        <classifier>jakarta</classifier>
-      </dependency>
-      <dependency>
-        <groupId>com.atomikos</groupId>
-        <artifactId>transactions-jta</artifactId>
-        <version>6.0.0</version>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>io.vavr</groupId>
@@ -257,140 +231,64 @@
         <version>3.0.6</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-broker</artifactId>
-        <version>6.1.8</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-kahadb-store</artifactId>
-        <version>6.1.8</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-spring</artifactId>
-        <version>6.1.8</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-core</artifactId>
         <version>4.0.10</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxrs</artifactId>
         <version>4.0.10</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>11.8.2</version>
-        <scope>provided</scope>
+        <version>${flyway.version}</version>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>2.3.232</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>6.3.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>2.7.4</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>jakarta.servlet</groupId>
         <artifactId>jakarta.servlet-api</artifactId>
         <version>5.0.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.ibm.db2</groupId>
-        <artifactId>jcc</artifactId>
-        <version>12.1.0.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mariadb.jdbc</groupId>
-        <artifactId>mariadb-java-client</artifactId>
-        <version>3.5.3</version>
-        <scope>provided</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker-qual</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.google.errorprone</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>com.microsoft.sqlserver</groupId>
-        <artifactId>mssql-jdbc</artifactId>
-        <version>12.10.0.jre11</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.oracle.database.jdbc</groupId>
-        <artifactId>ojdbc11</artifactId>
-        <version>23.8.0.25.04</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>42.7.7</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>6.2.8</version>
-        <scope>provided</scope>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
-        <version>6.2.8</version>
-        <scope>provided</scope>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
-        <version>6.2.8</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jms</artifactId>
-        <version>6.2.8</version>
-        <scope>provided</scope>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>6.2.8</version>
-        <scope>provided</scope>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.xbean</groupId>
         <artifactId>xbean-spring</artifactId>
         <version>4.27</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.assertj</groupId>
@@ -439,7 +337,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-database-postgresql</artifactId>
-        <version>11.8.2</version>
+        <version>${flyway.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -543,7 +441,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>6.2.8</version>
+        <version>${spring.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>

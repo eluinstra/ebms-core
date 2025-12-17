@@ -24,7 +24,7 @@
     <version>${revision}</version>
     <relativePath>../../..</relativePath>
   </parent>
-  <groupId>nl.clockwork.ebms.plugin.cache.hazelcast</groupId>
+  <groupId>nl.clockwork.ebms.plugin.cache</groupId>
   <artifactId>ebms-hazelcast-cache-plugin</artifactId>
   <version>${project.parent.version}</version>
   <packaging>jar</packaging>
