@@ -23,7 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.delivery.DeliveryManager;
 import nl.clockwork.ebms.model.EbMSPing;
@@ -38,7 +38,7 @@ import nl.clockwork.ebms.validation.ValidatorException;
 class PongProcessor
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 	@NonNull
 	EbMSMessageValidator messageValidator;
 	@NonNull

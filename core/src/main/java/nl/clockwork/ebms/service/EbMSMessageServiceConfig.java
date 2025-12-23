@@ -18,7 +18,7 @@ package nl.clockwork.ebms.service;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.DeliveryManager;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
@@ -59,7 +59,7 @@ public class EbMSMessageServiceConfig
 			DeliveryManager deliveryManager,
 			EbMSDAO ebMSDAO,
 			MessageEventDAO messageEventDAO,
-			CPAManager cpaManager,
+			CPAQueryManager cpaManager,
 			EbMSMessageFactory ebMSMessageFactory,
 			DeliveryTaskManager deliveryTaskManager,
 			MessagePropertiesValidator messagePropertiesValidator,

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.validation;
+package nl.clockwork.ebms.cpa;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -26,11 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.SecurityUtils;
 import nl.clockwork.ebms.util.StreamUtils;
+import nl.clockwork.ebms.validation.EbMSValidationException;
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -55,8 +56,13 @@ public class CPAValidator
 
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
-		if (!cpaManager.isValid(message.getMessageHeader().getCPAId(), message.getMessageHeader().getMessageData().getTimestamp()))
+		if (!isValid(message.getMessageHeader().getCPAId(), message.getMessageHeader().getMessageData().getTimestamp()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid", EbMSErrorCode.INCONSISTENT, "Invalid CPA."));
+	}
+
+	public boolean isValid(String cpaId, Instant timestamp)
+	{
+		return cpaManager.getCPA(cpaId).filter(CPAQuery.isValidCPA(timestamp)).isPresent();
 	}
 
 	public void validate(String cpaId) throws ValidatorException

@@ -17,7 +17,7 @@ package nl.clockwork.ebms.encryption;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
 public class EncryptionConfig
 {
 	@Autowired
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 
 	@Bean
 	public EbMSMessageEncrypter messageEncrypter(EbMSTrustStore trustStore)

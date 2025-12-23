@@ -30,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.delivery.client.EbMSClient;
 import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
@@ -50,14 +50,14 @@ public class DeliveryManager
 	@NonNull
 	MessageQueue<EbMSResponseMessage> messageQueue;
 	@NonNull
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 	@NonNull
 	EbMSHttpClientFactory ebMSClientFactory;
 
 	@Builder
 	public DeliveryManager(
 			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
-			@NonNull CPAManager cpaManager,
+			@NonNull CPAQueryManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory)
 	{
 		this.messageQueue = messageQueue;

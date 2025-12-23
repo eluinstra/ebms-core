@@ -17,7 +17,8 @@ package nl.clockwork.ebms.validation;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
+import nl.clockwork.ebms.cpa.CPAValidator;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
@@ -31,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 public class ValidationConfig
 {
 	@Autowired
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 	@Autowired
 	CPAValidator cpaValidator;
 	@Value("${https.clientCertificateAuthentication}")

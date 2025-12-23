@@ -28,7 +28,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -54,7 +54,7 @@ class MessageHeaderValidator
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 
 	public void validate(EbMSMessage message, Instant timestamp) throws EbMSValidationException
 	{

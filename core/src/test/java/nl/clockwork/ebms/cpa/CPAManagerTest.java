@@ -25,9 +25,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import jakarta.xml.bind.JAXBException;
-import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -43,7 +40,6 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
@@ -95,9 +91,10 @@ public class CPAManagerTest
 	URLMappingDAO urlMappingDAO;
 	URLMapper urlMapper;
 	CPAManager cpaManager;
+	CPAQueryManager cpaQueryManager;
 
 	@BeforeAll
-	void init() throws IOException, JAXBException
+	void init()
 	{
 		MockitoAnnotations.openMocks(this);
 		when(cpaDAO.existsCPA(DEFAULT_CPA_ID)).thenReturn(true);
@@ -108,7 +105,8 @@ public class CPAManagerTest
 		when(cpaDAO.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));
 		when(urlMappingDAO.getURLMapping(anyString())).thenReturn(Optional.empty());
 		urlMapper = new URLMapper(urlMappingDAO);
-		cpaManager = new CPAManager(cpaDAO, urlMapper);
+		cpaManager = new CPAManager(cpaDAO);
+		cpaQueryManager = new CPAQueryManager(cpaManager, urlMapper);
 	}
 
 	private static ServiceType createDefaultService()
@@ -135,32 +133,10 @@ public class CPAManagerTest
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"2011-01-01T00:00:00Z", "2020-01-01T00:00:00.00Z", "2021-01-01T00:00:00Z"})
-	void isValid(String timestamp)
-	{
-		assertThat(cpaManager.isValid(DEFAULT_CPA_ID, Instant.parse(timestamp))).isTrue();
-	}
-
-	@ParameterizedTest
-	@MethodSource
-	void isNotValid(String cpaId, String timestamp)
-	{
-		assertThat(cpaManager.isValid(cpaId, Instant.parse(timestamp))).isFalse();
-	}
-
-	private static Stream<Arguments> isNotValid()
-	{
-		return Stream.of(
-				arguments(DEFAULT_CPA_ID, "2010-12-31T23:59:59Z"),
-				arguments(DEFAULT_CPA_ID, "2031-01-01T00:00:01Z"),
-				arguments(NOT_EXISTING_CPA_ID, "2020-01-01T00:00:00.00Z"));
-	}
-
-	@ParameterizedTest
 	@MethodSource
 	void existsPartyId(String partyId)
 	{
-		assertThat(cpaManager.existsPartyId(DEFAULT_CPA_ID, partyId)).isTrue();
+		assertThat(cpaQueryManager.existsPartyId(DEFAULT_CPA_ID, partyId)).isTrue();
 	}
 
 	private static Stream<Arguments> existsPartyId()
@@ -172,7 +148,7 @@ public class CPAManagerTest
 	@MethodSource
 	void notExistsPartyId(String cpaId, String partyId)
 	{
-		assertThat(cpaManager.existsPartyId(cpaId, partyId)).isFalse();
+		assertThat(cpaQueryManager.existsPartyId(cpaId, partyId)).isFalse();
 	}
 
 	private static Stream<Arguments> notExistsPartyId()
@@ -188,7 +164,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getEbMSPartyInfo(String cpaId, String partyId, EbMSPartyInfo expectedEbMSPartyInfo)
 	{
-		assertThat(cpaManager.getEbMSPartyInfo(cpaId, partyId)).hasValueSatisfying(partyInfo ->
+		assertThat(cpaQueryManager.getEbMSPartyInfo(cpaId, partyId)).hasValueSatisfying(partyInfo ->
 		{
 			assertThat(partyInfo.getPartyIds().size()).isEqualTo(1);
 			assertThat(partyInfo.getPartyIds().get(0)).satisfies(id ->
@@ -216,7 +192,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoEbMSPartyInfo(String cpaId, String partyId)
 	{
-		assertThat(cpaManager.getEbMSPartyInfo(cpaId, partyId)).isEmpty();
+		assertThat(cpaQueryManager.getEbMSPartyInfo(cpaId, partyId)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoEbMSPartyInfo()
@@ -232,7 +208,8 @@ public class CPAManagerTest
 	@MethodSource
 	void getPartyInfo(String cpaId, List<PartyId> partyIds, String expectedPartyName)
 	{
-		assertThat(cpaManager.getPartyInfo(cpaId, partyIds)).hasValueSatisfying(partyInfo -> assertThat(partyInfo.getPartyName()).isEqualTo(expectedPartyName));
+		assertThat(cpaQueryManager.getPartyInfo(cpaId, partyIds))
+				.hasValueSatisfying(partyInfo -> assertThat(partyInfo.getPartyName()).isEqualTo(expectedPartyName));
 	}
 
 	private static Stream<Arguments> getPartyInfo()
@@ -254,7 +231,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoPartyInfo(String cpaId, List<PartyId> partyIds)
 	{
-		assertThat(cpaManager.getPartyInfo(cpaId, partyIds)).isEmpty();
+		assertThat(cpaQueryManager.getPartyInfo(cpaId, partyIds)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoPartyInfo()
@@ -275,7 +252,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
-		assertThat(cpaManager.getFromPartyInfo(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
+		assertThat(cpaQueryManager.getFromPartyInfo(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
 		{
 			/* TODO */});
 	}
@@ -310,7 +287,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
-		assertThat(cpaManager.getFromPartyInfo(cpaId, fromParty, service, action)).isEmpty();
+		assertThat(cpaQueryManager.getFromPartyInfo(cpaId, fromParty, service, action)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoFromPartyInfo()
@@ -336,7 +313,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
-		assertThat(cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
+		assertThat(cpaQueryManager.getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
 		{
 			/* TODO */});
 	}
@@ -363,7 +340,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
-		assertThat(cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, service, action)).isEmpty();
+		assertThat(cpaQueryManager.getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, service, action)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoToPartyInfoByFromPartyActionBinding()
@@ -389,7 +366,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getToPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
-		assertThat(cpaManager.getToPartyInfo(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
+		assertThat(cpaQueryManager.getToPartyInfo(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
 		{
 			/* TODO */});
 	}
@@ -416,7 +393,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoToPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
-		assertThat(cpaManager.getToPartyInfo(cpaId, fromParty, service, action)).isEmpty();
+		assertThat(cpaQueryManager.getToPartyInfo(cpaId, fromParty, service, action)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoToPartyInfo()
@@ -442,7 +419,7 @@ public class CPAManagerTest
 	@MethodSource
 	void canSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.canSend(cpaId, partyId, role, service, action)).isTrue();
+		assertThat(cpaQueryManager.canSend(cpaId, partyId, role, service, action)).isTrue();
 	}
 
 	private static Stream<Arguments> canSend()
@@ -458,7 +435,7 @@ public class CPAManagerTest
 	@MethodSource
 	void canNotSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.canSend(cpaId, partyId, role, service, action)).isFalse();
+		assertThat(cpaQueryManager.canSend(cpaId, partyId, role, service, action)).isFalse();
 	}
 
 	private static Stream<Arguments> canNotSend()
@@ -487,7 +464,7 @@ public class CPAManagerTest
 	@MethodSource
 	void canReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.canReceive(cpaId, partyId, role, service, action)).isTrue();
+		assertThat(cpaQueryManager.canReceive(cpaId, partyId, role, service, action)).isTrue();
 	}
 
 	private static Stream<Arguments> canReceive()
@@ -503,7 +480,7 @@ public class CPAManagerTest
 	@MethodSource
 	void canNotReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.canReceive(cpaId, partyId, role, service, action)).isFalse();
+		assertThat(cpaQueryManager.canReceive(cpaId, partyId, role, service, action)).isFalse();
 	}
 
 	private static Stream<Arguments> canNotReceive()
@@ -533,7 +510,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getDeliveryChannel(String cpaId, String deliveryChannelId)
 	{
-		assertThat(cpaManager.getDeliveryChannel(cpaId, deliveryChannelId))
+		assertThat(cpaQueryManager.getDeliveryChannel(cpaId, deliveryChannelId))
 				.hasValueSatisfying(deliveryChannel -> assertThat(deliveryChannel.getChannelId()).isEqualTo(deliveryChannelId));
 	}
 
@@ -550,7 +527,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoDeliveryChannel(String cpaId, String deliveryChannelId)
 	{
-		assertThat(cpaManager.getDeliveryChannel(cpaId, deliveryChannelId)).isEmpty();
+		assertThat(cpaQueryManager.getDeliveryChannel(cpaId, deliveryChannelId)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoDeliveryChannel()
@@ -562,7 +539,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action, String deliveryChannelId)
 	{
-		assertThat(cpaManager.getDefaultDeliveryChannel(cpaId, partyId, action))
+		assertThat(cpaQueryManager.getDefaultDeliveryChannel(cpaId, partyId, action))
 				.hasValueSatisfying(deliveryChannel -> assertThat(deliveryChannel.getChannelId()).isEqualTo(deliveryChannelId));
 	}
 
@@ -582,7 +559,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
-		assertThat(cpaManager.getDefaultDeliveryChannel(cpaId, partyId, action)).isEmpty();
+		assertThat(cpaQueryManager.getDefaultDeliveryChannel(cpaId, partyId, action)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoDefaultDeliveryChannel()
@@ -598,7 +575,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.getSendDeliveryChannel(cpaId, partyId, role, service, action)).hasValueSatisfying(deliveryChannel ->
+		assertThat(cpaQueryManager.getSendDeliveryChannel(cpaId, partyId, role, service, action)).hasValueSatisfying(deliveryChannel ->
 		{
 			/* TODO */});
 	}
@@ -617,7 +594,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.getSendDeliveryChannel(cpaId, partyId, role, service, action)).isEmpty();
+		assertThat(cpaQueryManager.getSendDeliveryChannel(cpaId, partyId, role, service, action)).isEmpty();
 	}
 
 	public static Stream<Arguments> getNoSendDeliveryChannel()
@@ -638,7 +615,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.getReceiveDeliveryChannel(cpaId, partyId, role, service, action)).hasValueSatisfying(deliveryChannel ->
+		assertThat(cpaQueryManager.getReceiveDeliveryChannel(cpaId, partyId, role, service, action)).hasValueSatisfying(deliveryChannel ->
 		{
 			/* TODO */});
 	}
@@ -657,7 +634,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.getReceiveDeliveryChannel(cpaId, partyId, role, service, action)).isEmpty();
+		assertThat(cpaQueryManager.getReceiveDeliveryChannel(cpaId, partyId, role, service, action)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoReceiveDeliveryChannel()
@@ -678,7 +655,7 @@ public class CPAManagerTest
 	@MethodSource
 	void isSendingNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.isSendingNonRepudiationRequired(cpaId, partyId, role, service, action)).isTrue();
+		assertThat(cpaQueryManager.isSendingNonRepudiationRequired(cpaId, partyId, role, service, action)).isTrue();
 	}
 
 	private static Stream<Arguments> isSendingNonRepudiationRequired()
@@ -694,7 +671,7 @@ public class CPAManagerTest
 	@MethodSource
 	void isSendingNotNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.isSendingNonRepudiationRequired(cpaId, partyId, role, service, action)).isFalse();
+		assertThat(cpaQueryManager.isSendingNonRepudiationRequired(cpaId, partyId, role, service, action)).isFalse();
 	}
 
 	private static Stream<Arguments> isSendingNotNonRepudiationRequired()
@@ -708,7 +685,7 @@ public class CPAManagerTest
 	@MethodSource
 	void isSendingConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.isSendingConfidential(cpaId, partyId, role, service, action)).isTrue();
+		assertThat(cpaQueryManager.isSendingConfidential(cpaId, partyId, role, service, action)).isTrue();
 	}
 
 	private static Stream<Arguments> isSendingConfidential()
@@ -724,7 +701,7 @@ public class CPAManagerTest
 	@MethodSource
 	void isSendingNotConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.isSendingConfidential(cpaId, partyId, role, service, action)).isFalse();
+		assertThat(cpaQueryManager.isSendingConfidential(cpaId, partyId, role, service, action)).isFalse();
 	}
 
 	private static Stream<Arguments> isSendingNotConfidential()
@@ -742,7 +719,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getUri(String cpaId, List<PartyId> partyId, String role, String service, String action, String url)
 	{
-		assertThat(cpaManager.getReceivingUri(cpaId, partyId, role, service, action)).isEqualTo(url);
+		assertThat(cpaQueryManager.getReceivingUri(cpaId, partyId, role, service, action)).isEqualTo(url);
 	}
 
 	private static Stream<Arguments> getUri()
@@ -760,7 +737,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoUri(String cpaId, List<PartyId> partyId, String role, String service, String action, String url)
 	{
-		assertThatIllegalStateException().isThrownBy(() -> cpaManager.getReceivingUri(cpaId, partyId, role, service, action))
+		assertThatIllegalStateException().isThrownBy(() -> cpaQueryManager.getReceivingUri(cpaId, partyId, role, service, action))
 				.withMessageStartingWith("ReceiveDeliveryChannel");
 	}
 
@@ -777,7 +754,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getSendSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action, SyncReplyModeType syncReplyMode)
 	{
-		assertThat(cpaManager.getSendSyncReply(cpaId, partyId, role, service, action)).hasValueSatisfying(mode -> assertThat(mode).isEqualTo(syncReplyMode));
+		assertThat(cpaQueryManager.getSendSyncReply(cpaId, partyId, role, service, action)).hasValueSatisfying(mode -> assertThat(mode).isEqualTo(syncReplyMode));
 	}
 
 	private static Stream<Arguments> getSendSyncReply()
@@ -855,7 +832,7 @@ public class CPAManagerTest
 	@MethodSource
 	void getNoSendSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		assertThat(cpaManager.getSendSyncReply(cpaId, partyId, role, service, action)).isEmpty();
+		assertThat(cpaQueryManager.getSendSyncReply(cpaId, partyId, role, service, action)).isEmpty();
 	}
 
 	private static Stream<Arguments> getNoSendSyncReply()

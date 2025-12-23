@@ -24,7 +24,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -54,7 +54,7 @@ class DeliveryTaskHandler
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 	@NonNull
 	URLMapper urlMapper;
 	@NonNull
@@ -72,7 +72,7 @@ class DeliveryTaskHandler
 	public DeliveryTaskHandler(
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,
-			@NonNull CPAManager cpaManager,
+			@NonNull CPAQueryManager cpaManager,
 			@NonNull URLMapper urlMapper,
 			@NonNull DeliveryTaskManager deliveryTaskManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,

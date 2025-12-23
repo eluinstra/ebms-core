@@ -29,9 +29,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CPAManagerConfig
 {
 	@Bean
-	public CPAManager cpaManager(CPADAO cpaDAO, DataSource dataSource, URLMapper urlMapper)
+	public CPAManager cpaManager(CPADAO cpaDAO)
 	{
-		return new CPAManager(cpaDAO, urlMapper);
+		return new CPAManager(cpaDAO);
+	}
+
+	@Bean
+	public CPAQueryManager cpaQueryManager(CPAManager cpaManager, URLMapper urlMapper)
+	{
+		return new CPAQueryManager(cpaManager, urlMapper);
 	}
 
 	@Bean

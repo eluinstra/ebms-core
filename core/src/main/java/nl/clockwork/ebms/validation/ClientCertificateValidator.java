@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.util.StreamUtils;
@@ -33,7 +33,7 @@ class ClientCertificateValidator
 {
 	private static class DisabledClientCertificateValidator extends ClientCertificateValidator
 	{
-		public DisabledClientCertificateValidator(CPAManager cpaManager)
+		public DisabledClientCertificateValidator(CPAQueryManager cpaManager)
 		{
 			super(cpaManager);
 		}
@@ -46,9 +46,9 @@ class ClientCertificateValidator
 	}
 
 	@NonNull
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 
-	public static ClientCertificateValidator of(@NonNull CPAManager cpaManager, boolean enabled)
+	public static ClientCertificateValidator of(@NonNull CPAQueryManager cpaManager, boolean enabled)
 	{
 		return enabled ? new ClientCertificateValidator(cpaManager) : new DisabledClientCertificateValidator(cpaManager);
 	}

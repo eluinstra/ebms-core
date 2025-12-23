@@ -36,8 +36,8 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.cpa.url.URLMappingDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SigningTest
 {
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 	EbMSMessageFactory messageFactory;
 	String cpaId = "cpaStubEBF.rm.https.signed";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
@@ -125,14 +125,14 @@ public class SigningTest
 		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
-	private CPAManager initCPAManager() throws IOException, JAXBException
+	private CPAQueryManager initCPAManager() throws IOException, JAXBException
 	{
-		return new CPAManager(initCPADAOMock(), new URLMapper(initURLMappingDAOMock()));
+		return new CPAQueryManager(initCPAManagerMock(), new URLMapper(initURLMappingDAOMock()));
 	}
 
-	private CPADAO initCPADAOMock() throws IOException, JAXBException
+	private CPAManager initCPAManagerMock() throws IOException, JAXBException
 	{
-		val result = mock(CPADAO.class);
+		val result = mock(CPAManager.class);
 		when(result.getCPA(cpaId)).thenReturn(cpaCache.apply(cpaId));
 		return result;
 	}
@@ -143,17 +143,17 @@ public class SigningTest
 		return result;
 	}
 
-	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
+	private EbMSMessageFactory initMessageFactory(CPAQueryManager cpaManager)
 	{
 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
-	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
+	private EbMSSignatureGenerator initSignatureGenerator(CPAQueryManager cpaManager) throws Exception
 	{
 		return new EbMSSignatureGenerator(cpaManager, EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword));
 	}
 
-	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
+	private EbMSSignatureValidator initSignatureValidator(CPAQueryManager cpaManager) throws Exception
 	{
 		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
 		return new EbMSSignatureValidator(cpaManager, trustStore);

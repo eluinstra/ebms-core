@@ -34,8 +34,8 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.cpa.url.URLMappingDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -64,7 +64,7 @@ import org.xml.sax.SAXException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EncryptionTest
 {
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 	EbMSMessageFactory messageFactory;
 	String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
@@ -149,14 +149,14 @@ public class EncryptionTest
 								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
-	private CPAManager initCPAManager() throws IOException, JAXBException
+	private CPAQueryManager initCPAManager() throws IOException, JAXBException
 	{
-		return new CPAManager(initCPADAOMock(), new URLMapper(initURLMappingDAOMock()));
+		return new CPAQueryManager(initCPAManagerMock(), new URLMapper(initURLMappingDAOMock()));
 	}
 
-	private CPADAO initCPADAOMock() throws IOException, JAXBException
+	private CPAManager initCPAManagerMock() throws IOException, JAXBException
 	{
-		val result = mock(CPADAO.class);
+		val result = mock(CPAManager.class);
 		when(result.getCPA(cpaId)).thenReturn(cpaCache.apply(cpaId));
 		return result;
 	}
@@ -166,18 +166,18 @@ public class EncryptionTest
 		return mock(URLMappingDAO.class);
 	}
 
-	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
+	private EbMSMessageFactory initMessageFactory(CPAQueryManager cpaManager)
 	{
 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
-	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager) throws Exception
+	private EbMSMessageEncrypter initMessageEncrypter(CPAQueryManager cpaManager) throws Exception
 	{
 		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
 		return new EbMSMessageEncrypter(cpaManager, trustStore);
 	}
 
-	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager) throws Exception
+	private EbMSMessageDecrypter initMessageDecrypter(CPAQueryManager cpaManager) throws Exception
 	{
 		val keyStore = EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword);
 		return new EbMSMessageDecrypter(cpaManager, keyStore);

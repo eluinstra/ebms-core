@@ -18,7 +18,7 @@ package nl.clockwork.ebms.delivery.task;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import org.quartz.Job;
 import org.quartz.Scheduler;
@@ -36,7 +36,7 @@ public class QuartzKafkaDeliveryTaskManager extends QuartzDeliveryTaskManager
 			@NonNull Scheduler scheduler,
 			@NonNull EbMSDAO ebMSDAO,
 			@NonNull DeliveryTaskDAO deliveryTaskDAO,
-			@NonNull CPAManager cpaManager,
+			@NonNull CPAQueryManager cpaManager,
 			int nrAutoRetries,
 			int autoRetryInterval,
 			@NonNull KafkaTemplate<String, DeliveryTask> kafkaTemplate)

@@ -19,7 +19,7 @@ import jakarta.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAQueryManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import org.quartz.Scheduler;
@@ -43,7 +43,7 @@ public class DeliveryTaskManagerConfig
 	@Value("${deliveryTaskHandler.type}")
 	DeliveryTaskHandlerType deliveryTaskHandlerType;
 	@Autowired
-	CPAManager cpaManager;
+	CPAQueryManager cpaManager;
 	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Autowired
