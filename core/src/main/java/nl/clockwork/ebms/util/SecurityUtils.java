@@ -35,6 +35,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import nl.clockwork.ebms.common.StreamUtils;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;

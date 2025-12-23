@@ -16,6 +16,8 @@
 package nl.clockwork.ebms.event;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.common.event.MessageEventException;
+import nl.clockwork.ebms.common.event.MessageEventListener;
 
 @Slf4j
 class LoggingMessageEventListener implements MessageEventListener

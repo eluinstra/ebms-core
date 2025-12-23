@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.util;
 
+import static nl.clockwork.ebms.EbMSMessageStatusMapper.toMessageStatusType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -36,14 +37,15 @@ import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSErrorCode;
-import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -104,7 +106,7 @@ public class EbMSMessageUtilsTest
 		/* createStatusResponse 1 */
 		var createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.FAILED, timestamp);
 		assertEquals(msgRef1, createStatusResponse.getRefToMessageId());
-		assertEquals(EbMSMessageStatus.RECEIVED.getStatusCode(), createStatusResponse.getMessageStatus());
+		assertEquals(toMessageStatusType(EbMSMessageStatus.RECEIVED), createStatusResponse.getMessageStatus());
 		assertEquals(timestamp, createStatusResponse.getTimestamp());
 		assertEquals(Constants.EBMS_VERSION, createStatusResponse.getVersion());
 

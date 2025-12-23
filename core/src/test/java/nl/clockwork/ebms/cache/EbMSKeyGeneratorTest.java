@@ -15,32 +15,33 @@
  */
 package nl.clockwork.ebms.cache;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Stream;
-import lombok.val;
-import nl.clockwork.ebms.model.Party;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
+import lombok.val;
+import nl.clockwork.ebms.common.Party;
+
 class EbMSKeyGeneratorTest
 {
-
 	EbMSKeyGenerator keyGenerator = new EbMSKeyGenerator();
 
 	@ParameterizedTest
 	@MethodSource("validInput")
 	void testKeyGenerator(Method method, Object[] params, String expected)
 	{
-		assertEquals(expected, keyGenerator.generate(null, method, params));
+		assertThat(keyGenerator.generate(null, method, params)).isEqualTo(expected);
 	}
 
-	public static Stream<Arguments> validInput() throws NoSuchMethodException, SecurityException
+	static Stream<Arguments> validInput() throws NoSuchMethodException, SecurityException
 	{
 		val method = Object.class.getMethod("toString");
 		return Stream.of(

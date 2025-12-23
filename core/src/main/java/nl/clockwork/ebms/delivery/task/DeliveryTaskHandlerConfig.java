@@ -15,17 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import jakarta.jms.ConnectionFactory;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import lombok.val;
-import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.url.URLMapper;
-import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
-import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
-import nl.clockwork.ebms.event.MessageEventListener;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,17 +30,30 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import jakarta.jms.ConnectionFactory;
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskDAO;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskHandler;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskHandlerType;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskManager;
+import nl.clockwork.ebms.common.event.MessageEventListener;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.url.URLMapper;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
+import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
+import nl.clockwork.ebms.plugin.messaging.jms.deliverytask.JMSDeliveryTaskListener;
+import nl.clockwork.ebms.plugin.messaging.jms.deliverytask.JMSDeliveryTaskManager;
+import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+
 @Configuration
-@ComponentScan(basePackageClasses = {nl.clockwork.ebms.delivery.task.DeliveryTaskJob.class, nl.clockwork.ebms.delivery.task.JMSJob.class})
+@ComponentScan(basePackageClasses = {nl.clockwork.ebms.common.deliverytask.quartz.DeliveryTaskJob.class, nl.clockwork.ebms.plugin.messaging.jms.deliverytask.JMSJob.class})
 @EnableAsync
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
 {
-	public enum DeliveryTaskHandlerType
-	{
-		DEFAULT, JMS, QUARTZ, QUARTZ_JMS, QUARTZ_KAFKA;
-	}
-
 	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Value("${deliveryTaskHandler.jms.destinationName}")
@@ -130,7 +132,7 @@ public class DeliveryTaskHandlerConfig
 			EbMSMessageEncrypter messageEncrypter,
 			EbMSMessageProcessor messageProcessor)
 	{
-		return DeliveryTaskHandler.builder()
+		return DeliveryTaskHandlerImpl.builder()
 				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
@@ -180,17 +182,6 @@ public class DeliveryTaskHandlerConfig
 									== DeliveryTaskHandlerType.QUARTZ_JMS
 							|| context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 									== DeliveryTaskHandlerType.QUARTZ_KAFKA);
-		}
-	}
-
-	public static class KafkaTaskHandlerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start", Boolean.class, true)
-					&& context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-							== DeliveryTaskHandlerType.QUARTZ_KAFKA;
 		}
 	}
 }

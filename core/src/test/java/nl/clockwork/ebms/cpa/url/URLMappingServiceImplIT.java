@@ -24,8 +24,9 @@ import java.util.stream.Stream;
 import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.WithFile;
-import nl.clockwork.ebms.datasource.DataSourceConfig;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig;
+import nl.clockwork.ebms.config.DataSourceConfig;
+import nl.clockwork.ebms.config.TransactionManagerConfig;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;

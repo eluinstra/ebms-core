@@ -18,6 +18,7 @@ package nl.clockwork.ebms.dao;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.EbMSAPIDAO;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -36,5 +37,11 @@ public class DAOConfig
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new EbMSDAOImpl(transactionTemplate, jdbcTemplate);
+	}
+
+	@Bean
+	public EbMSAPIDAO ebMSMessagePropertiesDAO(EbMSDAOImpl ebMSDAO)
+	{
+		return ebMSDAO;
 	}
 }

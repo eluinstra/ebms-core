@@ -32,10 +32,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.val;
+import nl.clockwork.ebms.common.Party;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.cpa.url.URLMappingDAO;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
-import nl.clockwork.ebms.model.Party;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

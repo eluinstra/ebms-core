@@ -25,13 +25,14 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.Party;
+import nl.clockwork.ebms.common.StreamUtils;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
-import nl.clockwork.ebms.util.StreamUtils;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessagingCharacteristics;
@@ -131,7 +132,7 @@ public class CPAManager
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
 		return getFromPartyInfo(cpaId, fromParty, service, action)
-				.flatMap(fromPartyInfo -> getCPA(cpaId).map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo, fromParty, service, action)))
+				.flatMap(fromPartyInfo -> getCPA(cpaId).map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo)))
 				.orElse(empty());
 	}
 

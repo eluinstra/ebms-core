@@ -21,10 +21,11 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.common.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.util.StreamUtils;
+
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

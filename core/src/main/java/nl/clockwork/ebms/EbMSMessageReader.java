@@ -28,6 +28,7 @@ import lombok.val;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.util.DOMUtils;
+
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.MimeConfig;

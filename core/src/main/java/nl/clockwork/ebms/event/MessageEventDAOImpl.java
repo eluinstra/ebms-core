@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.dao.WithMessageFilter;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;

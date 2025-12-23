@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.event.MessageEventType;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;

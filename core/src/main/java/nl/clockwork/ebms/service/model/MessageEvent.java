@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import nl.clockwork.ebms.event.MessageEventType;
+import nl.clockwork.ebms.common.event.MessageEventType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Builder

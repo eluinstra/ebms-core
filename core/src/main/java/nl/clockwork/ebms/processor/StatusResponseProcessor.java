@@ -17,6 +17,9 @@ package nl.clockwork.ebms.processor;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+
+import static nl.clockwork.ebms.EbMSMessageStatusMapper.toMessageStatusType;
+
 import java.time.Instant;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -26,14 +29,14 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSMessageProperties;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.DeliveryManager;
-import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -106,9 +109,9 @@ class StatusResponseProcessor
 	private Tuple2<EbMSMessageStatus, Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
 	{
 		if (status != null
-				&& (MessageStatusType.RECEIVED.equals(status.getStatusCode())
-						|| MessageStatusType.PROCESSED.equals(status.getStatusCode())
-						|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
+				&& (MessageStatusType.RECEIVED.equals(toMessageStatusType(status))
+						|| MessageStatusType.PROCESSED.equals(toMessageStatusType(status))
+						|| MessageStatusType.FORWARDED.equals(toMessageStatusType(status))))
 			return Tuple.of(status, timestamp);
 		else
 			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED, null);

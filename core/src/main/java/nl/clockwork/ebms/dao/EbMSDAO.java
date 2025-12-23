@@ -18,18 +18,19 @@ package nl.clockwork.ebms.dao;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.EbMSMessageStatus;
+
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSAPIDAO;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageFilter;
 import org.w3c.dom.Document;
 
-public interface EbMSDAO
+public interface EbMSDAO extends EbMSAPIDAO
 {
 	void executeTransaction(Runnable runnable);
 
@@ -41,10 +42,6 @@ public interface EbMSDAO
 
 	Optional<MTOMMessage> getMTOMMessage(String messageId);
 
-	Optional<EbMSMessageProperties> getEbMSMessageProperties(String messageId);
-
-	Optional<EbMSMessageProperties> getEbMSMessagePropertiesByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
-
 	Optional<Document> getDocument(String messageId);
 
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId);
@@ -52,8 +49,6 @@ public interface EbMSDAO
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
 
 	Optional<Instant> getPersistTime(String messageId);
-
-	Optional<EbMSAction> getMessageAction(String messageId);
 
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status);
 

@@ -20,6 +20,7 @@ import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static io.vavr.API.run;
 import static io.vavr.Predicates.instanceOf;
+import static nl.clockwork.ebms.EbMSMessageStatusMapper.toMessageStatusType;
 
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
@@ -38,6 +39,8 @@ import javax.xml.xpath.XPathExpressionException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -49,6 +52,7 @@ import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.util.DOMUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
@@ -241,8 +245,8 @@ public class EbMSMessageUtils
 		result.setRefToMessageId(statusRequest.getRefToMessageId());
 		if (status != null)
 		{
-			result.setMessageStatus(status.getStatusCode());
-			if (MessageStatusType.RECEIVED.equals(status.getStatusCode()) || MessageStatusType.PROCESSED.equals(status.getStatusCode()))
+			result.setMessageStatus(toMessageStatusType(status));
+			if (MessageStatusType.RECEIVED.equals(toMessageStatusType(status)) || MessageStatusType.PROCESSED.equals(toMessageStatusType(status)))
 				result.setTimestamp(timestamp);
 		}
 		return result;

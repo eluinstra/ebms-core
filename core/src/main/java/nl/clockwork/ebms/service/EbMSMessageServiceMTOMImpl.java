@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.event.MessageEventType;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.MessageEvent;

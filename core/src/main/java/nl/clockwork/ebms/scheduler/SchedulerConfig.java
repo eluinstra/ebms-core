@@ -15,18 +15,11 @@
  */
 package nl.clockwork.ebms.scheduler;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import java.util.Arrays;
 import java.util.Properties;
+
 import javax.sql.DataSource;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
-import lombok.val;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
+
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,6 +31,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskHandlerType;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 
 @Configuration
 @EnableTransactionManagement

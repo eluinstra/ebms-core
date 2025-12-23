@@ -15,23 +15,23 @@
  */
 package nl.clockwork.ebms;
 
+import nl.clockwork.ebms.config.DataSourceConfig;
+import nl.clockwork.ebms.config.TransactionManagerConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
 import nl.clockwork.ebms.cpa.CPAServiceConfig;
 import nl.clockwork.ebms.cpa.certificate.CertificateMappingServiceConfig;
 import nl.clockwork.ebms.cpa.url.URLMappingServiceConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
-import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.delivery.DeliveryManagerConfig;
 import nl.clockwork.ebms.delivery.client.EbMSClientConfig;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskManagerConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
 import nl.clockwork.ebms.event.MessageEventListenerConfig;
-import nl.clockwork.ebms.jms.JMSConfig;
+import nl.clockwork.ebms.plugin.messaging.jms.config.JMSConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
 import nl.clockwork.ebms.service.EbMSMessageServiceConfig;
 import nl.clockwork.ebms.signing.SigningConfig;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.validation.ValidationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;

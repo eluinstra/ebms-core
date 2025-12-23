@@ -31,6 +31,10 @@
   <name>EbMS JMS Messaging Plugin</name>
   <dependencies>
     <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-broker</artifactId>
       <version>6.1.8</version>
@@ -51,6 +55,18 @@
       <version>6.1.8</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>nl.clockwork.ebms.common</groupId>
       <artifactId>ebms-common</artifactId>
       <version>${project.parent.version}</version>
@@ -66,7 +82,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
+      <artifactId>spring-context-support</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>

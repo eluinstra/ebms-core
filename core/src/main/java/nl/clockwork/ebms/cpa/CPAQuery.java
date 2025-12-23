@@ -21,9 +21,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import nl.clockwork.ebms.common.Party;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -37,9 +38,12 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelT
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CPAQuery
 {
-
 	static Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
 	{
 		return cpa -> StatusValueType.AGREED.equals(cpa.getStatus().getValue())
@@ -59,12 +63,21 @@ public class CPAQuery
 
 	private static Predicate<PartyInfo> isEmptyOrMatchesPartyInfo(Party fromParty)
 	{
-		return partyInfo -> fromParty == null || fromParty.matches(partyInfo.getPartyId());
+		return partyInfo -> fromParty == null || matches(fromParty.getPartyId(), partyInfo.getPartyId());
+	}
+
+	private static boolean matches(String partyId, List<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId> partyIds)
+	{
+		if (partyId == null && (partyIds == null || partyIds.isEmpty()))
+			return true;
+		if (partyId == null || partyIds == null)
+			return false;
+		return partyIds.stream().anyMatch(id -> partyId.equals(CPAUtils.toString(id)));
 	}
 
 	private static Predicate<CollaborationRole> isEmptyOrMatchesRole(Party fromParty)
 	{
-		return collaborationRole -> fromParty == null || fromParty.matches(collaborationRole.getRole());
+		return collaborationRole -> fromParty == null || fromParty.getRole().equals(collaborationRole.getRole().getName());
 	}
 
 	private static Predicate<CollaborationRole> matchesRoleByRole(String role)
@@ -165,7 +178,14 @@ public class CPAQuery
 	private static Function<CanSend, FromPartyInfo> toFromPartyInfo(Party fromParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
 	{
 		return canSend -> CPAUtils
-				.getFromPartyInfo(fromParty == null ? partyInfo.getPartyId().get(0) : fromParty.getPartyId(partyInfo.getPartyId()), collaborationRole, canSend);
+				.getFromPartyInfo(fromParty == null ? partyInfo.getPartyId().get(0) : getPartyId(fromParty.getPartyId(), partyInfo.getPartyId()), collaborationRole, canSend);
+	}
+
+	private static org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId getPartyId(String partyId, List<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId> partyIds)
+	{
+		if (partyId == null || partyIds == null)
+			return null;
+		return partyIds.stream().filter(id -> partyId.equals(CPAUtils.toString(id))).findFirst().orElse(null);
 	}
 
 	private static Function<CanReceive, ToPartyInfo> toToPartyInfo(PartyInfo partyInfo, CollaborationRole collaborationRole)
@@ -176,7 +196,7 @@ public class CPAQuery
 	private static Function<CanReceive, ToPartyInfo> toToPartyInfo(Party toParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
 	{
 		return canReceive -> CPAUtils
-				.getToPartyInfo(toParty == null ? partyInfo.getPartyId().get(0) : toParty.getPartyId(partyInfo.getPartyId()), collaborationRole, canReceive);
+				.getToPartyInfo(toParty == null ? partyInfo.getPartyId().get(0) : getPartyId(toParty.getPartyId(), partyInfo.getPartyId()), collaborationRole, canReceive);
 	}
 
 	private static Function<OverrideMshActionBinding, DeliveryChannel> toDeliveryChannel()
@@ -233,7 +253,7 @@ public class CPAQuery
 
 	static
 			Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>>
-			getToPartyInfoByFromPartyActionBinding(FromPartyInfo fromPartyInfo, Party fromParty, String service, String action)
+			getToPartyInfoByFromPartyActionBinding(FromPartyInfo fromPartyInfo)
 	{
 		return cpa -> cpa.getPartyInfo()
 				.stream()

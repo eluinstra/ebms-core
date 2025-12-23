@@ -24,6 +24,8 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskDAO;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskHandler;
 import lombok.val;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 

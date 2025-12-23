@@ -20,8 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.common.Party;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 

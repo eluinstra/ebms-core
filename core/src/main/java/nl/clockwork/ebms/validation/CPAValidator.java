@@ -26,11 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.SecurityUtils;
-import nl.clockwork.ebms.util.StreamUtils;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;

@@ -19,9 +19,16 @@ import jakarta.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTask;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskDAO;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskManager;
+import nl.clockwork.ebms.common.deliverytask.quartz.QuartzDeliveryTaskManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
+import nl.clockwork.ebms.plugin.messaging.jms.deliverytask.JMSDeliveryTaskManager;
+import nl.clockwork.ebms.plugin.messaging.jms.deliverytask.QuartzJMSDeliveryTaskManager;
+import nl.clockwork.ebms.plugin.messaging.kakfa.deliverytask.QuartzKafkaDeliveryTaskManager;
+
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -110,55 +117,5 @@ public class DeliveryTaskManagerConfig
 	private DAODeliveryTaskManager createDefaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
 	{
 		return new DAODeliveryTaskManager(ebMSDAO, deliveryTaskDAO, cpaManager, serverId, nrAutoRetries, autoRetryInterval);
-	}
-
-	public static class DefaultTaskManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-					== DeliveryTaskHandlerType.DEFAULT;
-		}
-	}
-
-	public static class JmsTaskManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-					== DeliveryTaskHandlerType.JMS;
-		}
-	}
-
-	public static class QuartzTaskManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-					== DeliveryTaskHandlerType.QUARTZ;
-		}
-	}
-
-	public static class QuartzJMSTaskManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-					== DeliveryTaskHandlerType.QUARTZ_JMS;
-		}
-	}
-
-	public static class QuartzKafkaTaskManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-					== DeliveryTaskHandlerType.QUARTZ_KAFKA;
-		}
 	}
 }

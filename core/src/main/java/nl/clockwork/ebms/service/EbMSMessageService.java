@@ -21,7 +21,8 @@ import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import jakarta.xml.bind.annotation.XmlElement;
 import java.util.List;
-import nl.clockwork.ebms.event.MessageEventType;
+
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;

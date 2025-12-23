@@ -22,7 +22,8 @@ import jakarta.jws.WebService;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.ws.soap.MTOM;
 import java.util.List;
-import nl.clockwork.ebms.event.MessageEventType;
+
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.MessageEvent;

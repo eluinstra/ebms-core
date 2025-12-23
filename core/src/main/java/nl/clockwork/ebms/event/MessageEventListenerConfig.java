@@ -29,8 +29,15 @@ import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.common.EbMSMessageProperties;
+import nl.clockwork.ebms.common.event.MessageEventListener;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSMessageProperties;
+import nl.clockwork.ebms.plugin.messaging.jms.event.JMSMessageEventListener;
+import nl.clockwork.ebms.plugin.messaging.jms.event.JMSTextMessageEventListener;
+import nl.clockwork.ebms.plugin.messaging.jms.event.SimpleJMSMessageEventListener;
+import nl.clockwork.ebms.plugin.messaging.kakfa.event.KafkaMessageEventListener;
+
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;

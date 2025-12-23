@@ -24,6 +24,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTask;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskDAO;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskStatus;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 

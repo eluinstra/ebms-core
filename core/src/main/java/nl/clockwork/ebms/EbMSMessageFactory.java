@@ -16,6 +16,9 @@
 package nl.clockwork.ebms;
 
 import jakarta.xml.bind.JAXBException;
+
+import static nl.clockwork.ebms.EbMSMessageStatusMapper.toMessageStatusType;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
@@ -28,6 +31,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.Party;
+import nl.clockwork.ebms.common.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -38,7 +45,6 @@ import nl.clockwork.ebms.model.EbMSPing;
 import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
-import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.service.model.DataSource;
@@ -46,7 +52,7 @@ import nl.clockwork.ebms.service.model.MTOMDataSource;
 import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.MessageRequest;
 import nl.clockwork.ebms.service.model.MessageRequestProperties;
-import nl.clockwork.ebms.util.StreamUtils;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
@@ -433,8 +439,8 @@ public class EbMSMessageFactory
 		result.setRefToMessageId(statusRequest.getRefToMessageId());
 		if (status != null)
 		{
-			result.setMessageStatus(status.getStatusCode());
-			if (MessageStatusType.RECEIVED.equals(status.getStatusCode()) || MessageStatusType.PROCESSED.equals(status.getStatusCode()))
+			result.setMessageStatus(toMessageStatusType(status));
+			if (MessageStatusType.RECEIVED.equals(toMessageStatusType(status)) || MessageStatusType.PROCESSED.equals(toMessageStatusType(status)))
 				result.setTimestamp(timestamp);
 		}
 		return result;

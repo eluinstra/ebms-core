@@ -17,6 +17,9 @@ package nl.clockwork.ebms.service;
 
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
+
+import static nl.clockwork.ebms.EbMSMessageStatusMapper.toEbMSMessageStatus;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
@@ -30,20 +33,21 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSMessageProperties;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.StreamUtils;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskManager;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.DeliveryManager;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventDAO;
-import nl.clockwork.ebms.event.MessageEventType;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -59,7 +63,6 @@ import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
-import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 import org.slf4j.MDC;
 import org.w3c.dom.Document;
@@ -241,12 +244,12 @@ class EbMSMessageServiceHandler
 
 	private MessageStatus createMessageStatus(EbMSBaseMessage message)
 	{
-		if (message instanceof EbMSStatusResponse)
+		if (message instanceof EbMSStatusResponse ebmsStatusResponse)
 		{
 			val timestamp =
-					((EbMSStatusResponse)message).getStatusResponse().getTimestamp() == null ? null : ((EbMSStatusResponse)message).getStatusResponse().getTimestamp();
-			val messageStatus = ((EbMSStatusResponse)message).getStatusResponse().getMessageStatus();
-			val status = EbMSMessageStatus.get(messageStatus).orElseThrow(() -> new NotFoundException("No EbMSMessageStatus found for " + messageStatus));
+					ebmsStatusResponse.getStatusResponse().getTimestamp() == null ? null : ebmsStatusResponse.getStatusResponse().getTimestamp();
+			val messageStatus = ebmsStatusResponse.getStatusResponse().getMessageStatus();
+			val status = toEbMSMessageStatus(messageStatus).orElseThrow(() -> new NotFoundException("No EbMSMessageStatus found for " + messageStatus));
 			return new MessageStatus(timestamp, status);
 		}
 		else

@@ -18,10 +18,11 @@ package nl.clockwork.ebms.service;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.common.EbMSAPIDAO;
+import nl.clockwork.ebms.common.deliverytask.DeliveryTaskManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.DeliveryManager;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventDAO;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
@@ -58,6 +59,7 @@ public class EbMSMessageServiceConfig
 	public EbMSMessageServiceHandler ebMSMessageServiceHandler(
 			DeliveryManager deliveryManager,
 			EbMSDAO ebMSDAO,
+			EbMSAPIDAO ebMSMessagePropertiesDAO,
 			MessageEventDAO messageEventDAO,
 			CPAManager cpaManager,
 			EbMSMessageFactory ebMSMessageFactory,
