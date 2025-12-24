@@ -23,16 +23,16 @@ import jakarta.xml.bind.annotation.XmlElement;
 import java.util.List;
 
 @WebService(name = "CPAService", targetNamespace = "http://www.ordina.nl/cpa/2.18", serviceName = "CPAService", portName = "CPAPort")
-public interface CPAService
+public interface CPAController
 {
 	/**
 	 * Validates CPA cpa
 	 * 
 	 * @param cpa
-	 * @throws CPAServiceException
+	 * @throws CPAControllerException
 	 */
 	@WebMethod(operationName = "validateCPA")
-	void validateCPA(@WebParam(name = "cpa") @XmlElement(required = true) /* CollaborationProtocolAgreement */String cpa) throws CPAServiceException;
+	void validateCPA(@WebParam(name = "cpa") @XmlElement(required = true) /* CollaborationProtocolAgreement */String cpa) throws CPAControllerException;
 
 	/**
 	 * Stores CPA cpa. If overwrite is true and the CPA exists, the CPA will be overwritten
@@ -40,49 +40,49 @@ public interface CPAService
 	 * @param cpa
 	 * @param overwrite
 	 * @return The cpaId of the CPA
-	 * @throws CPAServiceException
+	 * @throws CPAControllerException
 	 */
 	@WebResult(name = "cpaId")
 	@WebMethod(operationName = "insertCPA")
 	String insertCPA(
 			@WebParam(name = "cpa") @XmlElement(required = true) /* CollaborationProtocolAgreement */String cpa,
-			@WebParam(name = "overwrite") Boolean overwrite) throws CPAServiceException;
+			@WebParam(name = "overwrite") Boolean overwrite) throws CPAControllerException;
 
 	/**
 	 * Removes CPA identified by cpaId
 	 * 
 	 * @param cpaId
-	 * @throws CPAServiceException
+	 * @throws CPAControllerException
 	 */
 	@WebMethod(operationName = "deleteCPA")
-	void deleteCPA(@WebParam(name = "cpaId") @XmlElement(required = true) String cpaId) throws CPAServiceException;
+	void deleteCPA(@WebParam(name = "cpaId") @XmlElement(required = true) String cpaId) throws CPAControllerException;
 
 	/**
 	 * Returns a list of all cpaIds
 	 * 
 	 * @return The list of cpaIds
-	 * @throws CPAServiceException
+	 * @throws CPAControllerException
 	 */
 	@WebResult(name = "cpaId")
 	@WebMethod(operationName = "getCPAIds")
-	List<String> getCPAIds() throws CPAServiceException;
+	List<String> getCPAIds() throws CPAControllerException;
 
 	/**
 	 * Returns the CPA identified by cpaId
 	 * 
 	 * @param cpaId
 	 * @return The CPA
-	 * @throws CPAServiceException
+	 * @throws CPAControllerException
 	 */
 	@WebResult(name = "cpa")
 	@WebMethod(operationName = "getCPA")
-	/* CollaborationProtocolAgreement */String getCPA(@WebParam(name = "cpaId") @XmlElement(required = true) String cpaId) throws CPAServiceException;
+	/* CollaborationProtocolAgreement */String getCPA(@WebParam(name = "cpaId") @XmlElement(required = true) String cpaId) throws CPAControllerException;
 
 	/**
 	 * Deletes the CPA cache
 	 * 
-	 * @throws CPAServiceException
+	 * @throws CPAControllerException
 	 */
 	@WebMethod(operationName = "deleteCache")
-	void deleteCache() throws CPAServiceException;
+	void deleteCache() throws CPAControllerException;
 }

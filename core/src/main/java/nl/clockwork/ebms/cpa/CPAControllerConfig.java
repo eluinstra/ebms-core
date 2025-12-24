@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CPAServiceConfig
+public class CPAControllerConfig
 {
 	@Bean
 	public CPAValidator cpaValidator(CPAManager cpaManager)
@@ -31,14 +31,14 @@ public class CPAServiceConfig
 	}
 
 	@Bean
-	public CPAService cpaService(CPAManager cpaManager, CPAValidator cpaValidator)
+	public CPAController cpaController(CPAManager cpaManager, CPAValidator cpaValidator)
 	{
-		return new CPAServiceImpl(cpaManager, cpaValidator);
+		return new CPAControllerImpl(cpaManager, cpaValidator);
 	}
 
 	@Bean
-	public CPARestService cpaRestService(CPAManager cpaManager, CPAValidator cpaValidator)
+	public CPARestController cpaRestController(CPAManager cpaManager, CPAValidator cpaValidator)
 	{
-		return new CPARestService(new CPAServiceImpl(cpaManager, cpaValidator));
+		return new CPARestController(new CPAControllerImpl(cpaManager, cpaValidator));
 	}
 }

@@ -37,7 +37,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.event.MessageEventType;
-import nl.clockwork.ebms.jaxrs.WithService;
+import nl.clockwork.ebms.jaxrs.WithController;
 import nl.clockwork.ebms.service.model.MTOMDataSource;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MTOMMessageRequest;
@@ -57,10 +57,10 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class EbMSMessageRestService implements WithService
+public class EbMSRestController implements WithController
 {
 	@NonNull
-	EbMSMessageServiceHandler serviceHandler;
+	EbMSControllerHandler serviceHandler;
 
 	@POST
 	@Path("ping/{cpaId}/from/{fromPartyId}/to/{toPartyId}")

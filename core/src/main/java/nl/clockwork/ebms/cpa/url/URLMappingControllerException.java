@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service;
+package nl.clockwork.ebms.cpa.url;
 
 import jakarta.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 
-@WebFault(name = "EbMSMessageServiceException", targetNamespace = "http://www.ordina.nl/ebms/2.18")
+@WebFault(name = "URLMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18")
 @NoArgsConstructor
-public class EbMSMessageServiceException extends RuntimeException
+public class URLMappingControllerException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
-	public EbMSMessageServiceException(String message, Throwable cause)
+	public URLMappingControllerException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
 
-	public EbMSMessageServiceException(String message)
+	public URLMappingControllerException(String message)
 	{
 		super(message);
 	}
 
-	public EbMSMessageServiceException(Throwable cause)
+	public URLMappingControllerException(Throwable cause)
 	{
 		super(cause);
 	}

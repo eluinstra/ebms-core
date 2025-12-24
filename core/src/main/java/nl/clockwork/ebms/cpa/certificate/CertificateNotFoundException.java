@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-public class CertificateNotFoundException extends CertificateMappingServiceException
+public class CertificateNotFoundException extends CertificateMappingControllerException
 {
 	private static final long serialVersionUID = 1L;
 

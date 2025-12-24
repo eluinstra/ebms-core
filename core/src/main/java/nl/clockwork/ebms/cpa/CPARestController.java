@@ -31,7 +31,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.jaxrs.WithService;
+import nl.clockwork.ebms.jaxrs.WithController;
 import org.xml.sax.SAXException;
 
 @Slf4j
@@ -39,10 +39,10 @@ import org.xml.sax.SAXException;
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class CPARestService implements WithService
+public class CPARestController implements WithController
 {
 	@NonNull
-	CPAServiceImpl cpaService;
+	CPAControllerImpl cpaService;
 
 	@POST
 	@Path("validate")

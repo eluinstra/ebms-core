@@ -28,7 +28,7 @@ public class CertificateMappingEndpointConfig
 	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/certificateMapping";
 
 	@Bean(name = "certificateMappingEndpoint")
-	Endpoint publishEndpoint(CertificateMappingService mappingService)
+	Endpoint publishEndpoint(CertificateMappingController mappingService)
 	{
 		return Endpoint.publish(SERVICE_ENDPOINT, mappingService);
 	}

@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-public class URLNotFoundException extends URLMappingServiceException
+public class URLNotFoundException extends URLMappingControllerException
 {
 	private static final long serialVersionUID = 1L;
 

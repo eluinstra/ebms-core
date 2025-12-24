@@ -28,7 +28,7 @@ public class EbMSEndpointConfig
 	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/ebms";
 
 	@Bean(name = "ebMSEndpoint")
-	Endpoint publishEndpoint(EbMSMessageService messageService)
+	Endpoint publishEndpoint(EbMSController messageService)
 	{
 		return Endpoint.publish(SERVICE_ENDPOINT, messageService);
 	}

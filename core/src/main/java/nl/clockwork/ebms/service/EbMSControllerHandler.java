@@ -69,7 +69,7 @@ import org.xml.sax.SAXException;
 @Builder
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-class EbMSMessageServiceHandler
+class EbMSControllerHandler
 {
 	@NonNull
 	DeliveryManager deliveryManager;
@@ -228,14 +228,14 @@ class EbMSMessageServiceHandler
 	private MessageStatus getMessageStatus(String messageId, EbMSMessageProperties messageProperties) throws EbMSProcessorException
 	{
 		if (EbMSAction.EBMS_SERVICE_URI.equals(messageProperties.getService()))
-			throw new EbMSMessageServiceException("Found MSH message " + messageId);
+			throw new EbMSControllerException("Found MSH message " + messageId);
 		else
 		{
 			val fromPartyId = messageProperties.getFromParty().getPartyId();
 			val toPartyId = messageProperties.getToParty().getPartyId();
 			val request = ebMSMessageFactory.createEbMSStatusRequest(messageProperties.getCpaId(), fromPartyId, toPartyId, messageId);
 			val response = deliveryManager.sendMessage(request);
-			return response.map(r -> (createMessageStatus(r))).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
+			return response.map(r -> (createMessageStatus(r))).orElseThrow(() -> new EbMSControllerException("No response received!"));
 		}
 	}
 
@@ -250,11 +250,11 @@ class EbMSMessageServiceHandler
 			return new MessageStatus(timestamp, status);
 		}
 		else
-			throw new EbMSMessageServiceException("No valid response received!");
+			throw new EbMSControllerException("No valid response received!");
 	}
 
 	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr)
-			throws EbMSMessageServiceException
+			throws EbMSControllerException
 	{
 		log.debug("GetMessageEvents");
 		return maxNr == null || maxNr == 0

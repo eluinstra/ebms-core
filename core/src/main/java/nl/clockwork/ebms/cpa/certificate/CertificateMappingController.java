@@ -30,44 +30,44 @@ import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
 		targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18",
 		serviceName = "CertificateMappingService",
 		portName = "CertificateMappingPort")
-public interface CertificateMappingService
+public interface CertificateMappingController
 {
 	/**
 	 * Stores Certificate mapping certificateMapping
 	 * 
 	 * @param certificateMapping - Maps the source Certificate to the destination Certificate
-	 * @throws CertificateMappingServiceException
+	 * @throws CertificateMappingControllerException
 	 */
 	@WebMethod(operationName = "setCertificateMapping")
 	void setCertificateMapping(@WebParam(name = "certificateMapping") @XmlElement(required = true) CertificateMapping certificateMapping)
-			throws CertificateMappingServiceException;
+			throws CertificateMappingControllerException;
 
 	/**
 	 * Removes Certificate mapping identified by source Certificate source
 	 * 
 	 * @param source
-	 * @throws CertificateMappingServiceException
+	 * @throws CertificateMappingControllerException
 	 */
 	@WebMethod(operationName = "deleteCertificateMapping")
 	void deleteCertificateMapping(
 			@WebParam(name = "sourceCertificate") @XmlElement(required = true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source,
-			@WebParam(name = "cpaId") String cpaId) throws CertificateMappingServiceException;
+			@WebParam(name = "cpaId") String cpaId) throws CertificateMappingControllerException;
 
 	/**
 	 * Returns a list of all Certificate mappings
 	 * 
 	 * @return The list of Certificate mappings
-	 * @throws CertificateMappingServiceException
+	 * @throws CertificateMappingControllerException
 	 */
 	@WebResult(name = "certificate")
 	@WebMethod(operationName = "getCertificateMappings")
-	List<CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException;
+	List<CertificateMapping> getCertificateMappings() throws CertificateMappingControllerException;
 
 	/**
 	 * Deletes the Certificate mapping cache
 	 * 
-	 * @throws CertificateMappingServiceException
+	 * @throws CertificateMappingControllerException
 	 */
 	@WebMethod(operationName = "deleteCache")
-	void deleteCache() throws CertificateMappingServiceException;
+	void deleteCache() throws CertificateMappingControllerException;
 }

@@ -28,7 +28,7 @@ public class CPAEndpointConfig
 	public static final String SERVICE_ENDPOINT = "http://localhost:8080/service/cpa";
 
 	@Bean(name = "cpaEndpoint")
-	Endpoint publishEndpoint(CPAService cpaService)
+	Endpoint publishEndpoint(CPAController cpaService)
 	{
 		return Endpoint.publish(SERVICE_ENDPOINT, cpaService);
 	}

@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.cpa;
 
-public class CPANotFoundException extends CPAServiceException
+public class CPANotFoundException extends CPAControllerException
 {
 	private static final long serialVersionUID = 1L;
 

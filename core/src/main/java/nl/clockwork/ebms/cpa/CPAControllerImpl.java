@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CPAServiceImpl implements CPAService
+public class CPAControllerImpl implements CPAController
 {
 	@NonNull
 	CPAManager cpaManager;
@@ -41,13 +41,13 @@ public class CPAServiceImpl implements CPAService
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
 
 	@Override
-	public void validateCPA(String cpa) throws CPAServiceException
+	public void validateCPA(String cpa) throws CPAControllerException
 	{
 		try
 		{
 			validateCPAImpl(cpa);
 		}
-		catch (CPAServiceException e)
+		catch (CPAControllerException e)
 		{
 			log.error("ValidateCPA\n" + cpa, e);
 			throw e;
@@ -55,7 +55,7 @@ public class CPAServiceImpl implements CPAService
 		catch (Exception e)
 		{
 			log.error("ValidateCPA\n" + cpa, e);
-			throw new CPAServiceException(e);
+			throw new CPAControllerException(e);
 		}
 	}
 
@@ -69,13 +69,13 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public String insertCPA(String cpa, Boolean overwrite) throws CPAServiceException
+	public String insertCPA(String cpa, Boolean overwrite) throws CPAControllerException
 	{
 		try
 		{
 			return insertCPAImpl(cpa, overwrite);
 		}
-		catch (CPAServiceException e)
+		catch (CPAControllerException e)
 		{
 			log.error("InsertCPA\n" + cpa, e);
 			throw e;
@@ -83,7 +83,7 @@ public class CPAServiceImpl implements CPAService
 		catch (Exception e)
 		{
 			log.error("InsertCPA\n" + cpa, e);
-			throw new CPAServiceException(e);
+			throw new CPAControllerException(e);
 		}
 	}
 
@@ -99,13 +99,13 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public void deleteCPA(String cpaId) throws CPAServiceException
+	public void deleteCPA(String cpaId) throws CPAControllerException
 	{
 		try
 		{
 			deleteCPAImpl(cpaId);
 		}
-		catch (CPAServiceException e)
+		catch (CPAControllerException e)
 		{
 			log.error("DeleteCPA " + cpaId, e);
 			throw e;
@@ -113,7 +113,7 @@ public class CPAServiceImpl implements CPAService
 		catch (Exception e)
 		{
 			log.error("DeleteCPA " + cpaId, e);
-			throw new CPAServiceException(e);
+			throw new CPAControllerException(e);
 		}
 	}
 
@@ -125,13 +125,13 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public List<String> getCPAIds() throws CPAServiceException
+	public List<String> getCPAIds() throws CPAControllerException
 	{
 		try
 		{
 			return getCPAIdsImpl();
 		}
-		catch (CPAServiceException e)
+		catch (CPAControllerException e)
 		{
 			log.error("GetCPAIds", e);
 			throw e;
@@ -139,7 +139,7 @@ public class CPAServiceImpl implements CPAService
 		catch (Exception e)
 		{
 			log.error("GetCPAIds", e);
-			throw new CPAServiceException(e);
+			throw new CPAControllerException(e);
 		}
 	}
 
@@ -150,13 +150,13 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public String getCPA(String cpaId) throws CPAServiceException
+	public String getCPA(String cpaId) throws CPAControllerException
 	{
 		try
 		{
 			return getCPAImpl(cpaId);
 		}
-		catch (CPAServiceException e)
+		catch (CPAControllerException e)
 		{
 			log.error("GetCPAId " + cpaId, e);
 			throw e;
@@ -164,7 +164,7 @@ public class CPAServiceImpl implements CPAService
 		catch (Exception e)
 		{
 			log.error("GetCPAId " + cpaId, e);
-			throw new CPAServiceException(e);
+			throw new CPAControllerException(e);
 		}
 	}
 
@@ -184,7 +184,7 @@ public class CPAServiceImpl implements CPAService
 		catch (Exception e)
 		{
 			log.error("DeleteCache", e);
-			throw new CPAServiceException(e);
+			throw new CPAControllerException(e);
 		}
 	}
 

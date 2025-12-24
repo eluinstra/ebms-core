@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa.url;
+package nl.clockwork.ebms.cpa.certificate;
 
 import javax.sql.DataSource;
 import lombok.AccessLevel;
@@ -25,29 +25,29 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class URLMappingServiceConfig
+public class CertificateMappingControllerConfig
 {
 	@Bean
-	public URLMappingService urlMappingService(URLMapper urlMapper)
+	public CertificateMappingController certificateMappingController(CertificateMapper certificateMapper)
 	{
-		return new URLMappingServiceImpl(urlMapper);
+		return new CertificateMappingControllerImpl(certificateMapper);
 	}
 
 	@Bean
-	public URLMappingRestService urlMappingRestService(URLMapper urlMapper)
+	public CertificateMappingRestController certificateMappingRestController(CertificateMapper certificateMapper)
 	{
-		return new URLMappingRestService(new URLMappingServiceImpl(urlMapper));
+		return new CertificateMappingRestController(new CertificateMappingControllerImpl(certificateMapper));
 	}
 
 	@Bean
-	public URLMapper urlMapper(DataSource dataSource)
+	public CertificateMapper certificateMapper(DataSource dataSource)
 	{
-		return new URLMapper(urlMappingDAO(dataSource));
+		return new CertificateMapper(certificateMappingDAO(dataSource));
 	}
 
-	private URLMappingDAO urlMappingDAO(DataSource dataSource)
+	private CertificateMappingDAO certificateMappingDAO(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new URLMappingDAOImpl(jdbcTemplate);
+		return new CertificateMappingDAOImpl(jdbcTemplate);
 	}
 }

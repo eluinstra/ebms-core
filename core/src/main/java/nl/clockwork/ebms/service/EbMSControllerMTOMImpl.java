@@ -30,12 +30,12 @@ import nl.clockwork.ebms.service.model.MessageStatus;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
+class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 {
-	EbMSMessageServiceHandler serviceHandler;
+	EbMSControllerHandler serviceHandler;
 
 	@Override
-	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
+	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSControllerException
 	{
 		try
 		{
@@ -44,12 +44,12 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("Ping " + cpaId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public String sendMessageMTOM(MTOMMessageRequest message) throws EbMSMessageServiceException
+	public String sendMessageMTOM(MTOMMessageRequest message) throws EbMSControllerException
 	{
 		try
 		{
@@ -58,12 +58,12 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("SendMessage " + message, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public String resendMessage(String messageId) throws EbMSMessageServiceException
+	public String resendMessage(String messageId) throws EbMSControllerException
 	{
 		try
 		{
@@ -72,12 +72,12 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("ResendMessage {}", messageId);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSControllerException
 	{
 		try
 		{
@@ -86,12 +86,12 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("GetMessageIds " + messageFilter, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public MTOMMessage getMessageMTOM(String messageId, Boolean process) throws EbMSMessageServiceException
+	public MTOMMessage getMessageMTOM(String messageId, Boolean process) throws EbMSControllerException
 	{
 		try
 		{
@@ -100,12 +100,12 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("GetMessage " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public void processMessage(String messageId) throws EbMSMessageServiceException
+	public void processMessage(String messageId) throws EbMSControllerException
 	{
 		try
 		{
@@ -114,12 +114,12 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("ProcessMessage " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
+	public MessageStatus getMessageStatus(String messageId) throws EbMSControllerException
 	{
 		try
 		{
@@ -128,13 +128,13 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("GetMessageStatus " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
 	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr)
-			throws EbMSMessageServiceException
+			throws EbMSControllerException
 	{
 		try
 		{
@@ -143,12 +143,12 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("GetMessageEvents" + messageFilter, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public void processMessageEvent(String messageId) throws EbMSMessageServiceException
+	public void processMessageEvent(String messageId) throws EbMSControllerException
 	{
 		try
 		{
@@ -157,7 +157,7 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 		catch (Exception e)
 		{
 			log.error("ProcessMessageEvent " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 }

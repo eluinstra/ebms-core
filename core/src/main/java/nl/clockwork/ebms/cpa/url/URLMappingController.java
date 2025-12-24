@@ -27,41 +27,41 @@ import java.util.List;
 		targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18",
 		serviceName = "UrlMappingService",
 		portName = "UrlMappingPort")
-public interface URLMappingService
+public interface URLMappingController
 {
 	/**
 	 * Stores URL mapping urlMapping
 	 * 
 	 * @param urlMapping - Maps the source URL to the destination URL
-	 * @throws URLMappingServiceException
+	 * @throws URLMappingControllerException
 	 */
 	@WebMethod(operationName = "setURLMapping")
-	void setURLMapping(@WebParam(name = "urlMapping") @XmlElement(required = true) URLMapping urlMapping) throws URLMappingServiceException;
+	void setURLMapping(@WebParam(name = "urlMapping") @XmlElement(required = true) URLMapping urlMapping) throws URLMappingControllerException;
 
 	/**
 	 * Removes URL mapping identified by source URL source
 	 * 
 	 * @param source
-	 * @throws URLMappingServiceException
+	 * @throws URLMappingControllerException
 	 */
 	@WebMethod(operationName = "deleteURLMapping")
-	void deleteURLMapping(@WebParam(name = "sourceURL") @XmlElement(required = true) String source) throws URLMappingServiceException;
+	void deleteURLMapping(@WebParam(name = "sourceURL") @XmlElement(required = true) String source) throws URLMappingControllerException;
 
 	/**
 	 * Returns a list of all URL mappings
 	 * 
 	 * @return The list of URL mappings
-	 * @throws URLMappingServiceException
+	 * @throws URLMappingControllerException
 	 */
 	@WebResult(name = "url")
 	@WebMethod(operationName = "getURLMappings")
-	List<URLMapping> getURLMappings() throws URLMappingServiceException;
+	List<URLMapping> getURLMappings() throws URLMappingControllerException;
 
 	/**
 	 * Deletes the URL mapping cache
 	 * 
-	 * @throws URLMappingServiceException
+	 * @throws URLMappingControllerException
 	 */
 	@WebMethod(operationName = "deleteCache")
-	void deleteCache() throws URLMappingServiceException;
+	void deleteCache() throws URLMappingControllerException;
 }

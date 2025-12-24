@@ -31,135 +31,135 @@ import nl.clockwork.ebms.service.model.MessageStatus;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-public class EbMSMessageServiceImpl implements EbMSMessageService
+public class EbMSControllerImpl implements EbMSController
 {
 	@NonNull
-	EbMSMessageServiceHandler serviceHandler;
+	EbMSControllerHandler ebMSHandler;
 
 	@Override
-	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
+	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSControllerException
 	{
 		try
 		{
-			serviceHandler.ping(cpaId, fromPartyId, toPartyId);
+			ebMSHandler.ping(cpaId, fromPartyId, toPartyId);
 		}
 		catch (Exception e)
 		{
 			log.error("Ping " + cpaId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public String sendMessage(MessageRequest messageRequest) throws EbMSMessageServiceException
+	public String sendMessage(MessageRequest messageRequest) throws EbMSControllerException
 	{
 		try
 		{
-			return serviceHandler.sendMessage(messageRequest);
+			return ebMSHandler.sendMessage(messageRequest);
 		}
 		catch (Exception e)
 		{
 			log.error("SendMessage " + messageRequest, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public String resendMessage(String messageId) throws EbMSMessageServiceException
+	public String resendMessage(String messageId) throws EbMSControllerException
 	{
 		try
 		{
-			return serviceHandler.resendMessage(messageId);
+			return ebMSHandler.resendMessage(messageId);
 		}
 		catch (Exception e)
 		{
 			log.error("ResendMessage {}", messageId);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSControllerException
 	{
 		try
 		{
-			return serviceHandler.getUnprocessedMessageIds(messageFilter, maxNr);
+			return ebMSHandler.getUnprocessedMessageIds(messageFilter, maxNr);
 		}
 		catch (Exception e)
 		{
 			log.error("GetMessageIds " + messageFilter, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public Message getMessage(String messageId, Boolean process) throws EbMSMessageServiceException
+	public Message getMessage(String messageId, Boolean process) throws EbMSControllerException
 	{
 		try
 		{
-			return serviceHandler.getMessage(messageId, process);
+			return ebMSHandler.getMessage(messageId, process);
 		}
 		catch (Exception e)
 		{
 			log.error("GetMessage " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public void processMessage(String messageId) throws EbMSMessageServiceException
+	public void processMessage(String messageId) throws EbMSControllerException
 	{
 		try
 		{
-			serviceHandler.processMessage(messageId);
+			ebMSHandler.processMessage(messageId);
 		}
 		catch (Exception e)
 		{
 			log.error("ProcessMessage " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
+	public MessageStatus getMessageStatus(String messageId) throws EbMSControllerException
 	{
 		try
 		{
-			return serviceHandler.getMessageStatus(messageId);
+			return ebMSHandler.getMessageStatus(messageId);
 		}
 		catch (Exception e)
 		{
 			log.error("GetMessageStatus " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
 	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr)
-			throws EbMSMessageServiceException
+			throws EbMSControllerException
 	{
 		try
 		{
-			return serviceHandler.getUnprocessedMessageEvents(messageFilter, eventTypes, maxNr);
+			return ebMSHandler.getUnprocessedMessageEvents(messageFilter, eventTypes, maxNr);
 		}
 		catch (Exception e)
 		{
 			log.error("GetMessageEvents" + messageFilter, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 
 	@Override
-	public void processMessageEvent(String messageId) throws EbMSMessageServiceException
+	public void processMessageEvent(String messageId) throws EbMSControllerException
 	{
 		try
 		{
-			serviceHandler.processMessageEvent(messageId);
+			ebMSHandler.processMessageEvent(messageId);
 		}
 		catch (Exception e)
 		{
 			log.error("ProcessMessageEvent " + messageId, e);
-			throw new EbMSMessageServiceException(e);
+			throw new EbMSControllerException(e);
 		}
 	}
 }

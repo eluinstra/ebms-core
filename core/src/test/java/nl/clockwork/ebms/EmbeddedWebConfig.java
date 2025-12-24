@@ -23,12 +23,12 @@ import javax.xml.namespace.QName;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPAService;
-import nl.clockwork.ebms.cpa.certificate.CertificateMappingService;
-import nl.clockwork.ebms.cpa.url.URLMappingService;
+import nl.clockwork.ebms.cpa.CPAController;
+import nl.clockwork.ebms.cpa.certificate.CertificateMappingController;
+import nl.clockwork.ebms.cpa.url.URLMappingController;
 import nl.clockwork.ebms.event.MessageEventListenerConfig.EventListenerType;
-import nl.clockwork.ebms.service.EbMSMessageService;
-import nl.clockwork.ebms.service.EbMSMessageServiceMTOM;
+import nl.clockwork.ebms.service.EbMSController;
+import nl.clockwork.ebms.service.EbMSControllerMTOM;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -46,15 +46,15 @@ public class EmbeddedWebConfig
 	@Value("#{'${ebms.cors.allowOrigins}'.split(',')}")
 	List<String> allowOrigins;
 	@Autowired
-	CPAService cpaService;
+	CPAController cpaService;
 	@Autowired
-	URLMappingService urlMappingService;
+	URLMappingController urlMappingService;
 	@Autowired
-	CertificateMappingService certificateMappingService;
+	CertificateMappingController certificateMappingService;
 	@Autowired
-	EbMSMessageService ebMSMessageService;
+	EbMSController ebMSMessageService;
 	@Autowired
-	EbMSMessageServiceMTOM ebMSMessageServiceMTOM;
+	EbMSControllerMTOM ebMSMessageServiceMTOM;
 
 	@Bean
 	public Endpoint cpaServiceEndpoint()

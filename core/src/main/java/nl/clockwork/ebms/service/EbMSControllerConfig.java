@@ -31,31 +31,31 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EbMSMessageServiceConfig
+public class EbMSControllerConfig
 {
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Bean
-	public EbMSMessageServiceImpl ebMSMessageService(EbMSMessageServiceHandler ebMSMessageServiceHandler)
+	public EbMSControllerImpl ebMSController(EbMSControllerHandler ebMSControllerHandler)
 	{
-		return new EbMSMessageServiceImpl(ebMSMessageServiceHandler);
+		return new EbMSControllerImpl(ebMSControllerHandler);
 	}
 
 	@Bean
-	public EbMSMessageServiceMTOM ebMSMessageServiceMTOM(EbMSMessageServiceHandler ebMSMessageServiceHandler)
+	public EbMSControllerMTOM ebMSControllerMTOM(EbMSControllerHandler ebMSControllerHandler)
 	{
-		return new EbMSMessageServiceMTOMImpl(ebMSMessageServiceHandler);
+		return new EbMSControllerMTOMImpl(ebMSControllerHandler);
 	}
 
 	@Bean
-	public EbMSMessageRestService ebMSMessageRestService(EbMSMessageServiceHandler ebMSMessageServiceHandler)
+	public EbMSRestController ebMSMessageRestService(EbMSControllerHandler ebMSControllerHandler)
 	{
-		return new EbMSMessageRestService(ebMSMessageServiceHandler);
+		return new EbMSRestController(ebMSControllerHandler);
 	}
 
 	@Bean
-	public EbMSMessageServiceHandler ebMSMessageServiceHandler(
+	public EbMSControllerHandler ebMSControllerHandler(
 			DeliveryManager deliveryManager,
 			EbMSDAO ebMSDAO,
 			MessageEventDAO messageEventDAO,
@@ -65,7 +65,7 @@ public class EbMSMessageServiceConfig
 			MessagePropertiesValidator messagePropertiesValidator,
 			EbMSSignatureGenerator signatureGenerator)
 	{
-		return EbMSMessageServiceHandler.builder()
+		return EbMSControllerHandler.builder()
 				.deliveryManager(deliveryManager)
 				.ebMSDAO(ebMSDAO)
 				.messageEventDAO(messageEventDAO)

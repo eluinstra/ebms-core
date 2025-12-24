@@ -25,18 +25,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CertificateMappingServiceImpl implements CertificateMappingService
+public class CertificateMappingControllerImpl implements CertificateMappingController
 {
 	CertificateMapper certificateMapper;
 
 	@Override
-	public void setCertificateMapping(nl.clockwork.ebms.cpa.certificate.CertificateMapping certificateMapping) throws CertificateMappingServiceException
+	public void setCertificateMapping(nl.clockwork.ebms.cpa.certificate.CertificateMapping certificateMapping) throws CertificateMappingControllerException
 	{
 		try
 		{
 			setCertificateMappingImpl(certificateMapping);
 		}
-		catch (CertificateMappingServiceException e)
+		catch (CertificateMappingControllerException e)
 		{
 			log.error("SetCertificateMapping", e);
 			throw e;
@@ -44,7 +44,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("SetCertificateMapping " + certificateMapping, e);
-			throw new CertificateMappingServiceException(e);
+			throw new CertificateMappingControllerException(e);
 		}
 	}
 
@@ -56,13 +56,13 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	}
 
 	@Override
-	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingControllerException
 	{
 		try
 		{
 			deleteCertificateMappingImpl(source, cpaId);
 		}
-		catch (CertificateMappingServiceException e)
+		catch (CertificateMappingControllerException e)
 		{
 			log.error("DeleteCertificateMapping", e);
 			throw e;
@@ -70,7 +70,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("DeleteCertificateMapping " + source, e);
-			throw new CertificateMappingServiceException(e);
+			throw new CertificateMappingControllerException(e);
 		}
 	}
 
@@ -83,13 +83,13 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	}
 
 	@Override
-	public List<nl.clockwork.ebms.cpa.certificate.CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException
+	public List<nl.clockwork.ebms.cpa.certificate.CertificateMapping> getCertificateMappings() throws CertificateMappingControllerException
 	{
 		try
 		{
 			return getCertificateMappingsImpl();
 		}
-		catch (CertificateMappingServiceException e)
+		catch (CertificateMappingControllerException e)
 		{
 			log.error("GetCertificateMappings", e);
 			throw e;
@@ -97,7 +97,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("GetCertificateMappings", e);
-			throw new CertificateMappingServiceException(e);
+			throw new CertificateMappingControllerException(e);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	}
 
 	@Override
-	public void deleteCache() throws CertificateMappingServiceException
+	public void deleteCache() throws CertificateMappingControllerException
 	{
 		try
 		{
@@ -117,7 +117,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("DeleteCache", e);
-			throw new CertificateMappingServiceException(e);
+			throw new CertificateMappingControllerException(e);
 		}
 	}
 

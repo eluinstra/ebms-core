@@ -47,14 +47,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class, CertificateMappingServiceConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class, CertificateMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class CertificateMappingServiceImplIT
 {
 	@Container
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
 
 	@Autowired
-	CertificateMappingService mappingService;
+	CertificateMappingController mappingService;
 
 	@ParameterizedTest
 	@MethodSource("validCertificateMappings")

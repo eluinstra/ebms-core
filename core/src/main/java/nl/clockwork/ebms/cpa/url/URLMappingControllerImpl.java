@@ -25,19 +25,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class URLMappingServiceImpl implements URLMappingService
+public class URLMappingControllerImpl implements URLMappingController
 {
 	@NonNull
 	URLMapper urlMapper;
 
 	@Override
-	public void setURLMapping(URLMapping urlMapping) throws URLMappingServiceException
+	public void setURLMapping(URLMapping urlMapping) throws URLMappingControllerException
 	{
 		try
 		{
 			setURLMappingImpl(urlMapping);
 		}
-		catch (URLMappingServiceException e)
+		catch (URLMappingControllerException e)
 		{
 			log.error("SetURLMapping " + urlMapping, e);
 			throw e;
@@ -45,7 +45,7 @@ public class URLMappingServiceImpl implements URLMappingService
 		catch (Exception e)
 		{
 			log.error("SetURLMapping " + urlMapping, e);
-			throw new URLMappingServiceException(e);
+			throw new URLMappingControllerException(e);
 		}
 	}
 
@@ -57,13 +57,13 @@ public class URLMappingServiceImpl implements URLMappingService
 	}
 
 	@Override
-	public void deleteURLMapping(String source) throws URLMappingServiceException
+	public void deleteURLMapping(String source) throws URLMappingControllerException
 	{
 		try
 		{
 			deleteURLMappingImpl(source);
 		}
-		catch (URLMappingServiceException e)
+		catch (URLMappingControllerException e)
 		{
 			log.error("DeleteURLMapping " + source, e);
 			throw e;
@@ -71,7 +71,7 @@ public class URLMappingServiceImpl implements URLMappingService
 		catch (Exception e)
 		{
 			log.error("DeleteURLMapping " + source, e);
-			throw new URLMappingServiceException(e);
+			throw new URLMappingControllerException(e);
 		}
 	}
 
@@ -83,13 +83,13 @@ public class URLMappingServiceImpl implements URLMappingService
 	}
 
 	@Override
-	public List<URLMapping> getURLMappings() throws URLMappingServiceException
+	public List<URLMapping> getURLMappings() throws URLMappingControllerException
 	{
 		try
 		{
 			return getURLMappingsImpl();
 		}
-		catch (URLMappingServiceException e)
+		catch (URLMappingControllerException e)
 		{
 			log.error("GetURLMappings", e);
 			throw e;
@@ -97,7 +97,7 @@ public class URLMappingServiceImpl implements URLMappingService
 		catch (Exception e)
 		{
 			log.error("GetURLMappings", e);
-			throw new URLMappingServiceException(e);
+			throw new URLMappingControllerException(e);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class URLMappingServiceImpl implements URLMappingService
 		catch (Exception e)
 		{
 			log.error("DeleteCache", e);
-			throw new URLMappingServiceException(e);
+			throw new URLMappingControllerException(e);
 		}
 	}
 

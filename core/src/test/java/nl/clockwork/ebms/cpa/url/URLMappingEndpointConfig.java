@@ -28,7 +28,7 @@ public class URLMappingEndpointConfig
 	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/urlMapping";
 
 	@Bean(name = "urlMappingEndpoint")
-	Endpoint publishEndpoint(URLMappingService mappingService)
+	Endpoint publishEndpoint(URLMappingController mappingService)
 	{
 		return Endpoint.publish(SERVICE_ENDPOINT, mappingService);
 	}

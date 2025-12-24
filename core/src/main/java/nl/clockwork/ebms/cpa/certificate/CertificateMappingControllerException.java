@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.certificate;
 
 import jakarta.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 
-@WebFault(name = "CPAServiceException", targetNamespace = "http://www.ordina.nl/cpa/2.18")
+@WebFault(name = "CertificateMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18")
 @NoArgsConstructor
-public class CPAServiceException extends RuntimeException
+public class CertificateMappingControllerException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
-	public CPAServiceException(String message, Throwable cause)
+	public CertificateMappingControllerException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
 
-	public CPAServiceException(String message)
+	public CertificateMappingControllerException(String message)
 	{
 		super(message);
 	}
 
-	public CPAServiceException(Throwable cause)
+	public CertificateMappingControllerException(Throwable cause)
 	{
 		super(cause);
 	}

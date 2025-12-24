@@ -30,13 +30,13 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.val;
 import nl.clockwork.ebms.cpa.BadRequestException;
+import nl.clockwork.ebms.cpa.CPAControllerException;
 import nl.clockwork.ebms.cpa.CPANotFoundException;
-import nl.clockwork.ebms.cpa.CPAServiceException;
 import nl.clockwork.ebms.cpa.certificate.CertificateNotFoundException;
 import nl.clockwork.ebms.cpa.url.URLNotFoundException;
 import nl.clockwork.ebms.service.NotFoundException;
 
-public interface WithService
+public interface WithController
 {
 	@Value
 	public class Error
@@ -45,7 +45,7 @@ public interface WithService
 		String message;
 	}
 
-	default WebApplicationException toWebApplicationException(Exception exception) throws CPAServiceException
+	default WebApplicationException toWebApplicationException(Exception exception) throws CPAControllerException
 	{
 		return toWebApplicationException(exception, MediaType.APPLICATION_JSON);
 	}

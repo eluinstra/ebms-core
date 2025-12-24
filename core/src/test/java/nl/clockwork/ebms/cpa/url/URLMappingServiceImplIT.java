@@ -44,14 +44,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class, URLMappingServiceConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class URLMappingServiceImplIT implements WithFile
 {
 	@Container
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
 
 	@Autowired
-	URLMappingService mappingService;
+	URLMappingController mappingService;
 
 	@ParameterizedTest
 	@MethodSource("invalidURLMappings")
