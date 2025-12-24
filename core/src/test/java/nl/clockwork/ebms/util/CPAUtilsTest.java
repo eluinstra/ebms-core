@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.api.cpa.CPAUtils;
 import org.junit.jupiter.api.Test;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Endpoint;

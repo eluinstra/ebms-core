@@ -17,8 +17,8 @@ package nl.clockwork.ebms.validation;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAQueryManager;
-import nl.clockwork.ebms.cpa.CPAValidator;
+import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAValidator;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;

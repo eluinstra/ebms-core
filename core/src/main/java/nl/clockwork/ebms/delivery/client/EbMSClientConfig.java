@@ -17,9 +17,10 @@ package nl.clockwork.ebms.delivery.client;
 
 import java.util.Set;
 import javax.net.ssl.SSLParameters;
+import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
+import lombok.val;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -72,7 +74,7 @@ public class EbMSClientConfig
 			SSLParameters sslParameters,
 			@Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore,
 			EbMSTrustStore trustStore,
-			CertificateMapper certificateMapper)
+			CertificateMappingDAO certificateMappingDAO)
 	{
 		return EbMSHttpClientFactory.builder()
 				.connectTimeout(connectTimeout)
@@ -84,7 +86,7 @@ public class EbMSClientConfig
 				.keyStore(clientKeyStore)
 				.trustStore(trustStore)
 				.httpErrors(httpErrors())
-				.certificateMapper(certificateMapper)
+				.certificateMappingDAO(certificateMappingDAO)
 				.useClientCertificate(useClientCertificate)
 				.build();
 	}
@@ -104,5 +106,12 @@ public class EbMSClientConfig
 	public SSLParametersFactory sslParametersFactory()
 	{
 		return new SSLParametersFactory(enabledProtocols, enabledCipherSuites);
+	}
+
+	@Bean
+	public CertificateMappingDAO certificateMappingDAO(DataSource dataSource)
+	{
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new CertificateMappingDAO(jdbcTemplate);
 	}
 }

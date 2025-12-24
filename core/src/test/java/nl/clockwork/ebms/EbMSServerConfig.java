@@ -15,10 +15,11 @@
  */
 package nl.clockwork.ebms;
 
-import nl.clockwork.ebms.cpa.CPAControllerConfig;
-import nl.clockwork.ebms.cpa.CPAManagerConfig;
-import nl.clockwork.ebms.cpa.certificate.CertificateMappingControllerConfig;
-import nl.clockwork.ebms.cpa.url.URLMappingControllerConfig;
+import nl.clockwork.ebms.api.cpa.CPAControllerConfig;
+import nl.clockwork.ebms.api.cpa.CPAManagerConfig;
+import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingControllerConfig;
+import nl.clockwork.ebms.api.cpa.url.URLMappingControllerConfig;
+import nl.clockwork.ebms.api.ebms.EbMSControllerConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.delivery.DeliveryManagerConfig;
@@ -29,7 +30,6 @@ import nl.clockwork.ebms.event.MessageEventListenerConfig;
 import nl.clockwork.ebms.jms.JMSConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
-import nl.clockwork.ebms.service.EbMSControllerConfig;
 import nl.clockwork.ebms.signing.SigningConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.validation.ValidationConfig;

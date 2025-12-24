@@ -39,17 +39,17 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.api.ebms.model.DataSource;
+import nl.clockwork.ebms.api.ebms.model.MTOMDataSource;
+import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
+import nl.clockwork.ebms.api.ebms.model.Message;
+import nl.clockwork.ebms.api.ebms.model.MessageFilter;
+import nl.clockwork.ebms.api.ebms.model.MessageProperties;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.service.model.DataSource;
-import nl.clockwork.ebms.service.model.MTOMDataSource;
-import nl.clockwork.ebms.service.model.MTOMMessage;
-import nl.clockwork.ebms.service.model.Message;
-import nl.clockwork.ebms.service.model.MessageFilter;
-import nl.clockwork.ebms.service.model.MessageProperties;
 import nl.clockwork.ebms.util.DOMUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -123,8 +123,8 @@ class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 		{
 			return MessageProperties.builder()
 					.cpaId(rs.getString("cpa_id"))
-					.fromParty(new nl.clockwork.ebms.service.model.Party(rs.getString("from_party_id"), rs.getString("from_role")))
-					.toParty(new nl.clockwork.ebms.service.model.Party(rs.getString("to_party_id"), rs.getString("to_role")))
+					.fromParty(new nl.clockwork.ebms.api.ebms.model.Party(rs.getString("from_party_id"), rs.getString("from_role")))
+					.toParty(new nl.clockwork.ebms.api.ebms.model.Party(rs.getString("to_party_id"), rs.getString("to_role")))
 					.service(rs.getString("service"))
 					.action(rs.getString("action"))
 					.timestamp(rs.getTimestamp("time_stamp").toInstant())

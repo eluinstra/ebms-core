@@ -18,7 +18,7 @@ package nl.clockwork.ebms.delivery.task;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAQueryManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.task.JMSDeliveryTaskManager.DeliveryTaskMessageCreator;
 import org.quartz.Job;

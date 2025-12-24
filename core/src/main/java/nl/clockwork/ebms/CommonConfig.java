@@ -17,7 +17,7 @@ package nl.clockwork.ebms;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAQueryManager;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import org.apache.xml.security.Init;

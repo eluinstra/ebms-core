@@ -20,9 +20,9 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Optional;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
+import nl.clockwork.ebms.api.ebms.model.Message;
+import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
-import nl.clockwork.ebms.service.model.MTOMMessage;
-import nl.clockwork.ebms.service.model.Message;
-import nl.clockwork.ebms.service.model.MessageFilter;
 import org.w3c.dom.Document;
 
 public interface EbMSDAO

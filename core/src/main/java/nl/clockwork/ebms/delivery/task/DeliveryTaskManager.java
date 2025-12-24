@@ -17,7 +17,7 @@ package nl.clockwork.ebms.delivery.task;
 
 import java.time.Instant;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.api.cpa.CPAUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 public interface DeliveryTaskManager

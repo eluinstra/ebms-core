@@ -19,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAQueryManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.DeliveryManager;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;

@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAQueryManager;
 import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSRequestMessage;

@@ -28,8 +28,8 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
+import nl.clockwork.ebms.api.cpa.CPAUtils;
+import nl.clockwork.ebms.api.cpa.certificate.CertificateMapping;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +49,7 @@ public class EbMSHttpClientFactory
 	EbMSTrustStore trustStore;
 	HttpErrors httpErrors;
 	@NonNull
-	CertificateMapper certificateMapper;
+	CertificateMappingDAO certificateMappingDAO;
 	boolean useClientCertificate;
 	@NonNull
 	Map<String, EbMSClient> clients = new ConcurrentHashMap<>();
@@ -65,7 +65,7 @@ public class EbMSHttpClientFactory
 			@NonNull EbMSKeyStore keyStore,
 			EbMSTrustStore trustStore,
 			HttpErrors httpErrors,
-			@NonNull CertificateMapper certificateMapper,
+			@NonNull CertificateMappingDAO certificateMappingDAO,
 			boolean useClientCertificate)
 	{
 		this.connectTimeout = connectTimeout;
@@ -76,7 +76,7 @@ public class EbMSHttpClientFactory
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
 		this.httpErrors = httpErrors;
-		this.certificateMapper = certificateMapper;
+		this.certificateMappingDAO = certificateMappingDAO;
 		this.useClientCertificate = useClientCertificate;
 		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.toString(!verifyHostnames));
 	}
@@ -136,7 +136,14 @@ public class EbMSHttpClientFactory
 	private X509Certificate getClientCertificate(String cpaId, DeliveryChannel deliveryChannel)
 	{
 		return useClientCertificate && deliveryChannel != null
-				? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)), cpaId)
+				? getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)), cpaId)
+				: null;
+	}
+
+	private X509Certificate getCertificate(X509Certificate certificate, String cpaId)
+	{
+		return certificate != null
+				? certificateMappingDAO.getCertificateMapping(CertificateMapping.getCertificateId(certificate), cpaId, false).orElse(certificate)
 				: null;
 	}
 }

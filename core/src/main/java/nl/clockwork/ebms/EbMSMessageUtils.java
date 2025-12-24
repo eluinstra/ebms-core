@@ -38,7 +38,7 @@ import javax.xml.xpath.XPathExpressionException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;

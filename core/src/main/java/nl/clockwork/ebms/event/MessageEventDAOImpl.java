@@ -28,9 +28,9 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.api.ebms.model.MessageEvent;
+import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.dao.WithMessageFilter;
-import nl.clockwork.ebms.service.model.MessageEvent;
-import nl.clockwork.ebms.service.model.MessageFilter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 

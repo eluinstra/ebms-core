@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.signing;
 
-import static nl.clockwork.ebms.cpa.CPATestUtils.cpaCache;
+import static nl.clockwork.ebms.api.cpa.CPATestUtils.cpaCache;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,10 +36,14 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CPAQueryManager;
-import nl.clockwork.ebms.cpa.url.URLMapper;
-import nl.clockwork.ebms.cpa.url.URLMappingDAO;
+import nl.clockwork.ebms.api.cpa.CPAManager;
+import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.url.URLMapper;
+import nl.clockwork.ebms.api.cpa.url.URLMappingRepository;
+import nl.clockwork.ebms.api.ebms.model.DataSource;
+import nl.clockwork.ebms.api.ebms.model.MessageRequest;
+import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
+import nl.clockwork.ebms.api.ebms.model.Party;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -47,10 +51,6 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.security.KeyStoreType;
-import nl.clockwork.ebms.service.model.DataSource;
-import nl.clockwork.ebms.service.model.MessageRequest;
-import nl.clockwork.ebms.service.model.MessageRequestProperties;
-import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import org.apache.xml.security.Init;
@@ -137,9 +137,9 @@ public class SigningTest
 		return result;
 	}
 
-	private URLMappingDAO initURLMappingDAOMock()
+	private URLMappingRepository initURLMappingDAOMock()
 	{
-		val result = mock(URLMappingDAO.class);
+		val result = mock(URLMappingRepository.class);
 		return result;
 	}
 
