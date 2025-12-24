@@ -20,14 +20,10 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.util.IsolationLevel;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
@@ -46,35 +42,7 @@ import org.springframework.context.event.EventListener;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {
-	public static final String BASEPATH = "classpath:/nl/clockwork/ebms/db/migration/";
-
-	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-	@AllArgsConstructor
-	@Getter
-	public enum Location
-	{
-		DB2("jdbc:db2:", BASEPATH + "db2", false),
-		DB2_STRICT("jdbc:db2:", BASEPATH + "db2.strict", true),
-		H2("jdbc:h2:", BASEPATH + "h2", false),
-		H2_STRICT("jdbc:h2:", BASEPATH + "h2.strict", true),
-		HSQLDB("jdbc:hsqldb:", BASEPATH + "hsqldb", false),
-		HSQLDB_STRICT("jdbc:hsqldb:", BASEPATH + "hsqldb.strict", true),
-		MARIADB("jdbc:mariadb:", BASEPATH + "mariadb", false),
-		MSSQL("jdbc:sqlserver:", BASEPATH + "mssql", false),
-		ORACLE("jdbc:oracle:", BASEPATH + "oracle", false),
-		ORACLE_STRICT("jdbc:oracle:", BASEPATH + "oracle.strict", true),
-		POSTGRES("jdbc:postgresql:", BASEPATH + "postgresql", false),
-		POSTGRES_STRICT("jdbc:postgresql:", BASEPATH + "postgresql.strict", true);
-
-		String jdbcUrl;
-		String location;
-		boolean strict;
-
-		public static Optional<String> getLocation(String jdbcUrl, boolean strict)
-		{
-			return Arrays.stream(values()).filter(l -> jdbcUrl.startsWith(l.jdbcUrl) && (l.strict == strict)).map(l -> l.location).findFirst();
-		}
-	}
+	public static final String BASEPATH = "classpath:/db/migration/";
 
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
@@ -186,12 +154,9 @@ public class DataSourceConfig
 	{
 		if (updateDb)
 		{
-			val locations = Location.getLocation(jdbcUrl, updateDbStrict);
-			locations.ifPresent(l ->
-			{
-				val config = Flyway.configure().dataSource(jdbcUrl, username, password).locations(l).ignoreMigrationPatterns("*:missing").outOfOrder(true);
-				config.load().migrate();
-			});
+			val location = BASEPATH + (updateDbStrict ? "strict/" : "default/");
+			val config = Flyway.configure().dataSource(jdbcUrl, username, password).locations(location).ignoreMigrationPatterns("*:missing").outOfOrder(true);
+			config.load().migrate();
 		}
 	}
 
