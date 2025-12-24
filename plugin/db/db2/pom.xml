@@ -24,17 +24,21 @@
     <version>${revision}</version>
     <relativePath>../../..</relativePath>
   </parent>
-  <groupId>nl.clockwork.ebms.plugin.cache</groupId>
-  <artifactId>ebms-ehcache-cache-plugin</artifactId>
+  <groupId>nl.clockwork.ebms.plugin.db</groupId>
+  <artifactId>ebms-db2-db-plugin</artifactId>
   <version>${project.parent.version}</version>
   <packaging>jar</packaging>
-  <name>EbMS EhCache Cache Plugin</name>
+  <name>EbMS DB2 Database Plugin</name>
   <dependencies>
     <dependency>
-      <groupId>org.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>3.10.8</version>
-      <classifier>jakarta</classifier>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-db2</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.db2</groupId>
+      <artifactId>jcc</artifactId>
+      <version>12.1.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.datasource;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
-import com.ibm.db2.jcc.DB2XADataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.util.IsolationLevel;
@@ -25,10 +24,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -136,16 +132,16 @@ public class DataSourceConfig
 	{
 		val result = new AtomikosDataSourceBean();
 		result.setUniqueResourceName(UUID.randomUUID().toString());
-		if (jdbcUrl.contains("db2"))
-			createDB2XADataSource().ifPresentOrElse(result::setXaDataSource, () ->
-			{
-				throw new IllegalStateException("Error creating DB2XADataSource");
-			});
-		else
-		{
-			result.setXaDataSourceClassName(driverClassName);
-			result.setXaProperties(createDriverProperties());
-		}
+		// if (jdbcUrl.contains("db2"))
+		// createDB2XADataSource().ifPresentOrElse(result::setXaDataSource, () ->
+		// {
+		// throw new IllegalStateException("Error creating DB2XADataSource");
+		// });
+		// else
+		// {
+		result.setXaDataSourceClassName(driverClassName);
+		result.setXaProperties(createDriverProperties());
+		// }
 		if (isolationLevel != null)
 			result.setDefaultIsolationLevel(isolationLevel.getLevelId());
 		result.setLocalTransactionMode(true);
@@ -163,27 +159,27 @@ public class DataSourceConfig
 		return result;
 	}
 
-	private Optional<XADataSource> createDB2XADataSource()
-	{
-		return matchJdbcUrl(jdbcUrl).map(matcher ->
-		{
-			val result = new DB2XADataSource();
-			result.setDatabaseName(matcher.group(3));
-			result.setUser(username);
-			result.setPassword(password);
-			result.setServerName(matcher.group(1));
-			result.setPortNumber(Integer.parseInt(matcher.group(2)));
-			result.setDriverType(4);
-			return result;
-		});
-	}
+	// private Optional<XADataSource> createDB2XADataSource()
+	// {
+	// return matchJdbcUrl(jdbcUrl).map(matcher ->
+	// {
+	// val result = new DB2XADataSource();
+	// result.setDatabaseName(matcher.group(3));
+	// result.setUser(username);
+	// result.setPassword(password);
+	// result.setServerName(matcher.group(1));
+	// result.setPortNumber(Integer.parseInt(matcher.group(2)));
+	// result.setDriverType(4);
+	// return result;
+	// });
+	// }
 
-	private Optional<Matcher> matchJdbcUrl(String jdbcUrl)
-	{
-		val p = Pattern.compile("^jdbc:db2://([^:]+):(\\d+)/(.*)$");
-		val m = p.matcher(jdbcUrl);
-		return m.find() ? Optional.of(m) : Optional.empty();
-	}
+	// private Optional<Matcher> matchJdbcUrl(String jdbcUrl)
+	// {
+	// val p = Pattern.compile("^jdbc:db2://([^:]+):(\\d+)/(.*)$");
+	// val m = p.matcher(jdbcUrl);
+	// return m.find() ? Optional.of(m) : Optional.empty();
+	// }
 
 	@EventListener(ContextRefreshedEvent.class)
 	public void init()

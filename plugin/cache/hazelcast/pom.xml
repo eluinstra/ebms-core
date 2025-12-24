@@ -24,17 +24,12 @@
     <version>${revision}</version>
     <relativePath>../../..</relativePath>
   </parent>
-  <groupId>nl.clockwork.ebms.plugin.cache.hazelcast</groupId>
+  <groupId>nl.clockwork.ebms.plugin.cache</groupId>
   <artifactId>ebms-hazelcast-cache-plugin</artifactId>
   <version>${project.parent.version}</version>
   <packaging>jar</packaging>
   <name>EbMS Hazelcast Cache Plugin</name>
   <dependencies>
-    <dependency>
-      <groupId>nl.clockwork.ebms.common</groupId>
-      <artifactId>ebms-common</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
     <dependency>
       <groupId>com.hazelcast</groupId>
       <artifactId>hazelcast-spring</artifactId>
@@ -43,10 +38,17 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>nl.clockwork.ebms.common</groupId>
+      <artifactId>ebms-common</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
@@ -65,13 +67,20 @@
                 <resource>license.txt</resource>
                 <resource>LICENSE.txt</resource>
                 <resource>NOTICE.txt</resource>
+                <resource>NOTICE</resource>
               </resources>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/spring/aot.factories</resource>
             </transformer>
             <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
               <resource>META-INF/spring.handlers</resource>
             </transformer>
             <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
               <resource>META-INF/spring.schemas</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/spring.tooling</resource>
             </transformer>
             <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
               <resource>META-INF/cxf/bus-extensions.txt</resource>
@@ -98,7 +107,7 @@
                 <exclude>META-INF/*.DSA</exclude>
                 <exclude>META-INF/*.RSA</exclude>
                 <exclude>META-INF/LICENSE</exclude>
-                <exclude>module-info.class</exclude>
+                <exclude>**/module-info.class</exclude>
               </excludes>
             </filter>
           </filters>
