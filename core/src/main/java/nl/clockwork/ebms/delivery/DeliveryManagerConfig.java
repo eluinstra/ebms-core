@@ -74,7 +74,7 @@ public class DeliveryManagerConfig
 	@Conditional(DefaultDeliveryManagerType.class)
 	public DeliveryManager defaultDeliveryManager()
 	{
-		return DeliveryManager.builder()
+		return DefaultDeliveryManager.builder()
 				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
@@ -86,7 +86,6 @@ public class DeliveryManagerConfig
 	public DeliveryManager jmsDeliveryManager(ConnectionFactory connectionFactory)
 	{
 		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
-				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
 				.transactionManager(transactionManager)

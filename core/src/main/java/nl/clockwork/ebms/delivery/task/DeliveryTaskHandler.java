@@ -158,13 +158,13 @@ class DeliveryTaskHandler
 		Runnable runnable = () ->
 		{
 			deliveryTaskManager.updateTask(task, url, DeliveryTaskStatus.FAILED, errorMessage);
-			if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(task.getMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERY_FAILED) > 0)
-				{
-					messageEventListener.onMessageFailed(task.getMessageId());
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(task.getMessageId());
-				}
+			if (((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+					&& ebMSDAO.updateMessage(task.getMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERY_FAILED) > 0)
+			{
+				messageEventListener.onMessageFailed(task.getMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(task.getMessageId());
+			}
 		};
 		ebMSDAO.executeTransaction(runnable);
 	}
@@ -190,23 +190,23 @@ class DeliveryTaskHandler
 		{
 			messageProcessor.processResponse(requestDocument, responseDocument);
 			deliveryTaskManager.updateTask(task, url, DeliveryTaskStatus.SUCCEEDED);
-			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(task.getMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERED) > 0)
-				{
-					messageEventListener.onMessageDelivered(task.getMessageId());
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(task.getMessageId());
-				}
+			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel)
+					&& ebMSDAO.updateMessage(task.getMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERED) > 0)
+			{
+				messageEventListener.onMessageDelivered(task.getMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(task.getMessageId());
+			}
 		};
 		ebMSDAO.executeTransaction(runnable);
 	}
 
 	private EbMSClient createClient(DeliveryTask task)
 	{
-		String cpaId = task.getCpaId();
-		val sendDeliveryChannel =
-				task.getSendDeliveryChannelId() != null ? cpaManager.getDeliveryChannel(cpaId, task.getSendDeliveryChannelId()).orElse(null) : null;
-		return ebMSClientFactory.getEbMSClient(cpaId, sendDeliveryChannel);
+		val cpaId = task.getCpaId();
+		val deliveryChannel = task.getSendDeliveryChannelId() != null ? cpaManager.getDeliveryChannel(cpaId, task.getSendDeliveryChannelId()).orElse(null) : null;
+		val certificate = cpaManager.getX509Certificate(deliveryChannel);
+		return ebMSClientFactory.getEbMSClient(cpaId, certificate);
 	}
 
 	private void expireTask(final DeliveryTask task)

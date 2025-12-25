@@ -151,7 +151,9 @@ public class EncryptionTest
 
 	private CPAQueryManager initCPAManager() throws IOException, JAXBException
 	{
-		return new CPAQueryManager(initCPAManagerMock(), new URLMapper(initURLMappingDAOMock()));
+		val cpaQueryManager = new CPAQueryManager(initCPAManagerMock(), new URLMapper(initURLMappingDAOMock()));
+		cpaQueryManager.setSelf(cpaQueryManager);
+		return cpaQueryManager;
 	}
 
 	private CPAManager initCPAManagerMock() throws IOException, JAXBException

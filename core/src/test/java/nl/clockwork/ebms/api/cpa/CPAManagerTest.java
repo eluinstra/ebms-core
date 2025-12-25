@@ -107,6 +107,7 @@ public class CPAManagerTest
 		urlMapper = new URLMapper(urlMappingRepository);
 		cpaManager = new CPAManager(cpaDAO);
 		cpaQueryManager = new CPAQueryManager(cpaManager, urlMapper);
+		cpaQueryManager.setSelf(cpaQueryManager);
 	}
 
 	private static ServiceType createDefaultService()

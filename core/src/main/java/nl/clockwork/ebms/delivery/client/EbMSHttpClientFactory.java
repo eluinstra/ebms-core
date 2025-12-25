@@ -28,12 +28,10 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.api.cpa.certificate.CertificateMapping;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import org.apache.commons.lang3.StringUtils;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSHttpClientFactory
@@ -119,11 +117,11 @@ public class EbMSHttpClientFactory
 		return SSLContextFactory.builder().keyStore(keyStore).trustStore(trustStore).clientAlias(clientAlias).build();
 	}
 
-	public EbMSClient getEbMSClient(String cpaId, DeliveryChannel sendDeliveryChannel)
+	public EbMSClient getEbMSClient(String cpaId, X509Certificate certificate)
 	{
 		try
 		{
-			val clientCertificate = getClientCertificate(cpaId, sendDeliveryChannel);
+			val clientCertificate = getClientCertificate(cpaId, certificate);
 			val clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
 			return getEbMSClient(clientAlias);
 		}
@@ -133,11 +131,9 @@ public class EbMSHttpClientFactory
 		}
 	}
 
-	private X509Certificate getClientCertificate(String cpaId, DeliveryChannel deliveryChannel)
+	private X509Certificate getClientCertificate(String cpaId, X509Certificate certificate)
 	{
-		return useClientCertificate && deliveryChannel != null
-				? getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)), cpaId)
-				: null;
+		return useClientCertificate && certificate != null ? getCertificate(certificate, cpaId) : null;
 	}
 
 	private X509Certificate getCertificate(X509Certificate certificate, String cpaId)
