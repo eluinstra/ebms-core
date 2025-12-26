@@ -68,7 +68,7 @@ public class ClientCertificateManagerFilter implements Filter
 			}
 			log.info(
 					"Certificate "
-							+ (ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : " not found!"));
+							+ (ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectX500Principal().toString() : " not found!"));
 			chain.doFilter(request, response);
 		}
 		catch (CertificateException e)

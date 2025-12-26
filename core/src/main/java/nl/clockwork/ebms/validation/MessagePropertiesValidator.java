@@ -79,8 +79,8 @@ public class MessagePropertiesValidator
 	{
 		if (thisPartyActionBinding == otherPartyActionBinding)
 			return true;
-		else if (thisPartyActionBinding != null && otherPartyActionBinding != null && otherPartyActionBinding instanceof ActionBindingType)
-			return thisPartyActionBinding.getId().equals(((ActionBindingType)otherPartyActionBinding).getId());
+		else if (thisPartyActionBinding != null && otherPartyActionBinding != null && otherPartyActionBinding instanceof ActionBindingType otherPartyActionBindingType)
+			return thisPartyActionBinding.getId().equals(otherPartyActionBindingType.getId());
 		return false;
 	}
 }

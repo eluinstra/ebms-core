@@ -69,11 +69,11 @@ public class CertificateMapping implements Serializable
 
 	private String printSource()
 	{
-		return "source=" + source.getSubjectDN() + "(" + getCertificateId(source) + ")";
+		return "source=" + source.getSubjectX500Principal() + "(" + getCertificateId(source) + ")";
 	}
 
 	private String printDestination()
 	{
-		return "destination=" + destination.getSubjectDN() + "(" + getCertificateId(destination) + ")";
+		return "destination=" + destination.getSubjectX500Principal() + "(" + getCertificateId(destination) + ")";
 	}
 }

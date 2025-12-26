@@ -52,11 +52,11 @@ public class SecurityUtils
 	public static KeyPair getKeyPair(EbMSKeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
 		val key = keyStore.getKey(alias, password.toCharArray());
-		if (key instanceof PrivateKey)
+		if (key instanceof PrivateKey privateKey)
 		{
 			val cert = keyStore.getCertificate(alias);
 			val publicKey = cert.getPublicKey();
-			return new KeyPair(publicKey, (PrivateKey)key);
+			return new KeyPair(publicKey, privateKey);
 		}
 		return null;
 	}
@@ -73,7 +73,7 @@ public class SecurityUtils
 					.filter(matches(certificate))
 					.filter(verifyWith(certificate))
 					.findAny()
-					.orElseThrow(() -> new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!"));
+					.orElseThrow(() -> new ValidationException("Certificate " + certificate.getIssuerX500Principal() + " not found!"));
 		}
 		catch (CertificateExpiredException | CertificateNotYetValidException e)
 		{
@@ -98,7 +98,7 @@ public class SecurityUtils
 
 	private static Predicate<? super Certificate> matches(X509Certificate certificate)
 	{
-		return c -> c instanceof X509Certificate && certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName());
+		return c -> c instanceof X509Certificate x509Certificate && certificate.getIssuerX500Principal().getName().equals(x509Certificate.getSubjectX500Principal().getName());
 	}
 
 	private static Predicate<? super Certificate> verifyWith(X509Certificate certificate)

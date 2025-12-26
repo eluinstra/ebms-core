@@ -264,21 +264,21 @@ public class EbMSMessageUtils
 		envelope.setHeader(new Header());
 		envelope.setBody(new Body());
 		envelope.getHeader().getAny().add(ebMSMessage.getMessageHeader());
-		if (ebMSMessage instanceof EbMSMessage)
+		if (ebMSMessage instanceof EbMSMessage message)
 		{
-			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getSyncReply());
-			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getMessageOrder());
-			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getAckRequested());
-			envelope.getBody().getAny().add(((EbMSMessage)ebMSMessage).getManifest());
+			envelope.getHeader().getAny().add(message.getSyncReply());
+			envelope.getHeader().getAny().add(message.getMessageOrder());
+			envelope.getHeader().getAny().add(message.getAckRequested());
+			envelope.getBody().getAny().add(message.getManifest());
 		}
-		else if (ebMSMessage instanceof EbMSAcknowledgment)
-			envelope.getHeader().getAny().add(((EbMSAcknowledgment)ebMSMessage).getAcknowledgment());
-		else if (ebMSMessage instanceof EbMSMessageError)
-			envelope.getHeader().getAny().add(((EbMSMessageError)ebMSMessage).getErrorList());
-		else if (ebMSMessage instanceof EbMSStatusRequest)
-			envelope.getBody().getAny().add(((EbMSStatusRequest)ebMSMessage).getStatusRequest());
-		else if (ebMSMessage instanceof EbMSStatusResponse)
-			envelope.getBody().getAny().add(((EbMSStatusResponse)ebMSMessage).getStatusResponse());
+		else if (ebMSMessage instanceof EbMSAcknowledgment acknowledgment)
+			envelope.getHeader().getAny().add(acknowledgment.getAcknowledgment());
+		else if (ebMSMessage instanceof EbMSMessageError messageError)
+			envelope.getHeader().getAny().add(messageError.getErrorList());
+		else if (ebMSMessage instanceof EbMSStatusRequest statusRequest)
+			envelope.getBody().getAny().add(statusRequest.getStatusRequest());
+		else if (ebMSMessage instanceof EbMSStatusResponse statusResponse)
+			envelope.getBody().getAny().add(statusResponse.getStatusResponse());
 		val parser = JAXBParser.getInstance(
 				Envelope.class,
 				Envelope.class,

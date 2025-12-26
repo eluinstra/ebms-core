@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.delivery.task;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.quartz.JobExecutionContext;
@@ -26,9 +27,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class DeliveryTaskJob extends QuartzJobBean
 {
-	@Autowired
 	DeliveryTaskHandler deliveryTaskHandler;
 
 	@Override

@@ -129,7 +129,7 @@ public class EbMSSignatureGenerator
 		val alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)
 			throw new EbMSProcessorException(
-					"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
+					"No certificate found with subject \"" + certificate.getSubjectX500Principal().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
 		val keyPair = SecurityUtils.getKeyPair(keyStore, alias, keyStore.getKeyPassword());
 		val signatureAlgorithm = CPAUtils.getSignatureAlgorithm(deliveryChannel);
 		val hashFunction = CPAUtils.getHashFunction(deliveryChannel);

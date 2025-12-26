@@ -79,8 +79,13 @@ class EbMSHttpClient implements EbMSClient
 			val response = httpClient.send(createRequest(readTimeout, proxy, uri, document), BodyHandlers.ofString());
 			return new EbMSResponseHandler(response, recoverableHttpErrors, unrecoverableHttpErrors).read();
 		}
-		catch (IOException | TransformerException | InterruptedException e)
+		catch (IOException | TransformerException e)
 		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (InterruptedException e)
+		{
+			Thread.currentThread().interrupt();
 			throw new EbMSProcessingException(e);
 		}
 	}

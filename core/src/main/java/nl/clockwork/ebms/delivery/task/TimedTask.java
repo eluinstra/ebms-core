@@ -54,6 +54,7 @@ class TimedTask
 		catch (InterruptedException e)
 		{
 			log.trace("", e);
+			Thread.currentThread().interrupt();
 		}
 	}
 }

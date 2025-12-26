@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.encryption;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.api.cpa.CPAQueryManager;
 import nl.clockwork.ebms.security.EbMSKeyStore;
@@ -27,9 +28,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class EncryptionConfig
 {
-	@Autowired
 	CPAQueryManager cpaManager;
 
 	@Bean

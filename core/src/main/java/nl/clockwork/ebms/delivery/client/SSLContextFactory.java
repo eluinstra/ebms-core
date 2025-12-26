@@ -117,8 +117,8 @@ public class SSLContextFactory
 	{
 		val keyManagers = kmf.getKeyManagers();
 		for (var i = 0; i < keyManagers.length; i++)
-			if (keyManagers[i] instanceof X509KeyManager)
-				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i], clientAlias);
+			if (keyManagers[i] instanceof X509KeyManager x509KeyManager)
+				keyManagers[i] = new EbMSX509KeyManager(x509KeyManager, clientAlias);
 		return kmf;
 	}
 

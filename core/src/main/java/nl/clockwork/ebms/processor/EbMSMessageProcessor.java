@@ -172,42 +172,40 @@ public class EbMSMessageProcessor
 			throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException,
 			TransformerFactoryConfigurationError, TransformerException, XPathExpressionException
 	{
-		if (message instanceof EbMSMessage)
-			return processMessage(timestamp, document, (EbMSMessage)message);
-		else if (message instanceof EbMSMessageError)
+		if (message instanceof EbMSMessage ebMSMessage)
+			return processMessage(timestamp, document, ebMSMessage);
+		else if (message instanceof EbMSMessageError messageError)
 		{
-			val messageError = (EbMSMessageError)message;
 			val requestMessage = getRequestMessage(messageError);
 			if (requestMessage.getSyncReply() != null)
 				throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			messageErrorProcessor.processMessageError(timestamp, document, requestMessage, messageError);
 			return null;
 		}
-		else if (message instanceof EbMSAcknowledgment)
+		else if (message instanceof EbMSAcknowledgment acknowledgment)
 		{
-			val acknowledgment = (EbMSAcknowledgment)message;
 			val requestMessage = getRequestMessage(acknowledgment);
 			if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
 				throw new EbMSProcessingException("No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			acknowledgmentProcessor.processAcknowledgment(timestamp, document, requestMessage, acknowledgment);
 			return null;
 		}
-		else if (message instanceof EbMSStatusRequest)
+		else if (message instanceof EbMSStatusRequest statusRequest)
 		{
-			return processStatusRequest((EbMSStatusRequest)message);
+			return processStatusRequest(statusRequest);
 		}
-		else if (message instanceof EbMSStatusResponse)
+		else if (message instanceof EbMSStatusResponse statusResponse)
 		{
-			statusResponseProcessor.processStatusResponse((EbMSStatusResponse)message);
+			statusResponseProcessor.processStatusResponse(statusResponse);
 			return null;
 		}
-		else if (message instanceof EbMSPing)
+		else if (message instanceof EbMSPing ping)
 		{
-			return processPing((EbMSPing)message);
+			return processPing(ping);
 		}
-		else if (message instanceof EbMSPong)
+		else if (message instanceof EbMSPong pong)
 		{
-			pongProcessor.processPong((EbMSPong)message);
+			pongProcessor.processPong(pong);
 			return null;
 		}
 		else
@@ -229,9 +227,8 @@ public class EbMSMessageProcessor
 		{
 			val message = EbMSMessageUtils.getEbMSMessage(request);
 			val requestMessageHeader = message.getMessageHeader();
-			if (message instanceof EbMSMessage)
+			if (message instanceof EbMSMessage requestMessage)
 			{
-				val requestMessage = (EbMSMessage)message;
 				if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
 					throw new EbMSProcessingException("No response received for message " + requestMessageHeader.getMessageData().getMessageId());
 
@@ -240,7 +237,7 @@ public class EbMSMessageProcessor
 					xsdValidator.validate(response.getMessage());
 					val timestamp = Instant.now();
 					val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
-					if (responseMessage instanceof EbMSMessageError)
+					if (responseMessage instanceof EbMSMessageError messageError)
 					{
 						if (!messageValidator.isSyncReply(requestMessage))
 							throw new EbMSProcessingException(
@@ -248,9 +245,9 @@ public class EbMSMessageProcessor
 											+ requestMessage.getMessageHeader().getMessageData().getMessageId()
 											+ "\n"
 											+ DOMUtils.toString(response.getMessage()));
-						messageErrorProcessor.processMessageError(timestamp, response, requestMessage, (EbMSMessageError)responseMessage);
+						messageErrorProcessor.processMessageError(timestamp, response, requestMessage, messageError);
 					}
-					else if (responseMessage instanceof EbMSAcknowledgment)
+					else if (responseMessage instanceof EbMSAcknowledgment acknowledgment)
 					{
 						if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
 							throw new EbMSProcessingException(
@@ -258,7 +255,7 @@ public class EbMSMessageProcessor
 											+ requestMessageHeader.getMessageData().getMessageId()
 											+ "\n"
 											+ DOMUtils.toString(response.getMessage()));
-						acknowledgmentProcessor.processAcknowledgment(timestamp, response, requestMessage, (EbMSAcknowledgment)responseMessage);
+						acknowledgmentProcessor.processAcknowledgment(timestamp, response, requestMessage, acknowledgment);
 					}
 					else
 						throw new EbMSProcessingException(

@@ -241,11 +241,11 @@ class EbMSControllerHandler
 
 	private MessageStatus createMessageStatus(EbMSBaseMessage message)
 	{
-		if (message instanceof EbMSStatusResponse)
+		if (message instanceof EbMSStatusResponse statusResponse)
 		{
 			val timestamp =
-					((EbMSStatusResponse)message).getStatusResponse().getTimestamp() == null ? null : ((EbMSStatusResponse)message).getStatusResponse().getTimestamp();
-			val messageStatus = ((EbMSStatusResponse)message).getStatusResponse().getMessageStatus();
+					statusResponse.getStatusResponse().getTimestamp() == null ? null : statusResponse.getStatusResponse().getTimestamp();
+			val messageStatus = statusResponse.getStatusResponse().getMessageStatus();
 			val status = EbMSMessageStatus.get(messageStatus).orElseThrow(() -> new NotFoundException("No EbMSMessageStatus found for " + messageStatus));
 			return new MessageStatus(timestamp, status);
 		}

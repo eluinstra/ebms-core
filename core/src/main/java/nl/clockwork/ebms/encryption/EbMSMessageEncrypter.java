@@ -176,7 +176,7 @@ public class EbMSMessageEncrypter
 	{
 		val encryptedData = xmlCipher.getEncryptedData();
 		val encryptedKeyInfo = new KeyInfo(document);
-		encryptedKeyInfo.add(new KeyName(document, certificate.getSubjectDN().getName()));
+		encryptedKeyInfo.add(new KeyName(document, certificate.getSubjectX500Principal().getName()));
 		encryptedKey.setKeyInfo(encryptedKeyInfo);
 		val keyInfo = new KeyInfo(document);
 		keyInfo.add(encryptedKey);

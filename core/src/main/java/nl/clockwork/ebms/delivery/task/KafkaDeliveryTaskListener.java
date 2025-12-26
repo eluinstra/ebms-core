@@ -20,11 +20,13 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import lombok.AllArgsConstructor;
+
 @Component
 @Conditional(DeliveryTaskHandlerConfig.KafkaTaskHandlerType.class)
+@AllArgsConstructor
 public class KafkaDeliveryTaskListener
 {
-	@Autowired
 	DeliveryTaskHandler deliveryTaskHandler;
 
 	@KafkaListener(topics = QuartzKafkaDeliveryTaskManager.KAFKA_TOPIC_NAME)
