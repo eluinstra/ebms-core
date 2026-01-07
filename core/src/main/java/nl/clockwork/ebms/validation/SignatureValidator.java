@@ -44,13 +44,12 @@ class SignatureValidator
 		val messageHeader = message.getMessageHeader();
 		val signature = message.getSignature();
 
-		val service = CPAUtils.toString(messageHeader.getService());
 		val deliveryChannel = cpaManager
 				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
-						service,
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> StreamUtils.illegalStateException(
@@ -58,13 +57,13 @@ class SignatureValidator
 								messageHeader.getCPAId(),
 								messageHeader.getFrom().getPartyId(),
 								messageHeader.getFrom().getRole(),
-								service,
+								messageHeader.getService(),
 								messageHeader.getAction()));
 		if (cpaManager.isSendingNonRepudiationRequired(
 				messageHeader.getCPAId(),
 				messageHeader.getFrom().getPartyId(),
 				messageHeader.getFrom().getRole(),
-				service,
+				messageHeader.getService(),
 				messageHeader.getAction()))
 		{
 			if (signature == null)

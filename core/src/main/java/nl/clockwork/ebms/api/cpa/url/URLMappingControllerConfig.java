@@ -40,12 +40,13 @@ public class URLMappingControllerConfig
 	}
 
 	@Bean
-	public URLMapper urlMapper(DataSource dataSource)
+	public URLMapper urlMapper(URLMappingRepository urlMappingRepository)
 	{
-		return new URLMapper(urlMappingRepository(dataSource));
+		return new URLMapper(urlMappingRepository);
 	}
 
-	private URLMappingRepository urlMappingRepository(DataSource dataSource)
+	@Bean
+	public URLMappingRepository urlMappingRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new URLMappingRepository(jdbcTemplate);

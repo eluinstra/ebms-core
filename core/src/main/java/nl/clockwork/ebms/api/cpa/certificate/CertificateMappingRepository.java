@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.api.cpa.certificate;
 
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -22,6 +24,7 @@ import java.security.cert.X509Certificate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +33,32 @@ import lombok.val;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CertificateMapping"})
-class CertificateMappingRepository
+public class CertificateMappingRepository
 {
+	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>
+	{
+		@Override
+		public Tuple2<X509Certificate, String> mapRow(ResultSet rs, int rowNum) throws SQLException
+		{
+			try
+			{
+				CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+				return Tuple.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination")), rs.getString("cpa_id"));
+			}
+			catch (CertificateException e)
+			{
+				throw new SQLException(e);
+			}
+		}
+	}
+
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -53,6 +74,31 @@ class CertificateMappingRepository
 		return cpaId == null
 				? jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id is null", Integer.class, id) > 0
 				: jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id = ?", Integer.class, id, cpaId) > 0;
+	}
+
+	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
+	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific)
+	{
+		try
+		{
+			val result = cpaId == null
+					? jdbcTemplate.query("select destination, cpa_id from certificate_mapping where id = ? and cpa_id is null", new CertificateRowMapper(), id)
+					: jdbcTemplate.query(
+							"select destination, cpa_id from certificate_mapping where id = ?" + (getSpecific ? " and cpa_id = ?" : " and (cpa_id = ? or cpa_id is null)"),
+							new CertificateRowMapper(),
+							id,
+							cpaId);
+			if (result.size() == 0)
+				return Optional.empty();
+			else if (result.size() == 1)
+				return Optional.of(result.get(0)._1);
+			else
+				return result.stream().filter(r -> r._2 != null).findFirst().map(r -> r._1);
+		}
+		catch (EmptyResultDataAccessException e)
+		{
+			return Optional.empty();
+		}
 	}
 
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")

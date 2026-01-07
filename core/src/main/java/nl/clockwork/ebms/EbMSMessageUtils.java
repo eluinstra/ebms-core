@@ -38,7 +38,6 @@ import javax.xml.xpath.XPathExpressionException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -62,7 +61,6 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
@@ -139,19 +137,9 @@ public class EbMSMessageUtils
 				Case($(instanceOf(StatusResponse.class)), result::statusResponse));
 	}
 
-	public static String toString(PartyId partyId)
-	{
-		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
-	}
-
 	public static String toString(List<PartyId> partyIds)
 	{
-		return partyIds.stream().map(EbMSMessageUtils::toString).findFirst().orElse(null);
-	}
-
-	public static String toString(Service service)
-	{
-		return CPAUtils.toString(service.getType(), service.getValue());
+		return partyIds.stream().map(Object::toString).findFirst().orElse(null);
 	}
 
 	public static EbMSDocument getEbMSDocument(EbMSBaseMessage message)

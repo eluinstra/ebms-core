@@ -25,7 +25,7 @@ import lombok.val;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class CertificateMapper
+public class CertificateMapper
 {
 	@NonNull
 	CertificateMappingRepository repository;

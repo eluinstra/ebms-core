@@ -43,7 +43,6 @@ import lombok.ToString;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"value"})
 @XmlRootElement(name = "PartyId")
-@ToString
 public class PartyId implements Serializable
 {
 
@@ -93,4 +92,8 @@ public class PartyId implements Serializable
 		this.type = value;
 	}
 
+	public String toString()
+	{
+		return (type == null ? "" : type + ":") + value;
+	}
 }

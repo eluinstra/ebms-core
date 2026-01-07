@@ -17,6 +17,8 @@ package nl.clockwork.ebms.signing;
 
 import static nl.clockwork.ebms.api.cpa.CPATestUtils.cpaCache;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,8 +26,11 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -38,6 +43,7 @@ import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository;
 import nl.clockwork.ebms.api.cpa.url.URLMapper;
 import nl.clockwork.ebms.api.cpa.url.URLMappingRepository;
 import nl.clockwork.ebms.api.ebms.model.DataSource;
@@ -125,9 +131,9 @@ public class SigningTest
 		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
-	private CPAQueryManager initCPAManager() throws IOException, JAXBException
+	private CPAQueryManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
 	{
-		val cpaQueryManager = new CPAQueryManager(initCPAManagerMock(), new URLMapper(initURLMappingDAOMock()));
+		val cpaQueryManager = new CPAQueryManager(initCPAManagerMock(), initCertificateMappingRepositoryMock(),new URLMapper(initURLMappingDAOMock()), EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"), false);
 		cpaQueryManager.setSelf(cpaQueryManager);
 		return cpaQueryManager;
 	}
@@ -136,6 +142,13 @@ public class SigningTest
 	{
 		val result = mock(CPAManager.class);
 		when(result.getCPA(cpaId)).thenReturn(cpaCache.apply(cpaId));
+		return result;
+	}
+
+	private CertificateMappingRepository initCertificateMappingRepositoryMock()
+	{
+		val result = mock(CertificateMappingRepository.class);
+		when(result.getCertificateMapping(anyString(), anyString(), anyBoolean())).thenReturn(Optional.empty());
 		return result;
 	}
 

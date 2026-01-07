@@ -74,25 +74,29 @@ public class EbMSMessageEncrypter
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			val service = CPAUtils.toString(messageHeader.getService());
 			if (cpaManager.isSendingConfidential(
 					messageHeader.getCPAId(),
 					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
-					service,
+					messageHeader.getService(),
 					messageHeader.getAction()))
 			{
 				val toPartyId = messageHeader.getTo().getPartyId();
-				val deliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(), toPartyId, messageHeader.getTo().getRole(), service, messageHeader.getAction())
-								.orElseThrow(
-										() -> StreamUtils.illegalStateException(
-												"ReceiveDeliveryChannel",
-												messageHeader.getCPAId(),
-												toPartyId,
-												messageHeader.getTo().getRole(),
-												service,
-												messageHeader.getAction()));
+				val deliveryChannel = cpaManager
+						.getReceiveDeliveryChannel(
+								messageHeader.getCPAId(),
+								toPartyId,
+								messageHeader.getTo().getRole(),
+								messageHeader.getService(),
+								messageHeader.getAction())
+						.orElseThrow(
+								() -> StreamUtils.illegalStateException(
+										"ReceiveDeliveryChannel",
+										messageHeader.getCPAId(),
+										toPartyId,
+										messageHeader.getTo().getRole(),
+										messageHeader.getService(),
+										messageHeader.getAction()));
 				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
 				val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);

@@ -29,7 +29,6 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.api.cpa.CPAQueryManager;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -73,7 +72,7 @@ class MessageHeaderValidator
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
-						CPAUtils.toString(messageHeader.getService()),
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> new EbMSValidationException(
@@ -151,15 +150,14 @@ class MessageHeaderValidator
 	private void validateMessage(EbMSMessage message, Instant timestamp)
 	{
 		val messageHeader = message.getMessageHeader();
-		val service = CPAUtils.toString(messageHeader.getService());
-		validateService(messageHeader, service);
+		validateService(messageHeader, messageHeader.getService());
 		validateMessageData(timestamp, messageHeader);
 		val deliveryChannel = cpaManager
 				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
-						CPAUtils.toString(messageHeader.getService()),
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> new EbMSValidationException(
@@ -173,7 +171,7 @@ class MessageHeaderValidator
 		validateMessageOrder(messageOrder);
 	}
 
-	private void validateService(MessageHeader messageHeader, String service)
+	private void validateService(MessageHeader messageHeader, Service service)
 	{
 		if (!cpaManager
 				.canSend(messageHeader.getCPAId(), messageHeader.getFrom().getPartyId(), messageHeader.getFrom().getRole(), service, messageHeader.getAction()))
@@ -244,7 +242,7 @@ class MessageHeaderValidator
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
-						CPAUtils.toString(messageHeader.getService()),
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> new EbMSValidationException(
@@ -352,9 +350,7 @@ class MessageHeaderValidator
 
 	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
-		val anyMatch = requestPartyIds.stream()
-				.map(EbMSMessageUtils::toString)
-				.anyMatch(req -> responsePartyIds.stream().map(EbMSMessageUtils::toString).anyMatch(req::equals));
+		val anyMatch = requestPartyIds.stream().map(Object::toString).anyMatch(req -> responsePartyIds.stream().map(Object::toString).anyMatch(req::equals));
 		if (!anyMatch)
 			throw new ValidationException("Request PartyIds do not match response PartyIds");
 

@@ -30,7 +30,6 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.api.cpa.CPAQueryManager;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.DeliveryManager;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
@@ -71,7 +70,7 @@ class StatusResponseProcessor
 				messageHeader.getCPAId(),
 				messageHeader.getTo().getPartyId(),
 				messageHeader.getTo().getRole(),
-				CPAUtils.toString(messageHeader.getService()),
+				messageHeader.getService(),
 				messageHeader.getAction());
 		deliveryManager.sendResponseMessage(uri, statusResponse);
 	}

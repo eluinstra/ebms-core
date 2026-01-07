@@ -60,32 +60,37 @@ public class EbMSMessageDecrypter
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			val service = CPAUtils.toString(messageHeader.getService());
 			if (cpaManager.isSendingConfidential(
 					messageHeader.getCPAId(),
 					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
-					service,
+					messageHeader.getService(),
 					messageHeader.getAction()))
 			{
 				val toPartyId = messageHeader.getTo().getPartyId();
-				val deliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(), toPartyId, messageHeader.getTo().getRole(), service, messageHeader.getAction())
-								.orElseThrow(
-										() -> StreamUtils.illegalStateException(
-												"ReceiveDeliveryChannel",
-												messageHeader.getCPAId(),
-												toPartyId,
-												messageHeader.getTo().getRole(),
-												service,
-												messageHeader.getAction()));
+				val deliveryChannel = cpaManager
+						.getReceiveDeliveryChannel(
+								messageHeader.getCPAId(),
+								toPartyId,
+								messageHeader.getTo().getRole(),
+								messageHeader.getService(),
+								messageHeader.getAction())
+						.orElseThrow(
+								() -> StreamUtils.illegalStateException(
+										"ReceiveDeliveryChannel",
+										messageHeader.getCPAId(),
+										toPartyId,
+										messageHeader.getTo().getRole(),
+										messageHeader.getService(),
+										messageHeader.getAction()));
 				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				if (certificate == null)
 					throw new EbMSProcessingException(
 							"No encryption certificate found for deliveryChannel \"" + deliveryChannel.getChannelId() + "\" in CPA \"" + messageHeader.getCPAId() + "\"");
 				val alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
-					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectX500Principal().getName() + "\" in keystore \"" + keyStore + "\"");
+					throw new ValidationException(
+							"No certificate found with subject \"" + certificate.getSubjectX500Principal().getName() + "\" in keystore \"" + keyStore + "\"");
 				val keyPair = SecurityUtils.getKeyPair(keyStore, alias, keyStore.getKeyPassword());
 				message.getAttachments().replaceAll(a -> decrypt(keyPair, a));
 			}

@@ -65,7 +65,7 @@ public class EbMSSignatureValidator
 					messageHeader.getCPAId(),
 					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
-					CPAUtils.toString(messageHeader.getService()),
+					messageHeader.getService(),
 					messageHeader.getAction()))
 			{
 				val signatureNodeList = document.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
@@ -144,13 +144,12 @@ public class EbMSSignatureValidator
 
 	private X509Certificate getCertificate(MessageHeader messageHeader)
 	{
-		val service = CPAUtils.toString(messageHeader.getService());
 		val deliveryChannel = cpaManager
 				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
-						service,
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> StreamUtils.illegalStateException(
@@ -158,7 +157,7 @@ public class EbMSSignatureValidator
 								messageHeader.getCPAId(),
 								messageHeader.getFrom().getPartyId(),
 								messageHeader.getFrom().getRole(),
-								service,
+								messageHeader.getService(),
 								messageHeader.getAction()));
 		if (deliveryChannel != null)
 			return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));

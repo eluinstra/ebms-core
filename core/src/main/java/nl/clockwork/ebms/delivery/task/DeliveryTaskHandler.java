@@ -205,8 +205,8 @@ class DeliveryTaskHandler
 	{
 		val cpaId = task.getCpaId();
 		val deliveryChannel = task.getSendDeliveryChannelId() != null ? cpaManager.getDeliveryChannel(cpaId, task.getSendDeliveryChannelId()).orElse(null) : null;
-		val certificate = cpaManager.getX509Certificate(deliveryChannel);
-		return ebMSClientFactory.getEbMSClient(cpaId, certificate);
+		val clientAlias = cpaManager.getSSLClientAlias(cpaId, deliveryChannel).orElse(null);
+		return ebMSClientFactory.getEbMSClient(clientAlias);
 	}
 
 	private void expireTask(final DeliveryTask task)

@@ -152,4 +152,9 @@ public class DeliveryChannel implements Serializable
 		this.docExchangeId = value;
 	}
 
+	@Override
+	public String toString()
+	{
+		return channelId;
+	}
 }

@@ -21,7 +21,6 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.api.cpa.CPAQueryManager;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

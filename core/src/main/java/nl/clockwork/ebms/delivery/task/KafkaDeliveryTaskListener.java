@@ -15,12 +15,10 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
-import lombok.AllArgsConstructor;
 
 @Component
 @Conditional(DeliveryTaskHandlerConfig.KafkaTaskHandlerType.class)

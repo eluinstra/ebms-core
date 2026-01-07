@@ -24,8 +24,10 @@ import java.util.stream.Stream;
 import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.WithFile;
+import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingControllerConfig;
 import nl.clockwork.ebms.api.cpa.url.URLMappingControllerConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
+import nl.clockwork.ebms.security.KeyStoreConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -46,7 +48,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-		classes = {PropertiesConfig.class, CPAControllerConfig.class, CPAManagerConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class,
+		classes = {PropertiesConfig.class, KeyStoreConfig.class, CPAControllerConfig.class, CPAManagerConfig.class, CertificateMappingControllerConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class,
 				TransactionManagerConfig.class})
 class CPAServiceImplIT implements WithFile
 {

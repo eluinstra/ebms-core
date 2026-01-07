@@ -34,7 +34,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
@@ -48,7 +47,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Packaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
@@ -59,31 +57,6 @@ public class CPAUtils
 	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
 		return !headerPartyIds.isEmpty() && headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds, headerPartyIds);
-	}
-
-	public static String toString(PartyId partyId)
-	{
-		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
-	}
-
-	public static String toString(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
-	{
-		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
-	}
-
-	public static String toString(ServiceType service)
-	{
-		return toString(service.getType(), service.getValue());
-	}
-
-	public static String toString(Service service)
-	{
-		return toString(service.getType(), service.getValue());
-	}
-
-	public static String toString(String type, String service)
-	{
-		return (type == null ? "" : type + ":") + service;
 	}
 
 	public static Service createEbMSMessageService()
@@ -328,12 +301,12 @@ public class CPAUtils
 
 	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
-		return headerPartyIds.stream().map(EbMSMessageUtils::toString).allMatch(anyMatchIn(cpaPartyIds));
+		return headerPartyIds.stream().map(Object::toString).allMatch(anyMatchIn(cpaPartyIds));
 	}
 
 	private static Predicate<String> anyMatchIn(List<PartyId> cpaPartyIds)
 	{
-		return headerPartyId -> cpaPartyIds.stream().map(CPAUtils::toString).anyMatch(headerPartyId::equals);
+		return headerPartyId -> cpaPartyIds.stream().map(Object::toString).anyMatch(headerPartyId::equals);
 	}
 
 }

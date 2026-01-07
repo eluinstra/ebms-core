@@ -86,14 +86,13 @@ class MessageErrorProcessor
 		val messageError = createMessageError(timestamp, message, e);
 		val result = EbMSMessageUtils.getEbMSDocument(messageError);
 		val messageHeader = message.getMessageHeader();
-		val service = CPAUtils.toString(messageError.getMessageHeader().getService());
 		val sendDeliveryChannel =
 				cpaManager
 						.getSendDeliveryChannel(
 								messageHeader.getCPAId(),
 								messageError.getMessageHeader().getFrom().getPartyId(),
 								messageError.getMessageHeader().getFrom().getRole(),
-								service,
+								messageError.getMessageHeader().getService(),
 								messageError.getMessageHeader().getAction())
 						.orElse(null);
 		val receiveDeliveryChannel =
@@ -102,7 +101,7 @@ class MessageErrorProcessor
 								messageHeader.getCPAId(),
 								messageError.getMessageHeader().getTo().getPartyId(),
 								messageError.getMessageHeader().getTo().getRole(),
-								service,
+								messageError.getMessageHeader().getService(),
 								messageError.getMessageHeader().getAction())
 						.orElse(null);
 		Runnable storeMessage = () ->
@@ -122,14 +121,13 @@ class MessageErrorProcessor
 			storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
 	{
 		val messageHeader = message.getMessageHeader();
-		val service = CPAUtils.toString(message.getMessageHeader().getService());
 		val deliveryChannel =
 				cpaManager
 						.getReceiveDeliveryChannel(
 								messageHeader.getCPAId(),
 								messageHeader.getTo().getPartyId(),
 								messageHeader.getTo().getRole(),
-								service,
+								message.getMessageHeader().getService(),
 								messageHeader.getAction())
 						.orElse(null);
 		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp, deliveryChannel) : null;

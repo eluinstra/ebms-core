@@ -40,12 +40,13 @@ public class CertificateMappingControllerConfig
 	}
 
 	@Bean
-	public CertificateMapper certificateMapper(DataSource dataSource)
+	public CertificateMapper certificateMapper(CertificateMappingRepository certificateMappingRepository)
 	{
-		return new CertificateMapper(certificateMappingRepository(dataSource));
+		return new CertificateMapper(certificateMappingRepository);
 	}
 
-	private CertificateMappingRepository certificateMappingRepository(DataSource dataSource)
+	@Bean
+	public CertificateMappingRepository certificateMappingRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new CertificateMappingRepository(jdbcTemplate);

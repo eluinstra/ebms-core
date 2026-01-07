@@ -18,14 +18,19 @@ package nl.clockwork.ebms.encryption;
 import static nl.clockwork.ebms.api.cpa.CPATestUtils.cpaCache;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
@@ -36,6 +41,7 @@ import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository;
 import nl.clockwork.ebms.api.cpa.url.URLMapper;
 import nl.clockwork.ebms.api.cpa.url.URLMappingRepository;
 import nl.clockwork.ebms.api.ebms.model.DataSource;
@@ -62,7 +68,7 @@ import org.xml.sax.SAXException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EncryptionTest
+class EncryptionTest
 {
 	CPAQueryManager cpaManager;
 	EbMSMessageFactory messageFactory;
@@ -74,7 +80,7 @@ public class EncryptionTest
 	EbMSMessageDecrypter messageDecrypter;
 
 	@BeforeAll
-	public void init() throws Exception
+	void init() throws Exception
 	{
 		MockitoAnnotations.openMocks(this);
 		Init.init();
@@ -85,7 +91,7 @@ public class EncryptionTest
 	}
 
 	@Test
-	public void testEncryption() throws EbMSProcessorException, ValidatorException, IOException
+	void testEncryption() throws EbMSProcessorException, ValidatorException, IOException
 	{
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
@@ -94,7 +100,7 @@ public class EncryptionTest
 	}
 
 	@Test
-	public void testEncryptionAttachmentValidationFailure()
+	void testEncryptionAttachmentValidationFailure()
 			throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
 		val message = createMessage();
@@ -104,7 +110,7 @@ public class EncryptionTest
 	}
 
 	@Test
-	public void testEncryptionAttachmentValidationFailure1()
+	void testEncryptionAttachmentValidationFailure1()
 			throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
 		val message = createMessage();
@@ -114,7 +120,7 @@ public class EncryptionTest
 	}
 
 	@Test
-	public void testEncryptionAttachmentNotEncrypted() throws EbMSProcessorException, ValidatorException
+	void testEncryptionAttachmentNotEncrypted() throws EbMSProcessorException, ValidatorException
 	{
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
@@ -149,9 +155,9 @@ public class EncryptionTest
 								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
-	private CPAQueryManager initCPAManager() throws IOException, JAXBException
+	private CPAQueryManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
 	{
-		val cpaQueryManager = new CPAQueryManager(initCPAManagerMock(), new URLMapper(initURLMappingDAOMock()));
+		val cpaQueryManager = new CPAQueryManager(initCPAManagerMock(), initCertificateMappingRepositoryMock(), new URLMapper(initURLMappingRepositoryMock()), EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"), false);
 		cpaQueryManager.setSelf(cpaQueryManager);
 		return cpaQueryManager;
 	}
@@ -163,7 +169,14 @@ public class EncryptionTest
 		return result;
 	}
 
-	private URLMappingRepository initURLMappingDAOMock()
+	private CertificateMappingRepository initCertificateMappingRepositoryMock()
+	{
+		val result = mock(CertificateMappingRepository.class);
+		when(result.getCertificateMapping(anyString(), anyString(), anyBoolean())).thenReturn(Optional.empty());
+		return result;
+	}
+
+	private URLMappingRepository initURLMappingRepositoryMock()
 	{
 		return mock(URLMappingRepository.class);
 	}

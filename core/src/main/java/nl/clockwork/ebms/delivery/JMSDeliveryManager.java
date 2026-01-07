@@ -158,8 +158,7 @@ public class JMSDeliveryManager implements DeliveryManager
 
 	private EbMSClient createClient(MessageHeader messageHeader)
 	{
-		val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader);
-		val certificate = cpaManager.getX509Certificate(sendDeliveryChannel);
-		return ebMSClientFactory.getEbMSClient(messageHeader.getCPAId(), certificate);
+		val clientAlias = cpaManager.getSSLClientAlias(messageHeader).orElse(null);
+		return ebMSClientFactory.getEbMSClient(clientAlias);
 	}
 }

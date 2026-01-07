@@ -98,13 +98,12 @@ class AcknowledgmentProcessor
 			EbMSAcknowledgment acknowledgment)
 	{
 		val messageHeader = message.getMessageHeader();
-		val service = CPAUtils.toString(message.getMessageHeader().getService());
 		val deliveryChannel = cpaManager
 				.getReceiveDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getTo().getPartyId(),
 						messageHeader.getTo().getRole(),
-						service,
+						message.getMessageHeader().getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> StreamUtils.illegalStateException(
@@ -112,7 +111,7 @@ class AcknowledgmentProcessor
 								messageHeader.getCPAId(),
 								messageHeader.getTo().getPartyId(),
 								messageHeader.getTo().getRole(),
-								service,
+								message.getMessageHeader().getService(),
 								messageHeader.getAction()));
 		val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(), deliveryChannel);
 		ebMSDAO.insertMessage(timestamp, persistTime, messageDocument.getMessage(), message, message.getAttachments(), EbMSMessageStatus.RECEIVED);
@@ -122,13 +121,12 @@ class AcknowledgmentProcessor
 	private void storeDeliveryTask(EbMSAcknowledgment acknowledgment, boolean isSyncReply)
 	{
 		MessageHeader messageHeader = acknowledgment.getMessageHeader();
-		val service = CPAUtils.toString(messageHeader.getService());
 		val sendDeliveryChannel = cpaManager
 				.getReceiveDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
-						service,
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> StreamUtils.illegalStateException(
@@ -136,14 +134,14 @@ class AcknowledgmentProcessor
 								messageHeader.getCPAId(),
 								messageHeader.getFrom().getPartyId(),
 								messageHeader.getFrom().getRole(),
-								service,
+								messageHeader.getService(),
 								messageHeader.getAction()));
 		val receiveDeliveryChannel = cpaManager
 				.getReceiveDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getTo().getPartyId(),
 						messageHeader.getTo().getRole(),
-						service,
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> StreamUtils.illegalStateException(
@@ -151,7 +149,7 @@ class AcknowledgmentProcessor
 								messageHeader.getCPAId(),
 								messageHeader.getTo().getPartyId(),
 								messageHeader.getTo().getRole(),
-								service,
+								messageHeader.getService(),
 								messageHeader.getAction()));
 		if (!isSyncReply)
 			deliveryTaskManager.insertTask(

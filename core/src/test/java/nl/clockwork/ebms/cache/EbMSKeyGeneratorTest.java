@@ -59,11 +59,11 @@ class EbMSKeyGeneratorTest
 						method,
 						new Object[]{"1", List.of(Party.of("1", "role"), Party.of("2", "role")), "3"},
 						"toString[1,[Party(partyId=1, role=role), Party(partyId=2, role=role)],3]"),
-				of(method, new Object[]{"1", List.of(createPartyId("1", "type")), "3"}, "toString[1,[PartyId(value=1, type=type)],3]"),
+				of(method, new Object[]{"1", List.of(createPartyId("1", "type")), "3"}, "toString[1,[type:1],3]"),
 				of(
 						method,
 						new Object[]{"1", List.of(createPartyId("1", "type"), createPartyId("2", "type")), "3"},
-						"toString[1,[PartyId(value=1, type=type), PartyId(value=2, type=type)],3]"));
+						"toString[1,[type:1, type:2],3]"));
 	}
 
 	private static PartyId createPartyId(String value, String type)

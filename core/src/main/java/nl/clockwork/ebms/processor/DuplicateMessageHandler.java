@@ -78,13 +78,24 @@ class DuplicateMessageHandler
 						EbMSAction.ACKNOWLEDGMENT);
 				StreamUtils
 						.ifNotPresent(messageProperties, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
-				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
 				val sendDeliveryChannel =
-						cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(), messageHeader.getTo().getPartyId(), messageHeader.getTo().getRole(), service, null)
+						cpaManager
+								.getSendDeliveryChannel(
+										messageHeader.getCPAId(),
+										messageHeader.getTo().getPartyId(),
+										messageHeader.getTo().getRole(),
+										CPAUtils.createEbMSMessageService(),
+										null)
 								.orElse(null);
-				val receiveDeliveryChannel = cpaManager
-						.getReceiveDeliveryChannel(messageHeader.getCPAId(), messageHeader.getFrom().getPartyId(), messageHeader.getFrom().getRole(), service, null)
-						.orElse(null);
+				val receiveDeliveryChannel =
+						cpaManager
+								.getReceiveDeliveryChannel(
+										messageHeader.getCPAId(),
+										messageHeader.getFrom().getPartyId(),
+										messageHeader.getFrom().getRole(),
+										CPAUtils.createEbMSMessageService(),
+										null)
+								.orElse(null);
 				Runnable storeMessage = () ->
 				{
 					if (receiveDeliveryChannel != null && messageProperties.isPresent())

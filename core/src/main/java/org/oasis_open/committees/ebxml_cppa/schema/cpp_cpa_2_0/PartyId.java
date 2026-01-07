@@ -93,4 +93,8 @@ public class PartyId implements Serializable
 		this.type = value;
 	}
 
+	public String toString()
+	{
+		return (type == null ? "" : type + ":") + value;
+	}
 }

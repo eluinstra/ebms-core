@@ -23,7 +23,6 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.api.cpa.CPAQueryManager;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.api.cpa.CPAValidator;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
@@ -103,13 +102,12 @@ public class EbMSMessageValidator
 		{
 			// return message.getSyncReply() != null;
 			val messageHeader = message.getMessageHeader();
-			val service = CPAUtils.toString(messageHeader.getService());
 			val syncReply = cpaManager
 					.getSendSyncReply(
 							messageHeader.getCPAId(),
 							messageHeader.getFrom().getPartyId(),
 							messageHeader.getFrom().getRole(),
-							service,
+							messageHeader.getService(),
 							messageHeader.getAction())
 					.orElseThrow(
 							() -> StreamUtils.illegalStateException(
@@ -117,7 +115,7 @@ public class EbMSMessageValidator
 									messageHeader.getCPAId(),
 									messageHeader.getFrom().getPartyId(),
 									messageHeader.getFrom().getRole(),
-									service,
+									messageHeader.getService(),
 									messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}

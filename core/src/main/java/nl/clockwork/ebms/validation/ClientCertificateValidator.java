@@ -67,7 +67,7 @@ class ClientCertificateValidator
 
 	private X509Certificate getClientCertificate(MessageHeader messageHeader)
 	{
-		val service = CPAUtils.toString(messageHeader.getService());
+		val service = messageHeader.getService();
 		val deliveryChannel = cpaManager
 				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),

@@ -69,7 +69,7 @@ public class EbMSSignatureGenerator
 					messageHeader.getCPAId(),
 					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
-					CPAUtils.toString(messageHeader.getService()),
+					messageHeader.getService(),
 					messageHeader.getAction()))
 				sign(document, message, message.getAttachments());
 		}
@@ -106,13 +106,12 @@ public class EbMSSignatureGenerator
 			throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
 		val messageHeader = message.getMessageHeader();
-		val service = CPAUtils.toString(messageHeader.getService());
 		val deliveryChannel = cpaManager
 				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),
 						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
-						service,
+						messageHeader.getService(),
 						messageHeader.getAction())
 				.orElseThrow(
 						() -> StreamUtils.illegalStateException(
@@ -120,7 +119,7 @@ public class EbMSSignatureGenerator
 								messageHeader.getCPAId(),
 								messageHeader.getFrom().getPartyId(),
 								messageHeader.getFrom().getRole(),
-								service,
+								messageHeader.getService(),
 								messageHeader.getAction()));
 		val certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		if (certificate == null)

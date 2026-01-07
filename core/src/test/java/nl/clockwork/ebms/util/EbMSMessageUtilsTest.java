@@ -63,32 +63,36 @@ import org.w3._2000._09.xmldsig.SignatureType;
 import org.w3c.dom.Document;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
-public class EbMSMessageUtilsTest
+class EbMSMessageUtilsTest
 {
 	@Test
-	public void partyIdToString()
+	void partyIdToString()
 	{
-		var partyId = new PartyId();
+		val partyId = new PartyId();
 		partyId.setType("B");
 		partyId.setValue("A");
-		assertEquals("B:A", EbMSMessageUtils.toString(partyId));
-
-		partyId = new PartyId();
-		partyId.setValue("A");
-		assertEquals("A", EbMSMessageUtils.toString(partyId));
+		assertEquals("B:A", partyId.toString());
 	}
 
 	@Test
-	public void serviceToString()
+	void partyIdToString1()
+	{
+		val partyId = new PartyId();
+		partyId.setValue("A");
+		assertEquals("A", partyId.toString());
+	}
+
+	@Test
+	void serviceToString()
 	{
 		val service = new Service();
 		service.setType("B");
 		service.setValue("A");
-		assertEquals("B:A", EbMSMessageUtils.toString(service));
+		assertEquals("B:A", service.toString());
 	}
 
 	@Test
-	public void createStatusResponse() throws DatatypeConfigurationException
+	void createStatusResponse() throws DatatypeConfigurationException
 	{
 		val msgRef1 = "ref1";
 		val msgRef2 = "ref2";
@@ -136,7 +140,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createErrorList()
+	void createErrorList()
 	{
 		val errorList = EbMSMessageUtils.createErrorList();
 		assertEquals(Constants.EBMS_VERSION, errorList.getVersion());
@@ -145,7 +149,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createError()
+	void createError()
 	{
 		val severity = SeverityType.WARNING;
 		val language = "nl";
@@ -169,7 +173,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createSyncReply()
+	void createSyncReply()
 	{
 		val dc = new DeliveryChannel();
 		dc.setMessagingCharacteristics(new MessagingCharacteristics());
@@ -198,7 +202,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createSOAPFault() throws Exception
+	void createSOAPFault() throws Exception
 	{
 		val fault = EbMSMessageUtils.createSOAPFault("Server", "An unexpected error occurred!");
 		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
@@ -206,7 +210,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createSOAPFault1() throws Exception
+	void createSOAPFault1() throws Exception
 	{
 		val e = new ValidationException("soapfault test");
 		val fault = EbMSMessageUtils.createSOAPFault("Client", e.getMessage());
@@ -223,7 +227,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void getEbMSMessage() throws Exception
+	void getEbMSMessage() throws Exception
 	{
 		val ackRequested = new AckRequested();
 		ackRequested.setActor("Actor1");
@@ -270,13 +274,13 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void getEbMSDocument()
+	void getEbMSDocument()
 	{
-
+		// TODO: implement test
 	}
 
 	@Test
-	public void createEbMSMessageSOAPMessage() throws Exception
+	void createEbMSMessageSOAPMessage() throws Exception
 	{
 		val builder = EbMSMessage.builder()
 				.messageHeader(createMessageHeader())
@@ -295,7 +299,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createEbMSMessageErrorSOAPMessage() throws Exception
+	void createEbMSMessageErrorSOAPMessage() throws Exception
 	{
 		val builder = EbMSMessageError.builder().messageHeader(createMessageHeader()).signature(createSignature()).errorList(EbMSMessageUtils.createErrorList());
 		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
@@ -310,7 +314,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createEbMSAcknowledgmentSOAPMessage() throws Exception
+	void createEbMSAcknowledgmentSOAPMessage() throws Exception
 	{
 		val builder = EbMSAcknowledgment.builder().messageHeader(createMessageHeader()).signature(createSignature()).acknowledgment(createAcknowledgment());
 		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
@@ -324,7 +328,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createEbMSStatusRequestSOAPMessage() throws Exception
+	void createEbMSStatusRequestSOAPMessage() throws Exception
 	{
 		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
 		val builder = EbMSStatusRequest.builder().messageHeader(createMessageHeader()).signature(createSignature()).statusRequest(statusRequest);
@@ -340,7 +344,7 @@ public class EbMSMessageUtilsTest
 	}
 
 	@Test
-	public void createSOAPMessage() throws Exception
+	void createSOAPMessage() throws Exception
 	{
 		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
 		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.EXPIRED, Instant.now());

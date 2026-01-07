@@ -103,12 +103,12 @@ public class CPAValidator
 	private void validateCanSend(CollaborationRole role, CanSend canSend)
 	{
 		if (canSend.getCanReceive() != null && !canSend.getCanReceive().isEmpty())
-			log.debug("Nesting of actions under CanSend in Service {} not supported!", CPAUtils.toString(role.getServiceBinding().getService()));
+			log.debug("Nesting of actions under CanSend in Service {} not supported!", role.getServiceBinding().getService());
 		if (canSend.getThisPartyActionBinding().getChannelId().size() > 1)
 			log.debug(
 					"Multiple channels per action as defined in Action {} of Service {} not supported! Using first channel.",
 					canSend.getThisPartyActionBinding().getAction(),
-					CPAUtils.toString(role.getServiceBinding().getService()));
+					role.getServiceBinding().getService());
 		if (canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationReceiptRequired()
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsIntelligibleCheckRequired()
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeReceipt() != null
@@ -117,21 +117,21 @@ public class CPAValidator
 			log.debug(
 					"Business signals defined in Action {} of Service {} not supported!",
 					canSend.getThisPartyActionBinding().getAction(),
-					CPAUtils.toString(role.getServiceBinding().getService()));
+					role.getServiceBinding().getService());
 		// if (canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
 		// log.debug("Authorization Required defined in Action {} of Service {}
-		// ignored!",canSend.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
+		// ignored!",canSend.getThisPartyActionBinding().getAction(),role.getServiceBinding().getService());
 	}
 
 	private void validateCanReceive(CollaborationRole role, CanReceive canReceive)
 	{
 		if (canReceive.getCanSend() != null && !canReceive.getCanSend().isEmpty())
-			log.debug("Nesting of actions under CanReceive in Service {} not supported!", CPAUtils.toString(role.getServiceBinding().getService()));
+			log.debug("Nesting of actions under CanReceive in Service {} not supported!", role.getServiceBinding().getService());
 		if (canReceive.getThisPartyActionBinding().getChannelId().size() > 1)
 			log.debug(
 					"Multiple channels per action as defined in Action {} of Service {} not supported! Using first channel.",
 					canReceive.getThisPartyActionBinding().getAction(),
-					CPAUtils.toString(role.getServiceBinding().getService()));
+					role.getServiceBinding().getService());
 		if (canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationReceiptRequired()
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsIntelligibleCheckRequired()
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeReceipt() != null
@@ -140,10 +140,10 @@ public class CPAValidator
 			log.debug(
 					"Business signals defined in Action {} of Service {} not supported!",
 					canReceive.getThisPartyActionBinding().getAction(),
-					CPAUtils.toString(role.getServiceBinding().getService()));
+					role.getServiceBinding().getService());
 		// if (canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
 		// log.debug("Authorization Required defined in Action {} of Service {}
-		// ignored!",canReceive.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
+		// ignored!",canReceive.getThisPartyActionBinding().getAction(),role.getServiceBinding().getService());
 	}
 
 	private void validateChannels(CollaborationProtocolAgreement cpa)

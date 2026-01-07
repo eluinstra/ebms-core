@@ -243,8 +243,7 @@ class EbMSControllerHandler
 	{
 		if (message instanceof EbMSStatusResponse statusResponse)
 		{
-			val timestamp =
-					statusResponse.getStatusResponse().getTimestamp() == null ? null : statusResponse.getStatusResponse().getTimestamp();
+			val timestamp = statusResponse.getStatusResponse().getTimestamp() == null ? null : statusResponse.getStatusResponse().getTimestamp();
 			val messageStatus = statusResponse.getStatusResponse().getMessageStatus();
 			val status = EbMSMessageStatus.get(messageStatus).orElseThrow(() -> new NotFoundException("No EbMSMessageStatus found for " + messageStatus));
 			return new MessageStatus(timestamp, status);
@@ -285,13 +284,12 @@ class EbMSControllerHandler
 		{
 			val timestamp = Instant.now();
 			val messageHeader = message.getMessageHeader();
-			val service = CPAUtils.toString(messageHeader.getService());
 			val sendDeliveryChannel = cpaManager
 					.getSendDeliveryChannel(
 							messageHeader.getCPAId(),
 							messageHeader.getFrom().getPartyId(),
 							messageHeader.getFrom().getRole(),
-							service,
+							messageHeader.getService(),
 							messageHeader.getAction())
 					.orElseThrow(
 							() -> StreamUtils.illegalStateException(
@@ -299,14 +297,14 @@ class EbMSControllerHandler
 									messageHeader.getCPAId(),
 									messageHeader.getFrom().getPartyId(),
 									messageHeader.getFrom().getRole(),
-									service,
+									messageHeader.getService(),
 									messageHeader.getAction()));
 			val receiveDeliveryChannel = cpaManager
 					.getReceiveDeliveryChannel(
 							messageHeader.getCPAId(),
 							messageHeader.getTo().getPartyId(),
 							messageHeader.getTo().getRole(),
-							service,
+							messageHeader.getService(),
 							messageHeader.getAction())
 					.orElseThrow(
 							() -> StreamUtils.illegalStateException(
@@ -314,14 +312,14 @@ class EbMSControllerHandler
 									messageHeader.getCPAId(),
 									messageHeader.getTo().getPartyId(),
 									messageHeader.getTo().getRole(),
-									service,
+									messageHeader.getService(),
 									messageHeader.getAction()));
 			val persistTime = CPAUtils.getPersistTime(timestamp, receiveDeliveryChannel);
 			val confidential = cpaManager.isSendingConfidential(
 					messageHeader.getCPAId(),
 					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
-					service,
+					messageHeader.getService(),
 					messageHeader.getAction());
 			Runnable runnable = () ->
 			{

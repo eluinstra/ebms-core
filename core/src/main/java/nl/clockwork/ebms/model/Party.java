@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
 @Value
@@ -39,7 +38,7 @@ public class Party implements Serializable
 	{
 		if (partyId == null || partyIds == null)
 			return null;
-		return partyIds.stream().filter(id -> partyId.equals(CPAUtils.toString(id))).findFirst().orElse(null);
+		return partyIds.stream().filter(id -> partyId.equals(id.toString())).findFirst().orElse(null);
 	}
 
 	public boolean matches(List<PartyId> partyIds)
@@ -48,7 +47,7 @@ public class Party implements Serializable
 			return true;
 		if (partyId == null || partyIds == null)
 			return false;
-		return partyIds.stream().anyMatch(id -> partyId.equals(CPAUtils.toString(id)));
+		return partyIds.stream().anyMatch(id -> partyId.equals(id.toString()));
 	}
 
 	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)

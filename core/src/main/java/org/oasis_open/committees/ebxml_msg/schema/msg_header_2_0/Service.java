@@ -21,6 +21,9 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -42,6 +45,8 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"value"})
 @XmlRootElement(name = "Service")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Service implements Serializable
 {
 
@@ -91,4 +96,8 @@ public class Service implements Serializable
 		this.type = value;
 	}
 
+	public String toString()
+	{
+		return (type == null ? "" : type + ":") + value;
+	}
 }

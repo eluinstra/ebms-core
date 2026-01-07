@@ -45,7 +45,7 @@ public class LoggingUtils
 			result.put("fromRole", header.getFrom().getRole());
 			result.put("toPartyId", EbMSMessageUtils.toString(header.getTo().getPartyId()));
 			result.put("toRole", header.getTo().getRole());
-			result.put("service", EbMSMessageUtils.toString(header.getService()));
+			result.put("service", header.getService().toString());
 			result.put("action", header.getAction());
 			result.put("messageId", header.getMessageData().getMessageId());
 			result.put("conversationId", header.getConversationId());

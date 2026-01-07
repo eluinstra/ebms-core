@@ -17,10 +17,8 @@ package nl.clockwork.ebms.delivery.client;
 
 import java.util.Set;
 import javax.net.ssl.SSLParameters;
-import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -64,17 +61,12 @@ public class EbMSClientConfig
 	String recoverableClientHttpErrors;
 	@Value("${http.errors.server.unrecoverable}")
 	String unrecoverableServerHttpErrors;
-	@Value("${https.useClientCertificate}")
-	boolean useClientCertificate;
 
 	@Bean
 	@DependsOn("ebMSProxyFactory")
-	public EbMSHttpClientFactory ebMSClientFactory(
-			EbMSProxy ebMSProxy,
-			SSLParameters sslParameters,
-			@Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore,
-			EbMSTrustStore trustStore,
-			CertificateMappingDAO certificateMappingDAO)
+	public
+			EbMSHttpClientFactory
+			ebMSClientFactory(EbMSProxy ebMSProxy, SSLParameters sslParameters, @Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore, EbMSTrustStore trustStore)
 	{
 		return EbMSHttpClientFactory.builder()
 				.connectTimeout(connectTimeout)
@@ -86,8 +78,6 @@ public class EbMSClientConfig
 				.keyStore(clientKeyStore)
 				.trustStore(trustStore)
 				.httpErrors(httpErrors())
-				.certificateMappingDAO(certificateMappingDAO)
-				.useClientCertificate(useClientCertificate)
 				.build();
 	}
 
@@ -108,10 +98,4 @@ public class EbMSClientConfig
 		return new SSLParametersFactory(enabledProtocols, enabledCipherSuites);
 	}
 
-	@Bean
-	public CertificateMappingDAO certificateMappingDAO(DataSource dataSource)
-	{
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new CertificateMappingDAO(jdbcTemplate);
-	}
 }

@@ -23,7 +23,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -157,7 +156,7 @@ public class EbMSMessageBuilder
 						Case($(), o ->
 						{
 							throw new EbMSProcessingException(
-									"Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
+									"Unable to build message from service " + messageHeader.getService() + " and action " + messageHeader.getAction());
 						}));
 		}
 		catch (EbMSProcessingException e)

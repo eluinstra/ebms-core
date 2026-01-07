@@ -98,7 +98,8 @@ public class SecurityUtils
 
 	private static Predicate<? super Certificate> matches(X509Certificate certificate)
 	{
-		return c -> c instanceof X509Certificate x509Certificate && certificate.getIssuerX500Principal().getName().equals(x509Certificate.getSubjectX500Principal().getName());
+		return c -> c instanceof X509Certificate x509Certificate
+				&& certificate.getIssuerX500Principal().getName().equals(x509Certificate.getSubjectX500Principal().getName());
 	}
 
 	private static Predicate<? super Certificate> verifyWith(X509Certificate certificate)
