@@ -24,7 +24,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -47,7 +47,7 @@ class DuplicateMessageHandler
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 	@NonNull
 	DeliveryTaskManager deliveryTaskManager;
 	@NonNull

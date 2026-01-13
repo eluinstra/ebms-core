@@ -18,10 +18,9 @@ package nl.clockwork.ebms.client.delivery.task;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.task.JMSDeliveryTaskManager.DeliveryTaskMessageCreator;
-
 import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.springframework.jms.core.JmsTemplate;
@@ -36,7 +35,7 @@ public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager
 			@NonNull Scheduler scheduler,
 			@NonNull EbMSDAO ebMSDAO,
 			@NonNull DeliveryTaskDAO deliveryTaskDAO,
-			@NonNull CPAQueryManager cpaManager,
+			@NonNull CPAManager cpaManager,
 			int nrAutoRetries,
 			int autoRetryInterval,
 			@NonNull JmsTemplate jmsTemplate)

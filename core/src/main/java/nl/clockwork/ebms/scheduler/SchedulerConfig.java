@@ -24,10 +24,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
-import lombok.val;
-
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Qualifier;

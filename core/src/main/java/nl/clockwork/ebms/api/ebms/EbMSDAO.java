@@ -18,9 +18,6 @@ package nl.clockwork.ebms.api.ebms;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
-import org.w3c.dom.Document;
-
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
 import nl.clockwork.ebms.api.ebms.model.Message;
@@ -28,6 +25,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
+import org.w3c.dom.Document;
 
 public interface EbMSDAO
 {
@@ -35,10 +33,10 @@ public interface EbMSDAO
 
 	Optional<EbMSMessageProperties> getEbMSMessageProperties(String messageId);
 
-  Optional<Message> getMessage(String messageId);
+	Optional<Message> getMessage(String messageId);
 
 	Optional<MTOMMessage> getMTOMMessage(String messageId);
-  
+
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status);
 
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status, int maxNr);

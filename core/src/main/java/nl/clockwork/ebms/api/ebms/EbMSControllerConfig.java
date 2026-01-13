@@ -18,12 +18,11 @@ package nl.clockwork.ebms.api.ebms;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventDAO;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,7 +57,7 @@ public class EbMSControllerConfig
 			DeliveryManager deliveryManager,
 			EbMSDAO ebMSDAO,
 			MessageEventDAO messageEventDAO,
-			CPAQueryManager cpaManager,
+			CPAManager cpaManager,
 			EbMSMessageFactory ebMSMessageFactory,
 			DeliveryTaskManager deliveryTaskManager,
 			MessagePropertiesValidator messagePropertiesValidator,

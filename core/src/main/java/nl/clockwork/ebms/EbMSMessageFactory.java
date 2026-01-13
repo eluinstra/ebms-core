@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.api.ebms.model.DataSource;
 import nl.clockwork.ebms.api.ebms.model.MTOMDataSource;
@@ -71,7 +71,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
 public class EbMSMessageFactory
 {
 	@NonNull
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 	@NonNull
 	EbMSIdGenerator ebMSIdGenerator;
 

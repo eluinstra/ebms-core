@@ -17,9 +17,8 @@ package nl.clockwork.ebms.client.delivery.task;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManagerConfig.QuartzKafkaTaskManagerType;
 import lombok.val;
-
+import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManagerConfig.QuartzKafkaTaskManagerType;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;

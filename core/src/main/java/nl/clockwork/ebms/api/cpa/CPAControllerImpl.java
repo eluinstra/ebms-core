@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 public class CPAControllerImpl implements CPAController
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPARepository cpaRepository;
 	@NonNull
 	CPAValidator cpaValidator;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
@@ -92,8 +92,8 @@ public class CPAControllerImpl implements CPAController
 		log.debug("InsertCPA");
 		xsdValidator.validate(cpa);
 		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
-		new CPAValidator(cpaManager).validate(parsedCpa);
-		cpaManager.setCPA(parsedCpa, overwrite);
+		new CPAValidator(cpaRepository).validate(parsedCpa);
+		cpaRepository.setCPA(parsedCpa, overwrite);
 		log.debug("InsertCPA done");
 		return parsedCpa.getCpaid();
 	}
@@ -120,7 +120,7 @@ public class CPAControllerImpl implements CPAController
 	protected void deleteCPAImpl(String cpaId)
 	{
 		log.debug("DeleteCPA " + cpaId);
-		if (cpaManager.deleteCPA(cpaId) == 0)
+		if (cpaRepository.deleteCPA(cpaId) == 0)
 			throw new CPANotFoundException();
 	}
 
@@ -146,7 +146,7 @@ public class CPAControllerImpl implements CPAController
 	protected List<String> getCPAIdsImpl()
 	{
 		log.debug("GetCPAIds");
-		return cpaManager.getCPAIds();
+		return cpaRepository.getCPAIds();
 	}
 
 	@Override
@@ -171,7 +171,7 @@ public class CPAControllerImpl implements CPAController
 	protected String getCPAImpl(String cpaId) throws JAXBException
 	{
 		log.debug("GetCPAId " + cpaId);
-		return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElseThrow(CPANotFoundException::new));
+		return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaRepository.getCPA(cpaId).orElseThrow(CPANotFoundException::new));
 	}
 
 	@Override
@@ -191,6 +191,6 @@ public class CPAControllerImpl implements CPAController
 	protected void deleteCacheImpl()
 	{
 		log.debug("DeleteCache");
-		cpaManager.clearCache();
+		cpaRepository.clearCache();
 	}
 }

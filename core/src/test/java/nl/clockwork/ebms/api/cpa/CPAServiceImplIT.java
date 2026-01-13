@@ -48,8 +48,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-		classes = {PropertiesConfig.class, KeyStoreConfig.class, CPAControllerConfig.class, CPAManagerConfig.class, CertificateMappingControllerConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class,
-				TransactionManagerConfig.class})
+		classes = {PropertiesConfig.class, KeyStoreConfig.class, CPAControllerConfig.class, CPAManagerConfig.class, CertificateMappingControllerConfig.class,
+				URLMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class CPAServiceImplIT implements WithFile
 {
 	@Container

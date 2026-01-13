@@ -20,13 +20,18 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.val;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,9 +39,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CPA"})
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 class CPARepository
 {
+	@Autowired
+	@NonFinal
+	@Setter
+	CPARepository self;
 	JdbcTemplate jdbcTemplate;
+
+	@CacheEvict(cacheNames = {"CPA", "CPAManager"}, allEntries = true)
+	public void clearCache()
+	{
+		// do nothing
+	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
@@ -66,6 +82,22 @@ class CPARepository
 	public List<String> getCPAIds()
 	{
 		return jdbcTemplate.queryForList("select cpa_id from cpa order by cpa_id asc", String.class);
+	}
+
+	public void setCPA(CollaborationProtocolAgreement cpa, Boolean overwrite)
+	{
+		if (self.existsCPA(cpa.getCpaid()))
+		{
+			if (overwrite != null && overwrite)
+			{
+				if (self.updateCPA(cpa) == 0)
+					throw new IllegalArgumentException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
+			}
+			else
+				throw new IllegalArgumentException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
+		}
+		else
+			self.insertCPA(cpa);
 	}
 
 	@CacheEvict(cacheNames = "CPA", allEntries = true)

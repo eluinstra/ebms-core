@@ -22,7 +22,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.api.cpa.CPAValidator;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
@@ -44,7 +44,7 @@ public class EbMSMessageValidator
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 	@NonNull
 	CPAValidator cpaValidator;
 	@NonNull

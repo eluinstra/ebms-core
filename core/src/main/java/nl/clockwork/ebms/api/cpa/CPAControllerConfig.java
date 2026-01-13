@@ -25,20 +25,20 @@ import org.springframework.context.annotation.Configuration;
 public class CPAControllerConfig
 {
 	@Bean
-	public CPAValidator cpaValidator(CPAManager cpaManager)
+	public CPAValidator cpaValidator(CPARepository cpaRepository)
 	{
-		return new CPAValidator(cpaManager);
+		return new CPAValidator(cpaRepository);
 	}
 
 	@Bean
-	public CPAController cpaController(CPAManager cpaManager, CPAValidator cpaValidator)
+	public CPAController cpaController(CPARepository cpaRepository, CPAValidator cpaValidator)
 	{
-		return new CPAControllerImpl(cpaManager, cpaValidator);
+		return new CPAControllerImpl(cpaRepository, cpaValidator);
 	}
 
 	@Bean
-	public CPARestController cpaRestController(CPAManager cpaManager, CPAValidator cpaValidator)
+	public CPARestController cpaRestController(CPARepository cpaRepository, CPAValidator cpaValidator)
 	{
-		return new CPARestController(new CPAControllerImpl(cpaManager, cpaValidator));
+		return new CPARestController(new CPAControllerImpl(cpaRepository, cpaValidator));
 	}
 }

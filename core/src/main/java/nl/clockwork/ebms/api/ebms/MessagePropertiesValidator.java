@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.validation;
+package nl.clockwork.ebms.api.ebms;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.model.Party;
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -30,7 +32,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType
 public class MessagePropertiesValidator
 {
 	@NonNull
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 
 	public void validate(@NonNull String cpaId, @NonNull String fromPartyId, String toPartyId) throws ValidationException
 	{

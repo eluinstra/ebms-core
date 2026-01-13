@@ -52,7 +52,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 public class CPAValidator
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPARepository cpaRepository;
 
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
@@ -62,12 +62,12 @@ public class CPAValidator
 
 	public boolean isValid(String cpaId, Instant timestamp)
 	{
-		return cpaManager.getCPA(cpaId).filter(CPAQuery.isValidCPA(timestamp)).isPresent();
+		return cpaRepository.getCPA(cpaId).filter(CPAQuery.isValidCPA(timestamp)).isPresent();
 	}
 
 	public void validate(String cpaId) throws ValidatorException
 	{
-		validate(cpaManager.getCPA(cpaId).orElseThrow(() -> StreamUtils.illegalStateException("CPA", cpaId)));
+		validate(cpaRepository.getCPA(cpaId).orElseThrow(() -> StreamUtils.illegalStateException("CPA", cpaId)));
 	}
 
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException

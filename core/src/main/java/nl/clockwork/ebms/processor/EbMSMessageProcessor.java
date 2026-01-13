@@ -33,7 +33,7 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -70,7 +70,7 @@ public class EbMSMessageProcessor
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 	@NonNull
 	EbMSMessageValidator messageValidator;
 	@NonNull
@@ -87,7 +87,7 @@ public class EbMSMessageProcessor
 			@NonNull DeliveryManager deliveryManager,
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,
-			@NonNull CPAQueryManager cpaManager,
+			@NonNull CPAManager cpaManager,
 			@NonNull EbMSMessageFactory ebMSMessageFactory,
 			@NonNull DeliveryTaskManager deliveryTaskManager,
 			@NonNull EbMSSignatureGenerator signatureGenerator,

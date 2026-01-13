@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.client.delivery.client.EbMSClient;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -52,7 +52,7 @@ public class JMSDeliveryManager implements DeliveryManager
 {
 	private static final String JMS_DESTINATION_NAME = "MESSAGE";
 	@NonNull
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 	@NonNull
 	EbMSHttpClientFactory ebMSClientFactory;
 	@NonNull
@@ -62,7 +62,7 @@ public class JMSDeliveryManager implements DeliveryManager
 
 	@Builder(builderMethodName = "jmsDeliveryManagerBuilder")
 	public JMSDeliveryManager(
-			@NonNull CPAQueryManager cpaManager,
+			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,
 			@NonNull PlatformTransactionManager transactionManager,
 			@NonNull JmsTemplate jmsTemplate)

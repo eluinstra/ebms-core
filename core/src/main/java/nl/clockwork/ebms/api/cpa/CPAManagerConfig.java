@@ -22,7 +22,6 @@ import lombok.val;
 import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository;
 import nl.clockwork.ebms.api.cpa.url.URLMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,26 +33,22 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CPAManagerConfig
 {
 	@Bean
-	public CPAManager cpaManager(CPARepository cpaRepository)
-	{
-		return new CPAManager(cpaRepository);
-	}
-
-	@Bean
-	public CPAQueryManager cpaQueryManager(
-			CPAManager cpaManager,
+	public CPAManager cpaManager(
+			CPARepository cpaRepository,
 			CertificateMappingRepository certificateMappingRepository,
 			URLMapper urlMapper,
 			@Qualifier("clientKeyStore") EbMSKeyStore keyStore,
 			@Value("${https.useClientCertificate}") boolean useClientCertificate)
 	{
-		return new CPAQueryManager(cpaManager, certificateMappingRepository, urlMapper, keyStore, useClientCertificate);
+		return new CPAManager(cpaRepository, certificateMappingRepository, urlMapper, keyStore, useClientCertificate);
 	}
 
 	@Bean
 	public CPARepository cpaRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new CPARepository(jdbcTemplate);
+		val result = new CPARepository(jdbcTemplate);
+		result.setSelf(result);
+		return result;
 	}
 }

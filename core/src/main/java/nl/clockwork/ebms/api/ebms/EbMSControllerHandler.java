@@ -34,7 +34,7 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.api.cpa.CPAUtils;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessageRequest;
@@ -59,7 +59,6 @@ import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
-import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 import org.slf4j.MDC;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -77,7 +76,7 @@ class EbMSControllerHandler
 	@NonNull
 	MessageEventDAO messageEventDAO;
 	@NonNull
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
 	@NonNull

@@ -18,7 +18,7 @@ package nl.clockwork.ebms.signing;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.api.cpa.CPAQueryManager;
+import nl.clockwork.ebms.api.cpa.CPAManager;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 public class SigningConfig
 {
-	CPAQueryManager cpaManager;
+	CPAManager cpaManager;
 
 	@Bean
 	public EbMSSignatureGenerator signatureGenerator(@Qualifier("signatureKeyStore") EbMSKeyStore keyStore)

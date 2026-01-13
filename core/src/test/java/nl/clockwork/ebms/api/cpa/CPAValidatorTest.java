@@ -41,22 +41,20 @@ class CPAValidatorTest
 	private static final String NOT_EXISTING_CPA_ID = "cpaStubEBF.rm.https.signed.not.existing";
 
 	@Mock
-	CPARepository cpaDAO;
-	CPAManager cpaManager;
+	CPARepository cpaRepository;
 	CPAValidator cpaValidator;
 
 	@BeforeAll
 	void init()
 	{
 		MockitoAnnotations.openMocks(this);
-		when(cpaDAO.existsCPA(DEFAULT_CPA_ID)).thenReturn(true);
-		when(cpaDAO.existsCPA(ENCRYPTED_CPA_ID)).thenReturn(true);
-		when(cpaDAO.existsCPA(SYNC_CPA_ID)).thenReturn(true);
-		when(cpaDAO.getCPA(DEFAULT_CPA_ID)).thenReturn(loadCPA(DEFAULT_CPA_ID));
-		when(cpaDAO.getCPA(ENCRYPTED_CPA_ID)).thenReturn(loadCPA(ENCRYPTED_CPA_ID));
-		when(cpaDAO.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));
-		cpaManager = new CPAManager(cpaDAO);
-		cpaValidator = new CPAValidator(cpaManager);
+		when(cpaRepository.existsCPA(DEFAULT_CPA_ID)).thenReturn(true);
+		when(cpaRepository.existsCPA(ENCRYPTED_CPA_ID)).thenReturn(true);
+		when(cpaRepository.existsCPA(SYNC_CPA_ID)).thenReturn(true);
+		when(cpaRepository.getCPA(DEFAULT_CPA_ID)).thenReturn(loadCPA(DEFAULT_CPA_ID));
+		when(cpaRepository.getCPA(ENCRYPTED_CPA_ID)).thenReturn(loadCPA(ENCRYPTED_CPA_ID));
+		when(cpaRepository.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));
+		cpaValidator = new CPAValidator(cpaRepository);
 	}
 
 	@ParameterizedTest
