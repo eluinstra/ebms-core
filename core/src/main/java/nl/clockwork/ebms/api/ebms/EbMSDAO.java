@@ -13,39 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao;
+package nl.clockwork.ebms.api.ebms;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import nl.clockwork.ebms.EbMSAction;
+
+import org.w3c.dom.Document;
+
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
 import nl.clockwork.ebms.api.ebms.model.Message;
 import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
-import org.w3c.dom.Document;
 
 public interface EbMSDAO
 {
 	void executeTransaction(Runnable runnable);
 
-	boolean existsMessage(String messageId);
-
-	boolean existsIdenticalMessage(EbMSBaseMessage message);
-
 	Optional<EbMSMessageProperties> getEbMSMessageProperties(String messageId);
 
-	Optional<EbMSMessageProperties> getEbMSMessagePropertiesByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
+  Optional<Message> getMessage(String messageId);
 
-	Optional<Document> getDocument(String messageId);
+	Optional<MTOMMessage> getMTOMMessage(String messageId);
+  
+	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status);
 
-	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
-
-	Optional<Instant> getPersistTime(String messageId);
+	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status, int maxNr);
 
 	String insertMessage(
 			Instant timestamp,
@@ -58,5 +54,4 @@ public interface EbMSDAO
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
 
 	int deleteAttachments(String messageId);
-
 }

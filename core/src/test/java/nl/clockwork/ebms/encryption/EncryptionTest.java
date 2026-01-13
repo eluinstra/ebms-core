@@ -18,7 +18,9 @@ package nl.clockwork.ebms.encryption;
 import static nl.clockwork.ebms.api.cpa.CPATestUtils.cpaCache;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -64,6 +66,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.mockito.MockitoAnnotations;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.xml.sax.SAXException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
@@ -157,6 +161,7 @@ class EncryptionTest
 
 	private CPAQueryManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
 	{
+		//TODO Mock CPAQueryManager
 		val cpaQueryManager = new CPAQueryManager(initCPAManagerMock(), initCertificateMappingRepositoryMock(), new URLMapper(initURLMappingRepositoryMock()), EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"), false);
 		cpaQueryManager.setSelf(cpaQueryManager);
 		return cpaQueryManager;
