@@ -49,7 +49,7 @@ public class DeliveryTaskHandlerConfig
 {
 	public enum DeliveryTaskHandlerType
 	{
-		DEFAULT, JMS, QUARTZ, QUARTZ_JMS, QUARTZ_KAFKA;
+		DEFAULT, JMS, QUARTZ, QUARTZ_JMS;
 	}
 
 	@Value("${ebms.serverId:#{null}}")
@@ -177,20 +177,7 @@ public class DeliveryTaskHandlerConfig
 					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 							== DeliveryTaskHandlerType.QUARTZ
 							|| context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-									== DeliveryTaskHandlerType.QUARTZ_JMS
-							|| context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-									== DeliveryTaskHandlerType.QUARTZ_KAFKA);
-		}
-	}
-
-	public static class KafkaTaskHandlerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start", Boolean.class, true)
-					&& context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-							== DeliveryTaskHandlerType.QUARTZ_KAFKA;
+									== DeliveryTaskHandlerType.QUARTZ_JMS);
 		}
 	}
 }

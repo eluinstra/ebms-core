@@ -24,7 +24,6 @@ import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
@@ -34,7 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -93,15 +91,6 @@ public class DeliveryTaskManagerConfig
 	}
 
 	@Bean
-	@Conditional(QuartzKafkaTaskManagerType.class)
-	public DeliveryTaskManager quartzKafkaDeliveryTaskManager(
-			DeliveryTaskDAO deliveryTaskDAO,
-			@Autowired(required = false) @Qualifier("deliveryTaskKafkaTemplate") KafkaTemplate<String, DeliveryTask> kafkaTemplate)
-	{
-		return new QuartzKafkaDeliveryTaskManager(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval, kafkaTemplate);
-	}
-
-	@Bean
 	public DeliveryTaskDAO deliveryTaskDAO(DataSource dataSource)
 	{
 		return new DeliveryTaskDAOImpl(new JdbcTemplate(dataSource));
@@ -149,16 +138,6 @@ public class DeliveryTaskManagerConfig
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 					== DeliveryTaskHandlerType.QUARTZ_JMS;
-		}
-	}
-
-	public static class QuartzKafkaTaskManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-					== DeliveryTaskHandlerType.QUARTZ_KAFKA;
 		}
 	}
 }

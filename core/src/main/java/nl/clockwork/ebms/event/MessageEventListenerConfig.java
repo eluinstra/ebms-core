@@ -30,17 +30,13 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.client.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSMessageProperties;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -48,7 +44,7 @@ public class MessageEventListenerConfig
 {
 	public enum EventListenerType
 	{
-		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT, KAFKA
+		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT
 	}
 
 	public enum JMSDestinationType
@@ -64,11 +60,7 @@ public class MessageEventListenerConfig
 	JMSDestinationType jmsDestinationType;
 
 	@Bean
-	public MessageEventListener messageEventListener(
-			ConnectionFactory connectionFactory,
-			MessageEventDAO messageEventDAO,
-			EbMSDAO ebMSDAO,
-			@Autowired(required = false) @Qualifier("messagePropertiesKafkaTemplate") KafkaTemplate<String, EbMSMessageProperties> kafkaTemplate)
+	public MessageEventListener messageEventListener(ConnectionFactory connectionFactory, MessageEventDAO messageEventDAO, EbMSDAO ebMSDAO)
 	{
 		val jmsTemplate = new JmsTemplate(connectionFactory);
 		val filter = Splitter.on(',')
@@ -82,7 +74,6 @@ public class MessageEventListenerConfig
 				Case($(EventListenerType.SIMPLE_JMS), o -> new SimpleJMSMessageEventListener(jmsTemplate, createMessageEventDestinations(jmsDestinationType))),
 				Case($(EventListenerType.JMS), o -> new JMSMessageEventListener(ebMSDAO, jmsTemplate, createMessageEventDestinations(jmsDestinationType))),
 				Case($(EventListenerType.JMS_TEXT), o -> new JMSTextMessageEventListener(ebMSDAO, jmsTemplate, createMessageEventDestinations(jmsDestinationType))),
-				Case($(EventListenerType.KAFKA), o -> new KafkaMessageEventListener(ebMSDAO, kafkaTemplate)),
 				Case($(), o -> new LoggingMessageEventListener()));
 		return filter.size() > 0 ? new MessageEventListenerFilter(filter, eventListener) : eventListener;
 	}
