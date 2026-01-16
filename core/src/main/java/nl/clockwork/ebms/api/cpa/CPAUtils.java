@@ -23,7 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,22 +32,18 @@ import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Certificate;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Packaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -57,13 +52,6 @@ public class CPAUtils
 	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
 		return !headerPartyIds.isEmpty() && headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds, headerPartyIds);
-	}
-
-	public static Service createEbMSMessageService()
-	{
-		val result = new Service();
-		result.setValue(EbMSAction.EBMS_SERVICE_URI);
-		return result;
 	}
 
 	public static List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> toPartyId(PartyId partyId)
@@ -101,11 +89,6 @@ public class CPAUtils
 				.build();
 	}
 
-	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)
-	{
-		return (DeliveryChannel)bindingType.getChannelId().get(0).getValue();
-	}
-
 	public static DeliveryChannel getDeliveryChannel(List<JAXBElement<Object>> channelIds)
 	{
 		if (!channelIds.isEmpty())
@@ -124,31 +107,11 @@ public class CPAUtils
 		return (DocExchange)deliveryChannel.getDocExchangeId();
 	}
 
-	public static Packaging getPackaging(CanSend canSend)
-	{
-		return (Packaging)canSend.getThisPartyActionBinding().getPackageId();
-	}
-
 	public static boolean isReliableMessaging(DeliveryChannel deliveryChannel)
 	{
 		return !PerMessageCharacteristicsType.NEVER.equals((deliveryChannel.getMessagingCharacteristics().getAckRequested()));
 		// && ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding() != null
 		// && ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null
-	}
-
-	public static ReliableMessaging getSenderReliableMessaging(DeliveryChannel deliveryChannel)
-	{
-		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
-	}
-
-	public static ReliableMessaging getReceiverReliableMessaging(DeliveryChannel deliveryChannel)
-	{
-		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
-	}
-
-	public static Duration getPersistantDuration(DeliveryChannel deliveryChannel)
-	{
-		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getPersistDuration();
 	}
 
 	public static Instant getPersistTime(Instant timestamp, DeliveryChannel deliveryChannel)
@@ -163,89 +126,12 @@ public class CPAUtils
 			return null;
 	}
 
-	public static Duration getRetryInterval(DeliveryChannel deliveryChannel)
-	{
-		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging().getRetryInterval();
-	}
-
 	public static Certificate getClientCertificate(DeliveryChannel deliveryChannel)
 	{
 		val transport = getTransport(deliveryChannel);
 		if (transport.getTransportSender().getTransportClientSecurity() != null
 				&& transport.getTransportSender().getTransportClientSecurity().getClientCertificateRef() != null)
 			return (Certificate)transport.getTransportSender().getTransportClientSecurity().getClientCertificateRef().getCertId();
-		return null;
-	}
-
-	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
-	{
-		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
-			return (Certificate)docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
-		return null;
-	}
-
-	public static Certificate getEncryptionCertificate(DeliveryChannel deliveryChannel)
-	{
-		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLReceiverBinding() != null
-				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null
-				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionCertificateRef() != null)
-			return (Certificate)docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionCertificateRef().getCertId();
-		return null;
-	}
-
-	public static String getNonRepudiationProtocol(DeliveryChannel deliveryChannel)
-	{
-		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
-			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getNonRepudiationProtocol().getValue();
-		return null;
-	}
-
-	public static String getHashFunction(DeliveryChannel deliveryChannel)
-	{
-		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
-			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction();
-		return null;
-	}
-
-	public static String getSignatureAlgorithm(DeliveryChannel deliveryChannel)
-	{
-		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLSenderBinding() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null
-				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null
-				&& !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
-		{
-			val senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
-			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null
-					? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C()
-					: senderNonRepudiation.getSignatureAlgorithm().get(0).getValue();
-		}
-		return null;
-	}
-
-	public static String getEncryptionAlgorithm(DeliveryChannel deliveryChannel)
-	{
-		val docExchange = getDocExchange(deliveryChannel);
-		if (docExchange.getEbXMLReceiverBinding() != null
-				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null
-				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm() != null
-				&& !docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm().isEmpty())
-		{
-			val receiverDigitalEnvelope = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope();
-			return receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() != null
-					? receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C()
-					: receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getValue();
-		}
 		return null;
 	}
 

@@ -84,7 +84,7 @@ class DuplicateMessageHandler
 										messageHeader.getCPAId(),
 										messageHeader.getTo().getPartyId(),
 										messageHeader.getTo().getRole(),
-										CPAUtils.createEbMSMessageService(),
+										nl.clockwork.ebms.CPAUtils.createEbMSMessageService(),
 										null)
 								.orElse(null);
 				val receiveDeliveryChannel =
@@ -93,7 +93,7 @@ class DuplicateMessageHandler
 										messageHeader.getCPAId(),
 										messageHeader.getFrom().getPartyId(),
 										messageHeader.getFrom().getRole(),
-										CPAUtils.createEbMSMessageService(),
+										nl.clockwork.ebms.CPAUtils.createEbMSMessageService(),
 										null)
 								.orElse(null);
 				Runnable storeMessage = () ->

@@ -97,9 +97,9 @@ public class EbMSMessageEncrypter
 										messageHeader.getTo().getRole(),
 										messageHeader.getService(),
 										messageHeader.getAction()));
-				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+				val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getEncryptionCertificate(deliveryChannel));
 				SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
-				val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+				val encryptionAlgorithm = nl.clockwork.ebms.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				message.getAttachments().replaceAll(a -> encrypt(createDocument(), certificate, encryptionAlgorithm, a));
 			}
 		}
@@ -117,9 +117,9 @@ public class EbMSMessageEncrypter
 	{
 		try
 		{
-			val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+			val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getEncryptionCertificate(deliveryChannel));
 			SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
-			val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+			val encryptionAlgorithm = nl.clockwork.ebms.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			val attachments = new ArrayList<EbMSAttachment>();
 			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(), certificate, encryptionAlgorithm, a)));
 			message.getAttachments().clear();

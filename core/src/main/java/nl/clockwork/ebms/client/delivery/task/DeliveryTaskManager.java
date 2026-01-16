@@ -17,8 +17,9 @@ package nl.clockwork.ebms.client.delivery.task;
 
 import java.time.Instant;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 
 public interface DeliveryTaskManager
 {
@@ -44,10 +45,15 @@ public interface DeliveryTaskManager
 
 	default DeliveryTask createNextTask(DeliveryTask task, DeliveryChannel deliveryChannel)
 	{
-		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
+		val rm = getReceiverReliableMessaging(deliveryChannel);
 		val timestamp = task.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : task.getTimeToLive();
 		return task.createNextTask(timestamp);
 	}
+
+  private ReliableMessaging getReceiverReliableMessaging(DeliveryChannel deliveryChannel)
+  {
+  	return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
+  }
 
 	default DeliveryTask createNextTask(DeliveryTask task, long retryInterval)
 	{

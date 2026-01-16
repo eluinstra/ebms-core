@@ -18,6 +18,8 @@ package nl.clockwork.ebms.api.cpa;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Predicate;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -60,9 +62,16 @@ public class CPAValidator
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid", EbMSErrorCode.INCONSISTENT, "Invalid CPA."));
 	}
 
-	public boolean isValid(String cpaId, Instant timestamp)
+	boolean isValid(String cpaId, Instant timestamp)
 	{
-		return cpaRepository.getCPA(cpaId).filter(CPAQuery.isValidCPA(timestamp)).isPresent();
+		return cpaRepository.getCPA(cpaId).filter(isValidCPA(timestamp)).isPresent();
+	}
+
+	private Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
+	{
+		return cpa -> StatusValueType.AGREED.equals(cpa.getStatus().getValue())
+				&& timestamp.compareTo(cpa.getStart()) >= 0
+				&& timestamp.compareTo(cpa.getEnd()) <= 0;
 	}
 
 	public void validate(String cpaId) throws ValidatorException

@@ -36,21 +36,12 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.OverrideMshActionBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CPAQuery
+class CPAQuery
 {
-
-	static Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
-	{
-		return cpa -> StatusValueType.AGREED.equals(cpa.getStatus().getValue())
-				&& timestamp.compareTo(cpa.getStart()) >= 0
-				&& timestamp.compareTo(cpa.getEnd()) <= 0;
-	}
-
 	private static Predicate<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId> matchesPartyId(String partyId)
 	{
 		return p -> p.toString().equals(partyId);

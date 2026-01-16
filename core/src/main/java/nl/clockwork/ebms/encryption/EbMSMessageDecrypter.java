@@ -83,7 +83,7 @@ public class EbMSMessageDecrypter
 										messageHeader.getTo().getRole(),
 										messageHeader.getService(),
 										messageHeader.getAction()));
-				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+				val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getEncryptionCertificate(deliveryChannel));
 				if (certificate == null)
 					throw new EbMSProcessingException(
 							"No encryption certificate found for deliveryChannel \"" + deliveryChannel.getChannelId() + "\" in CPA \"" + messageHeader.getCPAId() + "\"");
