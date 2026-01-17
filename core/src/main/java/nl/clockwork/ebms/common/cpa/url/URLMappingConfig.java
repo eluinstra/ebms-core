@@ -16,18 +16,30 @@
 package nl.clockwork.ebms.common.cpa.url;
 
 import java.util.function.UnaryOperator;
+import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class URLMappingConfig
 {
 	@Bean
-	public UnaryOperator<String> overrideURL(URLMappingRepository urlMappingRepository)
+	public UnaryOperator<String> overrideURL(URLMappingRepositoryImpl urlMappingRepository)
 	{
 		return urlMappingRepository::getURL;
+	}
+
+	@Bean
+	public URLMappingRepositoryImpl urlMappingRepository(DataSource dataSource)
+	{
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		val result = new URLMappingRepositoryImpl(jdbcTemplate);
+		result.setSelf(result);
+		return result;
 	}
 }

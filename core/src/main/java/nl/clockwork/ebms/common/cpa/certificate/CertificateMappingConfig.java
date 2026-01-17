@@ -19,21 +19,32 @@ import static nl.clockwork.ebms.common.cpa.certificate.CertificateMapping.getCer
 
 import java.security.cert.X509Certificate;
 import java.util.function.BiFunction;
+import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CertificateMappingConfig
 {
 	@Bean
-	public BiFunction<String, X509Certificate, X509Certificate> certificateOverrideLoader(CertificateMappingRepository certificateMappingRepository)
+	public BiFunction<String, X509Certificate, X509Certificate> certificateOverrideLoader(CertificateMappingRepositoryImpl certificateMappingRepository)
 	{
 		return (cpaId, certificate) -> certificate != null
 				? certificateMappingRepository.getCertificateMapping(getCertificateId(certificate), cpaId, false).orElse(certificate)
 				: null;
 	}
 
+	@Bean
+	public CertificateMappingRepositoryImpl certificateMappingRepository(DataSource dataSource)
+	{
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		val result = new CertificateMappingRepositoryImpl(jdbcTemplate);
+		result.setSelf(result);
+		return result;
+	}
 }

@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMapping;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class, CertificateMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
+@ContextConfiguration(classes = {PropertiesConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class CertificateMappingServiceImplIT
 {
 	@Container

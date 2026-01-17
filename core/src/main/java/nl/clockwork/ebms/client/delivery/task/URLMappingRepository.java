@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.cpa;
+package nl.clockwork.ebms.client.delivery.task;
 
-import java.util.Optional;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-
-interface CPARepository
+public interface URLMappingRepository
 {
 
-	boolean existsCPA(String cpaId);
-
-	Optional<CollaborationProtocolAgreement> getCPA(String cpaId);
+	String getURL(String source);
 
 }

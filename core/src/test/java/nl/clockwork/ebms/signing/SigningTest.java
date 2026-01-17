@@ -37,9 +37,10 @@ import nl.clockwork.ebms.api.ebms.model.DataSource;
 import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.api.ebms.model.Party;
+import nl.clockwork.ebms.client.delivery.task.URLMappingRepository;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepository;
-import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepositoryImpl;
+import nl.clockwork.ebms.common.cpa.url.URLMappingRepositoryImpl;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -125,16 +126,16 @@ public class SigningTest
 		return cpaManager;
 	}
 
-	private CertificateMappingRepository initCertificateMappingRepositoryMock()
+	private CertificateMappingRepositoryImpl initCertificateMappingRepositoryMock()
 	{
-		val result = mock(CertificateMappingRepository.class);
+		val result = mock(CertificateMappingRepositoryImpl.class);
 		when(result.getCertificateMapping(anyString(), anyString(), anyBoolean())).thenReturn(Optional.empty());
 		return result;
 	}
 
 	private URLMappingRepository initURLMappingDAOMock()
 	{
-		val result = mock(URLMappingRepository.class);
+		URLMappingRepository result = mock(URLMappingRepositoryImpl.class);
 		return result;
 	}
 

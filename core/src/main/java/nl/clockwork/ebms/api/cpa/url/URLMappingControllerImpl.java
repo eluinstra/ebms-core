@@ -22,7 +22,6 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.common.cpa.url.URLMapping;
-import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

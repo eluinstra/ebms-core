@@ -15,14 +15,10 @@
  */
 package nl.clockwork.ebms.api.cpa.certificate;
 
-import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
-import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -40,12 +36,4 @@ public class CertificateMappingControllerConfig
 		return new CertificateMappingRestController(new CertificateMappingControllerImpl(certificateMappingRepository));
 	}
 
-	@Bean
-	public CertificateMappingRepository certificateMappingRepository(DataSource dataSource)
-	{
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val result = new CertificateMappingRepository(jdbcTemplate);
-		result.setSelf(result);
-		return result;
-	}
 }

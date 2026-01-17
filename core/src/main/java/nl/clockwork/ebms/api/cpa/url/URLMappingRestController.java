@@ -40,7 +40,7 @@ import nl.clockwork.ebms.jaxrs.WithController;
 public class URLMappingRestController implements WithController
 {
 	@NonNull
-	URLMappingControllerImpl mappingService;
+	URLMappingController mappingController;
 
 	@POST
 	@Path("")
@@ -48,7 +48,7 @@ public class URLMappingRestController implements WithController
 	{
 		try
 		{
-			mappingService.setURLMappingImpl(urlMapping);
+			mappingController.setURLMapping(urlMapping);
 		}
 		catch (Exception e)
 		{
@@ -63,7 +63,7 @@ public class URLMappingRestController implements WithController
 	{
 		try
 		{
-			mappingService.deleteURLMappingImpl(source);
+			mappingController.deleteURLMapping(source);
 		}
 		catch (Exception e)
 		{
@@ -78,7 +78,7 @@ public class URLMappingRestController implements WithController
 	{
 		try
 		{
-			return mappingService.getURLMappingsImpl();
+			return mappingController.getURLMappings();
 		}
 		catch (Exception e)
 		{
@@ -93,7 +93,7 @@ public class URLMappingRestController implements WithController
 	{
 		try
 		{
-			mappingService.deleteCacheImpl();
+			mappingController.deleteCache();
 		}
 		catch (Exception e)
 		{

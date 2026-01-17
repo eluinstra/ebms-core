@@ -46,7 +46,7 @@ import org.springframework.jdbc.core.RowMapper;
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CertificateMapping"})
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class CertificateMappingRepository
+public class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository
 {
 	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>
 	{
@@ -68,10 +68,11 @@ public class CertificateMappingRepository
 	@Autowired
 	@NonFinal
 	@Setter
-	CertificateMappingRepository self;
+	CertificateMappingRepositoryImpl self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
+	@Override
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public void clearCache()
 	{
@@ -111,6 +112,7 @@ public class CertificateMappingRepository
 		}
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<CertificateMapping> getCertificateMappings()
 	{
@@ -135,6 +137,7 @@ public class CertificateMappingRepository
 		});
 	}
 
+	@Override
 	public void setCertificateMapping(CertificateMapping mapping)
 	{
 		if (self.existsCertificateMapping(mapping.getId(), mapping.getCpaId()))
@@ -182,6 +185,7 @@ public class CertificateMappingRepository
 		}
 	}
 
+	@Override
 	public int deleteCertificateMapping(X509Certificate source, String cpaId)
 	{
 		val id = CertificateMapping.getCertificateId(source);

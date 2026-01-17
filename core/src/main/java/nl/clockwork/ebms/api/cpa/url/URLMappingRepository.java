@@ -15,24 +15,18 @@
  */
 package nl.clockwork.ebms.api.cpa.url;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.List;
+import nl.clockwork.ebms.common.cpa.url.URLMapping;
 
-@Configuration
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class URLMappingControllerConfig
+public interface URLMappingRepository
 {
-	@Bean
-	public URLMappingController urlMappingService(URLMappingRepository urlMappingRepository)
-	{
-		return new URLMappingControllerImpl(urlMappingRepository);
-	}
 
-	@Bean
-	public URLMappingRestController urlMappingRestService(URLMappingController urlMappingController)
-	{
-		return new URLMappingRestController(urlMappingController);
-	}
+	void clearCache();
+
+	List<URLMapping> getURLMappings();
+
+	void setURLMapping(URLMapping urlMapping);
+
+	int deleteURLMapping(String source);
+
 }

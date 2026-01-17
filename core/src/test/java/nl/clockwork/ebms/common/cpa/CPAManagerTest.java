@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.val;
-import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepository;
-import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepositoryImpl;
+import nl.clockwork.ebms.common.cpa.url.URLMappingRepositoryImpl;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.security.EbMSKeyStore;
@@ -93,9 +93,9 @@ public class CPAManagerTest
 	@Mock
 	CPARepository cpaRepository;
 	@Mock
-	CertificateMappingRepository certificateMappingRepository;
+	CertificateMappingRepositoryImpl certificateMappingRepository;
 	@Mock
-	URLMappingRepository urlMappingRepository;
+	URLMappingRepositoryImpl urlMappingRepository;
 	CPAManager cpaManager;
 
 	@BeforeAll

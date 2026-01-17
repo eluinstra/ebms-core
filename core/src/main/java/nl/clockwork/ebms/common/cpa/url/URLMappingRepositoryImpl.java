@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import nl.clockwork.ebms.client.delivery.task.URLMappingRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -41,15 +42,16 @@ import org.springframework.jdbc.core.RowMapper;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"URLMapping"})
-public class URLMappingRepository
+public class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappingRepository, URLMappingRepository
 {
 	@Autowired
 	@NonFinal
 	@Setter
-	URLMappingRepository self;
+	URLMappingRepositoryImpl self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
+	@Override
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public void clearCache()
 	{
@@ -62,6 +64,7 @@ public class URLMappingRepository
 		return jdbcTemplate.queryForObject("select count(*) from url_mapping where source = ?", Integer.class, source) > 0;
 	}
 
+	@Override
 	public String getURL(String source)
 	{
 		if (!StringUtils.isEmpty(source))
@@ -83,6 +86,7 @@ public class URLMappingRepository
 		}
 	}
 
+	@Override
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<URLMapping> getURLMappings()
 	{
@@ -96,6 +100,7 @@ public class URLMappingRepository
 		});
 	}
 
+	@Override
 	public void setURLMapping(URLMapping urlMapping)
 	{
 		if (StringUtils.isEmpty(urlMapping.getDestination()))
@@ -146,6 +151,7 @@ public class URLMappingRepository
 		return jdbcTemplate.update("update url_mapping set destination = ? where source = ?", urlMapping.getDestination(), urlMapping.getSource());
 	}
 
+	@Override
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public int deleteURLMapping(String source)
 	{

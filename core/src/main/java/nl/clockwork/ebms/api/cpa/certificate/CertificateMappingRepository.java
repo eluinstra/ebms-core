@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.cpa;
+package nl.clockwork.ebms.api.cpa.certificate;
 
-import java.util.Optional;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMapping;
 
-interface CPARepository
+public interface CertificateMappingRepository
 {
 
-	boolean existsCPA(String cpaId);
+	void clearCache();
 
-	Optional<CollaborationProtocolAgreement> getCPA(String cpaId);
+	List<CertificateMapping> getCertificateMappings();
+
+	void setCertificateMapping(CertificateMapping mapping);
+
+	int deleteCertificateMapping(X509Certificate source, String cpaId);
 
 }
