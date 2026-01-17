@@ -21,6 +21,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.common.cpa.url.URLMapping;
+import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -28,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class URLMappingControllerImpl implements URLMappingController
 {
 	@NonNull
-	URLMapper urlMapper;
+	URLMappingRepository urlMappingRepository;
 
 	@Override
 	public void setURLMapping(URLMapping urlMapping) throws URLMappingControllerException
@@ -53,7 +55,7 @@ public class URLMappingControllerImpl implements URLMappingController
 	{
 		if (log.isDebugEnabled())
 			log.debug("SetURLMapping " + urlMapping);
-		urlMapper.setURLMapping(urlMapping);
+		urlMappingRepository.setURLMapping(urlMapping);
 	}
 
 	@Override
@@ -78,7 +80,7 @@ public class URLMappingControllerImpl implements URLMappingController
 	protected void deleteURLMappingImpl(String source)
 	{
 		log.debug("DeleteURLMapping " + source);
-		if (urlMapper.deleteURLMapping(source) == 0)
+		if (urlMappingRepository.deleteURLMapping(source) == 0)
 			throw new URLNotFoundException();
 	}
 
@@ -104,7 +106,7 @@ public class URLMappingControllerImpl implements URLMappingController
 	protected List<URLMapping> getURLMappingsImpl()
 	{
 		log.debug("GetURLMappings");
-		return urlMapper.getURLs();
+		return urlMappingRepository.getURLMappings();
 	}
 
 	@Override
@@ -124,6 +126,6 @@ public class URLMappingControllerImpl implements URLMappingController
 	protected void deleteCacheImpl()
 	{
 		log.debug("DeleteCache");
-		urlMapper.deleteCache();
+		urlMappingRepository.clearCache();
 	}
 }

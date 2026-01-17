@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa;
+package nl.clockwork.ebms.common.cpa;
 
 import static java.util.Optional.empty;
 
@@ -21,6 +21,8 @@ import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +32,6 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.api.cpa.certificate.CertificateMapping;
-import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository;
-import nl.clockwork.ebms.api.cpa.url.URLMapper;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
@@ -67,9 +66,9 @@ public class CPAManager
 	@NonNull
 	CPARepository cpaRepository;
 	@NonNull
-	CertificateMappingRepository certificateMappingRepository;
+	BiFunction<String, X509Certificate, X509Certificate> overrideCertificate;
 	@NonNull
-	URLMapper urlMapper;
+	Function<String, String> overrideURL;
 	@NonNull
 	EbMSKeyStore keyStore;
 	boolean useClientCertificate;
@@ -178,16 +177,9 @@ public class CPAManager
 		return Optional.ofNullable(deliveryChannel)
 				.filter(dc -> useClientCertificate)
 				.map(self::getX509Certificate)
-				.map(c -> toOverrideCertificate(cpaId, c))
+				.map(c -> overrideCertificate.apply(cpaId, c))
 				.map(this::toCertificateAlias)
 				.map(this::toDefaultAliasIfEmpty);
-	}
-
-	private X509Certificate toOverrideCertificate(String cpaId, X509Certificate certificate)
-	{
-		return certificate != null
-				? certificateMappingRepository.getCertificateMapping(CertificateMapping.getCertificateId(certificate), cpaId, false).orElse(certificate)
-				: null;
 	}
 
 	private String toCertificateAlias(X509Certificate c)
@@ -250,7 +242,7 @@ public class CPAManager
 	{
 		val deliveryChannel = self.getReceiveDeliveryChannel(cpaId, partyId, role, service, action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel", cpaId, partyId, role, service, action));
-		return urlMapper.getURL(CPAUtils.getUri(deliveryChannel));
+		return overrideURL.apply(CPAUtils.getUri(deliveryChannel));
 	}
 
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")

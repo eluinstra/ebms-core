@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa;
+package nl.clockwork.ebms.common.cpa;
 
 import io.vavr.control.Try;
 import jakarta.xml.bind.JAXBElement;
@@ -34,7 +34,6 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Certificate;

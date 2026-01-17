@@ -48,9 +48,6 @@ class CPAValidatorTest
 	void init()
 	{
 		MockitoAnnotations.openMocks(this);
-		when(cpaRepository.existsCPA(DEFAULT_CPA_ID)).thenReturn(true);
-		when(cpaRepository.existsCPA(ENCRYPTED_CPA_ID)).thenReturn(true);
-		when(cpaRepository.existsCPA(SYNC_CPA_ID)).thenReturn(true);
 		when(cpaRepository.getCPA(DEFAULT_CPA_ID)).thenReturn(loadCPA(DEFAULT_CPA_ID));
 		when(cpaRepository.getCPA(ENCRYPTED_CPA_ID)).thenReturn(loadCPA(ENCRYPTED_CPA_ID));
 		when(cpaRepository.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));

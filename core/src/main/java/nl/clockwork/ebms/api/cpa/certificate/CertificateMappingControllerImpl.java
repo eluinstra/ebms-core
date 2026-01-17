@@ -21,16 +21,17 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepository;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class CertificateMappingControllerImpl implements CertificateMappingController
 {
-	CertificateMapper certificateMapper;
+	CertificateMappingRepository certificateMappingRepository;
 
 	@Override
-	public void setCertificateMapping(nl.clockwork.ebms.api.cpa.certificate.CertificateMapping certificateMapping) throws CertificateMappingControllerException
+	public void setCertificateMapping(nl.clockwork.ebms.common.cpa.certificate.CertificateMapping certificateMapping) throws CertificateMappingControllerException
 	{
 		try
 		{
@@ -48,11 +49,11 @@ public class CertificateMappingControllerImpl implements CertificateMappingContr
 		}
 	}
 
-	protected void setCertificateMappingImpl(nl.clockwork.ebms.api.cpa.certificate.CertificateMapping certificateMapping)
+	protected void setCertificateMappingImpl(nl.clockwork.ebms.common.cpa.certificate.CertificateMapping certificateMapping)
 	{
 		if (log.isDebugEnabled())
 			log.debug("SetCertificateMapping " + certificateMapping);
-		certificateMapper.setCertificateMapping(certificateMapping);
+		certificateMappingRepository.setCertificateMapping(certificateMapping);
 	}
 
 	@Override
@@ -78,12 +79,12 @@ public class CertificateMappingControllerImpl implements CertificateMappingContr
 	{
 		if (log.isDebugEnabled())
 			log.debug("DeleteCertificateMapping " + source);
-		if (certificateMapper.deleteCertificateMapping(source, cpaId) == 0)
+		if (certificateMappingRepository.deleteCertificateMapping(source, cpaId) == 0)
 			throw new CertificateNotFoundException();
 	}
 
 	@Override
-	public List<nl.clockwork.ebms.api.cpa.certificate.CertificateMapping> getCertificateMappings() throws CertificateMappingControllerException
+	public List<nl.clockwork.ebms.common.cpa.certificate.CertificateMapping> getCertificateMappings() throws CertificateMappingControllerException
 	{
 		try
 		{
@@ -101,10 +102,10 @@ public class CertificateMappingControllerImpl implements CertificateMappingContr
 		}
 	}
 
-	protected List<nl.clockwork.ebms.api.cpa.certificate.CertificateMapping> getCertificateMappingsImpl()
+	protected List<nl.clockwork.ebms.common.cpa.certificate.CertificateMapping> getCertificateMappingsImpl()
 	{
 		log.debug("GetCertificateMappings");
-		return certificateMapper.getCertificates();
+		return certificateMappingRepository.getCertificateMappings();
 	}
 
 	@Override
@@ -123,6 +124,6 @@ public class CertificateMappingControllerImpl implements CertificateMappingContr
 
 	protected void deleteCacheImpl()
 	{
-		certificateMapper.deleteCache();
+		certificateMappingRepository.clearCache();
 	}
 }

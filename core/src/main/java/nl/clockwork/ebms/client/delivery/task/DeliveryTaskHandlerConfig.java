@@ -19,10 +19,10 @@ import jakarta.jms.ConnectionFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.CPAManager;
-import nl.clockwork.ebms.api.cpa.url.URLMapper;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
+import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
@@ -124,7 +124,7 @@ public class DeliveryTaskHandlerConfig
 			MessageEventListener messageEventListener,
 			EbMSDAO ebMSDAO,
 			CPAManager cpaManager,
-			URLMapper urlMapper,
+			URLMappingRepository urlMappingRepository,
 			DeliveryTaskManager deliveryTaskManager,
 			EbMSHttpClientFactory ebMSClientFactory,
 			EbMSMessageEncrypter messageEncrypter,
@@ -134,7 +134,7 @@ public class DeliveryTaskHandlerConfig
 				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.urlMapper(urlMapper)
+				.urlMappingRepository(urlMappingRepository)
 				.deliveryTaskManager(deliveryTaskManager)
 				.ebMSClientFactory(ebMSClientFactory)
 				.messageEncrypter(messageEncrypter)

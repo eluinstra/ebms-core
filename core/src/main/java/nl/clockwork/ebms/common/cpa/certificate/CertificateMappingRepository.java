@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa.certificate;
+package nl.clockwork.ebms.common.cpa.certificate;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -28,11 +28,16 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -40,6 +45,7 @@ import org.springframework.jdbc.core.RowMapper;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CertificateMapping"})
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CertificateMappingRepository
 {
 	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>
@@ -59,6 +65,10 @@ public class CertificateMappingRepository
 		}
 	}
 
+	@Autowired
+	@NonFinal
+	@Setter
+	CertificateMappingRepository self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -125,6 +135,14 @@ public class CertificateMappingRepository
 		});
 	}
 
+	public void setCertificateMapping(CertificateMapping mapping)
+	{
+		if (self.existsCertificateMapping(mapping.getId(), mapping.getCpaId()))
+			self.updateCertificateMapping(mapping);
+		else
+			self.insertCertificateMapping(mapping);
+	}
+
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public void insertCertificateMapping(CertificateMapping mapping)
 	{
@@ -162,6 +180,12 @@ public class CertificateMappingRepository
 		{
 			throw new IllegalArgumentException(e);
 		}
+	}
+
+	public int deleteCertificateMapping(X509Certificate source, String cpaId)
+	{
+		val id = CertificateMapping.getCertificateId(source);
+		return self.deleteCertificateMapping(id, cpaId);
 	}
 
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)

@@ -26,6 +26,9 @@ import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.WithFile;
 import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingControllerConfig;
 import nl.clockwork.ebms.api.cpa.url.URLMappingControllerConfig;
+import nl.clockwork.ebms.common.cpa.CPAConfig;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingConfig;
+import nl.clockwork.ebms.common.cpa.url.URLMappingConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
@@ -48,8 +51,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-		classes = {PropertiesConfig.class, KeyStoreConfig.class, CPAControllerConfig.class, CPAManagerConfig.class, CertificateMappingControllerConfig.class,
-				URLMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
+		classes = {PropertiesConfig.class, KeyStoreConfig.class, CPAConfig.class, CPAControllerConfig.class, CertificateMappingConfig.class,
+				CertificateMappingControllerConfig.class, URLMappingConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class,
+				TransactionManagerConfig.class})
 class CPAServiceImplIT implements WithFile
 {
 	@Container

@@ -18,7 +18,7 @@ package nl.clockwork.ebms.encryption;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.api.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import org.springframework.beans.factory.annotation.Qualifier;

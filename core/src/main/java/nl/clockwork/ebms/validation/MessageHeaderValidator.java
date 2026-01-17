@@ -28,7 +28,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.api.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;

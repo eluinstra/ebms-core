@@ -21,6 +21,7 @@ import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import jakarta.xml.bind.annotation.XmlElement;
 import java.util.List;
+import nl.clockwork.ebms.common.cpa.url.URLMapping;
 
 @WebService(
 		name = "UrlMappingService",

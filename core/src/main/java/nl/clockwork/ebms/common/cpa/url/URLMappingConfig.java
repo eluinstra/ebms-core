@@ -13,39 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa.url;
+package nl.clockwork.ebms.common.cpa.url;
 
-import javax.sql.DataSource;
+import java.util.function.UnaryOperator;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
-import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class URLMappingControllerConfig
+public class URLMappingConfig
 {
 	@Bean
-	public URLMappingController urlMappingService(URLMappingRepository urlMappingRepository)
+	public UnaryOperator<String> overrideURL(URLMappingRepository urlMappingRepository)
 	{
-		return new URLMappingControllerImpl(urlMappingRepository);
-	}
-
-	@Bean
-	public URLMappingRestController urlMappingRestService(URLMappingRepository urlMappingRepository)
-	{
-		return new URLMappingRestController(new URLMappingControllerImpl(urlMappingRepository));
-	}
-
-	@Bean
-	public URLMappingRepository urlMappingRepository(DataSource dataSource)
-	{
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val result = new URLMappingRepository(jdbcTemplate);
-		result.setSelf(result);
-		return result;
+		return urlMappingRepository::getURL;
 	}
 }

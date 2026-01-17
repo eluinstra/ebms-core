@@ -27,6 +27,7 @@ import java.security.cert.CertificateException;
 import java.util.stream.Stream;
 import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMapping;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import org.junit.jupiter.api.Test;

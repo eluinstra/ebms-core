@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa;
+package nl.clockwork.ebms.common.cpa;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -32,9 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository;
-import nl.clockwork.ebms.api.cpa.url.URLMapper;
-import nl.clockwork.ebms.api.cpa.url.URLMappingRepository;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepository;
+import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.security.EbMSKeyStore;
@@ -97,7 +96,6 @@ public class CPAManagerTest
 	CertificateMappingRepository certificateMappingRepository;
 	@Mock
 	URLMappingRepository urlMappingRepository;
-	URLMapper urlMapper;
 	CPAManager cpaManager;
 
 	@BeforeAll
@@ -112,11 +110,10 @@ public class CPAManagerTest
 		when(cpaRepository.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));
 		when(certificateMappingRepository.getCertificateMapping(anyString(), anyString(), anyBoolean())).thenReturn(Optional.empty());
 		when(urlMappingRepository.getURLMapping(anyString())).thenReturn(Optional.empty());
-		urlMapper = new URLMapper(urlMappingRepository);
 		cpaManager = new CPAManager(
 				cpaRepository,
-				certificateMappingRepository,
-				urlMapper,
+				(cpaId, certificate) -> certificate,
+				url -> url,
 				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"),
 				false);
 		cpaManager.setSelf(cpaManager);

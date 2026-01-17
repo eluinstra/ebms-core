@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa;
+package nl.clockwork.ebms.common.cpa;
 
+import java.security.cert.X509Certificate;
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository;
-import nl.clockwork.ebms.api.cpa.url.URLMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,17 +31,17 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CPAManagerConfig
+public class CPAConfig
 {
 	@Bean
 	public CPAManager cpaManager(
 			CPARepository cpaRepository,
-			CertificateMappingRepository certificateMappingRepository,
-			URLMapper urlMapper,
+			BiFunction<String, X509Certificate, X509Certificate> overrideCertificate,
+			UnaryOperator<String> overrideURL,
 			@Qualifier("clientKeyStore") EbMSKeyStore keyStore,
 			@Value("${https.useClientCertificate}") boolean useClientCertificate)
 	{
-		return new CPAManager(cpaRepository, certificateMappingRepository, urlMapper, keyStore, useClientCertificate);
+		return new CPAManager(cpaRepository, overrideCertificate, overrideURL, keyStore, useClientCertificate);
 	}
 
 	@Bean

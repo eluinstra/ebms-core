@@ -50,10 +50,10 @@ public interface DeliveryTaskManager
 		return task.createNextTask(timestamp);
 	}
 
-  private ReliableMessaging getReceiverReliableMessaging(DeliveryChannel deliveryChannel)
-  {
-  	return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
-  }
+	private ReliableMessaging getReceiverReliableMessaging(DeliveryChannel deliveryChannel)
+	{
+		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
+	}
 
 	default DeliveryTask createNextTask(DeliveryTask task, long retryInterval)
 	{

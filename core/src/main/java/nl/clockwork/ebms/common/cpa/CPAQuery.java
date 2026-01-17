@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa;
+package nl.clockwork.ebms.common.cpa;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;

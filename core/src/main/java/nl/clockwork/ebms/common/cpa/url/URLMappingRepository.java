@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa.url;
+package nl.clockwork.ebms.common.cpa.url;
 
+import io.vavr.control.Either;
+import io.vavr.control.Option;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,10 +39,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
+@RequiredArgsConstructor
 @CacheConfig(cacheNames = {"URLMapping"})
 public class URLMappingRepository
 {
+	@Autowired
+	@NonFinal
+	@Setter
+	URLMappingRepository self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -48,6 +60,14 @@ public class URLMappingRepository
 	public boolean existsURLMapping(String source)
 	{
 		return jdbcTemplate.queryForObject("select count(*) from url_mapping where source = ?", Integer.class, source) > 0;
+	}
+
+	public String getURL(String source)
+	{
+		if (!StringUtils.isEmpty(source))
+			return self.getURLMapping(source).orElse(source);
+		else
+			return source;
 	}
 
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
@@ -74,6 +94,43 @@ public class URLMappingRepository
 				return new URLMapping(rs.getString("source"), rs.getString("destination"));
 			}
 		});
+	}
+
+	public void setURLMapping(URLMapping urlMapping)
+	{
+		if (StringUtils.isEmpty(urlMapping.getDestination()))
+			self.deleteURLMapping(urlMapping.getSource());
+		else
+			validate(urlMapping).peek(this::save).getOrElseThrow(e -> e);
+	}
+
+	private Either<IllegalArgumentException, URLMapping> validate(URLMapping urlMapping)
+	{
+		return isValid(urlMapping.getSource()).map(e -> new IllegalArgumentException("Source invalid", e))
+				.orElse(() -> isValid(urlMapping.getDestination()).map(e -> new IllegalArgumentException("Destination invalid", e)))
+				.toEither(urlMapping)
+				.swap();
+	}
+
+	private Option<MalformedURLException> isValid(String url)
+	{
+		try
+		{
+			new URL(url);
+			return Option.none();
+		}
+		catch (MalformedURLException e)
+		{
+			return Option.some(e);
+		}
+	}
+
+	private void save(URLMapping urlMapping)
+	{
+		if (self.existsURLMapping(urlMapping.getSource()))
+			self.updateURLMapping(urlMapping);
+		else
+			self.insertURLMapping(urlMapping);
 	}
 
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)

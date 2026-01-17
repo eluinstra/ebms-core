@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,27 +29,23 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CertificateMappingControllerConfig
 {
 	@Bean
-	public CertificateMappingController certificateMappingController(CertificateMapper certificateMapper)
+	public CertificateMappingController certificateMappingController(CertificateMappingRepository certificateMappingRepository)
 	{
-		return new CertificateMappingControllerImpl(certificateMapper);
+		return new CertificateMappingControllerImpl(certificateMappingRepository);
 	}
 
 	@Bean
-	public CertificateMappingRestController certificateMappingRestController(CertificateMapper certificateMapper)
+	public CertificateMappingRestController certificateMappingRestController(CertificateMappingRepository certificateMappingRepository)
 	{
-		return new CertificateMappingRestController(new CertificateMappingControllerImpl(certificateMapper));
-	}
-
-	@Bean
-	public CertificateMapper certificateMapper(CertificateMappingRepository certificateMappingRepository)
-	{
-		return new CertificateMapper(certificateMappingRepository);
+		return new CertificateMappingRestController(new CertificateMappingControllerImpl(certificateMappingRepository));
 	}
 
 	@Bean
 	public CertificateMappingRepository certificateMappingRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new CertificateMappingRepository(jdbcTemplate);
+		val result = new CertificateMappingRepository(jdbcTemplate);
+		result.setSelf(result);
+		return result;
 	}
 }

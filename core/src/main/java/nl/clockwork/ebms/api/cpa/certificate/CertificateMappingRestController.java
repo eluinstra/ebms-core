@@ -58,7 +58,7 @@ public class CertificateMappingRestController implements WithController
 		String destination;
 		String cpaId;
 
-		static CertificateMapping of(nl.clockwork.ebms.api.cpa.certificate.CertificateMapping m)
+		static CertificateMapping of(nl.clockwork.ebms.common.cpa.certificate.CertificateMapping m)
 		{
 			try
 			{
@@ -70,11 +70,11 @@ public class CertificateMappingRestController implements WithController
 			}
 		}
 
-		nl.clockwork.ebms.api.cpa.certificate.CertificateMapping toCertificateMapping()
+		nl.clockwork.ebms.common.cpa.certificate.CertificateMapping toCertificateMapping()
 		{
 			try
 			{
-				return new nl.clockwork.ebms.api.cpa.certificate.CertificateMapping(
+				return new nl.clockwork.ebms.common.cpa.certificate.CertificateMapping(
 						parseCertificate(decodeBase64(source)),
 						parseCertificate(decodeBase64(destination)),
 						cpaId);

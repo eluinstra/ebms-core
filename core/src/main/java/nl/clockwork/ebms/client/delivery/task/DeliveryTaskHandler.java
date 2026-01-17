@@ -24,14 +24,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.api.cpa.CPAManager;
-import nl.clockwork.ebms.api.cpa.CPAUtils;
-import nl.clockwork.ebms.api.cpa.url.URLMapper;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.client.EbMSClient;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.client.delivery.client.EbMSResponseException;
 import nl.clockwork.ebms.client.delivery.client.EbMSUnrecoverableResponseException;
+import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAUtils;
+import nl.clockwork.ebms.common.cpa.url.URLMappingRepository;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -56,7 +56,7 @@ class DeliveryTaskHandler
 	@NonNull
 	CPAManager cpaManager;
 	@NonNull
-	URLMapper urlMapper;
+	URLMappingRepository urlMappingRepository;
 	@NonNull
 	DeliveryTaskManager deliveryTaskManager;
 	@NonNull
@@ -73,7 +73,7 @@ class DeliveryTaskHandler
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,
 			@NonNull CPAManager cpaManager,
-			@NonNull URLMapper urlMapper,
+			@NonNull URLMappingRepository urlMappingRepository,
 			@NonNull DeliveryTaskManager deliveryTaskManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,
 			@NonNull EbMSMessageEncrypter messageEncrypter,
@@ -84,7 +84,7 @@ class DeliveryTaskHandler
 		this.messageEventListener = messageEventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
-		this.urlMapper = urlMapper;
+		this.urlMappingRepository = urlMappingRepository;
 		this.deliveryTaskManager = deliveryTaskManager;
 		this.ebMSClientFactory = ebMSClientFactory;
 		this.messageEncrypter = messageEncrypter;
@@ -117,7 +117,7 @@ class DeliveryTaskHandler
 	{
 		val receiveDeliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
-		val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
+		val url = urlMappingRepository.getURL(CPAUtils.getUri(receiveDeliveryChannel));
 		val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId());
 		StreamUtils.ifPresentOrElse(requestDocument, d -> sendTask(task, receiveDeliveryChannel, url, d), () ->
 		{
