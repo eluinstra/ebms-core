@@ -22,14 +22,11 @@ import static nl.clockwork.ebms.api.cpa.CPATestUtils.loadCPA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.val;
 import nl.clockwork.ebms.model.EbMSPartyInfo;

@@ -21,7 +21,6 @@ import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -17,8 +17,6 @@ package nl.clockwork.ebms.api.cpa;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.cpa.CPAValidator;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -16,13 +16,19 @@
 package nl.clockwork.ebms.common.cpa;
 
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.security.EbMSKeyStore;
+import nl.clockwork.ebms.validation.CPAValidator;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -45,9 +51,9 @@ public class CPAConfig
 	}
 
 	@Bean
-	public CPAValidator cpaValidator(CPARepository cpaRepository)
+	public CPAValidator cpaValidator(BiPredicate<String, Instant> isValidCPA)
 	{
-		return new CPAValidator(cpaRepository);
+		return new CPAValidator(isValidCPA);
 	}
 
 	@Bean
@@ -57,5 +63,18 @@ public class CPAConfig
 		val result = new CPARepositoryImpl(jdbcTemplate);
 		result.setSelf(result);
 		return result;
+	}
+
+	@Bean
+	public static BiPredicate<String, Instant> isValidCPA(CPARepository cpaRepository)
+	{
+		return (cpaId, timestamp) -> cpaRepository.getCPA(cpaId).filter(isValidCPA(timestamp)).isPresent();
+	}
+
+	private static Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
+	{
+		return cpa -> StatusValueType.AGREED.equals(cpa.getStatus().getValue())
+				&& timestamp.compareTo(cpa.getStart()) >= 0
+				&& timestamp.compareTo(cpa.getEnd()) <= 0;
 	}
 }

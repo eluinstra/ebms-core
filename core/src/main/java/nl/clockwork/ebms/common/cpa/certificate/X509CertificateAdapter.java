@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.common.cpa.certificate;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-
 import java.security.cert.X509Certificate;
 
 public class X509CertificateAdapter extends XmlAdapter<byte[], X509Certificate>

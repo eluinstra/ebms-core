@@ -21,6 +21,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
@@ -42,7 +43,7 @@ class CPAValidatorTest
 
 	@Mock
 	CPARepository cpaRepository;
-	CPAValidator cpaValidator;
+	BiPredicate<String, Instant> isValidCPA;
 
 	@BeforeAll
 	void init()
@@ -51,21 +52,21 @@ class CPAValidatorTest
 		when(cpaRepository.getCPA(DEFAULT_CPA_ID)).thenReturn(loadCPA(DEFAULT_CPA_ID));
 		when(cpaRepository.getCPA(ENCRYPTED_CPA_ID)).thenReturn(loadCPA(ENCRYPTED_CPA_ID));
 		when(cpaRepository.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));
-		cpaValidator = new CPAValidator(cpaRepository);
+		isValidCPA = CPAConfig.isValidCPA(cpaRepository);
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = {"2011-01-01T00:00:00Z", "2020-01-01T00:00:00.00Z", "2021-01-01T00:00:00Z"})
 	void isValid(String timestamp)
 	{
-		assertThat(cpaValidator.isValid(DEFAULT_CPA_ID, Instant.parse(timestamp))).isTrue();
+		assertThat(isValidCPA.test(DEFAULT_CPA_ID, Instant.parse(timestamp))).isTrue();
 	}
 
 	@ParameterizedTest
 	@MethodSource
 	void isNotValid(String cpaId, String timestamp)
 	{
-		assertThat(cpaValidator.isValid(cpaId, Instant.parse(timestamp))).isFalse();
+		assertThat(isValidCPA.test(cpaId, Instant.parse(timestamp))).isFalse();
 	}
 
 	private static Stream<Arguments> isNotValid()

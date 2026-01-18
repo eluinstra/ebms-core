@@ -18,7 +18,13 @@ package nl.clockwork.ebms.api.cpa;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.List;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import nl.clockwork.ebms.util.SecurityUtils;
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -32,14 +38,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharact
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
-import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.util.SecurityUtils;
-import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -49,7 +49,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
+@ContextConfiguration(
+		classes = {PropertiesConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, DataSourceConfig.class,
+				TransactionManagerConfig.class})
 class CertificateMappingServiceImplIT
 {
 	@Container

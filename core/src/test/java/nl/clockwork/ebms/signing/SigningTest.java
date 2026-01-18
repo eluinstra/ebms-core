@@ -13,22 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// /*
-//  * Copyright 2011 Clockwork
-//  *
-//  * Licensed under the Apache License, Version 2.0 (the "License");
-//  * you may not use this file except in compliance with the License.
-//  * You may obtain a copy of the License at
-//  *
-//  *   http://www.apache.org/licenses/LICENSE-2.0
-//  *
-//  * Unless required by applicable law or agreed to in writing, software
-//  * distributed under the License is distributed on an "AS IS" BASIS,
-//  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  * See the License for the specific language governing permissions and
-//  * limitations under the License.
-//  */
-// package nl.clockwork.ebms.signing;
+package nl.clockwork.ebms.signing;
 
 // import static org.mockito.ArgumentMatchers.anyBoolean;
 // import static org.mockito.ArgumentMatchers.anyString;
@@ -71,151 +56,151 @@
 
 // @TestInstance(value = Lifecycle.PER_CLASS)
 // @FieldDefaults(level = AccessLevel.PRIVATE)
-// public class SigningTest
-// {
-// 	CPAManager cpaManager;
-// 	EbMSMessageFactory messageFactory;
-// 	String cpaId = "cpaStubEBF.rm.https.signed";
-// 	KeyStoreType keyStoreType = KeyStoreType.JKS;
-// 	String keyStorePath = "nl/clockwork/ebms/keystore.jks";
-// 	String keyStorePassword = "password";
-// 	EbMSSignatureGenerator signatureGenerator;
-// 	EbMSSignatureValidator signatureValidator;
+public class SigningTest
+{
+	// CPAManager cpaManager;
+	// EbMSMessageFactory messageFactory;
+	// String cpaId = "cpaStubEBF.rm.https.signed";
+	// KeyStoreType keyStoreType = KeyStoreType.JKS;
+	// String keyStorePath = "nl/clockwork/ebms/keystore.jks";
+	// String keyStorePassword = "password";
+	// EbMSSignatureGenerator signatureGenerator;
+	// EbMSSignatureValidator signatureValidator;
 
-// 	@BeforeAll
-// 	public void init() throws Exception
-// 	{
-// 		MockitoAnnotations.openMocks(this);
-// 		Init.init();
-// 		cpaManager = initCPAManager();
-// 		messageFactory = initMessageFactory(cpaManager);
-// 		signatureGenerator = initSignatureGenerator(cpaManager);
-// 		signatureValidator = initSignatureValidator(cpaManager);
-// 	}
+	// @BeforeAll
+	// public void init() throws Exception
+	// {
+	// MockitoAnnotations.openMocks(this);
+	// Init.init();
+	// cpaManager = initCPAManager();
+	// messageFactory = initMessageFactory(cpaManager);
+	// signatureGenerator = initSignatureGenerator(cpaManager);
+	// signatureValidator = initSignatureValidator(cpaManager);
+	// }
 
-// 	@Test
-// 	public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException,
-// 	IOException, TransformerFactoryConfigurationError, TransformerException
-// 	{
-// 	val message = createMessage();
-// 	val document = EbMSMessageUtils.getEbMSDocument(message);
-// 	signatureGenerator.generate(document, message);
-// 	signatureValidator.validate(document, message);
-// 	}
+	// @Test
+	// public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException,
+	// IOException, TransformerFactoryConfigurationError, TransformerException
+	// {
+	// val message = createMessage();
+	// val document = EbMSMessageUtils.getEbMSDocument(message);
+	// signatureGenerator.generate(document, message);
+	// signatureValidator.validate(document, message);
+	// }
 
-// 	@Test
-// 	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException,
-// 	ParserConfigurationException,
-// 	SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
-// 	{
-// 	val message = createMessage();
-// 	val document = EbMSMessageUtils.getEbMSDocument(message);
-// 	signatureGenerator.generate(document, message);
-// 	changeConversationId(document);
-// 	assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
-// 	}
+	// @Test
+	// public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException,
+	// ParserConfigurationException,
+	// SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	// {
+	// val message = createMessage();
+	// val document = EbMSMessageUtils.getEbMSDocument(message);
+	// signatureGenerator.generate(document, message);
+	// changeConversationId(document);
+	// assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
+	// }
 
-// 	@Test
-// 	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException,
-// 	ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
-// 	{
-// 	val message = createMessage();
-// 	val document = EbMSMessageUtils.getEbMSDocument(message);
-// 	signatureGenerator.generate(document, message);
-// 	message.getAttachments().clear();
-// 	message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-// 	assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
-// 	}
+	// @Test
+	// public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException,
+	// ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	// {
+	// val message = createMessage();
+	// val document = EbMSMessageUtils.getEbMSDocument(message);
+	// signatureGenerator.generate(document, message);
+	// message.getAttachments().clear();
+	// message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
+	// assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
+	// }
 
-// 	private void changeConversationId(EbMSDocument message)
-// 	{
-// 		val d = message.getMessage();
-// 		val conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", "ConversationId").item(0);
-// 		conversationId.setTextContent(conversationId.getTextContent() + "0");
-// 	}
+	// private void changeConversationId(EbMSDocument message)
+	// {
+	// val d = message.getMessage();
+	// val conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", "ConversationId").item(0);
+	// conversationId.setTextContent(conversationId.getTextContent() + "0");
+	// }
 
-// 	private CPAManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
-// 	{
-// 		// TODO Mock CpaManager
-// 		val cpaManager = mock(CPAManager.class);
-// 		return cpaManager;
-// 	}
+	// private CPAManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
+	// {
+	// // TODO Mock CpaManager
+	// val cpaManager = mock(CPAManager.class);
+	// return cpaManager;
+	// }
 
-// 	private CertificateMappingRepositoryImpl initCertificateMappingRepositoryMock()
-// 	{
-// 		val result = mock(CertificateMappingRepositoryImpl.class);
-// 		when(result.getCertificateMapping(anyString(), anyString(), anyBoolean())).thenReturn(Optional.empty());
-// 		return result;
-// 	}
+	// private CertificateMappingRepositoryImpl initCertificateMappingRepositoryMock()
+	// {
+	// val result = mock(CertificateMappingRepositoryImpl.class);
+	// when(result.getCertificateMapping(anyString(), anyString(), anyBoolean())).thenReturn(Optional.empty());
+	// return result;
+	// }
 
-// 	private URLMappingRepository initURLMappingDAOMock()
-// 	{
-// 		URLMappingRepository result = mock(URLMappingRepositoryImpl.class);
-// 		return result;
-// 	}
+	// private URLMappingRepository initURLMappingDAOMock()
+	// {
+	// URLMappingRepository result = mock(URLMappingRepositoryImpl.class);
+	// return result;
+	// }
 
-// 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
-// 	{
-// 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
-// 	}
+	// private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
+	// {
+	// return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
+	// }
 
-// 	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
-// 	{
-// 		return new EbMSSignatureGenerator(cpaManager, EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword));
-// 	}
+	// private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
+	// {
+	// return new EbMSSignatureGenerator(cpaManager, EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword));
+	// }
 
-// 	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
-// 	{
-// 		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
-// 		return new EbMSSignatureValidator(cpaManager, trustStore);
-// 	}
+	// private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
+	// {
+	// val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
+	// return new EbMSSignatureValidator(cpaManager, trustStore);
+	// }
 
-// 	private EbMSMessage createMessage() throws EbMSProcessorException
-// 	{
-// 		val message = createMessage(cpaId);
-// 		val result = messageFactory.createEbMSMessage(message);
-// 		return result;
-// 	}
+	// private EbMSMessage createMessage() throws EbMSProcessorException
+	// {
+	// val message = createMessage(cpaId);
+	// val result = messageFactory.createEbMSMessage(message);
+	// return result;
+	// }
 
-// 	private MessageRequest createMessage(String cpaId)
-// 	{
-// 		val result = new MessageRequest();
-// 		result.setProperties(createMessageProperties(cpaId));
-// 		result.setDataSources(createDataSources());
-// 		return result;
-// 	}
+	// private MessageRequest createMessage(String cpaId)
+	// {
+	// val result = new MessageRequest();
+	// result.setProperties(createMessageProperties(cpaId));
+	// result.setDataSources(createDataSources());
+	// return result;
+	// }
 
-// 	private MessageRequestProperties createMessageProperties(String cpaId)
-// 	{
-// 		return new MessageRequestProperties(
-// 				cpaId,
-// 				new Party("urn:osb:oin:00000000000000000000", "DIGIPOORT"),
-// 				"urn:osb:services:osb:afleveren:1.1$1.0",
-// 				"afleveren");
-// 	}
+	// private MessageRequestProperties createMessageProperties(String cpaId)
+	// {
+	// return new MessageRequestProperties(
+	// cpaId,
+	// new Party("urn:osb:oin:00000000000000000000", "DIGIPOORT"),
+	// "urn:osb:services:osb:afleveren:1.1$1.0",
+	// "afleveren");
+	// }
 
-// 	private List<DataSource> createDataSources()
-// 	{
-// 		val result = new ArrayList<DataSource>();
-// 		result.add(new DataSource("test.txt", null, "plain/text; charset=utf-8", "Dit is een test.".getBytes(Charset.forName("UTF-8"))));
-// 		return result;
-// 	}
+	// private List<DataSource> createDataSources()
+	// {
+	// val result = new ArrayList<DataSource>();
+	// result.add(new DataSource("test.txt", null, "plain/text; charset=utf-8", "Dit is een test.".getBytes(Charset.forName("UTF-8"))));
+	// return result;
+	// }
 
-// 	private List<EbMSAttachment> createAttachments(String messageId)
-// 	{
-// 		val result = new ArrayList<EbMSAttachment>();
-// 		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId, 1), createDataSource()));
-// 		return result;
-// 	}
+	// private List<EbMSAttachment> createAttachments(String messageId)
+	// {
+	// val result = new ArrayList<EbMSAttachment>();
+	// result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId, 1), createDataSource()));
+	// return result;
+	// }
 
-// 	private jakarta.activation.DataSource createDataSource()
-// 	{
-// 		return EbMSAttachmentFactory.createEbMSAttachment("test.txt", "plain/text; charset=utf-8", "Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
-// 	}
+	// private jakarta.activation.DataSource createDataSource()
+	// {
+	// return EbMSAttachmentFactory.createEbMSAttachment("test.txt", "plain/text; charset=utf-8", "Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
+	// }
 
-// 	private String createContentId(String messageId, int i)
-// 	{
-// 		return messageId.replaceAll("^([^@]+)@(.+)$", "$1-" + i + "@$2");
-// 	}
+	// private String createContentId(String messageId, int i)
+	// {
+	// return messageId.replaceAll("^([^@]+)@(.+)$", "$1-" + i + "@$2");
+	// }
 
-// }
+}

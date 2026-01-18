@@ -46,7 +46,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(Lifecycle.PER_CLASS)
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PropertiesConfig.class, URLMappingConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
+@ContextConfiguration(
+		classes = {PropertiesConfig.class, URLMappingConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class URLMappingServiceImplIT implements WithFile
 {
 	@Container

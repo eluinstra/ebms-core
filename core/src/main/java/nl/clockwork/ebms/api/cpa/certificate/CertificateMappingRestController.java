@@ -26,7 +26,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
