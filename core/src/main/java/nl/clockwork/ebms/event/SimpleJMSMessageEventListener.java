@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import lombok.val;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;

@@ -48,7 +48,8 @@ import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
 import nl.clockwork.ebms.api.ebms.model.Party;
-import nl.clockwork.ebms.event.MessageEventType;
+import nl.clockwork.ebms.common.event.MessageEventType;
+
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;

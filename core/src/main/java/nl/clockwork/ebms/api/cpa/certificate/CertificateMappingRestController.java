@@ -40,7 +40,7 @@ import nl.clockwork.ebms.api.WithController;
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-class CertificateMappingRestController implements WithController
+public class CertificateMappingRestController implements WithController
 {
 	@NonNull
 	CertificateMappingControllerImpl mappingService;

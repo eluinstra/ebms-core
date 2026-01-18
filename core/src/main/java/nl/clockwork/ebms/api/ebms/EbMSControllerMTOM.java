@@ -27,7 +27,7 @@ import nl.clockwork.ebms.api.ebms.model.MTOMMessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageEvent;
 import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
-import nl.clockwork.ebms.event.MessageEventType;
+import nl.clockwork.ebms.common.event.MessageEventType;
 
 @MTOM(enabled = true)
 @WebService(name = "EbMSMessageService", targetNamespace = "http://www.ordina.nl/ebms/2.18", serviceName = "EbMSMessageService", portName = "EbMSMessagePort")

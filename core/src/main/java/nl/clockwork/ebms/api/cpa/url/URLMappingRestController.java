@@ -37,7 +37,7 @@ import nl.clockwork.ebms.common.cpa.url.URLMapping;
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-class URLMappingRestController implements WithController
+public class URLMappingRestController implements WithController
 {
 	@NonNull
 	URLMappingController mappingController;

@@ -30,6 +30,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.api.ebms.model.MessageEvent;
 import nl.clockwork.ebms.api.ebms.model.MessageFilter;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.dao.WithMessageFilter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

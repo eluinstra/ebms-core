@@ -26,7 +26,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageEvent;
 import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
-import nl.clockwork.ebms.event.MessageEventType;
+import nl.clockwork.ebms.common.event.MessageEventType;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
