@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.cpa;
+package nl.clockwork.ebms.common.cpa;
 
 import static nl.clockwork.ebms.api.cpa.CPATestUtils.loadCPA;
 import static org.assertj.core.api.Assertions.assertThat;

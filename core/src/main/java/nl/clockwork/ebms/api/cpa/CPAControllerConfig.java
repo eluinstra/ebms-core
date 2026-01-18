@@ -17,6 +17,8 @@ package nl.clockwork.ebms.api.cpa;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.cpa.CPAValidator;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,20 +27,14 @@ import org.springframework.context.annotation.Configuration;
 public class CPAControllerConfig
 {
 	@Bean
-	public CPAValidator cpaValidator(CPARepository cpaRepository)
+	public CPAController cpaController(CPARepository cpaRepository)
 	{
-		return new CPAValidator(cpaRepository);
+		return new CPAControllerImpl(cpaRepository);
 	}
 
 	@Bean
-	public CPAController cpaController(CPARepository cpaRepository, CPAValidator cpaValidator)
+	public CPARestController cpaRestController(CPARepository cpaRepository)
 	{
-		return new CPAControllerImpl(cpaRepository, cpaValidator);
-	}
-
-	@Bean
-	public CPARestController cpaRestController(CPARepository cpaRepository, CPAValidator cpaValidator)
-	{
-		return new CPARestController(new CPAControllerImpl(cpaRepository, cpaValidator));
+		return new CPARestController(new CPAControllerImpl(cpaRepository));
 	}
 }

@@ -45,6 +45,12 @@ public class CPAConfig
 	}
 
 	@Bean
+	public CPAValidator cpaValidator(CPARepository cpaRepository)
+	{
+		return new CPAValidator(cpaRepository);
+	}
+
+	@Bean
 	public CPARepositoryImpl cpaRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);

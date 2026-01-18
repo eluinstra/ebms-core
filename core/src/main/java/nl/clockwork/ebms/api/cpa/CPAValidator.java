@@ -18,21 +18,7 @@ package nl.clockwork.ebms.api.cpa;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.List;
-import java.util.function.Predicate;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import nl.clockwork.ebms.EbMSErrorCode;
-import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.SecurityUtils;
-import nl.clockwork.ebms.util.StreamUtils;
-import nl.clockwork.ebms.validation.EbMSValidationException;
-import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -47,38 +33,19 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.util.SecurityUtils;
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
+
 @Slf4j
-@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CPAValidator
 {
-	@NonNull
-	CPARepository cpaRepository;
-
-	public void validate(EbMSMessage message) throws EbMSValidationException
-	{
-		if (!isValid(message.getMessageHeader().getCPAId(), message.getMessageHeader().getMessageData().getTimestamp()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid", EbMSErrorCode.INCONSISTENT, "Invalid CPA."));
-	}
-
-	boolean isValid(String cpaId, Instant timestamp)
-	{
-		return cpaRepository.getCPA(cpaId).filter(isValidCPA(timestamp)).isPresent();
-	}
-
-	private Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
-	{
-		return cpa -> StatusValueType.AGREED.equals(cpa.getStatus().getValue())
-				&& timestamp.compareTo(cpa.getStart()) >= 0
-				&& timestamp.compareTo(cpa.getEnd()) <= 0;
-	}
-
-	public void validate(String cpaId) throws ValidatorException
-	{
-		validate(cpaRepository.getCPA(cpaId).orElseThrow(() -> StreamUtils.illegalStateException("CPA", cpaId)));
-	}
-
-	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
+	public static void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
 	{
 		if (!"2_0b".equals(cpa.getVersion()))
 			log.debug("CPA version {} detected! CPA version 2_0b expected.", cpa.getVersion());
@@ -99,7 +66,7 @@ public class CPAValidator
 		validateTransports(cpa);
 	}
 
-	private void validateActions(CollaborationProtocolAgreement cpa)
+	private static void validateActions(CollaborationProtocolAgreement cpa)
 	{
 		cpa.getPartyInfo().forEach(partyInfo -> partyInfo.getCollaborationRole().forEach(role ->
 		{
@@ -108,7 +75,7 @@ public class CPAValidator
 		}));
 	}
 
-	private void validateCanSend(CollaborationRole role, CanSend canSend)
+	private static void validateCanSend(CollaborationRole role, CanSend canSend)
 	{
 		if (canSend.getCanReceive() != null && !canSend.getCanReceive().isEmpty())
 			log.debug("Nesting of actions under CanSend in Service {} not supported!", role.getServiceBinding().getService());
@@ -131,7 +98,7 @@ public class CPAValidator
 		// ignored!",canSend.getThisPartyActionBinding().getAction(),role.getServiceBinding().getService());
 	}
 
-	private void validateCanReceive(CollaborationRole role, CanReceive canReceive)
+	private static void validateCanReceive(CollaborationRole role, CanReceive canReceive)
 	{
 		if (canReceive.getCanSend() != null && !canReceive.getCanSend().isEmpty())
 			log.debug("Nesting of actions under CanReceive in Service {} not supported!", role.getServiceBinding().getService());
@@ -154,12 +121,12 @@ public class CPAValidator
 		// ignored!",canReceive.getThisPartyActionBinding().getAction(),role.getServiceBinding().getService());
 	}
 
-	private void validateChannels(CollaborationProtocolAgreement cpa)
+	private static void validateChannels(CollaborationProtocolAgreement cpa)
 	{
-		cpa.getPartyInfo().stream().flatMap(p -> p.getDeliveryChannel().stream()).forEach(c -> validateChannel(c));
+		cpa.getPartyInfo().stream().flatMap(p -> p.getDeliveryChannel().stream()).forEach(CPAValidator::validateChannel);
 	}
 
-	private void validateChannel(DeliveryChannel channel)
+	private static void validateChannel(DeliveryChannel channel)
 	{
 		if (((DocExchange)channel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null
 				&& MessageOrderSemanticsType.GUARANTEED
@@ -195,7 +162,7 @@ public class CPAValidator
 		}
 	}
 
-	private String getEncryptionAlgorithm(List<EncryptionAlgorithm> encryptionAlgorithm)
+	private static String getEncryptionAlgorithm(List<EncryptionAlgorithm> encryptionAlgorithm)
 	{
 		if (encryptionAlgorithm != null && !encryptionAlgorithm.isEmpty())
 			return encryptionAlgorithm.get(0).getW3C() == null ? encryptionAlgorithm.get(0).getValue() : encryptionAlgorithm.get(0).getW3C();
@@ -203,12 +170,12 @@ public class CPAValidator
 			return null;
 	}
 
-	private void validateTransports(CollaborationProtocolAgreement cpa)
+	private static void validateTransports(CollaborationProtocolAgreement cpa)
 	{
-		cpa.getPartyInfo().stream().flatMap(p -> p.getTransport().stream()).forEach(this::validateTransport);
+		cpa.getPartyInfo().stream().flatMap(p -> p.getTransport().stream()).forEach(CPAValidator::validateTransport);
 	}
 
-	private void validateTransport(Transport t)
+	private static void validateTransport(Transport t)
 	{
 		if (!"HTTP".equals(t.getTransportSender().getTransportProtocol().getValue()))
 			log.warn(

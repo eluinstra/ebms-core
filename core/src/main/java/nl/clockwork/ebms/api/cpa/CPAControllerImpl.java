@@ -32,12 +32,10 @@ import org.xml.sax.SAXException;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CPAControllerImpl implements CPAController
+class CPAControllerImpl implements CPAController
 {
 	@NonNull
 	CPARepository cpaRepository;
-	@NonNull
-	CPAValidator cpaValidator;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
 
 	@Override
@@ -65,7 +63,7 @@ public class CPAControllerImpl implements CPAController
 		xsdValidator.validate(cpa);
 		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
 		log.info("Validating CPA " + parsedCpa.getCpaid());
-		cpaValidator.validate(parsedCpa);
+		CPAValidator.validate(parsedCpa);
 	}
 
 	@Override
@@ -92,7 +90,7 @@ public class CPAControllerImpl implements CPAController
 		log.debug("InsertCPA");
 		xsdValidator.validate(cpa);
 		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
-		new CPAValidator(cpaRepository).validate(parsedCpa);
+		CPAValidator.validate(parsedCpa);
 		cpaRepository.setCPA(parsedCpa, overwrite);
 		log.debug("InsertCPA done");
 		return parsedCpa.getCpaid();
