@@ -29,15 +29,15 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.api.WithController;
 import nl.clockwork.ebms.common.cpa.url.URLMapping;
-import nl.clockwork.ebms.jaxrs.WithController;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class URLMappingRestController implements WithController
+class URLMappingRestController implements WithController
 {
 	@NonNull
 	URLMappingController mappingController;

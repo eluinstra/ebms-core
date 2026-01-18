@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CertificateMappingControllerImpl implements CertificateMappingController
+class CertificateMappingControllerImpl implements CertificateMappingController
 {
 	CertificateMappingRepository certificateMappingRepository;
 

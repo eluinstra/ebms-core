@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.jaxb;
+package nl.clockwork.ebms.common.cpa.certificate;
 
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateEncodingException;

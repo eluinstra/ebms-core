@@ -46,7 +46,7 @@ import org.springframework.jdbc.core.RowMapper;
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CertificateMapping"})
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository
+class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository
 {
 	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>
 	{

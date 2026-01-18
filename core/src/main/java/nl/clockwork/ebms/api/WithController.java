@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.jaxrs;
+package nl.clockwork.ebms.api;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;

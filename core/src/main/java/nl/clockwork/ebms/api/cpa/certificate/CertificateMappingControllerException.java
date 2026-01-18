@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @WebFault(name = "CertificateMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18")
 @NoArgsConstructor
-public class CertificateMappingControllerException extends RuntimeException
+class CertificateMappingControllerException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 

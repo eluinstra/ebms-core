@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @WebFault(name = "URLMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18")
 @NoArgsConstructor
-public class URLMappingControllerException extends RuntimeException
+class URLMappingControllerException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 

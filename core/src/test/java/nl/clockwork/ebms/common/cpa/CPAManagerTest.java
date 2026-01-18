@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.val;
-import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingRepositoryImpl;
-import nl.clockwork.ebms.common.cpa.url.URLMappingRepositoryImpl;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.security.EbMSKeyStore;
@@ -92,10 +90,6 @@ public class CPAManagerTest
 
 	@Mock
 	CPARepository cpaRepository;
-	@Mock
-	CertificateMappingRepositoryImpl certificateMappingRepository;
-	@Mock
-	URLMappingRepositoryImpl urlMappingRepository;
 	CPAManager cpaManager;
 
 	@BeforeAll
@@ -108,8 +102,6 @@ public class CPAManagerTest
 		when(cpaRepository.getCPA(DEFAULT_CPA_ID)).thenReturn(loadCPA(DEFAULT_CPA_ID));
 		when(cpaRepository.getCPA(ENCRYPTED_CPA_ID)).thenReturn(loadCPA(ENCRYPTED_CPA_ID));
 		when(cpaRepository.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));
-		when(certificateMappingRepository.getCertificateMapping(anyString(), anyString(), anyBoolean())).thenReturn(Optional.empty());
-		when(urlMappingRepository.getURLMapping(anyString())).thenReturn(Optional.empty());
 		cpaManager = new CPAManager(
 				cpaRepository,
 				(cpaId, certificate) -> certificate,

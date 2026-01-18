@@ -20,7 +20,6 @@ import nl.clockwork.ebms.common.cpa.url.URLMapping;
 
 public interface URLMappingRepository
 {
-
 	void clearCache();
 
 	List<URLMapping> getURLMappings();

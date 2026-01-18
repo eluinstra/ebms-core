@@ -31,7 +31,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.jaxrs.WithController;
+import nl.clockwork.ebms.api.WithController;
+
 import org.xml.sax.SAXException;
 
 @Slf4j

@@ -21,7 +21,6 @@ import nl.clockwork.ebms.common.cpa.certificate.CertificateMapping;
 
 public interface CertificateMappingRepository
 {
-
 	void clearCache();
 
 	List<CertificateMapping> getCertificateMappings();

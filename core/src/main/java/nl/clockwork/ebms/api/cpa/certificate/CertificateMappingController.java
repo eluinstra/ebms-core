@@ -24,7 +24,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMapping;
-import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
+import nl.clockwork.ebms.common.cpa.certificate.X509CertificateAdapter;
 
 @WebService(
 		name = "CertificateMappingService",

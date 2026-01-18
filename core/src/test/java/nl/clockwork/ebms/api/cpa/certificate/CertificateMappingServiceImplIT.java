@@ -16,7 +16,7 @@
 package nl.clockwork.ebms.api.cpa.certificate;
 
 import static nl.clockwork.ebms.WithFile.readFileS;
-import static nl.clockwork.ebms.jaxb.X509CertificateConverter.parseCertificate;
+import static nl.clockwork.ebms.common.cpa.certificate.X509CertificateConverter.parseCertificate;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

@@ -26,7 +26,7 @@ import nl.clockwork.ebms.common.cpa.url.URLMapping;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class URLMappingControllerImpl implements URLMappingController
+class URLMappingControllerImpl implements URLMappingController
 {
 	@NonNull
 	URLMappingRepository urlMappingRepository;

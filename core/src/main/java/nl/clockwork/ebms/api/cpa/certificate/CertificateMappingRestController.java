@@ -15,9 +15,8 @@
  */
 package nl.clockwork.ebms.api.cpa.certificate;
 
-import static nl.clockwork.ebms.jaxb.X509CertificateConverter.parseCertificate;
+import static nl.clockwork.ebms.common.cpa.certificate.X509CertificateConverter.parseCertificate;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -27,65 +26,23 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.jaxrs.WithController;
+import nl.clockwork.ebms.api.WithController;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class CertificateMappingRestController implements WithController
+class CertificateMappingRestController implements WithController
 {
-	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	private static class CertificateMapping
-	{
-		@NonNull
-		String source;
-		@NonNull
-		String destination;
-		String cpaId;
-
-		static CertificateMapping of(nl.clockwork.ebms.common.cpa.certificate.CertificateMapping m)
-		{
-			try
-			{
-				return new CertificateMapping(encodeBase64String(m.getSource().getEncoded()), encodeBase64String(m.getDestination().getEncoded()), m.getCpaId());
-			}
-			catch (CertificateEncodingException e)
-			{
-				throw new IllegalStateException(e);
-			}
-		}
-
-		nl.clockwork.ebms.common.cpa.certificate.CertificateMapping toCertificateMapping()
-		{
-			try
-			{
-				return new nl.clockwork.ebms.common.cpa.certificate.CertificateMapping(
-						parseCertificate(decodeBase64(source)),
-						parseCertificate(decodeBase64(destination)),
-						cpaId);
-			}
-			catch (CertificateException e)
-			{
-				throw new IllegalStateException(e);
-			}
-		}
-	}
-
 	@NonNull
 	CertificateMappingControllerImpl mappingService;
 

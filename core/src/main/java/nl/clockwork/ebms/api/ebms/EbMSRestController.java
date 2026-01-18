@@ -36,6 +36,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.api.WithController;
 import nl.clockwork.ebms.api.ebms.model.MTOMDataSource;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessageRequest;
@@ -48,7 +49,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
 import nl.clockwork.ebms.api.ebms.model.Party;
 import nl.clockwork.ebms.event.MessageEventType;
-import nl.clockwork.ebms.jaxrs.WithController;
+
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
