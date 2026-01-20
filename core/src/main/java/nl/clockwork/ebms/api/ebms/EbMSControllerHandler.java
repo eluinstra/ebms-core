@@ -43,7 +43,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageMapper;
 import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
-import nl.clockwork.ebms.client.delivery.DeliveryManager;
+import nl.clockwork.ebms.client.delivery.MessageServiceHandler;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
@@ -70,7 +70,7 @@ import org.xml.sax.SAXException;
 class EbMSControllerHandler
 {
 	@NonNull
-	DeliveryManager deliveryManager;
+	MessageServiceHandler messageServiceHandler;
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
@@ -92,7 +92,7 @@ class EbMSControllerHandler
 		log.debug("Ping {}", cpaId);
 		messagePropertiesValidator.validate(cpaId, fromPartyId, toPartyId);
 		val request = ebMSMessageFactory.createEbMSPing(cpaId, fromPartyId, toPartyId);
-		val response = deliveryManager.sendMessage(request);
+		val response = messageServiceHandler.sendMessage(request);
 		if (response.isPresent())
 		{
 			if (!EbMSAction.PONG.getAction().equals(response.get().getMessageHeader().getAction()))
@@ -232,7 +232,7 @@ class EbMSControllerHandler
 			val fromPartyId = messageProperties.getFromParty().getPartyId();
 			val toPartyId = messageProperties.getToParty().getPartyId();
 			val request = ebMSMessageFactory.createEbMSStatusRequest(messageProperties.getCpaId(), fromPartyId, toPartyId, messageId);
-			val response = deliveryManager.sendMessage(request);
+			val response = messageServiceHandler.sendMessage(request);
 			return response.map(r -> (createMessageStatus(r))).orElseThrow(() -> new EbMSControllerException("No response received!"));
 		}
 	}

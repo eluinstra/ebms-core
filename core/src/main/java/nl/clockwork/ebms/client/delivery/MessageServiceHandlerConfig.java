@@ -36,16 +36,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DeliveryManagerConfig
+public class MessageServiceHandlerConfig
 {
-	public enum DeliveryManagerType
+	public enum MessageServiceHandlerType
 	{
 		DEFAULT, JMS;
 	}
 
-	@Value("${deliveryManager.minThreads}")
+	@Value("${messageServiceHandler.minThreads}")
 	Integer minThreads;
-	@Value("${deliveryManager.maxThreads}")
+	@Value("${messageServiceHandler.maxThreads}")
 	Integer maxThreads;
 	@Value("${messageQueue.maxEntries}")
 	int maxEntries;
@@ -59,8 +59,8 @@ public class DeliveryManagerConfig
 	@Qualifier("jmsTransactionManager")
 	PlatformTransactionManager transactionManager;
 
-	@Bean("deliveryManagerTaskExecutor")
-	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor()
+	@Bean("messageServiceHandlerTaskExecutor")
+	public ThreadPoolTaskExecutor messageServiceHandlerTaskExecutor()
 	{
 		val result = new ThreadPoolTaskExecutor();
 		result.setCorePoolSize(minThreads);
@@ -71,10 +71,10 @@ public class DeliveryManagerConfig
 	}
 
 	@Bean
-	@Conditional(DefaultDeliveryManagerType.class)
-	public DeliveryManager defaultDeliveryManager()
+	@Conditional(DefaultMessageServiceHandlerType.class)
+	public MessageServiceHandler defaultMessageServiceHandler()
 	{
-		return DefaultDeliveryManager.builder()
+		return DefaultMessageServiceHandler.builder()
 				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
@@ -82,10 +82,10 @@ public class DeliveryManagerConfig
 	}
 
 	@Bean
-	@Conditional(JmsDeliveryManagerType.class)
-	public DeliveryManager jmsDeliveryManager(ConnectionFactory connectionFactory)
+	@Conditional(JmsMessageServiceHandlerType.class)
+	public MessageServiceHandler jmsMessageServiceHandler(ConnectionFactory connectionFactory)
 	{
-		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
+		return JMSMessageServiceHandler.jmsMessageServiceHandlerBuilder()
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
 				.transactionManager(transactionManager)
@@ -93,22 +93,22 @@ public class DeliveryManagerConfig
 				.build();
 	}
 
-	public static class DefaultDeliveryManagerType implements Condition
+	public static class DefaultMessageServiceHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT)
-					== DeliveryManagerType.DEFAULT;
+			return context.getEnvironment().getProperty("messageServiceHandler.type", MessageServiceHandlerType.class, MessageServiceHandlerType.DEFAULT)
+					== MessageServiceHandlerType.DEFAULT;
 		}
 	}
 
-	public static class JmsDeliveryManagerType implements Condition
+	public static class JmsMessageServiceHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
+			return context.getEnvironment().getProperty("messageServiceHandler.type", MessageServiceHandlerType.class, MessageServiceHandlerType.DEFAULT) == MessageServiceHandlerType.JMS;
 		}
 	}
 }

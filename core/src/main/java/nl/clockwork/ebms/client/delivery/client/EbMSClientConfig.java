@@ -35,7 +35,7 @@ public class EbMSClientConfig
 	int connectTimeout;
 	@Value("${http.readTimeout}")
 	int readTimeout;
-	@Value("${deliveryManager.maxThreads}")
+	@Value("${messageServiceHandler.maxThreads}")
 	Integer maxThreads;
 	@Value("${http.proxy.host}")
 	String proxyHost;

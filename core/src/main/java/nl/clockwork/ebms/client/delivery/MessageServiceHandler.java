@@ -21,7 +21,7 @@ import nl.clockwork.ebms.model.EbMSRequestMessage;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
-public interface DeliveryManager
+public interface MessageServiceHandler
 {
 	Optional<EbMSResponseMessage> sendMessage(final EbMSRequestMessage message) throws EbMSProcessorException;
 

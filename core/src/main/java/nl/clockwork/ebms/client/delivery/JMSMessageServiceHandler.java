@@ -29,6 +29,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.delivery.client.EbMSClient;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
@@ -39,48 +40,53 @@ import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.springframework.jms.JmsException;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DefaultDeliveryManager implements DeliveryManager
+public class JMSMessageServiceHandler implements MessageServiceHandler
 {
-	@NonNull
-	MessageQueue<EbMSResponseMessage> messageQueue;
+	private static final String JMS_DESTINATION_NAME = "MESSAGE";
 	@NonNull
 	CPAManager cpaManager;
 	@NonNull
 	EbMSHttpClientFactory ebMSClientFactory;
+	@NonNull
+	PlatformTransactionManager transactionManager;
+	@NonNull
+	JmsTemplate jmsTemplate;
 
-	@Builder
-	public DefaultDeliveryManager(
-			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
+	@Builder(builderMethodName = "jmsMessageServiceHandlerBuilder")
+	public JMSMessageServiceHandler(
 			@NonNull CPAManager cpaManager,
-			@NonNull EbMSHttpClientFactory ebMSClientFactory)
+			@NonNull EbMSHttpClientFactory ebMSClientFactory,
+			@NonNull PlatformTransactionManager transactionManager,
+			@NonNull JmsTemplate jmsTemplate)
 	{
-		this.messageQueue = messageQueue;
 		this.cpaManager = cpaManager;
 		this.ebMSClientFactory = ebMSClientFactory;
+		this.transactionManager = transactionManager;
+		this.jmsTemplate = jmsTemplate;
 	}
 
+	@Override
 	public Optional<EbMSResponseMessage> sendMessage(final EbMSRequestMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			val messageHeader = message.getMessageHeader();
 			val uri = cpaManager.getReceivingUri(messageHeader);
-			if (message.getSyncReply() == null)
+			log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+			val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
+			if (response != null)
+				return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
+			else if (message.getSyncReply() == null)
 			{
-				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				return sendMessage(message, messageHeader, uri);
-			}
-			else
-			{
-				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
-				if (response != null)
-					return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
+				return receiveMessage(messageHeader);
 			}
 			return Optional.empty();
 		}
@@ -94,47 +100,54 @@ public class DefaultDeliveryManager implements DeliveryManager
 		}
 	}
 
-	private Optional<EbMSResponseMessage> sendMessage(final EbMSRequestMessage message, final @NonNull MessageHeader messageHeader, final String uri)
-			throws TransformerFactoryConfigurationError, EbMSProcessorException, SOAPException, JAXBException, ParserConfigurationException, SAXException,
-			IOException, TransformerException, XPathExpressionException
+	private Optional<EbMSResponseMessage> receiveMessage(final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
 	{
+		val status = transactionManager.getTransaction(null);
 		try
 		{
-			messageQueue.register(messageHeader.getMessageData().getMessageId());
-			val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
-			if (response == null)
-				return messageQueue.get(messageHeader.getMessageData().getMessageId());
-			else
-			{
-				messageQueue.remove(messageHeader.getMessageData().getMessageId());
-				return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
-			}
+			jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
+			val result = jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME, "JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'");
+			transactionManager.commit(status);
+			return Optional.ofNullable((EbMSResponseMessage)result);
 		}
-		catch (EbMSProcessorException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException
-				| XPathExpressionException e)
+		catch (JmsException e)
 		{
-			messageQueue.remove(messageHeader.getMessageData().getMessageId());
-			throw e;
+			transactionManager.rollback(status);
+			throw new EbMSProcessorException(e);
 		}
 	}
 
+	@Override
 	public void handleResponseMessage(final EbMSResponseMessage message) throws EbMSProcessorException
 	{
-		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(), message);
+		val status = transactionManager.getTransaction(null);
+		try
+		{
+			jmsTemplate.setExplicitQosEnabled(true);
+			jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
+			jmsTemplate.convertAndSend(JMS_DESTINATION_NAME, message, m ->
+			{
+				m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
+				// m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
+				return m;
+			});
+			transactionManager.commit(status);
+		}
+		catch (JmsException e)
+		{
+			transactionManager.commit(status);
+			throw new EbMSProcessorException(e);
+		}
 	}
 
-	@Async("deliveryManagerTaskExecutor")
+	@Async("messageServiceHandlerTaskExecutor")
+	@Override
 	public void sendResponseMessage(final String uri, final EbMSBaseMessage response) throws EbMSProcessorException
 	{
 		try
 		{
-			val messageHeader = response.getMessageHeader();
-			log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-			createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(response));
-		}
-		catch (EbMSProcessorException e)
-		{
-			throw e;
+			log.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
+			createClient(response.getMessageHeader()).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(response));
 		}
 		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError
 				| TransformerException e)

@@ -23,7 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.client.delivery.DeliveryManager;
+import nl.clockwork.ebms.client.delivery.MessageServiceHandler;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.model.EbMSPing;
 import nl.clockwork.ebms.model.EbMSPong;
@@ -43,7 +43,7 @@ class PongProcessor
 	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
 	@NonNull
-	DeliveryManager deliveryManager;
+	MessageServiceHandler messageServiceHandler;
 
 	public EbMSPong createPong(EbMSPing message) throws ValidatorException, EbMSProcessorException
 	{
@@ -59,7 +59,7 @@ class PongProcessor
 				responseMessageHeader.getTo().getRole(),
 				responseMessageHeader.getService(),
 				responseMessageHeader.getAction());
-		deliveryManager.sendResponseMessage(uri, pong);
+		messageServiceHandler.sendResponseMessage(uri, pong);
 	}
 
 	public void processPong(EbMSPong pong)
@@ -67,7 +67,7 @@ class PongProcessor
 		try
 		{
 			messageValidator.validate(pong);
-			deliveryManager.handleResponseMessage(pong);
+			messageServiceHandler.handleResponseMessage(pong);
 		}
 		catch (ValidatorException e)
 		{

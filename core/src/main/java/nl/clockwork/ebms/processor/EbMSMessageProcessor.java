@@ -33,7 +33,7 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.client.delivery.DeliveryManager;
+import nl.clockwork.ebms.client.delivery.MessageServiceHandler;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -84,7 +84,7 @@ public class EbMSMessageProcessor
 
 	@Builder
 	public EbMSMessageProcessor(
-			@NonNull DeliveryManager deliveryManager,
+			@NonNull MessageServiceHandler messageServiceHandler,
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,
 			@NonNull CPAManager cpaManager,
@@ -129,13 +129,13 @@ public class EbMSMessageProcessor
 				.cpaManager(cpaManager)
 				.messageValidator(messageValidator)
 				.ebMSMessageFactory(ebMSMessageFactory)
-				.deliveryManager(deliveryManager)
+				.messageServiceHandler(messageServiceHandler)
 				.build();
 		this.pongProcessor = PongProcessor.builder()
 				.cpaManager(cpaManager)
 				.messageValidator(messageValidator)
 				.ebMSMessageFactory(ebMSMessageFactory)
-				.deliveryManager(deliveryManager)
+				.messageServiceHandler(messageServiceHandler)
 				.build();
 	}
 

@@ -29,7 +29,7 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.client.delivery.DeliveryManager;
+import nl.clockwork.ebms.client.delivery.MessageServiceHandler;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
@@ -54,7 +54,7 @@ class StatusResponseProcessor
 	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
 	@NonNull
-	DeliveryManager deliveryManager;
+	MessageServiceHandler messageServiceHandler;
 
 	public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest) throws ValidatorException, EbMSProcessorException
 	{
@@ -72,7 +72,7 @@ class StatusResponseProcessor
 				messageHeader.getTo().getRole(),
 				messageHeader.getService(),
 				messageHeader.getAction());
-		deliveryManager.sendResponseMessage(uri, statusResponse);
+		messageServiceHandler.sendResponseMessage(uri, statusResponse);
 	}
 
 	public void processStatusResponse(EbMSStatusResponse statusResponse)
@@ -80,7 +80,7 @@ class StatusResponseProcessor
 		try
 		{
 			messageValidator.validate(statusResponse);
-			deliveryManager.handleResponseMessage(statusResponse);
+			messageServiceHandler.handleResponseMessage(statusResponse);
 		}
 		catch (ValidatorException e)
 		{

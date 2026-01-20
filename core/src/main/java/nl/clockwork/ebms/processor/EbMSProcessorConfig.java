@@ -19,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.client.delivery.DeliveryManager;
+import nl.clockwork.ebms.client.delivery.MessageServiceHandler;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -44,7 +44,7 @@ public class EbMSProcessorConfig
 			EbMSDAO ebMSDAO,
 			CPAManager cpaManager,
 			EbMSMessageFactory ebMSMessageFactory,
-			DeliveryManager deliveryManager,
+			MessageServiceHandler messageServiceHandler,
 			EbMSSignatureGenerator signatureGenerator,
 			EbMSMessageValidator messageValidator)
 	{
@@ -55,7 +55,7 @@ public class EbMSProcessorConfig
 				.messageValidator(messageValidator)
 				.build();
 		return EbMSMessageProcessor.builder()
-				.deliveryManager(deliveryManager)
+				.messageServiceHandler(messageServiceHandler)
 				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)

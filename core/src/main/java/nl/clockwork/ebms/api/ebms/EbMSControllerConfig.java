@@ -18,7 +18,7 @@ package nl.clockwork.ebms.api.ebms;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.client.delivery.DeliveryManager;
+import nl.clockwork.ebms.client.delivery.MessageServiceHandler;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.event.MessageEventDAO;
@@ -54,7 +54,7 @@ public class EbMSControllerConfig
 
 	@Bean
 	public EbMSControllerHandler ebMSControllerHandler(
-			DeliveryManager deliveryManager,
+			MessageServiceHandler messageServiceHandler,
 			EbMSDAO ebMSDAO,
 			MessageEventDAO messageEventDAO,
 			CPAManager cpaManager,
@@ -64,7 +64,7 @@ public class EbMSControllerConfig
 			EbMSSignatureGenerator signatureGenerator)
 	{
 		return EbMSControllerHandler.builder()
-				.deliveryManager(deliveryManager)
+				.messageServiceHandler(messageServiceHandler)
 				.ebMSDAO(ebMSDAO)
 				.messageEventDAO(messageEventDAO)
 				.cpaManager(cpaManager)
