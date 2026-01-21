@@ -27,7 +27,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -56,7 +56,7 @@ public class EbMSSignatureGenerator
 	String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSKeyStore keyStore;
 

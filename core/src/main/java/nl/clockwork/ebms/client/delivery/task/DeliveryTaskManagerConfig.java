@@ -21,7 +21,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +41,7 @@ public class DeliveryTaskManagerConfig
 	@Value("${deliveryTaskHandler.type}")
 	DeliveryTaskHandlerType deliveryTaskHandlerType;
 	@Autowired
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Autowired

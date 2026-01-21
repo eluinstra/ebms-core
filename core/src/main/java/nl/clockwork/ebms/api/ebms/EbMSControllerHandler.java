@@ -45,7 +45,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.event.MessageEventDAO;
@@ -76,7 +76,7 @@ class EbMSControllerHandler
 	@NonNull
 	MessageEventDAO messageEventDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
 	@NonNull

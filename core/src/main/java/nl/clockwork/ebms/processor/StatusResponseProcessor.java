@@ -30,7 +30,7 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
@@ -48,7 +48,7 @@ class StatusResponseProcessor
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSMessageValidator messageValidator;
 	@NonNull

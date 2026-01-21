@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +52,7 @@ public class DeliveryManagerConfig
 	@Value("${messageQueue.timeout}")
 	int timeout;
 	@Autowired
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@Autowired
 	EbMSHttpClientFactory ebMSClientFactory;
 	@Autowired

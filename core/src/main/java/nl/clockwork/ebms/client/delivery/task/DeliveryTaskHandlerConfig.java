@@ -21,7 +21,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
@@ -122,7 +122,7 @@ public class DeliveryTaskHandlerConfig
 	public DeliveryTaskHandler deliveryTaskHandler(
 			MessageEventListener messageEventListener,
 			EbMSDAO ebMSDAO,
-			CPAManager cpaManager,
+			CPAManagerCacheInterface cpaManager,
 			URLMappingRepository urlMappingRepository,
 			DeliveryTaskManager deliveryTaskManager,
 			EbMSHttpClientFactory ebMSClientFactory,

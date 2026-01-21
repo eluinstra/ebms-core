@@ -22,7 +22,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.client.EbMSDAO;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 
@@ -35,7 +35,7 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 	@NonNull
 	DeliveryTaskDAO deliveryTaskDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	String serverId;
 	int nrAutoRetries;
 	int autoRetryInterval;

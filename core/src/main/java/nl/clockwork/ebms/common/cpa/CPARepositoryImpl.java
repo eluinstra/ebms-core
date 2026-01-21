@@ -38,12 +38,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CPA"})
-class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPARepository
+class CPARepositoryImpl implements CPARepositoryCacheInterface
 {
 	@Autowired
 	@NonFinal
 	@Setter
-	CPARepositoryImpl self;
+	CPARepositoryCacheInterface self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -104,6 +104,7 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 			self.insertCPA(cpa);
 	}
 
+	@Override
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public String insertCPA(CollaborationProtocolAgreement cpa)
 	{
@@ -119,6 +120,7 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 		}
 	}
 
+	@Override
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{

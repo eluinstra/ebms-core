@@ -40,7 +40,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CPAConfig
 {
 	@Bean
-	public CPAManager cpaManager(
+	public CPAManagerCacheInterface cpaManager(
 			CPARepository cpaRepository,
 			BiFunction<String, X509Certificate, X509Certificate> overrideCertificate,
 			UnaryOperator<String> overrideURL,
@@ -59,7 +59,7 @@ public class CPAConfig
 	}
 
 	@Bean
-	public CPARepositoryImpl cpaRepository(DataSource dataSource)
+	public CPARepositoryCacheInterface cpaRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		val result = new CPARepositoryImpl(jdbcTemplate);

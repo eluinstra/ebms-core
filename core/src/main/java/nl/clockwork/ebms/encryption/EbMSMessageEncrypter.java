@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
 public class EbMSMessageEncrypter
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSTrustStore trustStore;
 

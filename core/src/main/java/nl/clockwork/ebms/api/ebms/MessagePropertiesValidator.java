@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -32,7 +32,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType
 public class MessagePropertiesValidator
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 
 	public void validate(@NonNull String cpaId, @NonNull String fromPartyId, String toPartyId) throws ValidationException
 	{

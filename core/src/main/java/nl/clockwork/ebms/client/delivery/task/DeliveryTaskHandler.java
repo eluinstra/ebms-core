@@ -29,7 +29,7 @@ import nl.clockwork.ebms.client.delivery.client.EbMSClient;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.client.delivery.client.EbMSResponseException;
 import nl.clockwork.ebms.client.delivery.client.EbMSUnrecoverableResponseException;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;
@@ -53,7 +53,7 @@ class DeliveryTaskHandler
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	URLMappingRepository urlMappingRepository;
 	@NonNull
@@ -71,7 +71,7 @@ class DeliveryTaskHandler
 	public DeliveryTaskHandler(
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,
-			@NonNull CPAManager cpaManager,
+			@NonNull CPAManagerCacheInterface cpaManager,
 			@NonNull URLMappingRepository urlMappingRepository,
 			@NonNull DeliveryTaskManager deliveryTaskManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,

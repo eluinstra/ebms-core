@@ -33,7 +33,7 @@ import nl.clockwork.ebms.api.ebms.model.MTOMDataSource;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -71,7 +71,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
 public class EbMSMessageFactory
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSIdGenerator ebMSIdGenerator;
 

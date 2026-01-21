@@ -41,6 +41,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.api.ebms.model.Party;
 import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPARepository;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -64,7 +65,7 @@ import org.xml.sax.SAXException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class EncryptionTest
 {
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	EbMSMessageFactory messageFactory;
 	String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
@@ -149,9 +150,9 @@ class EncryptionTest
 								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
-	private CPAManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
+	private CPAManagerCacheInterface initCPAManager() throws IOException, JAXBException, GeneralSecurityException
 	{
-		val result = new CPAManager(
+		CPAManagerCacheInterface result = new CPAManager(
 				initCpaRepository(),
 				(cpaId, certificate) -> certificate,
 				url -> url,
@@ -168,18 +169,18 @@ class EncryptionTest
 		return result;
 	}
 
-	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
+	private EbMSMessageFactory initMessageFactory(CPAManagerCacheInterface cpaManager)
 	{
 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
-	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager) throws Exception
+	private EbMSMessageEncrypter initMessageEncrypter(CPAManagerCacheInterface cpaManager) throws Exception
 	{
 		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
 		return new EbMSMessageEncrypter(cpaManager, trustStore);
 	}
 
-	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager) throws Exception
+	private EbMSMessageDecrypter initMessageDecrypter(CPAManagerCacheInterface cpaManager) throws Exception
 	{
 		val keyStore = EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword);
 		return new EbMSMessageDecrypter(cpaManager, keyStore);

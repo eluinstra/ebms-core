@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
-@EnableCaching(proxyTargetClass = true)
+@EnableCaching
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {
@@ -52,6 +52,7 @@ public class CacheConfig
 	{
 		val result = new ArrayList<Cache>();
 		result.add(new ConcurrentMapCache("CPA"));
+		result.add(new ConcurrentMapCache("CPAManager"));
 		result.add(new ConcurrentMapCache("URLMapping"));
 		result.add(new ConcurrentMapCache("CertificateMapping"));
 		return result;

@@ -29,13 +29,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class URLMappingConfig
 {
 	@Bean
-	public UnaryOperator<String> overrideURL(URLMappingRepositoryImpl urlMappingRepository)
+	public UnaryOperator<String> overrideURL(URLMappingRepositoryCacheInterface urlMappingRepository)
 	{
 		return urlMappingRepository::getURL;
 	}
 
 	@Bean
-	public URLMappingRepositoryImpl urlMappingRepository(DataSource dataSource)
+	public URLMappingRepositoryCacheInterface urlMappingRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		val result = new URLMappingRepositoryImpl(jdbcTemplate);

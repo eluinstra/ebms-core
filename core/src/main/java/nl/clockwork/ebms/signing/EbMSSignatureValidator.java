@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
 public class EbMSSignatureValidator
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSTrustStore trustStore;
 

@@ -42,6 +42,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.api.ebms.model.Party;
 import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPARepository;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -64,7 +65,7 @@ import org.xml.sax.SAXException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SigningTest
 {
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	EbMSMessageFactory messageFactory;
 	String cpaId = "cpaStubEBF.rm.https.signed";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
@@ -124,9 +125,9 @@ public class SigningTest
 		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
-	private CPAManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
+	private CPAManagerCacheInterface initCPAManager() throws IOException, JAXBException, GeneralSecurityException
 	{
-		val result = new CPAManager(
+		CPAManagerCacheInterface result = new CPAManager(
 				initCpaRepository(),
 				(cpaId, certificate) -> certificate,
 				url -> url,
@@ -143,17 +144,17 @@ public class SigningTest
 		return result;
 	}
 
-	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
+	private EbMSMessageFactory initMessageFactory(CPAManagerCacheInterface cpaManager)
 	{
 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
-	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
+	private EbMSSignatureGenerator initSignatureGenerator(CPAManagerCacheInterface cpaManager) throws Exception
 	{
 		return new EbMSSignatureGenerator(cpaManager, EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword));
 	}
 
-	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
+	private EbMSSignatureValidator initSignatureValidator(CPAManagerCacheInterface cpaManager) throws Exception
 	{
 		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
 		return new EbMSSignatureValidator(cpaManager, trustStore);

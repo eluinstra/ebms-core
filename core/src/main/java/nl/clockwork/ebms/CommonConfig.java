@@ -17,7 +17,7 @@ package nl.clockwork.ebms;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import org.apache.xml.security.Init;
@@ -49,7 +49,7 @@ public class CommonConfig
 	}
 
 	@Bean
-	public EbMSMessageFactory ebMSMessageFactory(CPAManager cpaManager, EbMSIdGenerator ebMSIdGenerator)
+	public EbMSMessageFactory ebMSMessageFactory(CPAManagerCacheInterface cpaManager, EbMSIdGenerator ebMSIdGenerator)
 	{
 		return new EbMSMessageFactory(cpaManager, ebMSIdGenerator);
 	}

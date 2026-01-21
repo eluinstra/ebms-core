@@ -87,7 +87,7 @@ public class CPAManagerTest
 
 	@Mock
 	CPARepository cpaRepository;
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 
 	@BeforeAll
 	void init() throws GeneralSecurityException, IOException

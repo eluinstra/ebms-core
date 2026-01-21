@@ -35,7 +35,7 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -70,7 +70,7 @@ public class EbMSMessageProcessor
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSMessageValidator messageValidator;
 	@NonNull
@@ -87,7 +87,7 @@ public class EbMSMessageProcessor
 			@NonNull DeliveryManager deliveryManager,
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,
-			@NonNull CPAManager cpaManager,
+			@NonNull CPAManagerCacheInterface cpaManager,
 			@NonNull EbMSMessageFactory ebMSMessageFactory,
 			@NonNull DeliveryTaskManager deliveryTaskManager,
 			@NonNull EbMSSignatureGenerator signatureGenerator,

@@ -35,7 +35,7 @@ import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.MessageEventListener;
@@ -60,7 +60,7 @@ class MessageErrorProcessor
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	DeliveryTaskManager deliveryTaskManager;
 	@NonNull

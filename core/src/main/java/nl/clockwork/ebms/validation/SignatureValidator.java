@@ -22,7 +22,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.cpa.CPAManagerCacheInterface;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -34,7 +34,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 class SignatureValidator
 {
 	@NonNull
-	CPAManager cpaManager;
+	CPAManagerCacheInterface cpaManager;
 	@NonNull
 	EbMSSignatureValidator ebMSSignatureValidator;
 

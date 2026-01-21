@@ -54,12 +54,12 @@ import org.springframework.cache.annotation.Cacheable;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CPAManager"})
-public class CPAManager
+public class CPAManager implements CPAManagerCacheInterface
 {
 	@Autowired
 	@NonFinal
 	@Setter
-	CPAManager self;
+	CPAManagerCacheInterface self;
 	@NonNull
 	CPARepository cpaRepository;
 	@NonNull
@@ -70,36 +70,42 @@ public class CPAManager
 	EbMSKeyStore keyStore;
 	boolean useClientCertificate;
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
 	{
 		return cpaRepository.existsCPA(cpaId);
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsPartyId(String cpaId, String partyId)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.existsPartyId(partyId)).orElse(false);
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<EbMSPartyInfo> getEbMSPartyInfo(String cpaId, String partyId)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.getEbMSPartyInfo(partyId)).orElse(empty());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<PartyInfo> getPartyInfo(String cpaId, List<PartyId> partyId)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.getPartyInfo(partyId)).orElse(empty());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.getFromPartyInfo(fromParty, service, action)).orElse(empty());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
@@ -108,36 +114,42 @@ public class CPAManager
 				.orElse(empty());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Party toParty, String service, String action)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.getToPartyInfo(toParty, service, action)).orElse(empty());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean canSend(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.canSend(partyId, role, service, action)).orElse(false);
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.canReceive(partyId, role, service, action)).orElse(false);
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getDeliveryChannel(String cpaId, String deliveryChannelId)
 	{
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.getDeliveryChannel(deliveryChannelId)).orElse(empty());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
 		return self.getPartyInfo(cpaId, partyId).map(CPAQuery.getDefaultDeliveryChannel(action)).orElse(empty());
 	}
 
+	@Override
 	public Optional<DeliveryChannel> getSendDeliveryChannel(MessageHeader messageHeader)
 	{
 		return self.getSendDeliveryChannel(
@@ -148,6 +160,7 @@ public class CPAManager
 				messageHeader.getAction());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
@@ -156,18 +169,21 @@ public class CPAManager
 				: self.getPartyInfo(cpaId, partyId).flatMap(CPAQuery.getSendDeliveryChannel(role, service, action));
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public X509Certificate getX509Certificate(DeliveryChannel deliveryChannel)
 	{
 		return deliveryChannel != null ? CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)) : null;
 	}
 
+	@Override
 	public Optional<String> getSSLClientAlias(MessageHeader messageHeader)
 	{
 		val deliveryChannel = self.getSendDeliveryChannel(messageHeader).orElse(null);
 		return self.getSSLClientAlias(messageHeader.getCPAId(), deliveryChannel);
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<String> getSSLClientAlias(String cpaId, DeliveryChannel deliveryChannel)
 	{
@@ -198,6 +214,7 @@ public class CPAManager
 		return clientAlias == null && StringUtils.isNotEmpty(keyStore.getDefaultAlias()) ? keyStore.getDefaultAlias() : clientAlias;
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
@@ -206,6 +223,7 @@ public class CPAManager
 				: self.getPartyInfo(cpaId, partyId).flatMap(CPAQuery.getReceiveDeliveryChannel(role, service, action));
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean isSendingNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
@@ -215,6 +233,7 @@ public class CPAManager
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.isSendingNonRepudiationRequired(docExchange, partyId, role, service, action)).orElse(false);
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean isSendingConfidential(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
@@ -224,6 +243,7 @@ public class CPAManager
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.isSendingConfidential(docExchange, partyId, role, service, action)).orElse(false);
 	}
 
+	@Override
 	public String getReceivingUri(MessageHeader messageHeader)
 	{
 		return self.getReceivingUri(
@@ -234,6 +254,7 @@ public class CPAManager
 				messageHeader.getAction());
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public String getReceivingUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
@@ -242,6 +263,7 @@ public class CPAManager
 		return overrideURL.apply(CPAUtils.getUri(deliveryChannel));
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<SyncReplyModeType> getSendSyncReply(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
