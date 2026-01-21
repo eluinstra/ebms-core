@@ -17,12 +17,10 @@ package nl.clockwork.ebms.plugin.db.mariadb;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@EnableCaching
 @PropertySource(value = {"classpath:nl/clockwork/ebms/plugin/db/mariadb/default.properties"})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MariaDBConfig

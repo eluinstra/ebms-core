@@ -47,7 +47,9 @@ public class CPAConfig
 			@Qualifier("clientKeyStore") EbMSKeyStore keyStore,
 			@Value("${https.useClientCertificate}") boolean useClientCertificate)
 	{
-		return new CPAManager(cpaRepository, overrideCertificate, overrideURL, keyStore, useClientCertificate);
+		val result = new CPAManager(cpaRepository, overrideCertificate, overrideURL, keyStore, useClientCertificate);
+		result.setSelf(result);
+		return result;
 	}
 
 	@Bean

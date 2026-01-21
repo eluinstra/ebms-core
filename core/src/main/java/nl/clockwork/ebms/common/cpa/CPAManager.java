@@ -49,14 +49,11 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CPAManager"})
-@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CPAManager
 {
 	@Autowired

@@ -30,7 +30,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 @Configuration
-@EnableCaching
+@EnableCaching(proxyTargetClass = true)
 @PropertySource(value = {"classpath:nl/clockwork/ebms/plugin/cache/ehcache/default.properties"})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EhCacheConfig

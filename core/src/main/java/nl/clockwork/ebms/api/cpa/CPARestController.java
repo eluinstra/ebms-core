@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 public class CPARestController implements WithController
 {
 	@NonNull
-	CPAControllerImpl cpaService;
+	CPAControllerImpl cpaController;
 
 	@POST
 	@Path("validate")
@@ -51,7 +51,7 @@ public class CPARestController implements WithController
 	{
 		try
 		{
-			cpaService.validateCPAImpl(cpa);
+			cpaController.validateCPAImpl(cpa);
 		}
 		catch (SAXException | IllegalArgumentException e)
 		{
@@ -73,7 +73,7 @@ public class CPARestController implements WithController
 	{
 		try
 		{
-			return cpaService.insertCPAImpl(cpa, overwrite);
+			return cpaController.insertCPAImpl(cpa, overwrite);
 		}
 		catch (SAXException | IllegalArgumentException e)
 		{
@@ -93,7 +93,7 @@ public class CPARestController implements WithController
 	{
 		try
 		{
-			cpaService.deleteCPAImpl(cpaId);
+			cpaController.deleteCPAImpl(cpaId);
 		}
 		catch (Exception e)
 		{
@@ -108,7 +108,7 @@ public class CPARestController implements WithController
 	{
 		try
 		{
-			return cpaService.getCPAIdsImpl();
+			return cpaController.getCPAIdsImpl();
 		}
 		catch (Exception e)
 		{
@@ -124,7 +124,7 @@ public class CPARestController implements WithController
 	{
 		try
 		{
-			return cpaService.getCPAImpl(cpaId);
+			return cpaController.getCPAImpl(cpaId);
 		}
 		catch (Exception e)
 		{
@@ -139,7 +139,7 @@ public class CPARestController implements WithController
 	{
 		try
 		{
-			cpaService.deleteCacheImpl();
+			cpaController.deleteCacheImpl();
 		}
 		catch (Exception e)
 		{

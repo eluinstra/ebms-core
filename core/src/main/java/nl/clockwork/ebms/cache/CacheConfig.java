@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
-@EnableCaching
+@EnableCaching(proxyTargetClass = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {

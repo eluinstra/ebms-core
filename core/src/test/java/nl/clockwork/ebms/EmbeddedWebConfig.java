@@ -46,20 +46,20 @@ public class EmbeddedWebConfig
 	@Value("#{'${ebms.cors.allowOrigins}'.split(',')}")
 	List<String> allowOrigins;
 	@Autowired
-	CPAController cpaService;
+	CPAController cpaController;
 	@Autowired
 	URLMappingController urlMappingService;
 	@Autowired
 	CertificateMappingController certificateMappingService;
 	@Autowired
-	EbMSController ebMSMessageService;
+	EbMSController ebMSController;
 	@Autowired
 	EbMSControllerMTOM ebMSMessageServiceMTOM;
 
 	@Bean
 	public Endpoint cpaServiceEndpoint()
 	{
-		return publishEndpoint(cpaService, "/cpa", "http://www.ordina.nl/cpa/2.18", "CPAService", "CPAPort");
+		return publishEndpoint(cpaController, "/cpa", "http://www.ordina.nl/cpa/2.18", "CPAService", "CPAPort");
 	}
 
 	@Bean
@@ -82,7 +82,7 @@ public class EmbeddedWebConfig
 	@Bean
 	public Endpoint ebMSMessageServiceEndpoint()
 	{
-		return publishEndpoint(ebMSMessageService, "/ebms", "http://www.ordina.nl/ebms/2.18", "EbMSMessageService", "EbMSMessagePort");
+		return publishEndpoint(ebMSController, "/ebms", "http://www.ordina.nl/ebms/2.18", "EbMSMessageService", "EbMSMessagePort");
 	}
 
 	@Bean
