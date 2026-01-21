@@ -60,13 +60,13 @@ class CPAServiceImplIT implements WithFile
 	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
 
 	@Autowired
-	CPAController cpaService;
+	CPAController cpaController;
 
 	@ParameterizedTest
 	@MethodSource("invalidCPAs")
 	void validateInvalidXML(String cpa, String message)
 	{
-		assertThatThrownBy(() -> cpaService.validateCPA(cpa)).hasMessageContaining(message);
+		assertThatThrownBy(() -> cpaController.validateCPA(cpa)).hasMessageContaining(message);
 	}
 
 	private static Stream<Arguments> invalidCPAs()
@@ -87,7 +87,7 @@ class CPAServiceImplIT implements WithFile
 	@MethodSource("validCPAs")
 	void validateValidXML(String path)
 	{
-		assertThatCode(() -> cpaService.validateCPA(readFile(path))).doesNotThrowAnyException();
+		assertThatCode(() -> cpaController.validateCPA(readFile(path))).doesNotThrowAnyException();
 	}
 
 	private static Stream<Arguments> validCPAs()
@@ -115,14 +115,14 @@ class CPAServiceImplIT implements WithFile
 	@MethodSource("validCPAs")
 	void insertValidXML(String path)
 	{
-		assertThatCode(() -> cpaService.insertCPA(readFile(path), true)).doesNotThrowAnyException();
+		assertThatCode(() -> cpaController.insertCPA(readFile(path), true)).doesNotThrowAnyException();
 	}
 
 	@Test
 	void getCPAIds()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]), true));
-		assertThat(cpaService.getCPAIds()).hasSize(15)
+		validCPAs().forEach(path -> cpaController.insertCPA(readFile((String)path.get()[0]), true));
+		assertThat(cpaController.getCPAIds()).hasSize(15)
 				.contains("CPAID_EchoService-1-0")
 				.contains("cpaStubEBF.be.http.signed")
 				.contains("cpaStubEBF.be.http.unsigned.sync")
@@ -143,26 +143,26 @@ class CPAServiceImplIT implements WithFile
 	@Test
 	void getCPA()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]), true));
-		assertThat(cpaService.getCPAIds()).hasSizeGreaterThan(0);
-		assertThat(cpaService.getCPA("cpaStubEBF.rm.https.signed")).contains("cpaid=\"cpaStubEBF.rm.https.signed\"");
+		validCPAs().forEach(path -> cpaController.insertCPA(readFile((String)path.get()[0]), true));
+		assertThat(cpaController.getCPAIds()).hasSizeGreaterThan(0);
+		assertThat(cpaController.getCPA("cpaStubEBF.rm.https.signed")).contains("cpaid=\"cpaStubEBF.rm.https.signed\"");
 	}
 
 	@Test
 	void deleteCPA()
 	{
-		validCPAs().forEach(path -> cpaService.insertCPA(readFile((String)path.get()[0]), true));
-		assertThat(cpaService.getCPAIds()).hasSize(15);
-		assertThatCode(() -> cpaService.deleteCPA("CPAID_EchoService-1-0")).doesNotThrowAnyException();
-		assertThat(cpaService.getCPAIds()).hasSize(14);
-		assertThatThrownBy(() -> cpaService.deleteCPA("CPAID_EchoService-1-0")).hasMessageContaining("CPA not found");
-		assertThatCode(() -> cpaService.deleteCPA("cpaStubEBF.be.http.signed")).doesNotThrowAnyException();
-		assertThat(cpaService.getCPAIds()).hasSize(13);
+		validCPAs().forEach(path -> cpaController.insertCPA(readFile((String)path.get()[0]), true));
+		assertThat(cpaController.getCPAIds()).hasSize(15);
+		assertThatCode(() -> cpaController.deleteCPA("CPAID_EchoService-1-0")).doesNotThrowAnyException();
+		assertThat(cpaController.getCPAIds()).hasSize(14);
+		assertThatThrownBy(() -> cpaController.deleteCPA("CPAID_EchoService-1-0")).hasMessageContaining("CPA not found");
+		assertThatCode(() -> cpaController.deleteCPA("cpaStubEBF.be.http.signed")).doesNotThrowAnyException();
+		assertThat(cpaController.getCPAIds()).hasSize(13);
 	}
 
 	@Test
 	void deleteCache()
 	{
-		assertThatCode(() -> cpaService.deleteCache()).doesNotThrowAnyException();
+		assertThatCode(() -> cpaController.deleteCache()).doesNotThrowAnyException();
 	}
 }

@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.plugin.db.postgres;
+package nl.clockwork.ebms.common.cpa.certificate;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import java.security.cert.X509Certificate;
+import java.util.Optional;
 
-@Configuration
-@PropertySource(value = {"classpath:nl/clockwork/ebms/plugin/db/postgres/default.properties"})
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class PostgresConfig
+interface CertificateMappingRepository
 {
+
+	Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific);
 
 }

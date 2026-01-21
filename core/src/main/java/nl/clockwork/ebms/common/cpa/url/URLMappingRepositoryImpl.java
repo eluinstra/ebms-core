@@ -15,10 +15,6 @@
  */
 package nl.clockwork.ebms.common.cpa.url;
 
-import io.vavr.control.Either;
-import io.vavr.control.Option;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -26,12 +22,9 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.client.delivery.task.URLMappingRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,10 +37,6 @@ import org.springframework.jdbc.core.RowMapper;
 @CacheConfig(cacheNames = {"URLMapping"})
 class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappingRepository, URLMappingRepository
 {
-	@Autowired
-	@NonFinal
-	@Setter
-	URLMappingRepositoryImpl self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -58,6 +47,7 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 		// do nothing
 	}
 
+	@Override
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsURLMapping(String source)
 	{
@@ -65,16 +55,16 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 	}
 
 	@Override
+	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public String getURL(String source)
 	{
 		if (!StringUtils.isEmpty(source))
-			return self.getURLMapping(source).orElse(source);
+			return getURLMapping(source).orElse(source);
 		else
 			return source;
 	}
 
-	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
-	public Optional<String> getURLMapping(String source)
+	private Optional<String> getURLMapping(String source)
 	{
 		try
 		{
@@ -101,43 +91,6 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 	}
 
 	@Override
-	public void setURLMapping(URLMapping urlMapping)
-	{
-		if (StringUtils.isEmpty(urlMapping.getDestination()))
-			self.deleteURLMapping(urlMapping.getSource());
-		else
-			validate(urlMapping).peek(this::save).getOrElseThrow(e -> e);
-	}
-
-	private Either<IllegalArgumentException, URLMapping> validate(URLMapping urlMapping)
-	{
-		return isValid(urlMapping.getSource()).map(e -> new IllegalArgumentException("Source invalid", e))
-				.orElse(() -> isValid(urlMapping.getDestination()).map(e -> new IllegalArgumentException("Destination invalid", e)))
-				.toEither(urlMapping)
-				.swap();
-	}
-
-	private Option<MalformedURLException> isValid(String url)
-	{
-		try
-		{
-			new URL(url);
-			return Option.none();
-		}
-		catch (MalformedURLException e)
-		{
-			return Option.some(e);
-		}
-	}
-
-	private void save(URLMapping urlMapping)
-	{
-		if (self.existsURLMapping(urlMapping.getSource()))
-			self.updateURLMapping(urlMapping);
-		else
-			self.insertURLMapping(urlMapping);
-	}
-
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public String insertURLMapping(URLMapping urlMapping)
 	{
@@ -145,6 +98,7 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 		return urlMapping.getSource();
 	}
 
+	@Override
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public int updateURLMapping(URLMapping urlMapping)
 	{

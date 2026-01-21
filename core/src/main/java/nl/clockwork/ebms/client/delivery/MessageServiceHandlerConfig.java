@@ -108,7 +108,8 @@ public class MessageServiceHandlerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("messageServiceHandler.type", MessageServiceHandlerType.class, MessageServiceHandlerType.DEFAULT) == MessageServiceHandlerType.JMS;
+			return context.getEnvironment().getProperty("messageServiceHandler.type", MessageServiceHandlerType.class, MessageServiceHandlerType.DEFAULT)
+					== MessageServiceHandlerType.JMS;
 		}
 	}
 }

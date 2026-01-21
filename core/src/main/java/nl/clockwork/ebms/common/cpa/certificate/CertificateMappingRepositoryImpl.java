@@ -28,16 +28,11 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -45,8 +40,7 @@ import org.springframework.jdbc.core.RowMapper;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CertificateMapping"})
-@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository
+class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository, CertificateMappingRepository
 {
 	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>
 	{
@@ -65,10 +59,6 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 		}
 	}
 
-	@Autowired
-	@NonFinal
-	@Setter
-	CertificateMappingRepositoryImpl self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -79,6 +69,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 		// do nothing
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
@@ -87,6 +78,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 				: jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id = ?", Integer.class, id, cpaId) > 0;
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific)
 	{
@@ -138,14 +130,6 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 	}
 
 	@Override
-	public void setCertificateMapping(CertificateMapping mapping)
-	{
-		if (self.existsCertificateMapping(mapping.getId(), mapping.getCpaId()))
-			self.updateCertificateMapping(mapping);
-		else
-			self.insertCertificateMapping(mapping);
-	}
-
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public void insertCertificateMapping(CertificateMapping mapping)
 	{
@@ -164,6 +148,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 		}
 	}
 
+	@Override
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int updateCertificateMapping(CertificateMapping mapping)
 	{
@@ -186,12 +171,6 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 	}
 
 	@Override
-	public int deleteCertificateMapping(X509Certificate source, String cpaId)
-	{
-		val id = CertificateMapping.getCertificateId(source);
-		return self.deleteCertificateMapping(id, cpaId);
-	}
-
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int deleteCertificateMapping(String id, String cpaId)
 	{

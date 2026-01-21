@@ -32,7 +32,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 
 @Configuration
-@EnableCaching
+@EnableCaching(proxyTargetClass = true)
 @PropertySource(value = {"classpath:nl/clockwork/ebms/plugin/cache/hazelcast/default.properties"})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HazelcastConfig

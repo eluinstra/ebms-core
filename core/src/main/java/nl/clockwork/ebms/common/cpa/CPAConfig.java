@@ -60,9 +60,7 @@ public class CPAConfig
 	public CPARepositoryImpl cpaRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val result = new CPARepositoryImpl(jdbcTemplate);
-		result.setSelf(result);
-		return result;
+		return new CPARepositoryImpl(jdbcTemplate);
 	}
 
 	@Bean

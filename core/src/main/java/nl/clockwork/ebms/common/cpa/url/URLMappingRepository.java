@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.plugin.db.postgres;
+package nl.clockwork.ebms.common.cpa.url;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-
-@Configuration
-@PropertySource(value = {"classpath:nl/clockwork/ebms/plugin/db/postgres/default.properties"})
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class PostgresConfig
+interface URLMappingRepository
 {
+
+	String getURL(String source);
 
 }

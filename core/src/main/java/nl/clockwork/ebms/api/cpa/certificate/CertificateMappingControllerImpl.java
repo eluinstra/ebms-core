@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -52,7 +53,10 @@ class CertificateMappingControllerImpl implements CertificateMappingController
 	{
 		if (log.isDebugEnabled())
 			log.debug("SetCertificateMapping " + certificateMapping);
-		certificateMappingRepository.setCertificateMapping(certificateMapping);
+		if (certificateMappingRepository.existsCertificateMapping(certificateMapping.getId(), certificateMapping.getCpaId()))
+			certificateMappingRepository.updateCertificateMapping(certificateMapping);
+		else
+			certificateMappingRepository.insertCertificateMapping(certificateMapping);
 	}
 
 	@Override
@@ -78,8 +82,14 @@ class CertificateMappingControllerImpl implements CertificateMappingController
 	{
 		if (log.isDebugEnabled())
 			log.debug("DeleteCertificateMapping " + source);
-		if (certificateMappingRepository.deleteCertificateMapping(source, cpaId) == 0)
+		if (deleteCertificateMapping1(source, cpaId) == 0)
 			throw new CertificateNotFoundException();
+	}
+
+	private int deleteCertificateMapping1(X509Certificate source, String cpaId)
+	{
+		val id = nl.clockwork.ebms.common.cpa.certificate.CertificateMapping.getCertificateId(source);
+		return certificateMappingRepository.deleteCertificateMapping(id, cpaId);
 	}
 
 	@Override
