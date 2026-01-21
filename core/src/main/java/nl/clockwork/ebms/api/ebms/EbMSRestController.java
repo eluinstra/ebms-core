@@ -36,7 +36,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.api.WithController;
+import nl.clockwork.ebms.api.WithWebApplicationExceptionTransfomer;
 import nl.clockwork.ebms.api.ebms.model.MTOMDataSource;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessageRequest;
@@ -57,7 +57,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class EbMSRestController implements WithController
+public class EbMSRestController implements WithWebApplicationExceptionTransfomer
 {
 	@NonNull
 	EbMSControllerHandler serviceHandler;

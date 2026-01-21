@@ -33,14 +33,14 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.api.WithController;
+import nl.clockwork.ebms.api.WithWebApplicationExceptionTransfomer;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class CertificateMappingRestController implements WithController
+public class CertificateMappingRestController implements WithWebApplicationExceptionTransfomer
 {
 	@NonNull
 	CertificateMappingControllerImpl mappingService;

@@ -31,7 +31,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.api.WithController;
+import nl.clockwork.ebms.api.WithWebApplicationExceptionTransfomer;
 import org.xml.sax.SAXException;
 
 @Slf4j
@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class CPARestController implements WithController
+public class CPARestController implements WithWebApplicationExceptionTransfomer
 {
 	@NonNull
 	CPAControllerImpl cpaService;

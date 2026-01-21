@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.api.WithController;
+import nl.clockwork.ebms.api.WithWebApplicationExceptionTransfomer;
 import nl.clockwork.ebms.common.cpa.url.URLMapping;
 
 @Slf4j
@@ -37,7 +37,7 @@ import nl.clockwork.ebms.common.cpa.url.URLMapping;
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class URLMappingRestController implements WithController
+public class URLMappingRestController implements WithWebApplicationExceptionTransfomer
 {
 	@NonNull
 	URLMappingController mappingController;

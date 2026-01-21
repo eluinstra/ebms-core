@@ -26,26 +26,16 @@ import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import lombok.NonNull;
-import lombok.Value;
 import lombok.val;
 import nl.clockwork.ebms.api.cpa.BadRequestException;
-import nl.clockwork.ebms.api.cpa.CPAControllerException;
 import nl.clockwork.ebms.api.cpa.CPANotFoundException;
 import nl.clockwork.ebms.api.cpa.certificate.CertificateNotFoundException;
 import nl.clockwork.ebms.api.cpa.url.URLNotFoundException;
 import nl.clockwork.ebms.api.ebms.NotFoundException;
 
-public interface WithController
+public interface WithWebApplicationExceptionTransfomer
 {
-	@Value
-	public class Error
-	{
-		@NonNull
-		String message;
-	}
-
-	default WebApplicationException toWebApplicationException(Exception exception) throws CPAControllerException
+	default WebApplicationException toWebApplicationException(Exception exception)
 	{
 		return toWebApplicationException(exception, MediaType.APPLICATION_JSON);
 	}
