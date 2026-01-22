@@ -32,7 +32,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CertificateMappingConfig
 {
 	@Bean
-	public BiFunction<String, X509Certificate, X509Certificate> certificateOverrideLoader(CertificateMappingRepositoryImpl certificateMappingRepository)
+	public BiFunction<String, X509Certificate, X509Certificate> certificateOverrideLoader(CertificateMappingRepository certificateMappingRepository)
 	{
 		return (cpaId, certificate) -> certificate != null
 				? certificateMappingRepository.getCertificateMapping(getCertificateId(certificate), cpaId, false).orElse(certificate)
@@ -43,8 +43,6 @@ public class CertificateMappingConfig
 	public CertificateMappingRepositoryImpl certificateMappingRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val result = new CertificateMappingRepositoryImpl(jdbcTemplate);
-		result.setSelf(result);
-		return result;
+		return new CertificateMappingRepositoryImpl(jdbcTemplate);
 	}
 }

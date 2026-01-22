@@ -26,12 +26,10 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.client.delivery.task.URLMappingRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,10 +42,6 @@ import org.springframework.jdbc.core.RowMapper;
 @CacheConfig(cacheNames = {"URLMapping"})
 class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappingRepository, URLMappingRepository
 {
-	@Autowired
-	@NonFinal
-	@Setter
-	URLMappingRepositoryImpl self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -68,7 +62,7 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 	public String getURL(String source)
 	{
 		if (!StringUtils.isEmpty(source))
-			return self.getURLMapping(source).orElse(source);
+			return ((URLMappingRepositoryImpl)AopContext.currentProxy()).getURLMapping(source).orElse(source);
 		else
 			return source;
 	}
@@ -104,7 +98,7 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 	public void setURLMapping(URLMapping urlMapping)
 	{
 		if (StringUtils.isEmpty(urlMapping.getDestination()))
-			self.deleteURLMapping(urlMapping.getSource());
+			((URLMappingRepositoryImpl)AopContext.currentProxy()).deleteURLMapping(urlMapping.getSource());
 		else
 			validate(urlMapping).peek(this::save).getOrElseThrow(e -> e);
 	}
@@ -132,10 +126,10 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 
 	private void save(URLMapping urlMapping)
 	{
-		if (self.existsURLMapping(urlMapping.getSource()))
-			self.updateURLMapping(urlMapping);
+		if (((URLMappingRepositoryImpl)AopContext.currentProxy()).existsURLMapping(urlMapping.getSource()))
+			((URLMappingRepositoryImpl)AopContext.currentProxy()).updateURLMapping(urlMapping);
 		else
-			self.insertURLMapping(urlMapping);
+			((URLMappingRepositoryImpl)AopContext.currentProxy()).insertURLMapping(urlMapping);
 	}
 
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)

@@ -105,7 +105,6 @@ public class CPAManagerTest
 				url -> url,
 				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"),
 				false);
-		cpaManager.setSelf(cpaManager);
 	}
 
 	private static Service createDefaultService()

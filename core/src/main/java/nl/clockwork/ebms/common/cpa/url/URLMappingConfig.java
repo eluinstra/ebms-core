@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.client.delivery.task.URLMappingRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,7 +30,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class URLMappingConfig
 {
 	@Bean
-	public UnaryOperator<String> overrideURL(URLMappingRepositoryImpl urlMappingRepository)
+	public UnaryOperator<String> overrideURL(URLMappingRepository urlMappingRepository)
 	{
 		return urlMappingRepository::getURL;
 	}
@@ -38,8 +39,6 @@ public class URLMappingConfig
 	public URLMappingRepositoryImpl urlMappingRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val result = new URLMappingRepositoryImpl(jdbcTemplate);
-		result.setSelf(result);
-		return result;
+		return new URLMappingRepositoryImpl(jdbcTemplate);
 	}
 }
