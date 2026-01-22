@@ -30,10 +30,12 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
-@EnableCaching(proxyTargetClass = true)
+@EnableCaching
+@EnableAspectJAutoProxy(exposeProxy = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {
@@ -52,6 +54,7 @@ public class CacheConfig
 	{
 		val result = new ArrayList<Cache>();
 		result.add(new ConcurrentMapCache("CPA"));
+		result.add(new ConcurrentMapCache("CPAManager"));
 		result.add(new ConcurrentMapCache("URLMapping"));
 		result.add(new ConcurrentMapCache("CertificateMapping"));
 		return result;

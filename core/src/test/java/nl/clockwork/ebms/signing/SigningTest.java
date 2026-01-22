@@ -126,14 +126,12 @@ public class SigningTest
 
 	private CPAManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
 	{
-		val result = new CPAManager(
+		return new CPAManager(
 				initCpaRepository(),
 				(cpaId, certificate) -> certificate,
 				url -> url,
 				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"),
 				false);
-		result.setSelf(result);
-		return result;
 	}
 
 	private CPARepository initCpaRepository()

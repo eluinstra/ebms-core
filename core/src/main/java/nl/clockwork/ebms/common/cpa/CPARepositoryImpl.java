@@ -21,13 +21,11 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.val;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,10 +38,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @CacheConfig(cacheNames = {"CPA"})
 class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPARepository
 {
-	@Autowired
-	@NonFinal
-	@Setter
-	CPARepositoryImpl self;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -90,18 +84,18 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 	@Override
 	public void setCPA(CollaborationProtocolAgreement cpa, Boolean overwrite)
 	{
-		if (self.existsCPA(cpa.getCpaid()))
+		if (((CPARepositoryImpl)AopContext.currentProxy()).existsCPA(cpa.getCpaid()))
 		{
 			if (overwrite != null && overwrite)
 			{
-				if (self.updateCPA(cpa) == 0)
+				if (((CPARepositoryImpl)AopContext.currentProxy()).updateCPA(cpa) == 0)
 					throw new IllegalArgumentException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
 			}
 			else
 				throw new IllegalArgumentException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
 		}
 		else
-			self.insertCPA(cpa);
+			((CPARepositoryImpl)AopContext.currentProxy()).insertCPA(cpa);
 	}
 
 	@CacheEvict(cacheNames = "CPA", allEntries = true)

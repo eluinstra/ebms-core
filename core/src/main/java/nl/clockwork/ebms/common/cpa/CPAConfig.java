@@ -47,9 +47,7 @@ public class CPAConfig
 			@Qualifier("clientKeyStore") EbMSKeyStore keyStore,
 			@Value("${https.useClientCertificate}") boolean useClientCertificate)
 	{
-		val result = new CPAManager(cpaRepository, overrideCertificate, overrideURL, keyStore, useClientCertificate);
-		result.setSelf(result);
-		return result;
+		return new CPAManager(cpaRepository, overrideCertificate, overrideURL, keyStore, useClientCertificate);
 	}
 
 	@Bean
@@ -62,9 +60,7 @@ public class CPAConfig
 	public CPARepositoryImpl cpaRepository(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val result = new CPARepositoryImpl(jdbcTemplate);
-		result.setSelf(result);
-		return result;
+		return new CPARepositoryImpl(jdbcTemplate);
 	}
 
 	@Bean
