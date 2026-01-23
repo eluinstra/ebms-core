@@ -30,12 +30,10 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
 @EnableCaching
-@EnableAspectJAutoProxy(exposeProxy = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {
@@ -64,6 +62,12 @@ public class CacheConfig
 	public KeyGenerator keyGenerator()
 	{
 		return new EbMSKeyGenerator();
+	}
+
+	@Bean("ebMSMessageHeaderKeyGenerator")
+	public KeyGenerator messageHeaderKeyGenerator()
+	{
+		return new MessageHeaderKeyGenerator();
 	}
 
 	public static class DefaultCacheType implements Condition

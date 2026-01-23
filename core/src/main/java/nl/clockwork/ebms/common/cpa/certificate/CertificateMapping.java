@@ -22,16 +22,13 @@ import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.FieldDefaults;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CertificateMapping implements Serializable

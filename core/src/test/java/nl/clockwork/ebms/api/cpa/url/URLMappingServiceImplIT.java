@@ -68,6 +68,7 @@ class URLMappingServiceImplIT implements WithFile
 		return Stream.of(
 				// FIXME
 				// arguments(new URLMapping(null,null), "source is marked non-null but is null"),
+				arguments(new URLMapping("", ""), "Source invalid"),
 				arguments(new URLMapping("source", "destination"), "Source invalid"));
 	}
 
@@ -82,7 +83,6 @@ class URLMappingServiceImplIT implements WithFile
 	{
 		return Stream.of(
 				// FIXME
-				arguments(new URLMapping("", "")),
 				arguments(new URLMapping("http://www.example.com:8080", "http://localhost:8090")),
 				arguments(new URLMapping("http://www.example.com:8090", "http://localhost:8090")));
 	}

@@ -22,13 +22,18 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 public interface CPARepository
 {
 
+	void clearCache();
+
+	boolean existsCPA(String cpaId);
+
 	Optional<CollaborationProtocolAgreement> getCPA(String cpaId);
 
 	List<String> getCPAIds();
 
-	void setCPA(CollaborationProtocolAgreement cpa, Boolean overwrite);
+	String insertCPA(CollaborationProtocolAgreement cpa);
+
+	int updateCPA(CollaborationProtocolAgreement cpa);
 
 	int deleteCPA(String cpaId);
 
-	void clearCache();
 }

@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.api.cpa.url;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.common.cpa.url.URLMapping;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -54,7 +57,39 @@ class URLMappingControllerImpl implements URLMappingController
 	{
 		if (log.isDebugEnabled())
 			log.debug("SetURLMapping " + urlMapping);
-		urlMappingRepository.setURLMapping(urlMapping);
+		setURLMapping1(urlMapping);
+	}
+
+	private void setURLMapping1(URLMapping urlMapping)
+	{
+		validate(urlMapping.getSource(), "Source invalid");
+		if (StringUtils.isEmpty(urlMapping.getDestination()))
+			deleteURLMapping(urlMapping.getSource());
+		else
+		{
+			validate(urlMapping.getDestination(), "Destination invalid");
+			save(urlMapping);
+		}
+	}
+
+	private void validate(String url, String errorString)
+	{
+		try
+		{
+			new URL(url);
+		}
+		catch (MalformedURLException e)
+		{
+			throw new IllegalArgumentException(errorString, e);
+		}
+	}
+
+	private void save(URLMapping urlMapping)
+	{
+		if (urlMappingRepository.existsURLMapping(urlMapping.getSource()))
+			urlMappingRepository.updateURLMapping(urlMapping);
+		else
+			urlMappingRepository.insertURLMapping(urlMapping);
 	}
 
 	@Override

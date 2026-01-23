@@ -22,9 +22,13 @@ public interface URLMappingRepository
 {
 	void clearCache();
 
+	boolean existsURLMapping(String source);
+
 	List<URLMapping> getURLMappings();
 
-	void setURLMapping(URLMapping urlMapping);
+	String insertURLMapping(URLMapping urlMapping);
+
+	int updateURLMapping(URLMapping urlMapping);
 
 	int deleteURLMapping(String source);
 
