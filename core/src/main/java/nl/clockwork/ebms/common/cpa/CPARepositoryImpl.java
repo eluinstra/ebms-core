@@ -25,7 +25,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -82,23 +81,7 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 	}
 
 	@Override
-	public void setCPA(CollaborationProtocolAgreement cpa, Boolean overwrite)
-	{
-		if (((CPARepositoryImpl)AopContext.currentProxy()).existsCPA(cpa.getCpaid()))
-		{
-			if (overwrite != null && overwrite)
-			{
-				if (((CPARepositoryImpl)AopContext.currentProxy()).updateCPA(cpa) == 0)
-					throw new IllegalArgumentException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
-			}
-			else
-				throw new IllegalArgumentException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
-		}
-		else
-			((CPARepositoryImpl)AopContext.currentProxy()).insertCPA(cpa);
-	}
-
-	@CacheEvict(cacheNames = "CPA", allEntries = true)
+	@CacheEvict(cacheNames = {"CPA", "CPAManager"}, allEntries = true)
 	public String insertCPA(CollaborationProtocolAgreement cpa)
 	{
 		try
@@ -113,7 +96,8 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 		}
 	}
 
-	@CacheEvict(cacheNames = "CPA", allEntries = true)
+	@Override
+	@CacheEvict(cacheNames = {"CPA", "CPAManager"}, allEntries = true)
 	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{
 		try
@@ -128,7 +112,7 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 	}
 
 	@Override
-	@CacheEvict(cacheNames = "CPA", allEntries = true)
+	@CacheEvict(cacheNames = {"CPA", "CPAManager"}, allEntries = true)
 	public int deleteCPA(String cpaId)
 	{
 		return jdbcTemplate.update("delete from cpa where cpa_id = ?", cpaId);

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.api.cpa.certificate;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMapping;
 
@@ -23,10 +22,14 @@ public interface CertificateMappingRepository
 {
 	void clearCache();
 
+	boolean existsCertificateMapping(String id, String cpaId);
+
 	List<CertificateMapping> getCertificateMappings();
 
-	void setCertificateMapping(CertificateMapping mapping);
+	void insertCertificateMapping(CertificateMapping mapping);
 
-	int deleteCertificateMapping(X509Certificate source, String cpaId);
+	int updateCertificateMapping(CertificateMapping mapping);
+
+	int deleteCertificateMapping(String id, String cpaId);
 
 }

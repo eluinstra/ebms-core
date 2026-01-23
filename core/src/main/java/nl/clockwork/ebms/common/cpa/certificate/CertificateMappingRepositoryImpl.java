@@ -30,7 +30,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -70,6 +69,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 		// do nothing
 	}
 
+	@Override
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
@@ -130,14 +130,6 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 	}
 
 	@Override
-	public void setCertificateMapping(CertificateMapping mapping)
-	{
-		if (((CertificateMappingRepositoryImpl)AopContext.currentProxy()).existsCertificateMapping(mapping.getId(), mapping.getCpaId()))
-			((CertificateMappingRepositoryImpl)AopContext.currentProxy()).updateCertificateMapping(mapping);
-		else
-			((CertificateMappingRepositoryImpl)AopContext.currentProxy()).insertCertificateMapping(mapping);
-	}
-
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public void insertCertificateMapping(CertificateMapping mapping)
 	{
@@ -156,6 +148,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 		}
 	}
 
+	@Override
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int updateCertificateMapping(CertificateMapping mapping)
 	{
@@ -178,12 +171,6 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 	}
 
 	@Override
-	public int deleteCertificateMapping(X509Certificate source, String cpaId)
-	{
-		val id = CertificateMapping.getCertificateId(source);
-		return ((CertificateMappingRepositoryImpl)AopContext.currentProxy()).deleteCertificateMapping(id, cpaId);
-	}
-
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int deleteCertificateMapping(String id, String cpaId)
 	{

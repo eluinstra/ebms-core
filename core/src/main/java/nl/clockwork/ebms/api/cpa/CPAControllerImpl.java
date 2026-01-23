@@ -91,9 +91,25 @@ class CPAControllerImpl implements CPAController
 		xsdValidator.validate(cpa);
 		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
 		CPAValidator.validate(parsedCpa);
-		cpaRepository.setCPA(parsedCpa, overwrite);
+		setCPA(parsedCpa, overwrite);
 		log.debug("InsertCPA done");
 		return parsedCpa.getCpaid();
+	}
+
+	private void setCPA(CollaborationProtocolAgreement cpa, Boolean overwrite)
+	{
+		if (cpaRepository.existsCPA(cpa.getCpaid()))
+		{
+			if (overwrite != null && overwrite)
+			{
+				if (cpaRepository.updateCPA(cpa) == 0)
+					throw new IllegalArgumentException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
+			}
+			else
+				throw new IllegalArgumentException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
+		}
+		else
+			cpaRepository.insertCPA(cpa);
 	}
 
 	@Override

@@ -42,9 +42,8 @@
   </cache-template>
 
   <cache alias="CPA" uses-template="defaultCache"/>
-  <cache alias="URLMapping" uses-template="defaultCache">
-    <heap unit="entries">250</heap>
-  </cache>
+  <cache alias="CPAManager" uses-template="defaultCache"/>
+  <cache alias="URLMapping" uses-template="defaultCache"/>
   <cache alias="CertificateMapping" uses-template="defaultCache"/>
 
 </config>
