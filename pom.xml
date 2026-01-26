@@ -64,7 +64,7 @@
   <modules>
     <module>common</module>
     <module>core</module>
-    <!-- <module>plugin/cache/ehcache</module> -->
+    <module>plugin/cache/ehcache</module>
     <module>plugin/cache/hazelcast</module>
     <module>plugin/db/db2</module>
     <module>plugin/db/h2</module>
