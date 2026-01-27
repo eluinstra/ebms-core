@@ -27,13 +27,16 @@ public class FixedPostgreSQLContainer extends PostgreSQLContainer<FixedPostgreSQ
 	}
 
 	@Override
-	public void start() {
-		if (enabledTestContainers()) {
+	public void start()
+	{
+		if (enabledTestContainers())
+		{
 			super.start();
 		}
 	}
 
-	private static boolean enabledTestContainers() {
+	private static boolean enabledTestContainers()
+	{
 		return System.getenv("DISABLE_TEST_CONTAINERS") == null
 				|| System.getenv("DISABLE_TEST_CONTAINERS").equals("")
 				|| System.getenv("DISABLE_TEST_CONTAINERS").startsWith("n")
