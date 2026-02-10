@@ -121,7 +121,8 @@ class EbMSControllerHandler
 		}
 		finally
 		{
-			MDC.clear();
+			if (LoggingUtils.mdc == Status.ENABLED)
+				LoggingUtils.getProperties().forEach(MDC::remove);
 		}
 	}
 
@@ -144,7 +145,8 @@ class EbMSControllerHandler
 		}
 		finally
 		{
-			MDC.clear();
+			if (LoggingUtils.mdc == Status.ENABLED)
+				LoggingUtils.getProperties().forEach(MDC::remove);
 		}
 	}
 
@@ -174,7 +176,8 @@ class EbMSControllerHandler
 			}
 			finally
 			{
-				MDC.clear();
+				if (LoggingUtils.mdc == Status.ENABLED)
+					LoggingUtils.getProperties().forEach(MDC::remove);
 			}
 		}).orElseThrow(() -> new NotFoundException("Not found message " + messageId));
 	}
