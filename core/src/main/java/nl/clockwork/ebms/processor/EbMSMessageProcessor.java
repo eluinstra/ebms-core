@@ -147,7 +147,7 @@ public class EbMSMessageProcessor
 			val timestamp = Instant.now();
 			val message = EbMSMessageUtils.getEbMSMessage(document);
 			if (LoggingUtils.mdc == Status.ENABLED)
-				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+				LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 			val cpaId = message.getMessageHeader().getCPAId();
 			if (!cpaManager.existsCPA(cpaId))
 				throw new ValidationException("CPA " + cpaId + " not found!");

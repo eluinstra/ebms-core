@@ -111,7 +111,7 @@ class EbMSControllerHandler
 			messagePropertiesValidator.validate(messageRequest.getProperties());
 			val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
 			if (LoggingUtils.mdc == Status.ENABLED)
-				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+				LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
 			signatureGenerator.generate(document, message);
 			storeMessage(document.getMessage(), message);
@@ -135,7 +135,7 @@ class EbMSControllerHandler
 			messagePropertiesValidator.validate(messageRequest.getProperties());
 			val message = ebMSMessageFactory.createEbMSMessageMTOM(messageRequest);
 			if (LoggingUtils.mdc == Status.ENABLED)
-				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+				LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
 			signatureGenerator.generate(document, message);
 			storeMessage(document.getMessage(), message);
@@ -161,7 +161,7 @@ class EbMSControllerHandler
 				resetMessage(messageRequest.getProperties());
 				val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
 				if (LoggingUtils.mdc == Status.ENABLED)
-					MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+					LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 				val document = EbMSMessageUtils.getEbMSDocument(message);
 				signatureGenerator.generate(document, message);
 				storeMessage(document.getMessage(), message);

@@ -132,7 +132,7 @@ class DeliveryTaskHandler
 			if (LoggingUtils.mdc == Status.ENABLED)
 			{
 				val context = ebMSDAO.getEbMSMessageProperties(task.getMessageId()).orElse(null);
-				MDC.setContextMap(LoggingUtils.getPropertyMap(context));
+				LoggingUtils.getPropertyMap(context).forEach(MDC::put);
 			}
 			sendMessage(task, receiveDeliveryChannel, url, requestDocument);
 		}
