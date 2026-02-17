@@ -37,6 +37,7 @@ public class EbMSHttpClientFactory
 	int readTimeout;
 	int maxThreads;
 	EbMSProxy proxy;
+	String uuidHeader;
 	@NonNull
 	SSLParameters sslParameters;
 	@NonNull
@@ -52,6 +53,7 @@ public class EbMSHttpClientFactory
 			int readTimeout,
 			int maxThreads,
 			EbMSProxy proxy,
+			String uuidHeader,
 			SSLParameters sslParameters,
 			boolean verifyHostnames,
 			@NonNull EbMSKeyStore keyStore,
@@ -62,6 +64,7 @@ public class EbMSHttpClientFactory
 		this.readTimeout = readTimeout;
 		this.maxThreads = maxThreads;
 		this.proxy = proxy;
+		this.uuidHeader = uuidHeader;
 		this.sslParameters = sslParameters;
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
@@ -87,6 +90,7 @@ public class EbMSHttpClientFactory
 					readTimeout,
 					maxThreads,
 					proxy,
+					uuidHeader,
 					httpErrors.getRecoverableHttpErrors(),
 					httpErrors.getUnrecoverableHttpErrors());
 		}
