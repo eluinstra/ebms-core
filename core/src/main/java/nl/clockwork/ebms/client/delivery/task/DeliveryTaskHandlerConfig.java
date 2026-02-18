@@ -71,6 +71,8 @@ public class DeliveryTaskHandlerConfig
 	int taskHandlerTaskExecutionInterval;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
+	@Value("${http.uuid.headerName}")
+	String uuidHeader;
 	@Value("${deliveryTaskHandler.jms.destinationName}")
 	String destinationName;
 
@@ -139,6 +141,7 @@ public class DeliveryTaskHandlerConfig
 				.messageEncrypter(messageEncrypter)
 				.messageProcessor(messageProcessor)
 				.timedTask(new TimedTask(taskHandlerTaskExecutionInterval))
+				.uuidHeader(uuidHeader)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 	}

@@ -53,6 +53,8 @@ public class EbMSClientConfig
 	String[] enabledCipherSuites;
 	@Value("${https.verifyHostnames}")
 	boolean verifyHostnames;
+	@Value("${http.uuid.headerName}")
+	String uuidHeader;
 	@Value("${http.errors.informational.recoverable}")
 	String recoverableInformationalHttpErrors;
 	@Value("${http.errors.redirection.recoverable}")
@@ -73,6 +75,7 @@ public class EbMSClientConfig
 				.readTimeout(readTimeout)
 				.maxThreads(maxThreads)
 				.proxy(ebMSProxy)
+				.uuidHeader(uuidHeader)
 				.sslParameters(sslParameters)
 				.verifyHostnames(verifyHostnames)
 				.keyStore(clientKeyStore)

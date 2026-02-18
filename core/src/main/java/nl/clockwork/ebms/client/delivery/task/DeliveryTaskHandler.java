@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client.delivery.task;
 
 import java.time.Instant;
+import java.util.UUID;
 import java.util.concurrent.Future;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,6 +39,7 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.slf4j.MDC;
@@ -65,6 +67,7 @@ class DeliveryTaskHandler
 	@NonNull
 	EbMSMessageProcessor messageProcessor;
 	TimedTask timedTask;
+	String uuidHeader;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Builder
@@ -78,6 +81,7 @@ class DeliveryTaskHandler
 			@NonNull EbMSMessageEncrypter messageEncrypter,
 			@NonNull EbMSMessageProcessor messageProcessor,
 			TimedTask timedTask,
+			String uuidHeader,
 			boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		this.messageEventListener = messageEventListener;
@@ -88,19 +92,25 @@ class DeliveryTaskHandler
 		this.ebMSClientFactory = ebMSClientFactory;
 		this.messageEncrypter = messageEncrypter;
 		this.messageProcessor = messageProcessor;
-		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 		this.timedTask = timedTask;
+		this.uuidHeader = uuidHeader;
+		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 	}
 
 	public void handle(DeliveryTask task)
 	{
-		log.info("Executing task " + task);
+		log.info("Scheduling task " + task);
 		Runnable runnable = () ->
 		{
+			if (StringUtils.isNotEmpty(uuidHeader))
+				MDC.put(uuidHeader, UUID.randomUUID().toString());
+			log.info("Executing task " + task);
 			if (task.getTimeToLive() == null || Instant.now().isBefore(task.getTimeToLive()))
 				sendTask(task);
 			else
 				expireTask(task);
+			if (StringUtils.isNotEmpty(uuidHeader))
+				MDC.remove(uuidHeader);
 		};
 		timedTask.run(runnable);
 	}

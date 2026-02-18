@@ -34,12 +34,15 @@ import lombok.val;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class EbMSHttpClient implements EbMSClient
 {
 	int readTimeout;
 	EbMSProxy proxy;
+	String uuidHeader;
 	List<Integer> recoverableHttpErrors;
 	List<Integer> unrecoverableHttpErrors;
 	HttpClient httpClient;
@@ -51,6 +54,7 @@ class EbMSHttpClient implements EbMSClient
 			int readTimeout,
 			int maxThreads,
 			EbMSProxy proxy,
+			String uuidHeader,
 			List<Integer> recoverableHttpErrors,
 			List<Integer> unrecoverableHttpErrors)
 	{
@@ -58,6 +62,7 @@ class EbMSHttpClient implements EbMSClient
 		this.proxy = proxy;
 		this.recoverableHttpErrors = recoverableHttpErrors;
 		this.unrecoverableHttpErrors = unrecoverableHttpErrors;
+		this.uuidHeader = uuidHeader;
 		this.httpClient = HttpClient.newBuilder()
 				.executor(Executors.newFixedThreadPool(maxThreads))
 				.connectTimeout(Duration.ofMillis(connectTimeout))
@@ -76,7 +81,7 @@ class EbMSHttpClient implements EbMSClient
 	{
 		try
 		{
-			val response = httpClient.send(createRequest(readTimeout, proxy, uri, document), BodyHandlers.ofString());
+			val response = httpClient.send(createRequest(readTimeout, proxy, uuidHeader, uri, document), BodyHandlers.ofString());
 			return new EbMSResponseHandler(response, recoverableHttpErrors, unrecoverableHttpErrors).read();
 		}
 		catch (IOException | TransformerException e)
@@ -90,12 +95,14 @@ class EbMSHttpClient implements EbMSClient
 		}
 	}
 
-	private static HttpRequest createRequest(int readTimeout, EbMSProxy proxy, String uri, EbMSDocument document) throws TransformerException
+	private HttpRequest createRequest(int readTimeout, EbMSProxy proxy, String uuidHeader, String uri, EbMSDocument document) throws TransformerException
 	{
 		var request = HttpRequest.newBuilder().uri(URI.create(uri)).timeout(Duration.ofMillis(readTimeout));
 		request = new EbMSMessageWriter().write(request, document);
 		if (proxy != null && proxy.useProxyAuthorization())
 			request = request.setHeader(proxy.getProxyAuthorizationKey(), proxy.getProxyAuthorizationValue());
+		if (StringUtils.isNotEmpty(uuidHeader))
+			request = request.setHeader(uuidHeader, MDC.get(uuidHeader));
 		return request.build();
 	}
 }
