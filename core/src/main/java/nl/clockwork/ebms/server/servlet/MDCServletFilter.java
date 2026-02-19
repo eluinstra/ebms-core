@@ -37,7 +37,7 @@ public class MDCServletFilter implements Filter
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
 	{
-		headerNames = Stream.of(filterConfig.getInitParameter("headerNames").split(",")).map(String::trim).filter(s -> s != "").toList();
+		headerNames = Stream.of(filterConfig.getInitParameter("headerNames").split(",")).map(String::trim).filter(s -> !"".equals(s)).toList();
 	}
 
 	@Override

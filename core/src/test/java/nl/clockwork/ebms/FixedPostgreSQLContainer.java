@@ -21,8 +21,25 @@ public class FixedPostgreSQLContainer extends PostgreSQLContainer<FixedPostgreSQ
 {
 	public FixedPostgreSQLContainer()
 	{
-		super("postgres:15.1");
+		super("postgres:18");
 		this.withDatabaseName("ebms").withUsername("ebms").withPassword("ebms").withReuse(true).addFixedExposedPort(5432, 5432);
 		this.start();
+	}
+
+	@Override
+	public void start()
+	{
+		if (enabledTestContainers())
+		{
+			super.start();
+		}
+	}
+
+	private static boolean enabledTestContainers()
+	{
+		return System.getenv("DISABLE_TEST_CONTAINERS") == null
+				|| System.getenv("DISABLE_TEST_CONTAINERS").equals("")
+				|| System.getenv("DISABLE_TEST_CONTAINERS").startsWith("n")
+				|| System.getenv("DISABLE_TEST_CONTAINERS").startsWith("N");
 	}
 }

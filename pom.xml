@@ -64,7 +64,7 @@
   <modules>
     <module>common</module>
     <module>core</module>
-    <!-- <module>plugin/cache/ehcache</module> -->
+    <module>plugin/cache/ehcache</module>
     <module>plugin/cache/hazelcast</module>
     <module>plugin/db/db2</module>
     <module>plugin/db/h2</module>
@@ -449,7 +449,7 @@
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>postgresql</artifactId>
-        <version>1.21.3</version>
+        <version>1.21.4</version>
         <scope>test</scope>
       </dependency>
       <dependency>

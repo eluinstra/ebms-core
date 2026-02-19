@@ -33,10 +33,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -76,6 +80,7 @@ public class DataSourceConfig
 	int maxPoolSize;
 
 	@Bean(destroyMethod = "close")
+	@DependsOn("databaseServer")
 	@Conditional(DefaultTransactionManagerType.class)
 	public DataSource hikariDataSource()
 	{
@@ -92,6 +97,13 @@ public class DataSourceConfig
 		config.setMinimumIdle(minPoolSize);
 		config.setMaximumPoolSize(maxPoolSize);
 		return new HikariDataSource(config);
+	}
+
+	@Bean(name = "databaseServer")
+	@Conditional(NotStartDatabaseServerType.class)
+	public Object startH2DBServer()
+	{
+		return new Object();
 	}
 
 	@Bean(destroyMethod = "close")
@@ -173,4 +185,14 @@ public class DataSourceConfig
 		result.put("password", password);
 		return result;
 	}
+
+	public static class NotStartDatabaseServerType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return !context.getEnvironment().getProperty("database.start", Boolean.class, false);
+		}
+	}
+
 }

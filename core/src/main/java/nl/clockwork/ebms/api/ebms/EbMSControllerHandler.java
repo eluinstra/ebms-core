@@ -111,7 +111,7 @@ class EbMSControllerHandler
 			messagePropertiesValidator.validate(messageRequest.getProperties());
 			val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
 			if (LoggingUtils.mdc == Status.ENABLED)
-				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+				LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
 			signatureGenerator.generate(document, message);
 			storeMessage(document.getMessage(), message);
@@ -121,7 +121,8 @@ class EbMSControllerHandler
 		}
 		finally
 		{
-			MDC.clear();
+			if (LoggingUtils.mdc == Status.ENABLED)
+				LoggingUtils.getProperties().forEach(MDC::remove);
 		}
 	}
 
@@ -134,7 +135,7 @@ class EbMSControllerHandler
 			messagePropertiesValidator.validate(messageRequest.getProperties());
 			val message = ebMSMessageFactory.createEbMSMessageMTOM(messageRequest);
 			if (LoggingUtils.mdc == Status.ENABLED)
-				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+				LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
 			signatureGenerator.generate(document, message);
 			storeMessage(document.getMessage(), message);
@@ -144,7 +145,8 @@ class EbMSControllerHandler
 		}
 		finally
 		{
-			MDC.clear();
+			if (LoggingUtils.mdc == Status.ENABLED)
+				LoggingUtils.getProperties().forEach(MDC::remove);
 		}
 	}
 
@@ -159,7 +161,7 @@ class EbMSControllerHandler
 				resetMessage(messageRequest.getProperties());
 				val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
 				if (LoggingUtils.mdc == Status.ENABLED)
-					MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+					LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 				val document = EbMSMessageUtils.getEbMSDocument(message);
 				signatureGenerator.generate(document, message);
 				storeMessage(document.getMessage(), message);
@@ -174,7 +176,8 @@ class EbMSControllerHandler
 			}
 			finally
 			{
-				MDC.clear();
+				if (LoggingUtils.mdc == Status.ENABLED)
+					LoggingUtils.getProperties().forEach(MDC::remove);
 			}
 		}).orElseThrow(() -> new NotFoundException("Not found message " + messageId));
 	}
