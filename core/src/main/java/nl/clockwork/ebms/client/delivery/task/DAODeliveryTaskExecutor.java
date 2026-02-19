@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.client.delivery.task;
 
+import com.hazelcast.core.HazelcastInstance;
 import io.vavr.control.Try;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -36,6 +37,8 @@ class DAODeliveryTaskExecutor implements Runnable
 	@NonNull
 	DeliveryTaskHandler deliveryTaskHandler;
 	@NonNull
+	HazelcastInstance hazelcastInstance;
+	@NonNull
 	TimedTask timedTask;
 	int maxTasks;
 	String serverId;
@@ -44,12 +47,14 @@ class DAODeliveryTaskExecutor implements Runnable
 	public DAODeliveryTaskExecutor(
 			@NonNull DeliveryTaskDAO deliveryTaskDAO,
 			@NonNull DeliveryTaskHandler deliveryTaskHandler,
+			@NonNull HazelcastInstance hazelcastInstance,
 			@NonNull TimedTask timedTask,
 			int maxTasks,
 			String serverId)
 	{
 		this.deliveryTaskDAO = deliveryTaskDAO;
 		this.deliveryTaskHandler = deliveryTaskHandler;
+		this.hazelcastInstance = hazelcastInstance;
 		this.timedTask = timedTask;
 		this.maxTasks = maxTasks;
 		this.serverId = serverId;
@@ -62,7 +67,8 @@ class DAODeliveryTaskExecutor implements Runnable
 
 	public void run()
 	{
-		while (true)
+		val lock = hazelcastInstance.getCPSubsystem().getLock("ebms-delivery-task-executor-lock");
+		while (lock.tryLock())
 		{
 			Runnable runnable = () ->
 			{
@@ -86,6 +92,10 @@ class DAODeliveryTaskExecutor implements Runnable
 			catch (Exception e)
 			{
 				log.error("", e);
+			}
+			finally
+			{
+				lock.unlock();
 			}
 		}
 	}

@@ -177,6 +177,11 @@
         <version>33.4.8-jre</version>
       </dependency>
       <dependency>
+        <groupId>com.hazelcast</groupId>
+        <artifactId>hazelcast</artifactId>
+        <version>5.5.0</version>
+      </dependency>
+      <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>6.3.0</version>

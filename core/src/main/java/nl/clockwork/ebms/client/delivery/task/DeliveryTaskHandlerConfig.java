@@ -15,7 +15,11 @@
  */
 package nl.clockwork.ebms.client.delivery.task;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import jakarta.jms.ConnectionFactory;
+import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -34,6 +38,7 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -75,6 +80,8 @@ public class DeliveryTaskHandlerConfig
 	String uuidHeader;
 	@Value("${deliveryTaskHandler.jms.destinationName}")
 	String destinationName;
+	@Value("${cache.configLocation}")
+	Resource configLocation;
 
 	@Bean("deliveryTaskExecutor")
 	@Conditional(DefaultTaskHandlerType.class)
@@ -90,11 +97,12 @@ public class DeliveryTaskHandlerConfig
 
 	@Bean
 	@Conditional(DefaultTaskHandlerType.class)
-	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskHandler deliveryTaskHandler)
+	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskHandler deliveryTaskHandler, HazelcastInstance hazelcastInstance)
 	{
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.deliveryTaskHandler(deliveryTaskHandler)
+				.hazelcastInstance(hazelcastInstance)
 				.timedTask(new TimedTask(taskHandlerExecutionInterval))
 				.maxTasks(maxTasks)
 				.serverId(serverId)
@@ -144,6 +152,14 @@ public class DeliveryTaskHandlerConfig
 				.uuidHeader(uuidHeader)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
+	}
+
+	@Bean
+	public HazelcastInstance hazelcastInstance() throws IOException
+	{
+		val config = configLocation == null ? Config.load() : Config.loadFromFile(configLocation.getFile());
+		// config.getCPSubsystemConfig().setCPMemberCount(1);
+		return Hazelcast.newHazelcastInstance(config);
 	}
 
 	public static class DefaultTaskHandlerType implements Condition
