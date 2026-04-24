@@ -25,7 +25,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.security.cert.CertificateException;
 import java.util.stream.Stream;
-import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMapping;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingConfig;
@@ -41,21 +40,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 // @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
 @TestInstance(Lifecycle.PER_CLASS)
-@Testcontainers
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		classes = {PropertiesConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, DataSourceConfig.class,
 				TransactionManagerConfig.class})
 class CertificateMappingServiceImplIT
 {
-	@Container
-	static final FixedPostgreSQLContainer database = new FixedPostgreSQLContainer();
-
 	@Autowired
 	CertificateMappingController mappingService;
 

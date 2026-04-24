@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.val;
 import nl.clockwork.ebms.EbMSServer;
-import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.WithFile;
 import nl.clockwork.ebms.WithRestAssured;
 import nl.clockwork.ebms.WithTemplate;
@@ -42,18 +41,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.thymeleaf.TemplateEngine;
 
 // @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
 @TestInstance(Lifecycle.PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
-@Testcontainers
 class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssured
 {
-	@Container
-	static final FixedPostgreSQLContainer database = new FixedPostgreSQLContainer();
 	final TemplateEngine templateEngine = templateEngine();
 	final String messageId = randomUUID().toString();
 	Server server;

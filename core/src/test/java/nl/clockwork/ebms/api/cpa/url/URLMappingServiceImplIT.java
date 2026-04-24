@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.util.stream.Stream;
-import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.WithFile;
 import nl.clockwork.ebms.common.cpa.url.URLMapping;
@@ -38,9 +37,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
 
 // @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
 @TestInstance(Lifecycle.PER_CLASS)
@@ -50,9 +47,6 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 		classes = {PropertiesConfig.class, URLMappingConfig.class, URLMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 class URLMappingServiceImplIT implements WithFile
 {
-	@Container
-	static final PostgreSQLContainer database = new FixedPostgreSQLContainer();
-
 	@Autowired
 	URLMappingController mappingService;
 

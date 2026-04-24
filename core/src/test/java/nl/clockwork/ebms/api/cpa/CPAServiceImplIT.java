@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.util.stream.Stream;
-import nl.clockwork.ebms.FixedPostgreSQLContainer;
 import nl.clockwork.ebms.PropertiesConfig;
 import nl.clockwork.ebms.WithFile;
 import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingControllerConfig;
@@ -42,12 +41,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 // @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
 @TestInstance(Lifecycle.PER_CLASS)
-@Testcontainers
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		classes = {PropertiesConfig.class, KeyStoreConfig.class, CPAConfig.class, CPAControllerConfig.class, CertificateMappingConfig.class,
@@ -55,9 +51,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 				TransactionManagerConfig.class})
 class CPAServiceImplIT implements WithFile
 {
-	@Container
-	static final FixedPostgreSQLContainer database = new FixedPostgreSQLContainer();
-
 	@Autowired
 	CPAController cpaController;
 
