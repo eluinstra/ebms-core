@@ -62,6 +62,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 				.multiPartConfig(MultiPartConfig.multiPartConfig().defaultSubtype("related").defaultBoundary(UUID.randomUUID().toString()))
 				.connectionConfig(ConnectionConfig.connectionConfig().closeIdleConnectionsAfterEachResponse());
 		server = new EbMSServer().createServer();
+		server.setDumpAfterStart(true);
 		server.start();
 	}
 

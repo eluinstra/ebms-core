@@ -32,6 +32,7 @@ public class EbMSServer
 {
 	public Server createServer() throws Exception
 	{
+		System.setProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", "*");
 		var result = new Server();
 		var handlerCollection = new ContextHandlerCollection();
 		result.setHandler(handlerCollection);
