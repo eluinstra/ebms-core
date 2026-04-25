@@ -101,7 +101,7 @@ class EbMSHttpClient implements EbMSClient
 		request = new EbMSMessageWriter().write(request, document);
 		if (proxy != null && proxy.useProxyAuthorization())
 			request = request.setHeader(proxy.getProxyAuthorizationKey(), proxy.getProxyAuthorizationValue());
-		if (StringUtils.isNotEmpty(uuidHeader))
+		if (StringUtils.isNotEmpty(uuidHeader) && MDC.get(uuidHeader) != null)
 			request = request.setHeader(uuidHeader, MDC.get(uuidHeader));
 		return request.build();
 	}
