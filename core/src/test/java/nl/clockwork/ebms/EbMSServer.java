@@ -51,16 +51,19 @@ public class EbMSServer
 	{
 		val result = new ServerConnector(server);
 		result.setName(name);
+		result.setHost("0.0.0.0");
 		result.setPort(port);
 		return result;
 	}
 
 	private ServletContextHandler webEndpointHandler(String name, ContextLoaderListener contextLoaderListener)
 	{
-		val result = new ServletContextHandler();
+		val result = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		result.addVirtualHosts(new String[]{"@" + name});
+		result.setInitParameter("configuration", "deployment");
 		result.setContextPath("/");
 		result.addServlet(CXFServlet.class, "/service/*");
+		// result.setErrorHandler(createErrorHandler());
 		result.addEventListener(contextLoaderListener);
 		return result;
 	}
