@@ -102,7 +102,7 @@
     <flyway.version>12.4.0</flyway.version>
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <revision>2.20.5-SNAPSHOT</revision>
+    <revision>2.20.6</revision>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -212,15 +212,9 @@
         <version>3.0.0</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.mail</groupId>
-        <artifactId>jakarta.mail</artifactId>
-        <version>2.0.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>jakarta.mail</groupId>
+        <artifactId>jakarta.mail-api</artifactId>
+        <version>2.1.5</version>
       </dependency>
       <dependency>
         <groupId>jakarta.persistence</groupId>
