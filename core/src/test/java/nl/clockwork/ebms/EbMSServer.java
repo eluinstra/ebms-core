@@ -38,7 +38,9 @@ public class EbMSServer
 		result.setHandler(handlerCollection);
 		try (val context = new AnnotationConfigWebApplicationContext())
 		{
-			context.register(EbMSServerConfig.class);
+			context.register(EbMSTestServerConfig.class);
+			// context.scan("nl.clockwork.ebms");
+			// context.refresh();
 			val contextLoaderListener = new ContextLoaderListener(context);
 			result.addConnector(createConnector(result, "web", 8080));
 			handlerCollection.addHandler(webEndpointHandler("web", contextLoaderListener));
@@ -61,10 +63,8 @@ public class EbMSServer
 	{
 		val result = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		result.addVirtualHosts(new String[]{"@" + name});
-		result.setInitParameter("configuration", "deployment");
 		result.setContextPath("/");
 		result.addServlet(CXFServlet.class, "/service/*");
-		// result.setErrorHandler(createErrorHandler());
 		result.addEventListener(contextLoaderListener);
 		return result;
 	}

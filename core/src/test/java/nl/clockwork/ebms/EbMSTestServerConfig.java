@@ -34,6 +34,7 @@ import nl.clockwork.ebms.jms.JMSConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.scheduler.SchedulerConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
+import nl.clockwork.ebms.server.EbMSServerConfig;
 import nl.clockwork.ebms.signing.SigningConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.validation.ValidationConfig;
@@ -43,10 +44,10 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({PropertiesConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, CommonConfig.class, CPAConfig.class, CPAControllerConfig.class,
 		DAOConfig.class, DataSourceConfig.class, DeliveryManagerConfig.class, DeliveryTaskManagerConfig.class, DeliveryTaskHandlerConfig.class,
-		EbMSClientConfig.class, EbMSControllerConfig.class, EbMSProcessorConfig.class, nl.clockwork.ebms.server.EbMSServerConfig.class, EmbeddedWebConfig.class,
+		EbMSClientConfig.class, EbMSControllerConfig.class, EbMSProcessorConfig.class, EbMSServerConfig.class, EmbeddedWebConfig.class,
 		EncryptionConfig.class, JMSConfig.class, KeyStoreConfig.class, MessageEventListenerConfig.class, SchedulerConfig.class, SigningConfig.class,
 		TransactionManagerConfig.class, URLMappingConfig.class, URLMappingControllerConfig.class, ValidationConfig.class})
-public class EbMSServerConfig
+public class EbMSTestServerConfig
 {
 
 }
