@@ -18,7 +18,6 @@ package nl.clockwork.ebms.encryption;
 import static nl.clockwork.ebms.api.cpa.CPATestUtils.cpaCache;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

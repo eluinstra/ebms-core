@@ -17,7 +17,7 @@ package nl.clockwork.ebms.cache;
 
 import lombok.val;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.From;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;

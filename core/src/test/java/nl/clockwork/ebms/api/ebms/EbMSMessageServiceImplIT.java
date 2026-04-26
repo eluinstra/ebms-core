@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 
 import io.restassured.RestAssured;
+import io.restassured.config.ConnectionConfig;
 import io.restassured.config.MultiPartConfig;
 import io.restassured.http.ContentType;
 import io.restassured.http.Method;
@@ -41,7 +42,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.thymeleaf.TemplateEngine;
@@ -53,7 +53,7 @@ import org.thymeleaf.TemplateEngine;
 class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssured
 {
 	@Container
-	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
+	static final FixedPostgreSQLContainer database = new FixedPostgreSQLContainer();
 	final TemplateEngine templateEngine = templateEngine();
 	final String messageId = randomUUID().toString();
 	Server server;
@@ -64,7 +64,9 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	void beforeAll() throws Exception
 	{
 		RestAssured.port = 8888;
-		RestAssured.config().multiPartConfig(MultiPartConfig.multiPartConfig().defaultSubtype("related").defaultBoundary(UUID.randomUUID().toString()));
+		RestAssured.config = RestAssured.config()
+				.multiPartConfig(MultiPartConfig.multiPartConfig().defaultSubtype("related").defaultBoundary(UUID.randomUUID().toString()))
+				.connectionConfig(ConnectionConfig.connectionConfig().closeIdleConnectionsAfterEachResponse());
 		server = new EbMSServer().createServer();
 		server.start();
 	}

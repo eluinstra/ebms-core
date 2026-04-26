@@ -15,14 +15,14 @@
  */
 package nl.clockwork.ebms;
 
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
-public class FixedPostgreSQLContainer extends PostgreSQLContainer<FixedPostgreSQLContainer>
+public class FixedPostgreSQLContainer extends PostgreSQLContainer
 {
 	public FixedPostgreSQLContainer()
 	{
 		super("postgres:18");
-		this.withDatabaseName("ebms").withUsername("ebms").withPassword("ebms").withReuse(true).addFixedExposedPort(5432, 5432);
+		this.withDatabaseName("ebms").withUsername("ebms").withPassword("ebms").withReuse(true);
 		this.start();
 	}
 

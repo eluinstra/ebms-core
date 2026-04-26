@@ -38,9 +38,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 // @EnabledIf(expression = "#{systemProperties['spring.profiles.active'] == 'test'}")
 @TestInstance(Lifecycle.PER_CLASS)
@@ -51,7 +51,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class URLMappingServiceImplIT implements WithFile
 {
 	@Container
-	static final PostgreSQLContainer<?> database = new FixedPostgreSQLContainer();
+	static final PostgreSQLContainer database = new FixedPostgreSQLContainer();
 
 	@Autowired
 	URLMappingController mappingService;
