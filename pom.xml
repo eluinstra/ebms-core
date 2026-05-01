@@ -102,7 +102,7 @@
     <flyway.version>12.4.0</flyway.version>
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <revision>2.20.6</revision>
+    <revision>2.20.7-SNAPSHOT</revision>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -254,7 +254,7 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.38</version>
+        <version>1.18.46</version>
         <scope>compile</scope>
       </dependency>
       <dependency>
@@ -671,7 +671,7 @@
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-              <version>1.18.38</version>
+              <version>1.18.46</version>
             </path>
             <path>
               <groupId>org.projectlombok</groupId>
