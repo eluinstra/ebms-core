@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
 import lombok.val;
-import org.jline.prompt.InputResult;
 import org.jline.prompt.Prompter;
 import org.jline.prompt.PrompterFactory;
 import org.jline.reader.UserInterruptException;
@@ -72,6 +71,7 @@ public class EbMSCLI
 				.invalidNumberMessage("nummer tussen 1 en 100")
 				.addPrompt();
 		val consolePropertiesResults = prompter.prompt(Collections.emptyList(), consolePropertiesBuilder.build());
-		return ((InputResult)consolePropertiesResults.get("maxItemsPerPage")).getInput();
+		return ResultHelper.getInput(consolePropertiesResults, "maxItemsPerPage");
 	}
+
 }
