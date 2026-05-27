@@ -1,8 +1,23 @@
+/*
+ * Copyright 2011 Clockwork
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.clockwork.ebms.cli;
 
 import java.util.Map;
 import java.util.Set;
-
+import lombok.NoArgsConstructor;
 import org.jline.prompt.CheckboxResult;
 import org.jline.prompt.ConfirmResult;
 import org.jline.prompt.EditorResult;
@@ -11,13 +26,13 @@ import org.jline.prompt.KeyPressResult;
 import org.jline.prompt.ListResult;
 import org.jline.prompt.Prompt;
 import org.jline.prompt.PromptResult;
+import org.jline.prompt.SearchResult;
 import org.jline.prompt.ToggleResult;
 
-import lombok.NoArgsConstructor;
-
 @NoArgsConstructor
-public class ResultHelper {
-  
+public class ResultHelper
+{
+
 	public static Set<String> getCheckbox(final Map<String, ? extends PromptResult<? extends Prompt>> results, String key)
 	{
 		return ((CheckboxResult)results.get(key)).getSelectedIds();

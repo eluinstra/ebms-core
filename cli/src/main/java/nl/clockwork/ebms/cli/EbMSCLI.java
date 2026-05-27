@@ -18,14 +18,12 @@ package nl.clockwork.ebms.cli;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
-
+import lombok.val;
 import org.jline.prompt.Prompter;
 import org.jline.prompt.PrompterFactory;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
-
-import lombok.val;
 
 public class EbMSCLI
 {
