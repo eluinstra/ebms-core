@@ -59,6 +59,7 @@
     </developer>
   </developers>
   <modules>
+    <module>cli</module>
     <module>common</module>
     <module>core</module>
     <module>plugin/cache/ehcache</module>
