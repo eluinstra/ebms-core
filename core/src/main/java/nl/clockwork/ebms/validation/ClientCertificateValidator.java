@@ -23,7 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 

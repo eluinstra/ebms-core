@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 
 @Builder
 @Value

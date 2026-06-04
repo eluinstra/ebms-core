@@ -15,6 +15,12 @@
  */
 package nl.clockwork.ebms;
 
+
+import nl.clockwork.ebms.common.Constants;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.EbMSErrorCode;
+import nl.clockwork.ebms.common.Predicates;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
@@ -39,14 +45,14 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.common.jaxb.JAXBParser;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageError;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
-import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.common.model.EbMSAttachment;
+import nl.clockwork.ebms.common.model.EbMSBaseMessage;
+import nl.clockwork.ebms.common.model.EbMSDocument;
+import nl.clockwork.ebms.common.model.EbMSMessage;
+import nl.clockwork.ebms.common.model.EbMSMessageError;
+import nl.clockwork.ebms.common.model.EbMSStatusRequest;
+import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;

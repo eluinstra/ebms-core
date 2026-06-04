@@ -13,53 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
-import java.util.Collections;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-public class EbMSMessage extends EbMSRequestMessage
+public class EbMSStatusRequest extends EbMSRequestMessage
 {
 	private static final long serialVersionUID = 1L;
-	MessageOrder messageOrder;
-	AckRequested ackRequested;
-	Manifest manifest;
 	@NonNull
-	List<EbMSAttachment> attachments;
+	StatusRequest statusRequest;
 
 	@Builder
-	public EbMSMessage(
-			@NonNull MessageHeader messageHeader,
-			SignatureType signature,
-			SyncReply syncReply,
-			MessageOrder messageOrder,
-			AckRequested ackRequested,
-			Manifest manifest,
-			List<EbMSAttachment> attachments)
+	public EbMSStatusRequest(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply, @NonNull StatusRequest statusRequest)
 	{
 		super(messageHeader, signature, syncReply);
-		this.messageOrder = messageOrder;
-		this.ackRequested = ackRequested;
-		this.manifest = manifest;
-		this.attachments = attachments == null ? Collections.emptyList() : attachments;
+		this.statusRequest = statusRequest;
 	}
-
-	public String getContentId()
-	{
-		return getMessageHeader().getMessageData().getMessageId();
-	}
-
 }

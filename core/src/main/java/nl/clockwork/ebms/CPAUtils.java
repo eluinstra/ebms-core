@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms;
 
+
+import nl.clockwork.ebms.common.EbMSAction;
 import lombok.val;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Certificate;

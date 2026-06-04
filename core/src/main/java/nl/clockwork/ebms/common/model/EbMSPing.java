@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery;
+package nl.clockwork.ebms.common.model;
 
-import nl.clockwork.ebms.common.model.EbMSResponseMessage;
+import lombok.Builder;
+import lombok.NonNull;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
+import org.w3._2000._09.xmldsig.SignatureType;
 
-class EbMSMessageQueue extends MessageQueue<EbMSResponseMessage>
+public class EbMSPing extends EbMSRequestMessage
 {
-	public EbMSMessageQueue(int maxEntries, int timeout)
+	private static final long serialVersionUID = 1L;
+
+	@Builder
+	public EbMSPing(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply)
 	{
-		super(maxEntries, timeout);
+		super(messageHeader, signature, syncReply);
 	}
 }

@@ -39,7 +39,7 @@ import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.val;
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.common.model.EbMSAttachment;
 
 @Value
 public class MultipartBodyPublisher implements BodyPublisher

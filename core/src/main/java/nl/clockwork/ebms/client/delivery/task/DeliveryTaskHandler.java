@@ -24,7 +24,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.client.EbMSClient;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
@@ -34,7 +34,7 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;
-import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.common.util.LoggingUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils.Status;
@@ -194,7 +194,7 @@ class DeliveryTaskHandler
 			DeliveryChannel receiveDeliveryChannel,
 			final String url,
 			EbMSDocument requestDocument,
-			final nl.clockwork.ebms.model.EbMSDocument responseDocument)
+			final nl.clockwork.ebms.common.model.EbMSDocument responseDocument)
 	{
 		Runnable runnable = () ->
 		{

@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms;
 
+
+import nl.clockwork.ebms.common.EbMSAction;
 import static io.vavr.API.*;
 
 import java.util.ArrayList;
@@ -23,15 +25,15 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageError;
-import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSPong;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
-import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.common.model.EbMSAttachment;
+import nl.clockwork.ebms.common.model.EbMSBaseMessage;
+import nl.clockwork.ebms.common.model.EbMSMessage;
+import nl.clockwork.ebms.common.model.EbMSMessageError;
+import nl.clockwork.ebms.common.model.EbMSPing;
+import nl.clockwork.ebms.common.model.EbMSPong;
+import nl.clockwork.ebms.common.model.EbMSStatusRequest;
+import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;

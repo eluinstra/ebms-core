@@ -13,17 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common;
 
-import jakarta.activation.DataSource;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.function.Predicate;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-public interface EbMSAttachment extends AutoCloseable, DataSource
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Predicates
 {
-	public String getContentId();
+	public static Predicate<String> contains(String...values)
+	{
+		return obj -> Arrays.stream(values).anyMatch(obj::contains);
+	}
 
-	public void writeTo(OutputStream outputStream) throws IOException;
+	public static Predicate<String> startsWith(String value)
+	{
+		return obj -> obj.startsWith(value);
+	}
 
-	public void close();
+	public static Predicate<String> endsWith(String value)
+	{
+		return obj -> obj.endsWith(value);
+	}
 }

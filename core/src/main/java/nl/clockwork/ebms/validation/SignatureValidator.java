@@ -20,12 +20,12 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.common.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.common.model.EbMSDocument;
+import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.common.util.StreamUtils;
 

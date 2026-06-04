@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
+import java.io.Serializable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.SignatureType;
 
-public abstract class EbMSResponseMessage extends EbMSBaseMessage
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Getter
+public abstract class EbMSBaseMessage implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-
-	protected EbMSResponseMessage(MessageHeader messageHeader, SignatureType signature)
-	{
-		super(messageHeader, signature);
-	}
+	@NonNull
+	MessageHeader messageHeader;
+	SignatureType signature;
 }

@@ -13,32 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common;
 
-import java.io.Serializable;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
-@Builder
-@Value
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class FromPartyInfo implements Serializable
+@Getter
+public enum EbMSErrorCode
 {
-	private static final long serialVersionUID = 1L;
-	@NonNull
-	List<PartyId> partyIds;
-	String role;
-	@NonNull
-	ServiceType service;
-	@NonNull
-	CanSend canSend;
+	VALUE_NOT_RECOGNIZED("ValueNotRecognized"),
+	NOT_SUPPORTED("NotSupported"),
+	INCONSISTENT("Inconsistent"),
+	OTHER_XML("OtherXml"),
+	DELIVERY_FAILURE("DeliveryFailure"),
+	TIME_TO_LIVE_EXPIRED("TimeToLiveExpired"),
+	SECURITY_FAILURE("SecurityFailure"),
+	MIME_PROBLEM("MimeProblem"),
+	UNKNOWN("Unknown");
+
+	String errorCode;
 }

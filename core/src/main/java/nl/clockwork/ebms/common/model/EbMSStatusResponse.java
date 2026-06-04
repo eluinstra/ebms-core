@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.w3._2000._09.xmldsig.SignatureType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-public class EbMSAcknowledgment extends EbMSMessageResponse
+public class EbMSStatusResponse extends EbMSResponseMessage
 {
 	private static final long serialVersionUID = 1L;
 	@NonNull
-	Acknowledgment acknowledgment;
+	StatusResponse statusResponse;
 
 	@Builder
-	public EbMSAcknowledgment(MessageHeader messageHeader, SignatureType signature, @NonNull Acknowledgment acknowledgment)
+	public EbMSStatusResponse(MessageHeader messageHeader, SignatureType signature, @NonNull StatusResponse statusResponse)
 	{
 		super(messageHeader, signature);
-		this.acknowledgment = acknowledgment;
+		this.statusResponse = statusResponse;
 	}
 }

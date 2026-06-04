@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms;
 
+
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;

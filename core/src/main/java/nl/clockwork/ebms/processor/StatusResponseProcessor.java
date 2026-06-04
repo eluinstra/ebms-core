@@ -26,15 +26,15 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.common.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSMessageProperties;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
-import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.common.model.EbMSMessageProperties;
+import nl.clockwork.ebms.common.model.EbMSStatusRequest;
+import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
@@ -63,7 +63,7 @@ class StatusResponseProcessor
 		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest, result._1, result._2);
 	}
 
-	public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
+	public void sendStatusResponse(final nl.clockwork.ebms.common.model.EbMSStatusResponse statusResponse)
 	{
 		val messageHeader = statusResponse.getMessageHeader();
 		val uri = cpaManager.getReceivingUri(

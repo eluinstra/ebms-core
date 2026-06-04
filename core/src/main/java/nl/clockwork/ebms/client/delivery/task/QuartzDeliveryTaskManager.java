@@ -26,7 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.common.EbMSAction;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;

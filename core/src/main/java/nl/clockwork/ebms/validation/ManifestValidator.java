@@ -18,11 +18,11 @@ package nl.clockwork.ebms.validation;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.val;
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.common.Constants;
+import nl.clockwork.ebms.common.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.common.model.EbMSAttachment;
+import nl.clockwork.ebms.common.model.EbMSMessage;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
 
 class ManifestValidator

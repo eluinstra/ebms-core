@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import org.w3c.dom.Document;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Value
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@Getter
-public class EbMSDocument
+public class FromPartyInfo implements Serializable
 {
-	String contentId;
+	private static final long serialVersionUID = 1L;
 	@NonNull
-	Document message;
+	List<PartyId> partyIds;
+	String role;
 	@NonNull
-	@Default
-	List<EbMSAttachment> attachments = Collections.emptyList();
+	ServiceType service;
+	@NonNull
+	CanSend canSend;
 }

@@ -18,7 +18,7 @@ package nl.clockwork.ebms.common.jms;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
-import static nl.clockwork.ebms.Predicates.startsWith;
+import static nl.clockwork.ebms.common.Predicates.startsWith;
 
 import org.apache.activemq.xbean.BrokerFactoryBean;
 import org.springframework.beans.factory.DisposableBean;

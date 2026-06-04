@@ -22,7 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.model.EbMSMessageProperties;
+import nl.clockwork.ebms.common.model.EbMSMessageProperties;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

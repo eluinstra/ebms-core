@@ -25,8 +25,8 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSPong;
+import nl.clockwork.ebms.common.model.EbMSPing;
+import nl.clockwork.ebms.common.model.EbMSPong;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -50,7 +50,7 @@ class PongProcessor
 		return ebMSMessageFactory.createEbMSPong(message);
 	}
 
-	public void sendPong(final nl.clockwork.ebms.model.EbMSPong pong)
+	public void sendPong(final nl.clockwork.ebms.common.model.EbMSPong pong)
 	{
 		val responseMessageHeader = pong.getMessageHeader();
 		val uri = cpaManager.getReceivingUri(

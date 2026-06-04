@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
-import lombok.Builder;
-import lombok.NonNull;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.w3._2000._09.xmldsig.SignatureType;
+import jakarta.activation.DataSource;
+import java.io.IOException;
+import java.io.OutputStream;
 
-public class EbMSPong extends EbMSResponseMessage
+public interface EbMSAttachment extends AutoCloseable, DataSource
 {
-	private static final long serialVersionUID = 1L;
+	public String getContentId();
 
-	@Builder
-	public EbMSPong(@NonNull MessageHeader messageHeader, SignatureType signature)
-	{
-		super(messageHeader, signature);
-	}
+	public void writeTo(OutputStream outputStream) throws IOException;
+
+	public void close();
 }

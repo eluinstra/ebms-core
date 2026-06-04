@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.common.model.EbMSAttachment;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.parser.ContentHandler;

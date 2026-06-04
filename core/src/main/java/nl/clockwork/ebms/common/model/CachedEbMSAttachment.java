@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
-import jakarta.activation.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,51 +23,53 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
+import org.apache.cxf.io.CachedOutputStream;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class PlainEbMSAttachment implements EbMSAttachment
+public class CachedEbMSAttachment implements EbMSAttachment
 {
+	@Getter
+	String name;
+	@NonNull
 	@Getter
 	String contentId;
 	@NonNull
-	DataSource dataSource;
-
-	@Override
-	public String getContentType()
-	{
-		return dataSource.getContentType();
-	}
+	@Getter
+	String contentType;
+	@NonNull
+	CachedOutputStream content;
 
 	@Override
 	public InputStream getInputStream() throws IOException
 	{
-		return dataSource.getInputStream();
-	}
-
-	@Override
-	public String getName()
-	{
-		return dataSource.getName();
+		return CloseShieldInputStream.wrap(content.getInputStream());
 	}
 
 	@Override
 	public OutputStream getOutputStream() throws IOException
 	{
-		return dataSource.getOutputStream();
+		return CloseShieldOutputStream.wrap(content.getOut());
 	}
 
 	@Override
 	public void writeTo(OutputStream outputStream) throws IOException
 	{
-		IOUtils.copy(getInputStream(), outputStream);
+		content.writeCacheTo(outputStream);
 	}
 
 	@Override
 	public void close()
 	{
-		// do nothing
+		try
+		{
+			content.close();
+		}
+		catch (IOException e)
+		{
+			// do nothing
+		}
 	}
-
 }

@@ -13,27 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms;
+package nl.clockwork.ebms.common.model;
 
+import java.io.Serializable;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Builder
+@Value
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@Getter
-public enum EbMSErrorCode
+public class ToPartyInfo implements Serializable
 {
-	VALUE_NOT_RECOGNIZED("ValueNotRecognized"),
-	NOT_SUPPORTED("NotSupported"),
-	INCONSISTENT("Inconsistent"),
-	OTHER_XML("OtherXml"),
-	DELIVERY_FAILURE("DeliveryFailure"),
-	TIME_TO_LIVE_EXPIRED("TimeToLiveExpired"),
-	SECURITY_FAILURE("SecurityFailure"),
-	MIME_PROBLEM("MimeProblem"),
-	UNKNOWN("Unknown");
-
-	String errorCode;
+	private static final long serialVersionUID = 1L;
+	@NonNull
+	List<PartyId> partyIds;
+	@NonNull
+	String role;
+	@NonNull
+	ServiceType service;
+	@NonNull
+	CanReceive canReceive;
 }

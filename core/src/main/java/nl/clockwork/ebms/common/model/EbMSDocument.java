@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.common.model;
 
+import java.util.Collections;
+import java.util.List;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.w3._2000._09.xmldsig.SignatureType;
+import org.w3c.dom.Document;
 
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 @Getter
-public class EbMSMessageError extends EbMSMessageResponse
+public class EbMSDocument
 {
-	private static final long serialVersionUID = 1L;
+	String contentId;
 	@NonNull
-	ErrorList errorList;
-
-	@Builder
-	public EbMSMessageError(MessageHeader messageHeader, SignatureType signature, @NonNull ErrorList errorList)
-	{
-		super(messageHeader, signature);
-		this.errorList = errorList;
-	}
+	Document message;
+	@NonNull
+	@Default
+	List<EbMSAttachment> attachments = Collections.emptyList();
 }

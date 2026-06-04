@@ -15,6 +15,11 @@
  */
 package nl.clockwork.ebms;
 
+
+import nl.clockwork.ebms.common.Constants;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.EbMSErrorCode;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.time.Instant;
@@ -35,15 +40,15 @@ import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageError;
-import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSPong;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
-import nl.clockwork.ebms.model.EbMSStatusResponse;
-import nl.clockwork.ebms.model.Party;
+import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.common.model.EbMSAttachment;
+import nl.clockwork.ebms.common.model.EbMSMessage;
+import nl.clockwork.ebms.common.model.EbMSMessageError;
+import nl.clockwork.ebms.common.model.EbMSPing;
+import nl.clockwork.ebms.common.model.EbMSPong;
+import nl.clockwork.ebms.common.model.EbMSStatusRequest;
+import nl.clockwork.ebms.common.model.EbMSStatusResponse;
+import nl.clockwork.ebms.common.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.common.util.StreamUtils;
