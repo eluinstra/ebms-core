@@ -13,24 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.validation;
+package nl.clockwork.ebms.server.validation;
 
-import java.security.cert.X509Certificate;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ClientCertificateManager
+import nl.clockwork.ebms.common.validation.ValidationException;
+public class DuplicateMessageException extends ValidationException
 {
-	private static final ThreadLocal<X509Certificate> certificateHolder = new ThreadLocal<>();
+	private static final long serialVersionUID = 1L;
 
-	public static X509Certificate getCertificate()
-	{
-		return certificateHolder.get();
-	}
-
-	public static void setCertificate(X509Certificate certificate)
-	{
-		certificateHolder.set(certificate);
-	}
 }

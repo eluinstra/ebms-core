@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.server.processor;
 
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class EbMSProcessorException extends RuntimeException
+public class EbMSProcessingException extends EbMSProcessorException
 {
 	private static final long serialVersionUID = 1L;
 
-	public EbMSProcessorException(String message, Throwable cause)
+	public EbMSProcessingException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
 
-	public EbMSProcessorException(String message)
+	public EbMSProcessingException(String message)
 	{
 		super(message);
 	}
 
-	public EbMSProcessorException(Throwable cause)
+	public EbMSProcessingException(Throwable cause)
 	{
 		super(cause);
 	}

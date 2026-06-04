@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.server.processor;
 
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
@@ -44,8 +44,8 @@ import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.validation.DuplicateMessageException;
-import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.server.validation.DuplicateMessageException;
+import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.common.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.xml.sax.SAXException;

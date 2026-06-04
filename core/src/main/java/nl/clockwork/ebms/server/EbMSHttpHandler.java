@@ -26,8 +26,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

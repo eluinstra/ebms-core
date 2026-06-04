@@ -35,7 +35,7 @@ import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.common.util.LoggingUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils.Status;
 import nl.clockwork.ebms.common.util.StreamUtils;

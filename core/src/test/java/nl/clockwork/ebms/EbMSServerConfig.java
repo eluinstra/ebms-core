@@ -31,11 +31,11 @@ import nl.clockwork.ebms.common.datasource.DataSourceConfig;
 import nl.clockwork.ebms.common.encryption.EncryptionConfig;
 import nl.clockwork.ebms.common.event.MessageEventListenerConfig;
 import nl.clockwork.ebms.common.jms.JMSConfig;
-import nl.clockwork.ebms.processor.EbMSProcessorConfig;
+import nl.clockwork.ebms.server.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.common.security.KeyStoreConfig;
 import nl.clockwork.ebms.common.signing.SigningConfig;
 import nl.clockwork.ebms.common.transaction.TransactionManagerConfig;
-import nl.clockwork.ebms.validation.ValidationConfig;
+import nl.clockwork.ebms.server.validation.ValidationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 

@@ -34,7 +34,7 @@ import nl.clockwork.ebms.common.model.EbMSPing;
 import nl.clockwork.ebms.common.model.EbMSPong;
 import nl.clockwork.ebms.common.model.EbMSStatusRequest;
 import nl.clockwork.ebms.common.model.EbMSStatusResponse;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;

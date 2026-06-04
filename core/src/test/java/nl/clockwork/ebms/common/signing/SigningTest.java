@@ -46,7 +46,7 @@ import nl.clockwork.ebms.common.cpa.CPARepository;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 import nl.clockwork.ebms.common.security.EbMSKeyStore;
 import nl.clockwork.ebms.common.security.EbMSTrustStore;
 import nl.clockwork.ebms.common.security.KeyStoreType;

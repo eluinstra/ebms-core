@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.server.processor;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -25,7 +25,7 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -32,7 +32,7 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 import nl.clockwork.ebms.common.security.EbMSKeyStore;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;

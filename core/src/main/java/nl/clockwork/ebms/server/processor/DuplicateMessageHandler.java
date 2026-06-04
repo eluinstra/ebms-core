@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.server.processor;
 
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
@@ -34,7 +34,7 @@ import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.model.EbMSMessageError;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.common.validation.ValidationException;
 
 @Slf4j

@@ -24,7 +24,7 @@ import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.common.event.MessageEventListener;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

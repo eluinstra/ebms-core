@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.server.processor;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.model.EbMSPing;
 import nl.clockwork.ebms.common.model.EbMSPong;
-import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.common.validation.ValidatorException;
 
 @Slf4j

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.server.processor;
 
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
@@ -52,8 +52,8 @@ import nl.clockwork.ebms.common.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils.Status;
-import nl.clockwork.ebms.validation.DuplicateMessageException;
-import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.server.validation.DuplicateMessageException;
+import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.common.validation.EbMSValidationException;
 import nl.clockwork.ebms.common.validation.ValidationException;
 import nl.clockwork.ebms.common.validation.ValidatorException;

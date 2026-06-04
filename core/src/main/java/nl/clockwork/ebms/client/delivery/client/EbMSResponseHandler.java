@@ -27,7 +27,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.Constants;
 import nl.clockwork.ebms.common.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

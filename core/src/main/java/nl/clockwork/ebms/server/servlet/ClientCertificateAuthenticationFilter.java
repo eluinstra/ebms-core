@@ -31,7 +31,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.security.EbMSTrustStore;
 import nl.clockwork.ebms.common.security.KeyStoreType;
-import nl.clockwork.ebms.validation.ClientCertificateManager;
+import nl.clockwork.ebms.server.validation.ClientCertificateManager;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientCertificateAuthenticationFilter implements Filter

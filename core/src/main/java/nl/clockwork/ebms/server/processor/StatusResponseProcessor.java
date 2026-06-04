@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.server.processor;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -35,7 +35,7 @@ import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
 import nl.clockwork.ebms.common.model.EbMSStatusRequest;
 import nl.clockwork.ebms.common.model.EbMSStatusResponse;
-import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.common.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 

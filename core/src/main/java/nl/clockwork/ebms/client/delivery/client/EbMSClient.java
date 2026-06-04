@@ -16,7 +16,7 @@
 package nl.clockwork.ebms.client.delivery.client;
 
 import nl.clockwork.ebms.common.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 
 public interface EbMSClient
 {

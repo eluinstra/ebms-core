@@ -19,7 +19,7 @@ import java.util.Optional;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSRequestMessage;
 import nl.clockwork.ebms.common.model.EbMSResponseMessage;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 
 public interface DeliveryManager
 {
