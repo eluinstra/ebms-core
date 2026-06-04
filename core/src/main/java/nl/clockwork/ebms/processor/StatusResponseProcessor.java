@@ -27,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.common.message.EbMSMessageFactory;
 import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;

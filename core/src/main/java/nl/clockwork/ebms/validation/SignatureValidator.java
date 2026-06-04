@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.EbMSErrorCode;
-import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
@@ -70,7 +70,7 @@ class SignatureValidator
 			val reference = signature.getSignedInfo()
 					.getReference()
 					.stream()
-					.filter(r -> !nl.clockwork.ebms.CPAUtils.getHashFunction(deliveryChannel).equals(r.getDigestMethod().getAlgorithm()))
+					.filter(r -> !nl.clockwork.ebms.common.cpa.CPAUtils.getHashFunction(deliveryChannel).equals(r.getDigestMethod().getAlgorithm()))
 					.findFirst();
 			if (reference.isPresent())
 				throw new EbMSValidationException(
@@ -78,7 +78,7 @@ class SignatureValidator
 								"//Header/Signature/SignedInfo/Reference[@URI='" + reference.get().getURI() + "']/DigestMethod/@Algorithm",
 								EbMSErrorCode.SECURITY_FAILURE,
 								"Invalid DigestMethod."));
-			if (!nl.clockwork.ebms.CPAUtils.getSignatureAlgorithm(deliveryChannel).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
+			if (!nl.clockwork.ebms.common.cpa.CPAUtils.getSignatureAlgorithm(deliveryChannel).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
 				throw new EbMSValidationException(
 						EbMSMessageUtils
 								.createError("//Header/Signature/SignedInfo/SignatureMethod/@Algorithm", EbMSErrorCode.SECURITY_FAILURE, "Invalid SignatureMethod."));

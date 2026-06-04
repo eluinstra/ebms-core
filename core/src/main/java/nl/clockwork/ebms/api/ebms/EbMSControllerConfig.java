@@ -17,7 +17,7 @@ package nl.clockwork.ebms.api.ebms;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.common.message.EbMSMessageFactory;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;

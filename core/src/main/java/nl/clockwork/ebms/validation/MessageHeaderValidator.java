@@ -27,7 +27,7 @@ import lombok.val;
 import nl.clockwork.ebms.common.Constants;
 import nl.clockwork.ebms.common.EbMSAction;
 import nl.clockwork.ebms.common.EbMSErrorCode;
-import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;

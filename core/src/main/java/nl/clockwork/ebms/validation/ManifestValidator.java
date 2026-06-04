@@ -20,7 +20,7 @@ import java.util.List;
 import lombok.val;
 import nl.clockwork.ebms.common.Constants;
 import nl.clockwork.ebms.common.EbMSErrorCode;
-import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSMessage;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;

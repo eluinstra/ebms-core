@@ -24,6 +24,7 @@ import nl.clockwork.ebms.client.delivery.client.EbMSClientConfig;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManagerConfig;
 import nl.clockwork.ebms.common.cpa.CPAConfig;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingConfig;
+import nl.clockwork.ebms.common.message.CommonConfig;
 import nl.clockwork.ebms.common.cpa.url.URLMappingConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.common.datasource.DataSourceConfig;

@@ -30,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.common.Constants;
-import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.client.delivery.client.EbMSClient;
 import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;

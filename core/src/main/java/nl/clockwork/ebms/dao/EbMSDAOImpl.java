@@ -36,7 +36,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.api.ebms.model.DataSource;
 import nl.clockwork.ebms.api.ebms.model.MTOMDataSource;

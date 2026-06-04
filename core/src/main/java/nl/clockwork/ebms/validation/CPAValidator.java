@@ -23,7 +23,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.common.EbMSErrorCode;
-import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSMessage;
 
 @Slf4j

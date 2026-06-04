@@ -32,7 +32,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import org.junit.jupiter.api.Test;
 
 class MultipartBodyPublisherTest

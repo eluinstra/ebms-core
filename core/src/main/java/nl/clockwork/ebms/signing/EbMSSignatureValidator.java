@@ -160,7 +160,7 @@ public class EbMSSignatureValidator
 								messageHeader.getService(),
 								messageHeader.getAction()));
 		if (deliveryChannel != null)
-			return CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getSigningCertificate(deliveryChannel));
+			return CPAUtils.getX509Certificate(nl.clockwork.ebms.common.cpa.CPAUtils.getSigningCertificate(deliveryChannel));
 		return null;
 	}
 

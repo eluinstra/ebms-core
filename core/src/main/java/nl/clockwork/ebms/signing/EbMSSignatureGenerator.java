@@ -121,7 +121,7 @@ public class EbMSSignatureGenerator
 								messageHeader.getFrom().getRole(),
 								messageHeader.getService(),
 								messageHeader.getAction()));
-		val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getSigningCertificate(deliveryChannel));
+		val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.common.cpa.CPAUtils.getSigningCertificate(deliveryChannel));
 		if (certificate == null)
 			throw new EbMSProcessingException(
 					"No signing certificate found for deliveryChannel \"" + deliveryChannel.getChannelId() + "\" in CPA \"" + messageHeader.getCPAId() + "\"");
@@ -130,8 +130,8 @@ public class EbMSSignatureGenerator
 			throw new EbMSProcessorException(
 					"No certificate found with subject \"" + certificate.getSubjectX500Principal().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
 		val keyPair = SecurityUtils.getKeyPair(keyStore, alias, keyStore.getKeyPassword());
-		val signatureAlgorithm = nl.clockwork.ebms.CPAUtils.getSignatureAlgorithm(deliveryChannel);
-		val hashFunction = nl.clockwork.ebms.CPAUtils.getHashFunction(deliveryChannel);
+		val signatureAlgorithm = nl.clockwork.ebms.common.cpa.CPAUtils.getSignatureAlgorithm(deliveryChannel);
+		val hashFunction = nl.clockwork.ebms.common.cpa.CPAUtils.getHashFunction(deliveryChannel);
 		sign(keyStore, keyPair, alias, document.getMessage(), attachments, signatureAlgorithm, hashFunction);
 	}
 

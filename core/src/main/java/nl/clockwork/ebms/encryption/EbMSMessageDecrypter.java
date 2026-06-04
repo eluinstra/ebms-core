@@ -25,9 +25,9 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.EbMSErrorCode;
-import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
@@ -83,7 +83,7 @@ public class EbMSMessageDecrypter
 										messageHeader.getTo().getRole(),
 										messageHeader.getService(),
 										messageHeader.getAction()));
-				val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getEncryptionCertificate(deliveryChannel));
+				val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionCertificate(deliveryChannel));
 				if (certificate == null)
 					throw new EbMSProcessingException(
 							"No encryption certificate found for deliveryChannel \"" + deliveryChannel.getChannelId() + "\" in CPA \"" + messageHeader.getCPAId() + "\"");

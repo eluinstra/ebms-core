@@ -34,7 +34,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
@@ -97,9 +97,9 @@ public class EbMSMessageEncrypter
 										messageHeader.getTo().getRole(),
 										messageHeader.getService(),
 										messageHeader.getAction()));
-				val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getEncryptionCertificate(deliveryChannel));
+				val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionCertificate(deliveryChannel));
 				SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
-				val encryptionAlgorithm = nl.clockwork.ebms.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+				val encryptionAlgorithm = nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				message.getAttachments().replaceAll(a -> encrypt(createDocument(), certificate, encryptionAlgorithm, a));
 			}
 		}
@@ -117,9 +117,9 @@ public class EbMSMessageEncrypter
 	{
 		try
 		{
-			val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.CPAUtils.getEncryptionCertificate(deliveryChannel));
+			val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionCertificate(deliveryChannel));
 			SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
-			val encryptionAlgorithm = nl.clockwork.ebms.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+			val encryptionAlgorithm = nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			val attachments = new ArrayList<EbMSAttachment>();
 			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(), certificate, encryptionAlgorithm, a)));
 			message.getAttachments().clear();

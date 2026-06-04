@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms;
+package nl.clockwork.ebms.common.message;
 
 
 import nl.clockwork.ebms.common.Constants;
@@ -306,7 +306,7 @@ public class EbMSMessageFactory
 				.orElse(
 						cpaManager.getToPartyInfo(cpaId, toParty, properties.getService(), properties.getAction())
 								.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo", cpaId, toParty, properties.getService(), properties.getAction())));
-		val deliveryChannel = nl.clockwork.ebms.CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
+		val deliveryChannel = nl.clockwork.ebms.common.cpa.CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		val hostname = CPAUtils.getHostname(deliveryChannel);
 		val conversationId = properties.getConversationId() == null ? ebMSIdGenerator.generateConversationId() : properties.getConversationId();
 		val from = createForm(fromPartyInfo.getPartyIds(), fromPartyInfo.getRole());
@@ -380,9 +380,9 @@ public class EbMSMessageFactory
 	{
 		if (CPAUtils.isReliableMessaging(deliveryChannel))
 		{
-			val duration = nl.clockwork.ebms.CPAUtils.getSenderReliableMessaging(deliveryChannel)
+			val duration = nl.clockwork.ebms.common.cpa.CPAUtils.getSenderReliableMessaging(deliveryChannel)
 					.getRetryInterval()
-					.multipliedBy(nl.clockwork.ebms.CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
+					.multipliedBy(nl.clockwork.ebms.common.cpa.CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
 			return date.plus(duration);
 		}
 		else
@@ -394,7 +394,7 @@ public class EbMSMessageFactory
 		val cpaId = properties.getCpaId();
 		val fromParty = Party.of(properties.getFromPartyId(), properties.getFromRole());
 		val channel = cpaManager.getFromPartyInfo(cpaId, fromParty, properties.getService(), properties.getAction())
-				.map(p -> nl.clockwork.ebms.CPAUtils.getDeliveryChannel(p.getCanSend().getThisPartyActionBinding()))
+				.map(p -> nl.clockwork.ebms.common.cpa.CPAUtils.getDeliveryChannel(p.getCanSend().getThisPartyActionBinding()))
 				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo", cpaId, fromParty, properties.getService(), properties.getAction()));
 
 		if (PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckRequested()))
