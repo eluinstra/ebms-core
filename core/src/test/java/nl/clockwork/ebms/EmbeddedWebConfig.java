@@ -28,7 +28,7 @@ import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingController;
 import nl.clockwork.ebms.api.cpa.url.URLMappingController;
 import nl.clockwork.ebms.api.ebms.EbMSController;
 import nl.clockwork.ebms.api.ebms.EbMSControllerMTOM;
-import nl.clockwork.ebms.event.MessageEventListenerConfig.EventListenerType;
+import nl.clockwork.ebms.common.event.MessageEventListenerConfig.EventListenerType;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.EndpointImpl;

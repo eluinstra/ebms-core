@@ -15,6 +15,9 @@
  */
 package nl.clockwork.ebms.validation;
 
+
+import nl.clockwork.ebms.common.validation.EbMSValidationException;
+import nl.clockwork.ebms.common.validation.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -29,7 +32,7 @@ import nl.clockwork.ebms.common.EbMSAction;
 import nl.clockwork.ebms.common.EbMSErrorCode;
 import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSMessage;

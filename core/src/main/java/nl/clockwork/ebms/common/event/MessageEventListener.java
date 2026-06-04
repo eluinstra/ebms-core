@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.validation;
+package nl.clockwork.ebms.common.event;
 
-
-import nl.clockwork.ebms.common.validation.ValidationException;
-public class DuplicateMessageException extends ValidationException
+public interface MessageEventListener
 {
-	private static final long serialVersionUID = 1L;
+	void onMessageReceived(String messageId) throws MessageEventException;
 
+	void onMessageDelivered(String messageId) throws MessageEventException;
+
+	void onMessageFailed(String messageId) throws MessageEventException;
+
+	void onMessageExpired(String messageId) throws MessageEventException;
 }

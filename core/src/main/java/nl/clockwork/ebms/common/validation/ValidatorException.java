@@ -13,12 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.validation;
+package nl.clockwork.ebms.common.validation;
 
+import lombok.NoArgsConstructor;
 
-import nl.clockwork.ebms.common.validation.ValidationException;
-public class DuplicateMessageException extends ValidationException
+@NoArgsConstructor
+public class ValidatorException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
+
+	public ValidatorException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+
+	public ValidatorException(String message)
+	{
+		super(message);
+	}
+
+	public ValidatorException(Throwable cause)
+	{
+		super(cause);
+	}
 
 }

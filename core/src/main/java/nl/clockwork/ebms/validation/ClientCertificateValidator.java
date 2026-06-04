@@ -15,6 +15,9 @@
  */
 package nl.clockwork.ebms.validation;
 
+
+import nl.clockwork.ebms.common.validation.ValidationException;
+import nl.clockwork.ebms.common.validation.ValidatorException;
 import java.security.cert.X509Certificate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

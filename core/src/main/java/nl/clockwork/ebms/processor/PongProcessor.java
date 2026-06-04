@@ -28,7 +28,7 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.model.EbMSPing;
 import nl.clockwork.ebms.common.model.EbMSPong;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
-import nl.clockwork.ebms.validation.ValidatorException;
+import nl.clockwork.ebms.common.validation.ValidatorException;
 
 @Slf4j
 @Builder

@@ -15,6 +15,10 @@
  */
 package nl.clockwork.ebms.validation;
 
+
+import nl.clockwork.ebms.common.validation.EbMSValidationException;
+import nl.clockwork.ebms.common.validation.ValidationException;
+import nl.clockwork.ebms.common.validation.ValidatorException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -26,7 +30,7 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.signing.EbMSSignatureValidator;
+import nl.clockwork.ebms.common.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.common.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

@@ -31,12 +31,12 @@ import nl.clockwork.ebms.common.message.EbMSMessageFactory;
 import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
 import nl.clockwork.ebms.common.model.EbMSStatusRequest;
 import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
-import nl.clockwork.ebms.validation.ValidatorException;
+import nl.clockwork.ebms.common.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 @Slf4j

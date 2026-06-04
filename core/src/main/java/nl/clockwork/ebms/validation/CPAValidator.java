@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.validation;
 
+
+import nl.clockwork.ebms.common.validation.EbMSValidationException;
 import java.time.Instant;
 import java.util.function.BiPredicate;
 import lombok.AccessLevel;

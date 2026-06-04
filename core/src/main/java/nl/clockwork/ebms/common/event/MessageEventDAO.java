@@ -13,12 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.validation;
+package nl.clockwork.ebms.common.event;
 
+import java.util.List;
+import nl.clockwork.ebms.api.ebms.model.MessageEvent;
+import nl.clockwork.ebms.api.ebms.model.MessageFilter;
+import nl.clockwork.ebms.common.event.MessageEventType;
 
-import nl.clockwork.ebms.common.validation.ValidationException;
-public class DuplicateMessageException extends ValidationException
+public interface MessageEventDAO
 {
-	private static final long serialVersionUID = 1L;
+	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types);
 
+	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types, int maxNr);
+
+	String insertEbMSMessageEvent(String messageId, MessageEventType eventType);
+
+	int processEbMSMessageEvent(String messageId);
 }

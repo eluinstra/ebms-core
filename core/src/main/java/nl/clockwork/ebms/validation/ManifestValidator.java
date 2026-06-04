@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.validation;
 
+
+import nl.clockwork.ebms.common.validation.EbMSValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.val;

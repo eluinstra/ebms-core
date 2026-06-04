@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.validation;
 
+
+import nl.clockwork.ebms.common.validation.ValidatorException;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,8 +25,8 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
+import nl.clockwork.ebms.common.dao.EbMSDAO;
+import nl.clockwork.ebms.common.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSDocument;
