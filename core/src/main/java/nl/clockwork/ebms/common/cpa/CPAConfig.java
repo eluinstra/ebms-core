@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.security.EbMSKeyStore;
+import nl.clockwork.ebms.common.security.EbMSKeyStore;
 import nl.clockwork.ebms.validation.CPAValidator;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;

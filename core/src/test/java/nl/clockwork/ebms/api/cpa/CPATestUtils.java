@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
 import java.util.Optional;
 import lombok.val;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
-import nl.clockwork.ebms.jaxb.JAXBParser;
+import nl.clockwork.ebms.common.jaxb.JAXBParser;
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 

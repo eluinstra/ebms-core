@@ -30,7 +30,7 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
-import nl.clockwork.ebms.util.StreamUtils;
+import nl.clockwork.ebms.common.util.StreamUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.quartz.Job;
 import org.quartz.JobDataMap;

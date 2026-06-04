@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import nl.clockwork.ebms.jaxb.DurationAdapter;
+import nl.clockwork.ebms.common.jaxb.DurationAdapter;
 
 /**
  * <p>

@@ -49,7 +49,7 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;

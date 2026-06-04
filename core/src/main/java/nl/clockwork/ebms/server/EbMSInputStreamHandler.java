@@ -37,7 +37,7 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;

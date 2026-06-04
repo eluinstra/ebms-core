@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
-import nl.clockwork.ebms.jaxb.InstantAdapter;
+import nl.clockwork.ebms.common.jaxb.InstantAdapter;
 import org.w3c.dom.Element;
 
 /**

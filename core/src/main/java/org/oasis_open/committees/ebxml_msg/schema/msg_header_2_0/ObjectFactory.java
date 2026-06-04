@@ -21,7 +21,7 @@ import jakarta.xml.bind.annotation.XmlRegistry;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.Instant;
 import javax.xml.namespace.QName;
-import nl.clockwork.ebms.jaxb.InstantAdapter;
+import nl.clockwork.ebms.common.jaxb.InstantAdapter;
 
 /**
  * This object contains factory methods for each Java content interface and Java element interface generated in the

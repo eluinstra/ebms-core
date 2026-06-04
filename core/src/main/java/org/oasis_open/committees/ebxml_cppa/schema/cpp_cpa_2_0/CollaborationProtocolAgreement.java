@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import nl.clockwork.ebms.jaxb.InstantAdapter;
+import nl.clockwork.ebms.common.jaxb.InstantAdapter;
 
 /**
  * <p>

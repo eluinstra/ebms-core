@@ -25,7 +25,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
