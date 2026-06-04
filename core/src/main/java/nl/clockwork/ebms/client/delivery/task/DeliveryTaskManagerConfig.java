@@ -19,7 +19,7 @@ import jakarta.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.client.EbMSDAO;
+import nl.clockwork.ebms.client.delivery.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import org.quartz.Scheduler;

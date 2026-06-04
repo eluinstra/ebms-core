@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery.client;
+package nl.clockwork.ebms.client.delivery.http;
 
-import java.net.http.HttpResponse;
+import nl.clockwork.ebms.common.model.EbMSDocument;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 
-public class EbMSUnrecoverableResponseException extends EbMSResponseException
+public interface EbMSClient
 {
-	private static final long serialVersionUID = 1L;
-
-	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse)
-	{
-		super(repsonse);
-	}
-
-	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse, String message)
-	{
-		super(repsonse, message);
-	}
-
+	EbMSDocument sendMessage(String uri, EbMSDocument message) throws EbMSProcessorException;
 }

@@ -63,7 +63,7 @@ import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clockwork.ebms.client.EbMSDAO, WithMessageFilter
+class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clockwork.ebms.client.delivery.EbMSDAO, WithMessageFilter
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor

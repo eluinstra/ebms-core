@@ -29,7 +29,7 @@ import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.EbMSDAO;
+import nl.clockwork.ebms.client.delivery.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventType;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;

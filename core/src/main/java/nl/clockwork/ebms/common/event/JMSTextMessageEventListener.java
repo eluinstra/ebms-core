@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.EbMSDAO;
+import nl.clockwork.ebms.client.delivery.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
 import org.springframework.jms.JmsException;
