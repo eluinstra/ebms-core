@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.server.validation;
 
-
-import nl.clockwork.ebms.common.validation.ValidatorException;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,6 +32,7 @@ import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.model.EbMSMessageError;
 import nl.clockwork.ebms.common.model.EbMSRequestMessage;
 import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.common.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 

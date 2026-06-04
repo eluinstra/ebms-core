@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.server.validation;
 
-
 import nl.clockwork.ebms.common.validation.ValidationException;
+
 public class DuplicateMessageException extends ValidationException
 {
 	private static final long serialVersionUID = 1L;

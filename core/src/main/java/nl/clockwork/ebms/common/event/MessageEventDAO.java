@@ -18,7 +18,6 @@ package nl.clockwork.ebms.common.event;
 import java.util.List;
 import nl.clockwork.ebms.api.ebms.model.MessageEvent;
 import nl.clockwork.ebms.api.ebms.model.MessageFilter;
-import nl.clockwork.ebms.common.event.MessageEventType;
 
 public interface MessageEventDAO
 {

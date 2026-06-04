@@ -15,11 +15,6 @@
  */
 package nl.clockwork.ebms.common.message;
 
-
-import nl.clockwork.ebms.common.Constants;
-import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
-import nl.clockwork.ebms.common.EbMSErrorCode;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.time.Instant;
@@ -38,6 +33,10 @@ import nl.clockwork.ebms.api.ebms.model.MTOMDataSource;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
+import nl.clockwork.ebms.common.Constants;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSErrorCode;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
@@ -49,9 +48,9 @@ import nl.clockwork.ebms.common.model.EbMSPong;
 import nl.clockwork.ebms.common.model.EbMSStatusRequest;
 import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.common.model.Party;
+import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 import nl.clockwork.ebms.server.processor.EbMSProcessorException;
-import nl.clockwork.ebms.common.util.StreamUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
