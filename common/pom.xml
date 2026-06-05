@@ -25,7 +25,6 @@
   </parent>
   <groupId>nl.clockwork.ebms.common</groupId>
   <artifactId>ebms-common</artifactId>
-  <version>${project.parent.version}</version>
   <packaging>jar</packaging>
   <name>EbMS Common</name>
   <dependencies/>

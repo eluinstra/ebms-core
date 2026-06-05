@@ -46,7 +46,7 @@ class URLMappingControllerImpl implements URLMappingController
 			log.error("SetURLMapping " + urlMapping, e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("SetURLMapping " + urlMapping, e);
 			throw new URLMappingControllerException(e);
@@ -104,7 +104,7 @@ class URLMappingControllerImpl implements URLMappingController
 			log.error("DeleteURLMapping " + source, e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteURLMapping " + source, e);
 			throw new URLMappingControllerException(e);
@@ -130,7 +130,7 @@ class URLMappingControllerImpl implements URLMappingController
 			log.error("GetURLMappings", e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetURLMappings", e);
 			throw new URLMappingControllerException(e);
@@ -150,7 +150,7 @@ class URLMappingControllerImpl implements URLMappingController
 		{
 			deleteCacheImpl();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCache", e);
 			throw new URLMappingControllerException(e);

@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common.dao;
 
+import java.util.Objects;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -33,8 +34,8 @@ public class DAOConfig
 	@Bean
 	public EbMSDAOImpl ebMSDAO(@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager, DataSource dataSource)
 	{
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-		val jdbcTemplate = new JdbcTemplate(dataSource);
+		val transactionTemplate = new TransactionTemplate(Objects.requireNonNull(dataSourceTransactionManager));
+		val jdbcTemplate = new JdbcTemplate(Objects.requireNonNull(dataSource));
 		return new EbMSDAOImpl(transactionTemplate, jdbcTemplate);
 	}
 }

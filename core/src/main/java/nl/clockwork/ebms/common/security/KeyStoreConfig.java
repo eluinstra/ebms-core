@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.common.security;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,25 +61,25 @@ public class KeyStoreConfig
 	String encryptionKeyStoreKeyPassword;
 
 	@Bean
-	public EbMSTrustStore trustStore() throws GeneralSecurityException, IOException
+	public EbMSTrustStore trustStore()
 	{
 		return EbMSTrustStore.of(trustStoretype, trustStorepath, trustStorepassword);
 	}
 
 	@Bean("clientKeyStore")
-	public EbMSKeyStore clientKeyStore() throws GeneralSecurityException, IOException
+	public EbMSKeyStore clientKeyStore()
 	{
 		return EbMSKeyStore.of(clientKeyStoreType, clientKeyStorePath, clientKeyStorePassword, clientKeyStoreKeyPassword, clientKeyStoreDefaultAlias);
 	}
 
 	@Bean("signatureKeyStore")
-	public EbMSKeyStore signatureKeyStore() throws GeneralSecurityException, IOException
+	public EbMSKeyStore signatureKeyStore()
 	{
 		return EbMSKeyStore.of(signatureKeyStoreType, signatureKeyStorePath, signatureKeyStorePassword, signatureKeyStoreKeyPassword);
 	}
 
 	@Bean("encryptionKeyStore")
-	public EbMSKeyStore encryptionKeyStore() throws GeneralSecurityException, IOException
+	public EbMSKeyStore encryptionKeyStore()
 	{
 		return EbMSKeyStore.of(encryptionKeyStoreType, encryptionKeyStorePath, encryptionKeyStorePassword, encryptionKeyStoreKeyPassword);
 	}

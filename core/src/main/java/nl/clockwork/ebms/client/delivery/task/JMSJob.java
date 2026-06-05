@@ -22,6 +22,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -30,14 +31,18 @@ import org.springframework.transaction.PlatformTransactionManager;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JMSJob extends QuartzJobBean
 {
+	final PlatformTransactionManager transactionManager;
+	final DeliveryTaskManager deliveryTaskManager;
+
 	@Autowired
-	@Qualifier("jmsTransactionManager")
-	PlatformTransactionManager transactionManager;
-	@Autowired
-	DeliveryTaskManager deliveryTaskManager;
+	public JMSJob(@Qualifier("jmsTransactionManager") PlatformTransactionManager transactionManager, DeliveryTaskManager deliveryTaskManager)
+	{
+		this.transactionManager = transactionManager;
+		this.deliveryTaskManager = deliveryTaskManager;
+	}
 
 	@Override
-	protected void executeInternal(JobExecutionContext context) throws JobExecutionException
+	protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException
 	{
 		val status = transactionManager.getTransaction(null);
 		try
@@ -46,10 +51,10 @@ public class JMSJob extends QuartzJobBean
 			val task = QuartzDeliveryTaskManager.createDeliveryTask(properties);
 			deliveryTaskManager.insertTask(task);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			transactionManager.rollback(status);
-			throw new JobExecutionException();
+			throw new JobExecutionException(e);
 		}
 		transactionManager.commit(status);
 	}

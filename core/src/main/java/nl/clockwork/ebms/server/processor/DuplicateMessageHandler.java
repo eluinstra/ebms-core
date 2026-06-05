@@ -55,75 +55,86 @@ class DuplicateMessageHandler
 	public EbMSDocument handleMessage(final EbMSMessage message) throws EbMSProcessingException
 	{
 		val messageHeader = message.getMessageHeader();
-		if (isIdenticalMessage(message))
+		if (!isIdenticalMessage(message))
+			throw new EbMSProcessingException("MessageId " + messageHeader.getMessageData().getMessageId() + " already used!");
+
+		log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
+		if (messageValidator.isSyncReply(message))
+			return handleSyncDuplicateResponse(message);
+
+		handleAsyncDuplicateResponse(message);
+		return null;
+	}
+
+	private EbMSDocument handleSyncDuplicateResponse(EbMSMessage message)
+	{
+		val messageHeader = message.getMessageHeader();
+		val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
+				messageHeader.getCPAId(),
+				messageHeader.getMessageData().getMessageId(),
+				EbMSAction.MESSAGE_ERROR,
+				EbMSAction.ACKNOWLEDGMENT);
+		StreamUtils.ifNotPresent(result, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+		return result.orElse(null);
+	}
+
+	private void handleAsyncDuplicateResponse(EbMSMessage message) throws EbMSProcessingException
+	{
+		val messageHeader = message.getMessageHeader();
+		val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
+				messageHeader.getCPAId(),
+				messageHeader.getMessageData().getMessageId(),
+				EbMSAction.MESSAGE_ERROR,
+				EbMSAction.ACKNOWLEDGMENT);
+		StreamUtils
+				.ifNotPresent(messageProperties, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+
+		val sendDeliveryChannel =
+				cpaManager
+						.getSendDeliveryChannel(
+								messageHeader.getCPAId(),
+								messageHeader.getTo().getPartyId(),
+								messageHeader.getTo().getRole(),
+								nl.clockwork.ebms.common.cpa.CPAUtils.createEbMSMessageService(),
+								null)
+						.orElse(null);
+		val receiveDeliveryChannel =
+				cpaManager
+						.getReceiveDeliveryChannel(
+								messageHeader.getCPAId(),
+								messageHeader.getFrom().getPartyId(),
+								messageHeader.getFrom().getRole(),
+								nl.clockwork.ebms.common.cpa.CPAUtils.createEbMSMessageService(),
+								null)
+						.orElse(null);
+
+		Runnable storeMessage = () ->
 		{
-			log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
-			if (messageValidator.isSyncReply(message))
+			if (receiveDeliveryChannel != null && messageProperties.isPresent())
+				deliveryTaskManager.insertTask(
+						deliveryTaskManager.createNewTask(
+								messageHeader.getCPAId(),
+								sendDeliveryChannel.getChannelId(),
+								receiveDeliveryChannel.getChannelId(),
+								messageProperties.get().getMessageId(),
+								messageHeader.getMessageData().getTimeToLive(),
+								messageProperties.get().getTimestamp(),
+								false));
+		};
+		ebMSDAO.executeTransaction(storeMessage);
+
+		if (receiveDeliveryChannel == null && messageProperties.isPresent())
+		{
+			try
 			{
-				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
-						messageHeader.getCPAId(),
-						messageHeader.getMessageData().getMessageId(),
-						EbMSAction.MESSAGE_ERROR,
-						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(result, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
-				return result.orElse(null);
+				val result = ebMSDAO.getDocument(messageProperties.get().getMessageId());
+				throw new ValidationException(DOMUtils.toString(result.get()));
 			}
-			else
+			catch (TransformerException e)
 			{
-				val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
-						messageHeader.getCPAId(),
-						messageHeader.getMessageData().getMessageId(),
-						EbMSAction.MESSAGE_ERROR,
-						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils
-						.ifNotPresent(messageProperties, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
-				val sendDeliveryChannel =
-						cpaManager
-								.getSendDeliveryChannel(
-										messageHeader.getCPAId(),
-										messageHeader.getTo().getPartyId(),
-										messageHeader.getTo().getRole(),
-										nl.clockwork.ebms.common.cpa.CPAUtils.createEbMSMessageService(),
-										null)
-								.orElse(null);
-				val receiveDeliveryChannel =
-						cpaManager
-								.getReceiveDeliveryChannel(
-										messageHeader.getCPAId(),
-										messageHeader.getFrom().getPartyId(),
-										messageHeader.getFrom().getRole(),
-										nl.clockwork.ebms.common.cpa.CPAUtils.createEbMSMessageService(),
-										null)
-								.orElse(null);
-				Runnable storeMessage = () ->
-				{
-					if (receiveDeliveryChannel != null && messageProperties.isPresent())
-						deliveryTaskManager.insertTask(
-								deliveryTaskManager.createNewTask(
-										messageHeader.getCPAId(),
-										sendDeliveryChannel.getChannelId(),
-										receiveDeliveryChannel.getChannelId(),
-										messageProperties.get().getMessageId(),
-										messageHeader.getMessageData().getTimeToLive(),
-										messageProperties.get().getTimestamp(),
-										false));
-				};
-				ebMSDAO.executeTransaction(storeMessage);
-				if (receiveDeliveryChannel == null && messageProperties.isPresent())
-					try
-					{
-						val result = ebMSDAO.getDocument(messageProperties.get().getMessageId());
-						throw new ValidationException(DOMUtils.toString(result.get()));
-					}
-					catch (TransformerException e)
-					{
-						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!", e);
-					}
-				return null;
+				throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!", e);
 			}
 		}
-		else
-			throw new EbMSProcessingException("MessageId " + messageHeader.getMessageData().getMessageId() + " already used!");
 	}
 
 	public void handleMessageError(final EbMSMessageError responseMessage) throws EbMSProcessingException

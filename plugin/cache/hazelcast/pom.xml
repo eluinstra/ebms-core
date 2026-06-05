@@ -26,7 +26,6 @@
   </parent>
   <groupId>nl.clockwork.ebms.plugin.cache</groupId>
   <artifactId>ebms-hazelcast-cache-plugin</artifactId>
-  <version>${project.parent.version}</version>
   <packaging>jar</packaging>
   <name>EbMS Hazelcast Cache Plugin</name>
   <dependencies>

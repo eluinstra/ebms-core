@@ -42,15 +42,15 @@ import org.springframework.jdbc.core.RowMapper;
 @CacheConfig(cacheNames = {"CertificateMapping"})
 class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository, CertificateMappingRepository
 {
-	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, String>>
+	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, Boolean>>
 	{
 		@Override
-		public Tuple2<X509Certificate, String> mapRow(ResultSet rs, int rowNum) throws SQLException
+		public Tuple2<X509Certificate, Boolean> mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
 		{
 			try
 			{
 				CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-				return Tuple.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination")), rs.getString("cpa_id"));
+				return Tuple.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination")), rs.getString("cpa_id") != null);
 			}
 			catch (CertificateException e)
 			{
@@ -73,9 +73,10 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
-		return cpaId == null
-				? jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id is null", Integer.class, id) > 0
-				: jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id = ?", Integer.class, id, cpaId) > 0;
+		val count = cpaId == null
+				? jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id is null", Integer.class, id)
+				: jdbcTemplate.queryForObject("select count(*) from certificate_mapping where id = ? and cpa_id = ?", Integer.class, id, cpaId);
+		return count != null && count > 0;
 	}
 
 	@Override
@@ -84,19 +85,16 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 	{
 		try
 		{
+			val cpaQueryFilter = getSpecific ? " and cpa_id = ?" : " and (cpa_id = ? or cpa_id is null)";
 			val result = cpaId == null
 					? jdbcTemplate.query("select destination, cpa_id from certificate_mapping where id = ? and cpa_id is null", new CertificateRowMapper(), id)
-					: jdbcTemplate.query(
-							"select destination, cpa_id from certificate_mapping where id = ?" + (getSpecific ? " and cpa_id = ?" : " and (cpa_id = ? or cpa_id is null)"),
-							new CertificateRowMapper(),
-							id,
-							cpaId);
+					: jdbcTemplate.query("select destination, cpa_id from certificate_mapping where id = ?" + cpaQueryFilter, new CertificateRowMapper(), id, cpaId);
 			if (result.size() == 0)
 				return Optional.empty();
 			else if (result.size() == 1)
 				return Optional.of(result.get(0)._1);
 			else
-				return result.stream().filter(r -> r._2 != null).findFirst().map(r -> r._1);
+				return result.stream().filter(r -> r._2).findFirst().map(r -> r._1);
 		}
 		catch (EmptyResultDataAccessException e)
 		{
@@ -111,7 +109,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 		return jdbcTemplate.query("select source, destination, cpa_id from certificate_mapping", new RowMapper<CertificateMapping>()
 		{
 			@Override
-			public CertificateMapping mapRow(ResultSet rs, int nr) throws SQLException
+			public CertificateMapping mapRow(@org.springframework.lang.NonNull ResultSet rs, int nr) throws SQLException
 			{
 				try
 				{

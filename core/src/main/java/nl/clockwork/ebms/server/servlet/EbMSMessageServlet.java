@@ -37,13 +37,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class EbMSMessageServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
-	EbMSMessageProcessor ebMSMessageProcessor;
+	transient EbMSMessageProcessor ebMSMessageProcessor;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
 	{
 		super.init(config);
-		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(java.util.Objects.requireNonNull(getServletContext()));
 		ebMSMessageProcessor = wac.getBean(EbMSMessageProcessor.class);
 	}
 

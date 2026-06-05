@@ -15,7 +15,12 @@
  */
 package nl.clockwork.ebms.api.ebms;
 
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.soap.SOAPException;
+import java.io.IOException;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +31,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageEvent;
 import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
 import nl.clockwork.ebms.common.event.MessageEventType;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -41,7 +47,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			serviceHandler.ping(cpaId, fromPartyId, toPartyId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("Ping " + cpaId, e);
 			throw new EbMSControllerException(e);
@@ -55,7 +61,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			return serviceHandler.sendMessageMTOM(message);
 		}
-		catch (Exception e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException | RuntimeException e)
 		{
 			log.error("SendMessage " + message, e);
 			throw new EbMSControllerException(e);
@@ -69,7 +75,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			return serviceHandler.resendMessage(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("ResendMessage {}", messageId);
 			throw new EbMSControllerException(e);
@@ -83,7 +89,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			return serviceHandler.getUnprocessedMessageIds(messageFilter, maxNr);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessageIds " + messageFilter, e);
 			throw new EbMSControllerException(e);
@@ -97,7 +103,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			return serviceHandler.getMessageMTOM(messageId, process);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessage " + messageId, e);
 			throw new EbMSControllerException(e);
@@ -111,7 +117,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			serviceHandler.processMessage(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("ProcessMessage " + messageId, e);
 			throw new EbMSControllerException(e);
@@ -125,7 +131,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			return serviceHandler.getMessageStatus(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessageStatus " + messageId, e);
 			throw new EbMSControllerException(e);
@@ -140,7 +146,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			return serviceHandler.getUnprocessedMessageEvents(messageFilter, eventTypes, maxNr);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessageEvents" + messageFilter, e);
 			throw new EbMSControllerException(e);
@@ -154,7 +160,7 @@ class EbMSControllerMTOMImpl implements EbMSControllerMTOM
 		{
 			serviceHandler.processMessageEvent(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("ProcessMessageEvent " + messageId, e);
 			throw new EbMSControllerException(e);

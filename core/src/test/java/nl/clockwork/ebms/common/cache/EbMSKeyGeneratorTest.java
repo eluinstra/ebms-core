@@ -20,6 +20,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.val;
 import nl.clockwork.ebms.common.model.Party;
@@ -37,7 +38,7 @@ class EbMSKeyGeneratorTest
 	@MethodSource("validInput")
 	void testKeyGenerator(Method method, Object[] params, String expected)
 	{
-		assertEquals(expected, keyGenerator.generate(null, method, params));
+		assertEquals(expected, keyGenerator.generate(this, Objects.requireNonNull(method), Objects.requireNonNull(params)));
 	}
 
 	public static Stream<Arguments> validInput() throws NoSuchMethodException, SecurityException

@@ -50,7 +50,7 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 		Long delay;
 
 		@Override
-		public Message createMessage(Session session) throws JMSException
+		public @org.springframework.lang.NonNull Message createMessage(@org.springframework.lang.NonNull Session session) throws JMSException
 		{
 			val result = session.createMessage();
 			if (delay != null)

@@ -17,6 +17,7 @@ package nl.clockwork.ebms.common.cpa;
 
 import java.security.cert.X509Certificate;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -59,7 +60,7 @@ public class CPAConfig
 	@Bean
 	public CPARepositoryImpl cpaRepository(DataSource dataSource)
 	{
-		val jdbcTemplate = new JdbcTemplate(dataSource);
+		val jdbcTemplate = new JdbcTemplate(Objects.requireNonNull(dataSource));
 		return new CPARepositoryImpl(jdbcTemplate);
 	}
 

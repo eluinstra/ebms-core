@@ -19,6 +19,7 @@ import java.util.function.Function;
 
 public interface ThrowingFunction<T, R>
 {
+	@SuppressWarnings("java:S112")
 	R apply(T t) throws Exception;
 
 	@SuppressWarnings("unchecked")

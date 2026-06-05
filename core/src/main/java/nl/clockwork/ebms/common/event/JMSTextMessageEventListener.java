@@ -43,7 +43,7 @@ class JMSTextMessageEventListener extends LoggingMessageEventListener
 		EbMSMessageProperties messageProperties;
 
 		@Override
-		public Message createMessage(Session session) throws JMSException
+		public @org.springframework.lang.NonNull Message createMessage(@org.springframework.lang.NonNull Session session) throws JMSException
 		{
 			val result = session.createTextMessage();
 			result.setStringProperty("cpaId", messageProperties.getCpaId());
@@ -68,13 +68,17 @@ class JMSTextMessageEventListener extends LoggingMessageEventListener
 	@NonNull
 	Map<String, Destination> destinations;
 
+	private @org.springframework.lang.NonNull Destination getDestination(MessageEventType messageEventType)
+	{
+		return java.util.Objects.requireNonNull(destinations.get(messageEventType.name()));
+	}
+
 	@Override
 	public void onMessageReceived(String messageId) throws MessageEventException
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()), new EventMessageCreator(p)));
+			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.RECEIVED), new EventMessageCreator(p)));
 			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
@@ -88,8 +92,7 @@ class JMSTextMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()), new EventMessageCreator(p)));
+			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.DELIVERED), new EventMessageCreator(p)));
 			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
@@ -103,8 +106,7 @@ class JMSTextMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()), new EventMessageCreator(p)));
+			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.FAILED), new EventMessageCreator(p)));
 			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
@@ -118,8 +120,7 @@ class JMSTextMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()), new EventMessageCreator(p)));
+			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.EXPIRED), new EventMessageCreator(p)));
 			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)

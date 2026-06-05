@@ -97,8 +97,14 @@ class MultipartBodyPublisherTest
 		}
 		assertEquals(false, channel.isOpen());
 
-		val expect =
-				"--boundary\r\n" + "Content-Type: text/xml; charset=UTF-8\r\n" + "Content-ID: <contentId>\r\n" + "\r\n" + "<content/>\r\n" + "--boundary--\r\n";
+		val expect = """
+				--boundary\r
+				Content-Type: text/xml; charset=UTF-8\r
+				Content-ID: <contentId>\r
+				\r
+				<content/>\r
+				--boundary--\r
+				""";
 		assertEquals(expect, content.toString());
 	}
 

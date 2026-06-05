@@ -230,9 +230,7 @@ class CPAQuery
 				.findFirst();
 	}
 
-	static
-			Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>>
-			getToPartyInfoByFromPartyActionBinding(FromPartyInfo fromPartyInfo, Party fromParty, String service, String action)
+	static Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>> getToPartyInfoByFromPartyActionBinding(FromPartyInfo fromPartyInfo)
 	{
 		return cpa -> cpa.getPartyInfo()
 				.stream()

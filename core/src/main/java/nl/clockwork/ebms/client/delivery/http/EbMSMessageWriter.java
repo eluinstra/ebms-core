@@ -57,7 +57,7 @@ class EbMSMessageWriter
 			messageLog.info(">>>>\n{}", message);
 
 		val publisher = new MultipartBodyPublisher(document.getContentId()).addXml(document.getContentId(), message);
-		document.getAttachments().stream().forEach(publisher::addAttachment);
+		document.getAttachments().forEach(publisher::addAttachment);
 		return request.setHeader("Content-Type", publisher.contentType()).setHeader("SOAPAction", Constants.EBMS_SOAP_ACTION).POST(publisher);
 	}
 }

@@ -126,10 +126,21 @@ public class CPAValidator
 
 	private static void validateChannel(DeliveryChannel channel)
 	{
-		if (((DocExchange)channel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null
-				&& MessageOrderSemanticsType.GUARANTEED
-						.equals(((DocExchange)channel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics()))
-			log.warn("Message Order as defined in DocExchange {} not implemented!", ((DocExchange)channel.getDocExchangeId()).getDocExchangeId());
+		val docExchange = (DocExchange)channel.getDocExchangeId();
+		validateMessageOrderSemantics(docExchange);
+		validateMessagingCharacteristics(channel);
+		validateReceiverDigitalEnvelope(docExchange);
+	}
+
+	private static void validateMessageOrderSemantics(DocExchange docExchange)
+	{
+		if (docExchange.getEbXMLSenderBinding().getReliableMessaging() != null
+				&& MessageOrderSemanticsType.GUARANTEED.equals(docExchange.getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics()))
+			log.warn("Message Order as defined in DocExchange {} not implemented!", docExchange.getDocExchangeId());
+	}
+
+	private static void validateMessagingCharacteristics(DeliveryChannel channel)
+	{
 		if (SyncReplyModeType.SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode())
 				|| SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(channel.getMessagingCharacteristics().getSyncReplyMode()))
 			log.debug("Business signals defined in Channel {} not supported!", channel.getChannelId());
@@ -137,26 +148,39 @@ public class CPAValidator
 			log.debug("Duplicate Elimination defined in Channel {} always enabled!", channel.getChannelId());
 		if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(channel.getMessagingCharacteristics().getActor()))
 			log.warn("Actor NextMSH not supported!");
-		if (((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
+	}
+
+	private static void validateReceiverDigitalEnvelope(DocExchange docExchange)
+	{
+		val digitalEnvelope = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope();
+		if (digitalEnvelope == null)
+			return;
+
+		validateDigitalEnvelopeProtocol(docExchange);
+		validateEncryptionAlgorithm(digitalEnvelope.getEncryptionAlgorithm());
+	}
+
+	private static void validateDigitalEnvelopeProtocol(DocExchange docExchange)
+	{
+		val digitalEnvelopeProtocol = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol();
+		if (digitalEnvelopeProtocol != null && !"XMLENC".equals(digitalEnvelopeProtocol.getValue()))
+			log.warn("Digital Envelope Protocol {} not supported!", digitalEnvelopeProtocol.getValue());
+	}
+
+	private static void validateEncryptionAlgorithm(List<EncryptionAlgorithm> algorithms)
+	{
+		val encryptionAlgorithm = getEncryptionAlgorithm(algorithms);
+		if (encryptionAlgorithm == null)
+			return;
+
+		try
 		{
-			if (((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol() != null
-					&& !"XMLENC"
-							.equals(((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue()))
-				log.warn(
-						"Digital Envelope Protocol {} not supported!",
-						((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue());
-			val encryptionAlgorithm =
-					getEncryptionAlgorithm(((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm());
-			if (encryptionAlgorithm != null)
-				try
-				{
-					if (SecurityUtils.generateKey(encryptionAlgorithm) == null)
-						log.warn("Encryption Algorithm {} not supported!", encryptionAlgorithm);
-				}
-				catch (NoSuchAlgorithmException e)
-				{
-					log.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!", e);
-				}
+			if (SecurityUtils.generateKey(encryptionAlgorithm) == null)
+				log.warn("Encryption Algorithm {} not supported!", encryptionAlgorithm);
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			log.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!", e);
 		}
 	}
 

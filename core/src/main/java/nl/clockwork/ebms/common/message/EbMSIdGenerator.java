@@ -36,7 +36,13 @@ public class EbMSIdGenerator
 
 	public String createMessageId(String hostname, String conversationId, String messageId)
 	{
-		return (messageId == null ? (conversationId == null ? generateConversationId() : conversationId) : messageId) + "@" + hostname;
+		String resolvedMessageId = messageId != null ? messageId : resolveConversationId(conversationId);
+		return resolvedMessageId + "@" + hostname;
+	}
+
+	private String resolveConversationId(String conversationId)
+	{
+		return conversationId != null ? conversationId : generateConversationId();
 	}
 
 	public String generateContentId()

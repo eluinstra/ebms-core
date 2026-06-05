@@ -23,7 +23,6 @@ import nl.clockwork.ebms.client.delivery.EbMSDAO;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import org.quartz.Scheduler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
@@ -38,47 +37,50 @@ import org.springframework.jms.core.JmsTemplate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskManagerConfig
 {
+	private static final String DELIVERY_TASK_HANDLER_TYPE = "deliveryTaskHandler.type";
+
 	@Value("${deliveryTaskHandler.type}")
 	DeliveryTaskHandlerType deliveryTaskHandlerType;
-	@Autowired
-	CPAManager cpaManager;
 	@Value("${ebms.serverId:#{null}}")
 	String serverId;
-	@Autowired
-	ConnectionFactory connectionFactory;
-	@Autowired(required = false)
-	Scheduler scheduler;
 	@Value("${deliveryTaskManager.nrAutoRetries}")
 	int nrAutoRetries;
 	@Value("${deliveryTaskManager.autoRetryInterval}")
 	int autoRetryInterval;
-	@Autowired
-	EbMSDAO ebMSDAO;
 
 	@Bean
 	@Conditional(DefaultTaskManagerType.class)
-	public DeliveryTaskManager defaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
+	public DeliveryTaskManager defaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO, EbMSDAO ebMSDAO, CPAManager cpaManager)
 	{
-		return createDefaultDeliveryTaskManager(deliveryTaskDAO);
+		return createDefaultDeliveryTaskManager(deliveryTaskDAO, ebMSDAO, cpaManager);
 	}
 
 	@Bean
 	@Conditional(JmsTaskManagerType.class)
-	public DeliveryTaskManager jmsDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
+	public DeliveryTaskManager jmsDeliveryTaskManager(
+			DeliveryTaskDAO deliveryTaskDAO,
+			EbMSDAO ebMSDAO,
+			CPAManager cpaManager,
+			@org.springframework.lang.NonNull ConnectionFactory connectionFactory)
 	{
 		return new JMSDeliveryTaskManager(new JmsTemplate(connectionFactory), ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
 	}
 
 	@Bean
 	@Conditional(QuartzTaskManagerType.class)
-	public DeliveryTaskManager quartzDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
+	public DeliveryTaskManager quartzDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO, EbMSDAO ebMSDAO, CPAManager cpaManager, Scheduler scheduler)
 	{
 		return new QuartzDeliveryTaskManager(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
 	}
 
 	@Bean
 	@Conditional(QuartzJMSTaskManagerType.class)
-	public DeliveryTaskManager quartzJMSDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
+	public DeliveryTaskManager quartzJMSDeliveryTaskManager(
+			DeliveryTaskDAO deliveryTaskDAO,
+			EbMSDAO ebMSDAO,
+			CPAManager cpaManager,
+			Scheduler scheduler,
+			@org.springframework.lang.NonNull ConnectionFactory connectionFactory)
 	{
 		return new QuartzJMSDeliveryTaskManager(
 				scheduler,
@@ -91,12 +93,12 @@ public class DeliveryTaskManagerConfig
 	}
 
 	@Bean
-	public DeliveryTaskDAO deliveryTaskDAO(DataSource dataSource)
+	public DeliveryTaskDAO deliveryTaskDAO(@org.springframework.lang.NonNull DataSource dataSource)
 	{
 		return new DeliveryTaskDAOImpl(new JdbcTemplate(dataSource));
 	}
 
-	private DAODeliveryTaskManager createDefaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
+	private DAODeliveryTaskManager createDefaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO, EbMSDAO ebMSDAO, CPAManager cpaManager)
 	{
 		return new DAODeliveryTaskManager(ebMSDAO, deliveryTaskDAO, cpaManager, serverId, nrAutoRetries, autoRetryInterval);
 	}
@@ -104,9 +106,9 @@ public class DeliveryTaskManagerConfig
 	public static class DefaultTaskManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 					== DeliveryTaskHandlerType.DEFAULT;
 		}
 	}
@@ -114,9 +116,9 @@ public class DeliveryTaskManagerConfig
 	public static class JmsTaskManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 					== DeliveryTaskHandlerType.JMS;
 		}
 	}
@@ -124,9 +126,9 @@ public class DeliveryTaskManagerConfig
 	public static class QuartzTaskManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 					== DeliveryTaskHandlerType.QUARTZ;
 		}
 	}
@@ -134,9 +136,9 @@ public class DeliveryTaskManagerConfig
 	public static class QuartzJMSTaskManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 					== DeliveryTaskHandlerType.QUARTZ_JMS;
 		}
 	}

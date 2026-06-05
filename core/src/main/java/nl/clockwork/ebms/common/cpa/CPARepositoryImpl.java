@@ -51,7 +51,8 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
 	{
-		return jdbcTemplate.queryForObject("select count(*) from cpa where cpa_id = ?", Integer.class, cpaId) > 0;
+		val result = jdbcTemplate.queryForObject("select count(*) from cpa where cpa_id = ?", Integer.class, cpaId);
+		return result != null && result > 0;
 	}
 
 	@Override

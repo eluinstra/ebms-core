@@ -20,9 +20,7 @@ import static org.h2.tools.Server.createTcpServer;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Scanner;
 import lombok.AccessLevel;
@@ -38,6 +36,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.lang.NonNull;
 
 @Slf4j
 @Configuration
@@ -51,15 +50,17 @@ public class H2Config
 			@Value("${database.start:false}") boolean startDatabase,
 			@Value("${database.dir:./h2}") String databaseDir,
 			@Value("${ebms.jdbc.driverClassName}") String driverClassName,
-			@Value("${ebms.jdbc.url}") String jdbcUrl) throws IOException, URISyntaxException, SQLException
+			@Value("${ebms.jdbc.url}") String jdbcUrl) throws IOException
 	{
 		if (startDatabase)
 		{
 			return getH2JdbcUrl(driverClassName, jdbcUrl)
 					.map(unchecked(url -> createTcpServer("-baseDir", databaseDir, "-ifNotExists", "-tcp", "-tcpPort", url.getPort().toString())))
-					.stream()
-					.peek(server -> log.info("Starting H2DB Server on port {} in baseDir {}", server.getPort(), databaseDir))
-					.findFirst()
+					.map(server ->
+					{
+						log.info("Starting H2DB Server on port {} in baseDir {}", server.getPort(), databaseDir);
+						return server;
+					})
 					.map(unchecked(Server::start))
 					.orElse(null);
 		}
@@ -105,7 +106,7 @@ public class H2Config
 	public static class StartDatabaseServerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@NonNull ConditionContext context, @NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("database.start", Boolean.class, false);
 		}

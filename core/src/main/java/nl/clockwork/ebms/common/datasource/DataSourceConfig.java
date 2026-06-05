@@ -46,8 +46,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {
-	public static final String BASEPATH = "classpath:/db/migration/";
-
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
 	@Value("${transactionManager.isolationLevel}")
@@ -64,6 +62,8 @@ public class DataSourceConfig
 	boolean updateDb;
 	@Value("${ebms.jdbc.strict}")
 	boolean updateDbStrict;
+	@Value("${ebms.jdbc.migrationBasePath:classpath:/db/migration/}")
+	String migrationBasePath;
 	@Value("${ebms.pool.autoCommit}")
 	boolean isAutoCommit;
 	@Value("${ebms.pool.connectionTimeout}")
@@ -153,20 +153,18 @@ public class DataSourceConfig
 	// return result;
 	// });
 	// }
-
 	// private Optional<Matcher> matchJdbcUrl(String jdbcUrl)
 	// {
 	// val p = Pattern.compile("^jdbc:db2://([^:]+):(\\d+)/(.*)$");
 	// val m = p.matcher(jdbcUrl);
 	// return m.find() ? Optional.of(m) : Optional.empty();
 	// }
-
 	@EventListener(ContextRefreshedEvent.class)
 	public void init()
 	{
 		if (updateDb)
 		{
-			val location = BASEPATH + (updateDbStrict ? "strict/" : "default/");
+			val location = migrationBasePath + (updateDbStrict ? "strict/" : "default/");
 			val config = Flyway.configure().dataSource(jdbcUrl, username, password).locations(location).ignoreMigrationPatterns("*:missing").outOfOrder(true);
 			config.load().migrate();
 		}
@@ -189,7 +187,7 @@ public class DataSourceConfig
 	public static class NotStartDatabaseServerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return !context.getEnvironment().getProperty("database.start", Boolean.class, false);
 		}

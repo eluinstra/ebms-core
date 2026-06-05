@@ -26,7 +26,6 @@
   </parent>
   <groupId>nl.clockwork.ebms.plugin.db</groupId>
   <artifactId>ebms-mssql-db-plugin</artifactId>
-  <version>${project.parent.version}</version>
   <packaging>jar</packaging>
   <name>EbMS MS SQLServer Database Plugin</name>
   <dependencies>

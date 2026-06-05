@@ -65,6 +65,12 @@ import org.xml.sax.SAXException;
 @AllArgsConstructor
 class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clockwork.ebms.client.delivery.EbMSDAO, WithMessageFilter
 {
+	private static final String MESSAGE_ID = "message_id";
+	private static final String STATUS = "status";
+	private static final String CONTENT = "content";
+	private static final String CONTENT_ID = "content_id";
+	private static final String CONTENT_TYPE = "content_type";
+
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
 	private static class EbMSMessageContextRowMapper implements RowMapper<EbMSMessageProperties>
@@ -83,7 +89,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 				+ " status";
 
 		@Override
-		public EbMSMessageProperties mapRow(ResultSet rs, int rowNum) throws SQLException
+		public EbMSMessageProperties mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
 		{
 			return EbMSMessageProperties.builder()
 					.cpaId(rs.getString("cpa_id"))
@@ -93,9 +99,9 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 					.action(rs.getString("action"))
 					.timestamp(rs.getTimestamp("time_stamp").toInstant())
 					.conversationId(rs.getString("conversation_id"))
-					.messageId(rs.getString("message_id"))
+					.messageId(rs.getString(MESSAGE_ID))
 					.refToMessageId(rs.getString("ref_to_message_id"))
-					.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")).orElse(null))
+					.messageStatus(rs.getObject(STATUS) == null ? null : EbMSMessageStatus.get(rs.getInt(STATUS)).orElse(null))
 					.build();
 		}
 	}
@@ -118,7 +124,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 				+ " status";
 
 		@Override
-		public MessageProperties mapRow(ResultSet rs, int rowNum) throws SQLException
+		public MessageProperties mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
 		{
 			return MessageProperties.builder()
 					.cpaId(rs.getString("cpa_id"))
@@ -128,9 +134,9 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 					.action(rs.getString("action"))
 					.timestamp(rs.getTimestamp("time_stamp").toInstant())
 					.conversationId(rs.getString("conversation_id"))
-					.messageId(rs.getString("message_id"))
+					.messageId(rs.getString(MESSAGE_ID))
 					.refToMessageId(rs.getString("ref_to_message_id"))
-					.messageStatus(EbMSMessageStatus.get(rs.getInt("status")).orElseThrow())
+					.messageStatus(EbMSMessageStatus.get(rs.getInt(STATUS)).orElseThrow())
 					.build();
 		}
 	}
@@ -145,30 +151,32 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 		try
 		{
 			return EbMSAttachmentFactory
-					.createCachedEbMSAttachment(rs.getString("name"), rs.getString("content_id"), rs.getString("content_type"), rs.getBinaryStream("content"));
+					.createCachedEbMSAttachment(rs.getString("name"), rs.getString(CONTENT_ID), rs.getString(CONTENT_TYPE), rs.getBinaryStream(CONTENT));
 		}
 		catch (IOException e)
 		{
 			throw new DataRetrievalFailureException("", e);
 		}
 	};
+	@NonNull
 	RowMapper<DataSource> ebMSDataSourceRowMapper = (rs, rowNum) ->
 	{
 		try
 		{
-			return new DataSource(rs.getString("name"), rs.getString("content_id"), rs.getString("content_type"), IOUtils.toByteArray(rs.getBinaryStream("content")));
+			return new DataSource(rs.getString("name"), rs.getString(CONTENT_ID), rs.getString(CONTENT_TYPE), IOUtils.toByteArray(rs.getBinaryStream(CONTENT)));
 		}
 		catch (IOException e)
 		{
 			throw new DataRetrievalFailureException("", e);
 		}
 	};
+	@NonNull
 	RowMapper<MTOMDataSource> ebMSDataSourceMTOMRowMapper = (rs, rowNum) ->
 	{
 		try
 		{
 			val a = EbMSAttachmentFactory
-					.createCachedEbMSAttachment(rs.getString("name"), rs.getString("content_id"), rs.getString("content_type"), rs.getBinaryStream("content"));
+					.createCachedEbMSAttachment(rs.getString("name"), rs.getString(CONTENT_ID), rs.getString(CONTENT_TYPE), rs.getBinaryStream(CONTENT));
 			return new MTOMDataSource(a.getContentId(), new DataHandler(a));
 		}
 		catch (IOException e)
@@ -186,13 +194,14 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 	@Override
 	public boolean existsMessage(String messageId)
 	{
-		return jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ?", Integer.class, messageId) > 0;
+		Integer result = jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ?", Integer.class, messageId);
+		return result != null && result > 0;
 	}
 
 	@Override
 	public boolean existsIdenticalMessage(EbMSBaseMessage message)
 	{
-		return jdbcTemplate.queryForObject(
+		Integer result = jdbcTemplate.queryForObject(
 				"select count(message_id)" + " from ebms_message" + " where message_id = ?" + " and cpa_id = ?" /*
 																																																				 * + " and from_role =?" + " and to_role = ?" +
 																																																				 * " and service = ?" + " and action = ?"
@@ -203,77 +212,60 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 																							 * , message.getMessageHeader().getFrom().getRole(), message.getMessageHeader().getTo().getRole(),
 																							 * message.getMessageHeader().getService(), message.getMessageHeader().getAction()
 																							 */
-		) > 0;
+		);
+		return result != null && result > 0;
 	}
 
 	@Override
 	public Optional<Message> getMessage(String messageId)
 	{
-		val dataSources = getAttachments(messageId, ebMSDataSourceRowMapper);
+		val dataSources = getAttachments(messageId, java.util.Objects.requireNonNull(ebMSDataSourceRowMapper));
 		return getMessageProperties(messageId).map(p -> new Message(p, dataSources));
 	}
 
 	@Override
 	public Optional<MTOMMessage> getMTOMMessage(String messageId)
 	{
-		val dataSources = getAttachments(messageId, ebMSDataSourceMTOMRowMapper);
+		val dataSources = getAttachments(messageId, java.util.Objects.requireNonNull(ebMSDataSourceMTOMRowMapper));
 		return getMessageProperties(messageId).map(p -> new MTOMMessage(p, dataSources));
 	}
 
 	protected Optional<MessageProperties> getMessageProperties(String messageId)
 	{
-		try
-		{
-			return Optional.of(
-					jdbcTemplate.queryForObject(MessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new MessageContextRowMapper(), messageId));
-		}
-		catch (EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		return jdbcTemplate.query(MessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new MessageContextRowMapper(), messageId)
+				.stream()
+				.findFirst();
 	}
 
 	@Override
 	public Optional<EbMSMessageProperties> getEbMSMessageProperties(String messageId)
 	{
-		try
-		{
-			return Optional.of(
-					jdbcTemplate
-							.queryForObject(EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new EbMSMessageContextRowMapper(), messageId));
-		}
-		catch (EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		return jdbcTemplate.query(EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ?", new EbMSMessageContextRowMapper(), messageId)
+				.stream()
+				.findFirst();
 	}
 
 	@Override
 	public Optional<EbMSMessageProperties> getEbMSMessagePropertiesByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions)
 	{
-		try
-		{
-			return Optional.of(
-					jdbcTemplate.queryForObject(
-							EbMSMessageContextRowMapper.SELECT
-									+ " from ebms_message"
-									+ " where cpa_id = ?"
-									+ " and ref_to_message_id = ?"
-									+ (actions.length == 0
-											? ""
-											: " and service = '"
-													+ EbMSAction.EBMS_SERVICE_URI
-													+ "' and action in ('"
-													+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
-													+ "')"),
-							new EbMSMessageContextRowMapper(),
-							cpaId,
-							refToMessageId));
-		}
-		catch (EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		return jdbcTemplate
+				.query(
+						EbMSMessageContextRowMapper.SELECT
+								+ " from ebms_message"
+								+ " where cpa_id = ?"
+								+ " and ref_to_message_id = ?"
+								+ (actions.length == 0
+										? ""
+										: " and service = '"
+												+ EbMSAction.EBMS_SERVICE_URI
+												+ "' and action in ('"
+												+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
+												+ "')"),
+						new EbMSMessageContextRowMapper(),
+						cpaId,
+						refToMessageId)
+				.stream()
+				.findFirst();
 	}
 
 	@Override
@@ -297,23 +289,28 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 	@Override
 	public Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId)
 	{
-		try
-		{
-			val content = jdbcTemplate.queryForObject(
-					"select content" + " from ebms_message" + " where message_id = ?" + " and (status is null or status = " + EbMSMessageStatus.CREATED.getId() + ")",
-					String.class,
-					messageId);
-			val builder = EbMSDocument.builder().contentId(messageId).message(DOMUtils.read(content)).attachments(getAttachments(messageId, ebMSAttachmentRowMapper));
-			return Optional.of(builder.build());
-		}
-		catch (EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
-		catch (ParserConfigurationException | SAXException | IOException e)
-		{
-			throw new DataRetrievalFailureException("", e);
-		}
+		return jdbcTemplate
+				.queryForList(
+						"select content" + " from ebms_message" + " where message_id = ?" + " and (status is null or status = " + EbMSMessageStatus.CREATED.getId() + ")",
+						String.class,
+						messageId)
+				.stream()
+				.findFirst()
+				.map(content ->
+				{
+					try
+					{
+						val builder = EbMSDocument.builder()
+								.contentId(messageId)
+								.message(DOMUtils.read(content))
+								.attachments(getAttachments(messageId, java.util.Objects.requireNonNull(ebMSAttachmentRowMapper)));
+						return builder.build();
+					}
+					catch (ParserConfigurationException | SAXException | IOException e)
+					{
+						throw new DataRetrievalFailureException("", e);
+					}
+				});
 	}
 
 	@Override
@@ -321,39 +318,40 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 	{
 		try
 		{
-			val document = jdbcTemplate.queryForObject(
-					"select message_id, content"
-							+ " from ebms_message"
-							+ " where cpa_id = ?"
-							+ " and ref_to_message_id = ?"
-							+ (actions.length == 0
-									? ""
-									: " and service = '"
-											+ EbMSAction.EBMS_SERVICE_URI
-											+ "' and action in ('"
-											+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
-											+ "')"),
-					new RowMapper<EbMSDocument>()
-					{
-						@Override
-						public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
-						{
-							try
+			val document = java.util.Objects.requireNonNull(
+					jdbcTemplate.queryForObject(
+							"select message_id, content"
+									+ " from ebms_message"
+									+ " where cpa_id = ?"
+									+ " and ref_to_message_id = ?"
+									+ (actions.length == 0
+											? ""
+											: " and service = '"
+													+ EbMSAction.EBMS_SERVICE_URI
+													+ "' and action in ('"
+													+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
+													+ "')"),
+							new RowMapper<EbMSDocument>()
 							{
-								return EbMSDocument.builder().contentId(rs.getString("message_id")).message(DOMUtils.read(rs.getString("content"))).build();
-							}
-							catch (ParserConfigurationException | SAXException | IOException e)
-							{
-								throw new SQLException(e);
-							}
-						}
-					},
-					cpaId,
-					refToMessageId);
+								@Override
+								public EbMSDocument mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
+								{
+									try
+									{
+										return EbMSDocument.builder().contentId(rs.getString(MESSAGE_ID)).message(DOMUtils.read(rs.getString(CONTENT))).build();
+									}
+									catch (ParserConfigurationException | SAXException | IOException e)
+									{
+										throw new SQLException(e);
+									}
+								}
+							},
+							cpaId,
+							refToMessageId));
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())
-					.attachments(getAttachments(refToMessageId, ebMSAttachmentRowMapper));
+					.attachments(getAttachments(refToMessageId, java.util.Objects.requireNonNull(ebMSAttachmentRowMapper)));
 			return Optional.of(builder.build());
 		}
 		catch (EmptyResultDataAccessException e)
@@ -484,7 +482,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 				new BatchPreparedStatementSetter()
 				{
 					@Override
-					public void setValues(PreparedStatement ps, int i) throws SQLException
+					public void setValues(@org.springframework.lang.NonNull PreparedStatement ps, int i) throws SQLException
 					{
 						try
 						{
@@ -526,7 +524,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 		return jdbcTemplate.update("delete from ebms_attachment" + " where message_id = ?", messageId);
 	}
 
-	protected <T> List<T> getAttachments(String messageId, RowMapper<T> rowMapper)
+	protected <T> List<T> getAttachments(String messageId, @org.springframework.lang.NonNull RowMapper<T> rowMapper)
 	{
 		return jdbcTemplate.query(
 				"select name, content_id, content_type, content" + " from ebms_attachment" + " where message_id = ?" + " order by order_nr",

@@ -73,7 +73,7 @@ class DAODeliveryTaskExecutor implements Runnable
 					val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp, serverId, maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp, serverId);
 					tasks.forEach(task -> futures.add(deliveryTaskHandler.handleAsync(task)));
 				}
-				catch (Exception e)
+				catch (RuntimeException e)
 				{
 					log.error("", e);
 				}
@@ -83,7 +83,7 @@ class DAODeliveryTaskExecutor implements Runnable
 			{
 				timedTask.run(runnable);
 			}
-			catch (Exception e)
+			catch (RuntimeException e)
 			{
 				log.error("", e);
 			}

@@ -185,7 +185,8 @@ public class CPAUtils
 
 	private static X509Certificate toCertificate(InputStream s)
 	{
-		return Try.of(() -> (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(s)).getOrElseThrow(e -> new IllegalStateException(e));
+		return Try.of(() -> (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(s))
+				.getOrElseThrow((Function<Throwable, IllegalStateException>)IllegalStateException::new);
 	}
 
 	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)

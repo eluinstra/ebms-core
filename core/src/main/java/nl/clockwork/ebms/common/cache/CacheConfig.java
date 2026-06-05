@@ -44,7 +44,7 @@ public class CacheConfig
 	public CacheManager simpleCacheManager()
 	{
 		val result = new SimpleCacheManager();
-		result.setCaches(createCaches());
+		result.setCaches(java.util.Objects.requireNonNull(createCaches()));
 		return result;
 	}
 
@@ -73,7 +73,7 @@ public class CacheConfig
 	public static class DefaultCacheType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("cache.type", String.class, "").equals(CACHE_TYPE);
 		}

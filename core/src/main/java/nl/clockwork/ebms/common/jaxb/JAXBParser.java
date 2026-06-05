@@ -40,17 +40,22 @@ import org.xml.sax.SAXNotSupportedException;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JAXBParser<T>
 {
-	private static HashMap<Class<?>, JAXBParser<?>> xmlHandlers = new HashMap<>();
-	private static SAXParserFactory saxParserFactory;
+	private static final HashMap<Class<?>, JAXBParser<?>> xmlHandlers = new HashMap<>();
+	private static final SAXParserFactory saxParserFactory = initializeSaxParserFactory();
 	JAXBContext context;
 
+	private static SAXParserFactory initializeSaxParserFactory()
 	{
 		try
 		{
-			saxParserFactory = SAXParserFactory.newInstance();
-			saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			val parserFactory = SAXParserFactory.newInstance();
+			parserFactory.setNamespaceAware(true);
+			parserFactory.setXIncludeAware(false);
+			parserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			parserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			parserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			parserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			return parserFactory;
 		}
 		catch (SAXNotRecognizedException | SAXNotSupportedException | ParserConfigurationException e)
 		{

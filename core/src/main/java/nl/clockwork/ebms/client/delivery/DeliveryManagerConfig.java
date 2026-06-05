@@ -21,7 +21,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -51,13 +50,6 @@ public class DeliveryManagerConfig
 	int maxEntries;
 	@Value("${messageQueue.timeout}")
 	int timeout;
-	@Autowired
-	CPAManager cpaManager;
-	@Autowired
-	EbMSHttpClientFactory ebMSClientFactory;
-	@Autowired
-	@Qualifier("jmsTransactionManager")
-	PlatformTransactionManager transactionManager;
 
 	@Bean("deliveryManagerTaskExecutor")
 	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor()
@@ -72,7 +64,7 @@ public class DeliveryManagerConfig
 
 	@Bean
 	@Conditional(DefaultDeliveryManagerType.class)
-	public DeliveryManager defaultDeliveryManager()
+	public DeliveryManager defaultDeliveryManager(CPAManager cpaManager, EbMSHttpClientFactory ebMSClientFactory)
 	{
 		return DefaultDeliveryManager.builder()
 				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
@@ -83,7 +75,11 @@ public class DeliveryManagerConfig
 
 	@Bean
 	@Conditional(JmsDeliveryManagerType.class)
-	public DeliveryManager jmsDeliveryManager(ConnectionFactory connectionFactory)
+	public DeliveryManager jmsDeliveryManager(
+			@org.springframework.lang.NonNull ConnectionFactory connectionFactory,
+			CPAManager cpaManager,
+			EbMSHttpClientFactory ebMSClientFactory,
+			@Qualifier("jmsTransactionManager") PlatformTransactionManager transactionManager)
 	{
 		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
 				.cpaManager(cpaManager)
@@ -96,7 +92,7 @@ public class DeliveryManagerConfig
 	public static class DefaultDeliveryManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT)
 					== DeliveryManagerType.DEFAULT;
@@ -106,7 +102,7 @@ public class DeliveryManagerConfig
 	public static class JmsDeliveryManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
 		}

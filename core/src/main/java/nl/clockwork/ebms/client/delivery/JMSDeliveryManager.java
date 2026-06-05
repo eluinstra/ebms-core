@@ -105,7 +105,7 @@ public class JMSDeliveryManager implements DeliveryManager
 		val status = transactionManager.getTransaction(null);
 		try
 		{
-			jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
+			jmsTemplate.setReceiveTimeout(3L * Constants.MINUTE_IN_MILLIS);
 			val result = jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME, "JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'");
 			transactionManager.commit(status);
 			return Optional.ofNullable((EbMSResponseMessage)result);
@@ -125,7 +125,7 @@ public class JMSDeliveryManager implements DeliveryManager
 		{
 			jmsTemplate.setExplicitQosEnabled(true);
 			jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
-			jmsTemplate.convertAndSend(JMS_DESTINATION_NAME, message, m ->
+			jmsTemplate.convertAndSend(JMS_DESTINATION_NAME, java.util.Objects.requireNonNull(message), m ->
 			{
 				m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
 				// m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);

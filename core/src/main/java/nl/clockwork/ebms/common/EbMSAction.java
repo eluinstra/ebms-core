@@ -18,7 +18,6 @@ package nl.clockwork.ebms.common;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,7 +52,7 @@ public enum EbMSAction
 
 	public static List<String> getActions(EbMSAction[] actions)
 	{
-		return Arrays.stream(actions).map(a -> a.action).collect(Collectors.toList());
+		return Arrays.stream(actions).map(a -> a.action).toList();
 	}
 
 	public String getServiceUri()

@@ -25,6 +25,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBException;
+import java.io.IOException;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -58,7 +60,12 @@ public class CPARestController implements WithController
 			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(new BadRequestException(e));
 		}
-		catch (Exception e)
+		catch (IOException | JAXBException e)
+		{
+			log.error("ValidateCPA\n" + cpa, e);
+			throw toWebApplicationException(e);
+		}
+		catch (RuntimeException e)
 		{
 			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(e);
@@ -80,7 +87,12 @@ public class CPARestController implements WithController
 			log.error("InsertCPA\n" + cpa, e);
 			throw toWebApplicationException(new BadRequestException(e), MediaType.TEXT_PLAIN);
 		}
-		catch (Exception e)
+		catch (IOException | JAXBException e)
+		{
+			log.error("InsertCPA\n" + cpa, e);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
+		}
+		catch (RuntimeException e)
 		{
 			log.error("InsertCPA\n" + cpa, e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
@@ -95,7 +107,7 @@ public class CPARestController implements WithController
 		{
 			cpaController.deleteCPAImpl(cpaId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCPA " + cpaId, e);
 			throw toWebApplicationException(e);
@@ -110,7 +122,7 @@ public class CPARestController implements WithController
 		{
 			return cpaController.getCPAIdsImpl();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetCPAIds", e);
 			throw toWebApplicationException(e);
@@ -126,7 +138,12 @@ public class CPARestController implements WithController
 		{
 			return cpaController.getCPAImpl(cpaId);
 		}
-		catch (Exception e)
+		catch (JAXBException e)
+		{
+			log.error("GetCPAId " + cpaId, e);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
+		}
+		catch (RuntimeException e)
 		{
 			log.error("GetCPAId " + cpaId, e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
@@ -141,7 +158,7 @@ public class CPARestController implements WithController
 		{
 			cpaController.deleteCacheImpl();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCache", e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);

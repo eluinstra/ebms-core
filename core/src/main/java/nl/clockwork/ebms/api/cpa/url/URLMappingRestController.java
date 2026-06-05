@@ -50,7 +50,7 @@ public class URLMappingRestController implements WithController
 		{
 			mappingController.setURLMapping(urlMapping);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("SetURLMapping " + urlMapping, e);
 			throw toWebApplicationException(e);
@@ -65,7 +65,7 @@ public class URLMappingRestController implements WithController
 		{
 			mappingController.deleteURLMapping(source);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteURLMapping " + source, e);
 			throw toWebApplicationException(e);
@@ -80,7 +80,7 @@ public class URLMappingRestController implements WithController
 		{
 			return mappingController.getURLMappings();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetURLMappings", e);
 			throw toWebApplicationException(e);
@@ -95,7 +95,7 @@ public class URLMappingRestController implements WithController
 		{
 			mappingController.deleteCache();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCache", e);
 			throw toWebApplicationException(e);

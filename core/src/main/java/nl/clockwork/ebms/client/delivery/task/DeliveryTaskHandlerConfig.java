@@ -46,6 +46,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
 {
+	private static final String DELIVERY_TASK_HANDLER_START = "deliveryTaskHandler.start";
+	private static final String DELIVERY_TASK_HANDLER_TYPE = "deliveryTaskHandler.type";
+
 	public enum DeliveryTaskHandlerType
 	{
 		DEFAULT, JMS, QUARTZ, QUARTZ_JMS;
@@ -149,10 +152,10 @@ public class DeliveryTaskHandlerConfig
 	public static class DefaultTaskHandlerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start", Boolean.class, true)
-					&& context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
+					&& context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 							== DeliveryTaskHandlerType.DEFAULT;
 		}
 	}
@@ -160,12 +163,12 @@ public class DeliveryTaskHandlerConfig
 	public static class JmsTaskHandlerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start", Boolean.class, true)
-					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
+					&& (context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 							== DeliveryTaskHandlerType.JMS
-							|| context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+							|| context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 									== DeliveryTaskHandlerType.QUARTZ_JMS);
 		}
 	}
@@ -173,12 +176,12 @@ public class DeliveryTaskHandlerConfig
 	public static class QuartzTaskHandlerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start", Boolean.class, true)
-					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
+					&& (context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 							== DeliveryTaskHandlerType.QUARTZ
-							|| context.getEnvironment().getProperty("deliveryTaskHandler.type", DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
+							|| context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
 									== DeliveryTaskHandlerType.QUARTZ_JMS);
 		}
 	}

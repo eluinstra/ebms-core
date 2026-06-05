@@ -15,7 +15,13 @@
  */
 package nl.clockwork.ebms.api.ebms;
 
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.soap.SOAPException;
+import java.io.IOException;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -27,6 +33,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.api.ebms.model.MessageRequest;
 import nl.clockwork.ebms.api.ebms.model.MessageStatus;
 import nl.clockwork.ebms.common.event.MessageEventType;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
@@ -43,7 +50,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			ebMSHandler.ping(cpaId, fromPartyId, toPartyId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("Ping " + cpaId, e);
 			throw new EbMSControllerException(e);
@@ -57,7 +64,8 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			return ebMSHandler.sendMessage(messageRequest);
 		}
-		catch (Exception e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError
+				| TransformerException | RuntimeException e)
 		{
 			log.error("SendMessage " + messageRequest, e);
 			throw new EbMSControllerException(e);
@@ -71,7 +79,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			return ebMSHandler.resendMessage(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("ResendMessage {}", messageId);
 			throw new EbMSControllerException(e);
@@ -85,7 +93,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			return ebMSHandler.getUnprocessedMessageIds(messageFilter, maxNr);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessageIds " + messageFilter, e);
 			throw new EbMSControllerException(e);
@@ -99,7 +107,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			return ebMSHandler.getMessage(messageId, process);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessage " + messageId, e);
 			throw new EbMSControllerException(e);
@@ -113,7 +121,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			ebMSHandler.processMessage(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("ProcessMessage " + messageId, e);
 			throw new EbMSControllerException(e);
@@ -127,7 +135,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			return ebMSHandler.getMessageStatus(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessageStatus " + messageId, e);
 			throw new EbMSControllerException(e);
@@ -142,7 +150,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			return ebMSHandler.getUnprocessedMessageEvents(messageFilter, eventTypes, maxNr);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetMessageEvents" + messageFilter, e);
 			throw new EbMSControllerException(e);
@@ -156,7 +164,7 @@ public class EbMSControllerImpl implements EbMSController
 		{
 			ebMSHandler.processMessageEvent(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("ProcessMessageEvent " + messageId, e);
 			throw new EbMSControllerException(e);

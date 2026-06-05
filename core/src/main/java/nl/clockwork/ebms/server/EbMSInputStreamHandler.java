@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.server;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.bind.JAXBException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +67,7 @@ public abstract class EbMSInputStreamHandler
 			log.error("", e);
 			handleValidationException("Client", e.getMessage());
 		}
-		catch (Exception e)
+		catch (IOException | MimeException | ParserConfigurationException | SAXException | TransformerException | RuntimeException e)
 		{
 			log.error("", e);
 			handleException();
@@ -166,7 +167,7 @@ public abstract class EbMSInputStreamHandler
 			val response = getOutputStream();
 			DOMUtils.write(soapFault, response);
 		}
-		catch (Exception e)
+		catch (IOException | ParserConfigurationException | JAXBException | SAXException | TransformerException | RuntimeException e)
 		{
 			log.error("", e);
 			throw new IllegalStateException("An unexpected error occurred!");

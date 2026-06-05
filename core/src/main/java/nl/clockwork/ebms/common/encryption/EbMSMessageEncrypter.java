@@ -107,7 +107,7 @@ public class EbMSMessageEncrypter
 		{
 			throw new EbMSProcessorException(e);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
@@ -129,7 +129,7 @@ public class EbMSMessageEncrypter
 		{
 			throw new EbMSProcessorException(e);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new EbMSProcessingException(e);
 		}

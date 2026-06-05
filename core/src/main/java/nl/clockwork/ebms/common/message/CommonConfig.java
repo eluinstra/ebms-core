@@ -45,7 +45,7 @@ public class CommonConfig
 	{
 		Init.init();
 		EbMSAttachmentFactory.init(attachmentOutputDirectory, attachmentMemoryTreshold, attachmentCipherTransformation);
-		LoggingUtils.mdc = mdc;
+		LoggingUtils.setMdc(mdc);
 	}
 
 	@Bean

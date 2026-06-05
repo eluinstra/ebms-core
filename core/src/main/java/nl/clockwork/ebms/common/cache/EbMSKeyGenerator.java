@@ -18,11 +18,13 @@ package nl.clockwork.ebms.common.cache;
 import java.lang.reflect.Method;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.lang.NonNull;
 
 public class EbMSKeyGenerator implements KeyGenerator
 {
 	@Override
-	public Object generate(Object target, Method method, Object...params)
+	@NonNull
+	public Object generate(@NonNull Object target, @NonNull Method method, @NonNull Object...params)
 	{
 		return method.getName() + "[" + StringUtils.join(params, ",") + "]";
 	}

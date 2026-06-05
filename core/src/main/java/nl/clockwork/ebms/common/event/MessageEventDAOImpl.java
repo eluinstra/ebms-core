@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
@@ -33,6 +34,7 @@ import nl.clockwork.ebms.api.ebms.model.MessageFilter;
 import nl.clockwork.ebms.common.dao.WithMessageFilter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.Nullable;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -41,7 +43,8 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 	public static class EbMSMessageEventRowMapper implements RowMapper<MessageEvent>
 	{
 		@Override
-		public MessageEvent mapRow(ResultSet rs, int nr) throws SQLException
+		@Nullable
+		public MessageEvent mapRow(@org.springframework.lang.NonNull ResultSet rs, int nr) throws SQLException
 		{
 			return new MessageEvent(rs.getString("message_id"), MessageEventType.values()[rs.getInt("event_type")]);
 		}
@@ -68,6 +71,7 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 				parameters.toArray(new Object[0]));
 	}
 
+	@org.springframework.lang.NonNull
 	private String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 	{
 		return "select message_event.message_id, message_event.event_type"
@@ -89,7 +93,7 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 	public List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types, int maxNr)
 	{
 		val parameters = new ArrayList<Object>();
-		val messageContextFilter = getMessageFilter(messageFilter, parameters);
+		val messageContextFilter = Objects.requireNonNull(getMessageFilter(messageFilter, parameters));
 		return jdbcTemplate.query(getMessageEventsQuery(messageContextFilter, types, maxNr), new EbMSMessageEventRowMapper(), parameters.toArray(new Object[0]));
 	}
 

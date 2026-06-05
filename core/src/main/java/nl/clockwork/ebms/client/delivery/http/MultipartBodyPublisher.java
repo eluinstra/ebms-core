@@ -165,6 +165,7 @@ enum State
 class MultipartChannel implements ReadableByteChannel
 {
 	private static final Charset LATIN1 = StandardCharsets.ISO_8859_1;
+	private static final int CONTINUE_READING = Integer.MIN_VALUE;
 	private boolean closed = false;
 	private State state = State.BOUNDARY;
 	private final String boundary;
@@ -204,52 +205,78 @@ class MultipartChannel implements ReadableByteChannel
 		while (true)
 		{
 			if (this.buf.hasRemaining())
-			{
-				val n = Math.min(this.buf.remaining(), buf.remaining());
-				val slice = this.buf.slice();
-				slice.limit(n);
-				buf.put(slice);
-				this.buf.position(this.buf.position() + n);
-				return n;
-			}
+				return readFromCurrentBuffer(buf);
 
-			switch (state)
-			{
-				case BOUNDARY:
-					if (parts.hasNext())
-					{
-						current = parts.next();
-						this.buf = ByteBuffer.wrap(("--" + boundary + "\r\n").getBytes(LATIN1));
-						state = State.HEADERS;
-					}
-					else
-					{
-						this.buf = ByteBuffer.wrap(("--" + boundary + "--\r\n").getBytes(LATIN1));
-						state = State.DONE;
-					}
-					break;
-				case HEADERS:
-					this.buf = ByteBuffer.wrap(currentHeaders().getBytes(charset));
-					state = State.BODY;
-					break;
-				case BODY:
-					if (channel == null)
-						channel = current.open();
-					val n = channel.read(buf);
-					if (n == -1)
-					{
-						channel.close();
-						channel = null;
-						this.buf = ByteBuffer.wrap("\r\n".getBytes(LATIN1));
-						state = State.BOUNDARY;
-					}
-					else
-						return n;
-					break;
-				case DONE:
-					return -1;
-			}
+			val n = readFromCurrentState(buf);
+			if (n != CONTINUE_READING)
+				return n;
 		}
+	}
+
+	private int readFromCurrentBuffer(ByteBuffer target)
+	{
+		val n = Math.min(this.buf.remaining(), target.remaining());
+		val slice = this.buf.slice();
+		slice.limit(n);
+		target.put(slice);
+		this.buf.position(this.buf.position() + n);
+		return n;
+	}
+
+	private int readFromCurrentState(ByteBuffer target) throws IOException
+	{
+		switch (state)
+		{
+			case BOUNDARY:
+				prepareBoundaryBuffer();
+				return CONTINUE_READING;
+			case HEADERS:
+				prepareHeadersBuffer();
+				return CONTINUE_READING;
+			case BODY:
+				return readFromBody(target);
+			case DONE:
+				return -1;
+			default:
+				throw new IllegalStateException("Unexpected state " + state);
+		}
+	}
+
+	private void prepareBoundaryBuffer()
+	{
+		if (parts.hasNext())
+		{
+			current = parts.next();
+			this.buf = ByteBuffer.wrap(("--" + boundary + "\r\n").getBytes(LATIN1));
+			state = State.HEADERS;
+		}
+		else
+		{
+			this.buf = ByteBuffer.wrap(("--" + boundary + "--\r\n").getBytes(LATIN1));
+			state = State.DONE;
+		}
+	}
+
+	private void prepareHeadersBuffer()
+	{
+		this.buf = ByteBuffer.wrap(currentHeaders().getBytes(charset));
+		state = State.BODY;
+	}
+
+	private int readFromBody(ByteBuffer target) throws IOException
+	{
+		if (channel == null)
+			channel = current.open();
+
+		val n = channel.read(target);
+		if (n != -1)
+			return n;
+
+		channel.close();
+		channel = null;
+		this.buf = ByteBuffer.wrap("\r\n".getBytes(LATIN1));
+		state = State.BOUNDARY;
+		return CONTINUE_READING;
 	}
 
 	String currentHeaders()

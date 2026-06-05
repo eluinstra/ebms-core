@@ -29,7 +29,7 @@ import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 public class EbMSResponseException extends EbMSProcessingException
 {
 	private static final long serialVersionUID = 1L;
-	HttpResponse<String> response;
+	final transient HttpResponse<String> response;
 
 	public EbMSResponseException(@NonNull HttpResponse<String> response, String message)
 	{
@@ -52,6 +52,9 @@ public class EbMSResponseException extends EbMSProcessingException
 	@Override
 	public String getMessage()
 	{
+		if (response == null)
+			return super.getMessage();
+
 		return "StatusCode=" + response.statusCode() + "\nHeaders=" + response.headers() + "\n" + (super.getMessage() != null ? super.getMessage() : "");
 	}
 }

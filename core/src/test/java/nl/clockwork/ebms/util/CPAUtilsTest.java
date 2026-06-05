@@ -29,7 +29,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.TransportReceiver;
 
-public class CPAUtilsTest
+class CPAUtilsTest
 {
 
 	class MsgPartyId extends org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId
@@ -38,7 +38,7 @@ public class CPAUtilsTest
 	}
 
 	@Test
-	public void testEquals()
+	void testEquals()
 	{
 		val cpaPartyIds = new ArrayList<PartyId>();
 		val headerPartyIds = new ArrayList<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId>();
@@ -72,7 +72,7 @@ public class CPAUtilsTest
 	}
 
 	@Test
-	public void getHostname()
+	void getHostname()
 	{
 		assertEquals("", CPAUtils.getHostname(null));
 

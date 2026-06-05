@@ -17,6 +17,7 @@ package nl.clockwork.ebms.client.delivery.task;
 
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -44,7 +45,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -119,7 +119,7 @@ class DeliveryTaskHandler
 	public Future<Void> handleAsync(DeliveryTask task)
 	{
 		handle(task);
-		return AsyncResult.forValue(null);
+		return CompletableFuture.completedFuture(null);
 	}
 
 	private void sendTask(final DeliveryTask task)

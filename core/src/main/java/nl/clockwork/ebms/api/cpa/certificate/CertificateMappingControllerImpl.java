@@ -42,7 +42,7 @@ class CertificateMappingControllerImpl implements CertificateMappingController
 			log.error("SetCertificateMapping", e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("SetCertificateMapping " + certificateMapping, e);
 			throw new CertificateMappingControllerException(e);
@@ -76,7 +76,7 @@ class CertificateMappingControllerImpl implements CertificateMappingController
 			log.error("DeleteCertificateMapping", e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCertificateMapping " + source, e);
 			throw new CertificateMappingControllerException(e);
@@ -109,7 +109,7 @@ class CertificateMappingControllerImpl implements CertificateMappingController
 			log.error("GetCertificateMappings", e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetCertificateMappings", e);
 			throw new CertificateMappingControllerException(e);
@@ -129,7 +129,7 @@ class CertificateMappingControllerImpl implements CertificateMappingController
 		{
 			deleteCacheImpl();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCache", e);
 			throw new CertificateMappingControllerException(e);

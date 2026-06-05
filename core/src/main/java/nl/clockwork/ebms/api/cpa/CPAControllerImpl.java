@@ -50,7 +50,12 @@ class CPAControllerImpl implements CPAController
 			log.error("ValidateCPA\n" + cpa, e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (SAXException | IOException | JAXBException e)
+		{
+			log.error("ValidateCPA\n" + cpa, e);
+			throw new CPAControllerException(e);
+		}
+		catch (RuntimeException e)
 		{
 			log.error("ValidateCPA\n" + cpa, e);
 			throw new CPAControllerException(e);
@@ -78,7 +83,12 @@ class CPAControllerImpl implements CPAController
 			log.error("InsertCPA\n" + cpa, e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (SAXException | IOException | JAXBException e)
+		{
+			log.error("InsertCPA\n" + cpa, e);
+			throw new CPAControllerException(e);
+		}
+		catch (RuntimeException e)
 		{
 			log.error("InsertCPA\n" + cpa, e);
 			throw new CPAControllerException(e);
@@ -124,7 +134,7 @@ class CPAControllerImpl implements CPAController
 			log.error("DeleteCPA " + cpaId, e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCPA " + cpaId, e);
 			throw new CPAControllerException(e);
@@ -150,7 +160,7 @@ class CPAControllerImpl implements CPAController
 			log.error("GetCPAIds", e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetCPAIds", e);
 			throw new CPAControllerException(e);
@@ -175,7 +185,12 @@ class CPAControllerImpl implements CPAController
 			log.error("GetCPAId " + cpaId, e);
 			throw e;
 		}
-		catch (Exception e)
+		catch (JAXBException e)
+		{
+			log.error("GetCPAId " + cpaId, e);
+			throw new CPAControllerException(e);
+		}
+		catch (RuntimeException e)
 		{
 			log.error("GetCPAId " + cpaId, e);
 			throw new CPAControllerException(e);
@@ -195,7 +210,7 @@ class CPAControllerImpl implements CPAController
 		{
 			deleteCacheImpl();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCache", e);
 			throw new CPAControllerException(e);
