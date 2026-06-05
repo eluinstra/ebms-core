@@ -68,7 +68,6 @@ class MessageHeaderValidator
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
-		// TODO: remove???
 		cpaManager
 				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),

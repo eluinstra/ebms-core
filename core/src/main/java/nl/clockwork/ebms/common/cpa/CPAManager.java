@@ -176,7 +176,6 @@ public class CPAManager
 
 	private String toCertificateAlias(X509Certificate c)
 	{
-		// TODO: improve error handling
 		try
 		{
 			return keyStore.getCertificateAlias(c);

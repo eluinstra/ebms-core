@@ -29,29 +29,29 @@ import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 public class EbMSResponseException extends EbMSProcessingException
 {
 	private static final long serialVersionUID = 1L;
-	HttpResponse<String> repsonse;
+	HttpResponse<String> response;
 
-	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, String message)
+	public EbMSResponseException(@NonNull HttpResponse<String> response, String message)
 	{
 		super(message);
-		this.repsonse = repsonse;
+		this.response = response;
 	}
 
-	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, Throwable cause)
+	public EbMSResponseException(@NonNull HttpResponse<String> response, Throwable cause)
 	{
 		super(cause);
-		this.repsonse = repsonse;
+		this.response = response;
 	}
 
-	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, String message, Throwable cause)
+	public EbMSResponseException(@NonNull HttpResponse<String> response, String message, Throwable cause)
 	{
 		super(message, cause);
-		this.repsonse = repsonse;
+		this.response = response;
 	}
 
 	@Override
 	public String getMessage()
 	{
-		return "StatusCode=" + repsonse.statusCode() + "\nHeaders=" + repsonse.headers().toString() + "\n" + (super.getMessage() != null ? super.getMessage() : "");
+		return "StatusCode=" + response.statusCode() + "\nHeaders=" + response.headers() + "\n" + (super.getMessage() != null ? super.getMessage() : "");
 	}
 }

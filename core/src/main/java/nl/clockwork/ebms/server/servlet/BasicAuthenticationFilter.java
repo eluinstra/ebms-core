@@ -98,7 +98,6 @@ public class BasicAuthenticationFilter implements Filter
 		}
 	}
 
-	// TODO: support all allowed password encodings
 	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException
 	{
 		if (savedPassword.startsWith("MD5:"))
