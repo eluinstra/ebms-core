@@ -94,7 +94,7 @@ public class EbMSHttpClientFactory
 					httpErrors.getRecoverableHttpErrors(),
 					httpErrors.getUnrecoverableHttpErrors());
 		}
-		catch (Exception e)
+		catch (UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException e)
 		{
 			throw new IllegalStateException(e);
 		}

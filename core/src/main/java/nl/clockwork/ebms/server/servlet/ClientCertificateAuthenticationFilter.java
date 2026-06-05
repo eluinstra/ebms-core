@@ -23,7 +23,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import lombok.AccessLevel;
@@ -41,17 +40,10 @@ public class ClientCertificateAuthenticationFilter implements Filter
 	@Override
 	public void init(FilterConfig config) throws ServletException
 	{
-		try
-		{
-			val trustStoreType = config.getInitParameter("trustStoreType");
-			val trustStorePath = config.getInitParameter("trustStorePath");
-			val trustStorePassword = config.getInitParameter("trustStorePassword");
-			trustStore = EbMSTrustStore.of(KeyStoreType.valueOf(trustStoreType), trustStorePath, trustStorePassword);
-		}
-		catch (GeneralSecurityException | IOException e)
-		{
-			throw new ServletException(e);
-		}
+		val trustStoreType = config.getInitParameter("trustStoreType");
+		val trustStorePath = config.getInitParameter("trustStorePath");
+		val trustStorePassword = config.getInitParameter("trustStorePassword");
+		trustStore = EbMSTrustStore.of(KeyStoreType.valueOf(trustStoreType), trustStorePath, trustStorePassword);
 	}
 
 	@Override

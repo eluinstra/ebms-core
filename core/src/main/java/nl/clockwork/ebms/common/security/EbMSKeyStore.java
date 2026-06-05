@@ -48,22 +48,36 @@ public class EbMSKeyStore
 	protected String defaultAlias;
 
 	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword)
-			throws GeneralSecurityException, IOException
 	{
-		if (!keyStores.containsKey(path))
-			keyStores.put(path, new EbMSKeyStore(path, KeyStoreUtils.loadKeyStore(type, path, password), keyPassword, null));
-		return keyStores.get(path);
+		return keyStores.computeIfAbsent(path, p ->
+		{
+			try
+			{
+				return new EbMSKeyStore(p, KeyStoreUtils.loadKeyStore(type, p, password), keyPassword, null);
+			}
+			catch (GeneralSecurityException | IOException e)
+			{
+				throw new IllegalStateException(e);
+			}
+		});
 	}
 
 	public static
 			EbMSKeyStore
 			of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, @NonNull String defaultAlias)
-					throws GeneralSecurityException, IOException
 	{
 		String key = path + defaultAlias;
-		if (!keyStores.containsKey(key))
-			keyStores.put(key, new EbMSKeyStore(path, KeyStoreUtils.loadKeyStore(type, path, password), keyPassword, defaultAlias));
-		return keyStores.get(key);
+		return keyStores.computeIfAbsent(key, k ->
+		{
+			try
+			{
+				return new EbMSKeyStore(path, KeyStoreUtils.loadKeyStore(type, path, password), keyPassword, defaultAlias);
+			}
+			catch (GeneralSecurityException | IOException e)
+			{
+				throw new IllegalStateException(e);
+			}
+		});
 	}
 
 	public EbMSKeyStore(@NonNull String path, @NonNull KeyStore keyStore, String keyPassword, String defaultAlias)

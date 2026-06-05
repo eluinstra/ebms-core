@@ -15,11 +15,7 @@
  */
 package nl.clockwork.ebms.common.jms;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
-import static nl.clockwork.ebms.common.Predicates.startsWith;
-
+import java.util.Objects;
 import org.apache.activemq.xbean.BrokerFactoryBean;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.ClassPathResource;
@@ -42,10 +38,12 @@ class EbMSBrokerFactoryBean implements DisposableBean
 
 	private static Resource createResource(String path)
 	{
-		return Match(path).of(
-				Case($(startsWith("classpath:")), o -> new ClassPathResource(path.substring("classpath:".length()))),
-				Case($(startsWith("file:")), o -> new FileSystemResource(path.substring("file:".length()))),
-				Case($(), o -> new FileSystemResource(path)));
+		String resourcePath = Objects.requireNonNull(path);
+		if (resourcePath.startsWith("classpath:"))
+			return new ClassPathResource(Objects.requireNonNull(resourcePath.substring("classpath:".length())));
+		if (resourcePath.startsWith("file:"))
+			return new FileSystemResource(Objects.requireNonNull(resourcePath.substring("file:".length())));
+		return new FileSystemResource(resourcePath);
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.common.EbMSAction;
@@ -44,8 +45,10 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -62,6 +65,19 @@ public class CPAManager
 	@NonNull
 	EbMSKeyStore keyStore;
 	boolean useClientCertificate;
+
+	// Self-injection of the Spring proxy so internal @Cacheable calls hit the proxy (S6809). Field injection is required here because constructor injection would
+	// create a self-referential cycle at construction time.
+	@SuppressWarnings("java:S6813")
+	@Autowired
+	@Lazy
+	@NonFinal
+	CPAManager self;
+
+	private CPAManager self()
+	{
+		return self != null ? self : this;
+	}
 
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
@@ -96,8 +112,8 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
-		return getFromPartyInfo(cpaId, fromParty, service, action)
-				.flatMap(fromPartyInfo -> cpaRepository.getCPA(cpaId).map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo, fromParty, service, action)))
+		return self().getFromPartyInfo(cpaId, fromParty, service, action)
+				.flatMap(fromPartyInfo -> cpaRepository.getCPA(cpaId).map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo)))
 				.orElse(empty());
 	}
 
@@ -128,13 +144,13 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
-		return getPartyInfo(cpaId, partyId).map(CPAQuery.getDefaultDeliveryChannel(action)).orElse(empty());
+		return self().getPartyInfo(cpaId, partyId).map(CPAQuery.getDefaultDeliveryChannel(action)).orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSMessageHeaderKeyGenerator")
 	public Optional<DeliveryChannel> getSendDeliveryChannel(MessageHeader messageHeader)
 	{
-		return getSendDeliveryChannel(
+		return self().getSendDeliveryChannel(
 				messageHeader.getCPAId(),
 				messageHeader.getFrom().getPartyId(),
 				messageHeader.getFrom().getRole(),
@@ -146,8 +162,8 @@ public class CPAManager
 	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
 		return service != null && EbMSAction.EBMS_SERVICE_URI.equals(service.toString())
-				? getDefaultDeliveryChannel(cpaId, partyId, action)
-				: getPartyInfo(cpaId, partyId).flatMap(CPAQuery.getSendDeliveryChannel(role, service, action));
+				? self().getDefaultDeliveryChannel(cpaId, partyId, action)
+				: self().getPartyInfo(cpaId, partyId).flatMap(CPAQuery.getSendDeliveryChannel(role, service, action));
 	}
 
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
@@ -159,8 +175,8 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSMessageHeaderKeyGenerator")
 	public Optional<String> getSSLClientAlias(MessageHeader messageHeader)
 	{
-		val deliveryChannel = getSendDeliveryChannel(messageHeader).orElse(null);
-		return getSSLClientAlias(messageHeader.getCPAId(), deliveryChannel);
+		val deliveryChannel = self().getSendDeliveryChannel(messageHeader).orElse(null);
+		return self().getSSLClientAlias(messageHeader.getCPAId(), deliveryChannel);
 	}
 
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
@@ -196,14 +212,14 @@ public class CPAManager
 	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
 		return service != null && EbMSAction.EBMS_SERVICE_URI.equals(service.toString())
-				? getDefaultDeliveryChannel(cpaId, partyId, action)
-				: getPartyInfo(cpaId, partyId).flatMap(CPAQuery.getReceiveDeliveryChannel(role, service, action));
+				? self().getDefaultDeliveryChannel(cpaId, partyId, action)
+				: self().getPartyInfo(cpaId, partyId).flatMap(CPAQuery.getReceiveDeliveryChannel(role, service, action));
 	}
 
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean isSendingNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
-		val deliveryChannel = getSendDeliveryChannel(cpaId, partyId, role, service, action)
+		val deliveryChannel = self().getSendDeliveryChannel(cpaId, partyId, role, service, action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel", cpaId, partyId, role, service, action));
 		val docExchange = CPAUtils.getDocExchange(deliveryChannel);
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.isSendingNonRepudiationRequired(docExchange, partyId, role, service, action)).orElse(false);
@@ -212,7 +228,7 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public boolean isSendingConfidential(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
-		val deliveryChannel = getSendDeliveryChannel(cpaId, partyId, role, service, action)
+		val deliveryChannel = self().getSendDeliveryChannel(cpaId, partyId, role, service, action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel", cpaId, partyId, role, service, action));
 		val docExchange = CPAUtils.getDocExchange(deliveryChannel);
 		return cpaRepository.getCPA(cpaId).map(CPAQuery.isSendingConfidential(docExchange, partyId, role, service, action)).orElse(false);
@@ -221,7 +237,7 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSMessageHeaderKeyGenerator")
 	public String getReceivingUri(MessageHeader messageHeader)
 	{
-		return getReceivingUri(
+		return self().getReceivingUri(
 				messageHeader.getCPAId(),
 				messageHeader.getTo().getPartyId(),
 				messageHeader.getTo().getRole(),
@@ -232,7 +248,7 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public String getReceivingUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
-		val deliveryChannel = getReceiveDeliveryChannel(cpaId, partyId, role, service, action)
+		val deliveryChannel = self().getReceiveDeliveryChannel(cpaId, partyId, role, service, action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel", cpaId, partyId, role, service, action));
 		return overrideURL.apply(CPAUtils.getUri(deliveryChannel));
 	}
@@ -240,7 +256,8 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<SyncReplyModeType> getSendSyncReply(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
-		return getSendDeliveryChannel(cpaId, partyId, role, service, action).map(DeliveryChannel::getMessagingCharacteristics)
+		return self().getSendDeliveryChannel(cpaId, partyId, role, service, action)
+				.map(DeliveryChannel::getMessagingCharacteristics)
 				.map(MessagingCharacteristics::getSyncReplyMode);
 	}
 }

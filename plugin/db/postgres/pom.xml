@@ -26,7 +26,6 @@
   </parent>
   <groupId>nl.clockwork.ebms.plugin.db</groupId>
   <artifactId>ebms-postgres-db-plugin</artifactId>
-  <version>${project.parent.version}</version>
   <packaging>jar</packaging>
   <name>EbMS Postgres Database Plugin</name>
   <dependencies>

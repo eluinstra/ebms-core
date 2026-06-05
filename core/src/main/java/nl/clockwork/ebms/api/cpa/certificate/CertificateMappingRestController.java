@@ -26,8 +26,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import java.security.cert.CertificateException;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -53,7 +53,7 @@ public class CertificateMappingRestController implements WithController
 		{
 			mappingService.setCertificateMappingImpl(certificateMapping.toCertificateMapping());
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("SetCertificateMapping " + certificateMapping, e);
 			throw toWebApplicationException(e);
@@ -69,7 +69,12 @@ public class CertificateMappingRestController implements WithController
 		{
 			mappingService.deleteCertificateMappingImpl(parseCertificate(decodeBase64(source)), cpaId);
 		}
-		catch (Exception e)
+		catch (CertificateException e)
+		{
+			log.error("DeleteCertificateMapping " + source, e);
+			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
+		}
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCertificateMapping " + source, e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
@@ -82,9 +87,9 @@ public class CertificateMappingRestController implements WithController
 	{
 		try
 		{
-			return mappingService.getCertificateMappingsImpl().stream().map(m -> CertificateMapping.of(m)).collect(Collectors.toList());
+			return mappingService.getCertificateMappingsImpl().stream().map(CertificateMapping::of).toList();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("GetCertificateMappings", e);
 			throw toWebApplicationException(e);
@@ -99,7 +104,7 @@ public class CertificateMappingRestController implements WithController
 		{
 			mappingService.deleteCacheImpl();
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			log.error("DeleteCache", e);
 			throw toWebApplicationException(e);

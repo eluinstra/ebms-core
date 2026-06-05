@@ -830,26 +830,15 @@
                 </config>
               </prettier>
             </format>
-            <!-- <format>
-              <includes>
-                <include>src/*/resources/**/*.xml</include>
-              </includes>
-              <eclipseWtp>
-                <type>XML</type>
-                <files>
-                  <file>${maven.multiModuleProjectDirectory}/.spotless.xml.prefs</file>
-                </files>
-              </eclipseWtp>
-            </format> -->
           </formats>
           <java>
             <eclipse>
-              <file>${maven.multiModuleProjectDirectory}/.eclipse-formatter.xml</file>
+              <file>${session.executionRootDirectory}/.eclipse-formatter.xml</file>
             </eclipse>
             <removeUnusedImports/>
             <importOrder/>
             <licenseHeader>
-              <file>${maven.multiModuleProjectDirectory}/resources/license/java-header.txt</file>
+              <file>${session.executionRootDirectory}/resources/license/java-header.txt</file>
             </licenseHeader>
           </java>
           <markdown>

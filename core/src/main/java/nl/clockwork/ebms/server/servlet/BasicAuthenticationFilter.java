@@ -25,8 +25,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
@@ -85,20 +85,20 @@ public class BasicAuthenticationFilter implements Filter
 			if (authorization != null && authorization.toLowerCase().startsWith("basic"))
 			{
 				authorization = authorization.substring("basic".length()).trim();
-				authorization = new String(Base64.getDecoder().decode(authorization));
+				authorization = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
 				val credenitals = StringUtils.split(authorization, ":");
 				if (credenitals.length == 2)
 					return validate(users.get(credenitals[0]), credenitals[1]);
 			}
 			return false;
 		}
-		catch (NoSuchAlgorithmException | UnsupportedEncodingException e)
+		catch (NoSuchAlgorithmException e)
 		{
 			throw new ServletException(e);
 		}
 	}
 
-	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException
+	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException
 	{
 		if (savedPassword.startsWith("MD5:"))
 			return toMD5(password).equals(savedPassword);

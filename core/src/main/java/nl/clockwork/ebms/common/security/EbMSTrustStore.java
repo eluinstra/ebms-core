@@ -40,11 +40,19 @@ public class EbMSTrustStore
 	@NonNull
 	KeyStore keyStore;
 
-	public static EbMSTrustStore of(KeyStoreType type, String path, String password) throws GeneralSecurityException, IOException
+	public static EbMSTrustStore of(KeyStoreType type, String path, String password)
 	{
-		if (!trustStores.containsKey(path))
-			trustStores.put(path, new EbMSTrustStore(KeyStoreUtils.loadKeyStore(type, path, password)));
-		return trustStores.get(path);
+		return trustStores.computeIfAbsent(path, p ->
+		{
+			try
+			{
+				return new EbMSTrustStore(KeyStoreUtils.loadKeyStore(type, p, password));
+			}
+			catch (GeneralSecurityException | IOException e)
+			{
+				throw new IllegalStateException(e);
+			}
+		});
 	}
 
 	public EbMSTrustStore(@NonNull KeyStore keyStore)

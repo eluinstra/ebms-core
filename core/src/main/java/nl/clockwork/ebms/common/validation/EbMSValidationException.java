@@ -31,7 +31,7 @@ public class EbMSValidationException extends ValidationException
 {
 	private static final long serialVersionUID = 1L;
 	@NonNull
-	Error error;
+	final Error error;
 
 	@Override
 	public String getMessage()

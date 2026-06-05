@@ -59,8 +59,8 @@ public class EbMSMessageBuilder
 	StatusRequest statusRequest;
 	StatusResponse statusResponse;
 	SignatureType signature;
-	boolean attachments$set;
-	List<EbMSAttachment> attachments$value;
+	boolean attachmentsSet;
+	List<EbMSAttachment> attachmentsValue;
 
 	public EbMSMessageBuilder messageHeader(@NonNull final MessageHeader messageHeader)
 	{
@@ -124,8 +124,8 @@ public class EbMSMessageBuilder
 
 	public EbMSMessageBuilder attachments(@NonNull final List<EbMSAttachment> attachments)
 	{
-		this.attachments$value = attachments;
-		attachments$set = true;
+		attachmentsValue = attachments;
+		attachmentsSet = true;
 		return this;
 	}
 
@@ -133,9 +133,9 @@ public class EbMSMessageBuilder
 	{
 		try
 		{
-			List<EbMSAttachment> attachments$value = this.attachments$value;
-			if (!this.attachments$set)
-				attachments$value = new ArrayList<>();
+			List<EbMSAttachment> localAttachments = attachmentsValue;
+			if (!attachmentsSet)
+				localAttachments = new ArrayList<>();
 			if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 				return EbMSMessage.builder()
 						.messageHeader(messageHeader)
@@ -144,7 +144,7 @@ public class EbMSMessageBuilder
 						.messageOrder(messageOrder)
 						.ackRequested(ackRequested)
 						.manifest(manifest)
-						.attachments(attachments$value)
+						.attachments(localAttachments)
 						.build();
 			else
 				return Match(messageHeader.getAction()).of(
@@ -164,7 +164,7 @@ public class EbMSMessageBuilder
 		{
 			throw e;
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new EbMSProcessingException("Unable to build a valid message message!", e);
 		}
@@ -193,8 +193,8 @@ public class EbMSMessageBuilder
 				+ this.statusResponse
 				+ ", signature="
 				+ this.signature
-				+ ", attachments$value="
-				+ this.attachments$value
+				+ ", attachmentsValue="
+				+ attachmentsValue
 				+ ")";
 	}
 }

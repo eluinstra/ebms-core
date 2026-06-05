@@ -38,7 +38,7 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 		public static final String SELECT = "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries";
 
 		@Override
-		public DeliveryTask mapRow(ResultSet rs, int rowNum) throws SQLException
+		public DeliveryTask mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
 		{
 			return DeliveryTask.builder()
 					.cpaId(rs.getString("cpa_id"))

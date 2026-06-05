@@ -53,16 +53,14 @@ class EbMSResponseHandler
 			switch (response.statusCode() / 100)
 			{
 				case 2:
-					if (response.statusCode() == HttpServletResponse.SC_NO_CONTENT || response.body().length() == 0)
+					if (response.statusCode() == HttpServletResponse.SC_NO_CONTENT || response.body().isEmpty())
 					{
 						logResponse(response);
 						return null;
 					}
 					else
 						return readSuccesResponse(response);
-				case 1:
-				case 3:
-				case 4:
+				case 1, 3, 4:
 					throw createRecoverableErrorException(response);
 				case 5:
 					throw createUnrecoverableErrorException(response);

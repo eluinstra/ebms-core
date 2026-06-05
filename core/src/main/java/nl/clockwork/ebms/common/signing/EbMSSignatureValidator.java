@@ -61,30 +61,15 @@ public class EbMSSignatureValidator
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			if (cpaManager.isSendingNonRepudiationRequired(
-					messageHeader.getCPAId(),
-					messageHeader.getFrom().getPartyId(),
-					messageHeader.getFrom().getRole(),
-					messageHeader.getService(),
-					messageHeader.getAction()))
-			{
-				val signatureNodeList = document.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
-				if (signatureNodeList.getLength() > 0)
-				{
-					val certificate = getCertificate(messageHeader);
-					if (certificate != null)
-					{
-						val timestamp = messageHeader.getMessageData().getTimestamp() == null ? Instant.now() : messageHeader.getMessageData().getTimestamp();
-						SecurityUtils.validateCertificate(trustStore, certificate, timestamp);
-						if (!verify(certificate, (Element)signatureNodeList.item(0), message.getAttachments()))
-							throw new ValidationException("Invalid Signature!");
-					}
-					else
-						throw new ValidationException("Certificate not found!");
-				}
-				else
-					throw new ValidationException("Signature not found!");
-			}
+			if (!isNonRepudiationRequired(messageHeader))
+				return;
+
+			val signatureElement = getSignatureElement(document);
+			val certificate = getRequiredCertificate(messageHeader);
+			val timestamp = resolveTimestamp(messageHeader.getMessageData().getTimestamp());
+			SecurityUtils.validateCertificate(trustStore, certificate, timestamp);
+			if (!verify(certificate, signatureElement, message.getAttachments()))
+				throw new ValidationException("Invalid Signature!");
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -101,28 +86,17 @@ public class EbMSSignatureValidator
 	{
 		try
 		{
-			if (requestMessage.getAckRequested().isSigned())
-			{
-				val signatureNodeList = responseDocument.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
-				if (signatureNodeList.getLength() > 0)
-				{
-					val certificate = getCertificate(responseMessage.getMessageHeader());
-					if (certificate != null)
-					{
-						val date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null
-								? Instant.now()
-								: responseMessage.getMessageHeader().getMessageData().getTimestamp();
-						SecurityUtils.validateCertificate(trustStore, certificate, date);
-						if (!verify(certificate, (Element)signatureNodeList.item(0), Collections.emptyList()))
-							throw new ValidationException("Invalid Signature!");
-						validateSignatureReferences(requestMessage, responseMessage);
-					}
-					else
-						throw new ValidationException("Certificate not found!");
-				}
-				else
-					throw new ValidationException("Signature not found!");
-			}
+			if (!requestMessage.getAckRequested().isSigned())
+				return;
+
+			val signatureElement = getSignatureElement(responseDocument);
+			val certificate = getRequiredCertificate(responseMessage.getMessageHeader());
+			val date = resolveTimestamp(responseMessage.getMessageHeader().getMessageData().getTimestamp());
+			SecurityUtils.validateCertificate(trustStore, certificate, date);
+			if (!verify(certificate, signatureElement, Collections.emptyList()))
+				throw new ValidationException("Invalid Signature!");
+
+			validateSignatureReferences(requestMessage, responseMessage);
 		}
 		catch (KeyStoreException e)
 		{
@@ -162,6 +136,37 @@ public class EbMSSignatureValidator
 		if (deliveryChannel != null)
 			return CPAUtils.getX509Certificate(nl.clockwork.ebms.common.cpa.CPAUtils.getSigningCertificate(deliveryChannel));
 		return null;
+	}
+
+	private boolean isNonRepudiationRequired(MessageHeader messageHeader)
+	{
+		return cpaManager.isSendingNonRepudiationRequired(
+				messageHeader.getCPAId(),
+				messageHeader.getFrom().getPartyId(),
+				messageHeader.getFrom().getRole(),
+				messageHeader.getService(),
+				messageHeader.getAction());
+	}
+
+	private Element getSignatureElement(EbMSDocument document) throws ValidationException
+	{
+		val signatureNodeList = document.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
+		if (signatureNodeList.getLength() == 0)
+			throw new ValidationException("Signature not found!");
+		return (Element)signatureNodeList.item(0);
+	}
+
+	private X509Certificate getRequiredCertificate(MessageHeader messageHeader) throws ValidationException
+	{
+		val certificate = getCertificate(messageHeader);
+		if (certificate == null)
+			throw new ValidationException("Certificate not found!");
+		return certificate;
+	}
+
+	private Instant resolveTimestamp(Instant timestamp)
+	{
+		return timestamp == null ? Instant.now() : timestamp;
 	}
 
 	private void validateSignatureReferences(EbMSMessage requestMessage, EbMSAcknowledgment responseMessage) throws ValidationException

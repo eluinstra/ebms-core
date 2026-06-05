@@ -32,7 +32,7 @@ public class DeliveryTaskJob extends QuartzJobBean
 	DeliveryTaskHandler deliveryTaskHandler;
 
 	@Override
-	public void executeInternal(JobExecutionContext context) throws JobExecutionException
+	public void executeInternal(@org.springframework.lang.NonNull JobExecutionContext context) throws JobExecutionException
 	{
 		try
 		{
@@ -40,7 +40,7 @@ public class DeliveryTaskJob extends QuartzJobBean
 			val task = QuartzDeliveryTaskManager.createDeliveryTask(properties);
 			deliveryTaskHandler.handle(task);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new JobExecutionException(e);
 		}

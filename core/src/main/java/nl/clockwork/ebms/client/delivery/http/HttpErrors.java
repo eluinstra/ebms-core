@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -57,16 +56,16 @@ class HttpErrors
 			@NonNull List<Integer> recoverableClientHttpErrors,
 			@NonNull List<Integer> unrecoverableServerHttpErrors)
 	{
-		val recoverableHttpErrors = new ArrayList<Integer>();
-		recoverableHttpErrors.addAll(recoverableInformationalHttpErrors);
-		recoverableHttpErrors.addAll(recoverableRedirectionHttpErrors);
-		recoverableHttpErrors.addAll(recoverableClientHttpErrors);
-		this.recoverableHttpErrors = Collections.unmodifiableList(recoverableHttpErrors);
+		val recoverableCodes = new ArrayList<Integer>();
+		recoverableCodes.addAll(recoverableInformationalHttpErrors);
+		recoverableCodes.addAll(recoverableRedirectionHttpErrors);
+		recoverableCodes.addAll(recoverableClientHttpErrors);
+		this.recoverableHttpErrors = Collections.unmodifiableList(recoverableCodes);
 		this.unrecoverableHttpErrors = Collections.unmodifiableList(unrecoverableServerHttpErrors);
 	}
 
 	private static List<Integer> getIntegerList(String input)
 	{
-		return Arrays.stream(StringUtils.split(input, ',')).map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
+		return Arrays.stream(StringUtils.split(input, ',')).map(s -> Integer.parseInt(s.trim())).toList();
 	}
 }

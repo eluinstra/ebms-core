@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common.scheduler;
 
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -23,6 +24,7 @@ import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -32,15 +34,18 @@ public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 	SchedulerContext schedulerContext;
 
 	@Override
-	protected Object createJobInstance(TriggerFiredBundle bundle) throws Exception
+	@NonNull
+	protected Object createJobInstance(@NonNull TriggerFiredBundle bundle) throws Exception
 	{
-		val job = applicationContext.getBean(bundle.getJobDetail().getJobClass());
+		val jobClass = Objects.requireNonNull(bundle.getJobDetail().getJobClass());
+		val job = applicationContext.getBean(jobClass);
 		val beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(job);
-		val propertyValues = createPropertyValues(bundle);
+		val propertyValues = Objects.requireNonNull(createPropertyValues(bundle));
 		beanWrapper.setPropertyValues(propertyValues, true);
 		return job;
 	}
 
+	@NonNull
 	private MutablePropertyValues createPropertyValues(TriggerFiredBundle bundle)
 	{
 		val result = new MutablePropertyValues();
@@ -52,13 +57,13 @@ public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
+	public void setApplicationContext(@NonNull ApplicationContext applicationContext)
 	{
 		this.applicationContext = applicationContext;
 	}
 
 	@Override
-	public void setSchedulerContext(SchedulerContext schedulerContext)
+	public void setSchedulerContext(@NonNull SchedulerContext schedulerContext)
 	{
 		this.schedulerContext = schedulerContext;
 		super.setSchedulerContext(schedulerContext);

@@ -21,11 +21,13 @@ import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.lang.NonNull;
 
 public class MessageHeaderKeyGenerator implements KeyGenerator
 {
 	@Override
-	public Object generate(Object target, Method method, Object...params)
+	@NonNull
+	public Object generate(@NonNull Object target, @NonNull Method method, @NonNull Object...params)
 	{
 		val messageHeader = (MessageHeader)params[0];
 		val values = new ArrayList<>();

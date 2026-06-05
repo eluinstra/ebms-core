@@ -33,7 +33,13 @@ public class LoggingUtils
 		DISABLED, ENABLED;
 	}
 
+	@SuppressWarnings({"java:S1104", "java:S1444"})
 	public static Status mdc;
+
+	public static void setMdc(Status status)
+	{
+		mdc = status;
+	}
 
 	public static Map<String, String> getPropertyMap(MessageHeader header)
 	{

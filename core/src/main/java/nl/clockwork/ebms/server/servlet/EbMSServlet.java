@@ -34,13 +34,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class EbMSServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
-	EbMSHttpHandler httpHandler;
+	transient EbMSHttpHandler httpHandler;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
 	{
 		super.init(config);
-		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(java.util.Objects.requireNonNull(getServletContext()));
 		httpHandler = wac.getBean(EbMSHttpHandler.class);
 	}
 

@@ -31,6 +31,9 @@ public class ClientCertificateManager
 
 	public static void setCertificate(X509Certificate certificate)
 	{
-		certificateHolder.set(certificate);
+		if (certificate == null)
+			certificateHolder.remove();
+		else
+			certificateHolder.set(certificate);
 	}
 }

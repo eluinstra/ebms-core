@@ -27,10 +27,15 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.soap.SOAPException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -52,6 +57,7 @@ import nl.clockwork.ebms.common.event.MessageEventType;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
@@ -70,7 +76,7 @@ public class EbMSRestController implements WithController
 		{
 			serviceHandler.ping(cpaId, fromPartyId, toPartyId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e);
 		}
@@ -85,9 +91,13 @@ public class EbMSRestController implements WithController
 		{
 			return serviceHandler.sendMessage(messageRequest);
 		}
-		catch (Exception e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException | RuntimeException e)
 		{
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
+		}
+		catch (TransformerFactoryConfigurationError e)
+		{
+			throw toWebApplicationException(new RuntimeException(e), MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -99,12 +109,15 @@ public class EbMSRestController implements WithController
 	{
 		try
 		{
-			return serviceHandler
-					.sendMessageMTOM(new MTOMMessageRequest(requestProperties, attachments.stream().map(toMTOMDataSource()).collect(Collectors.toList())));
+			return serviceHandler.sendMessageMTOM(new MTOMMessageRequest(requestProperties, attachments.stream().map(toMTOMDataSource()).toList()));
 		}
-		catch (Exception e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException | RuntimeException e)
 		{
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
+		}
+		catch (TransformerFactoryConfigurationError e)
+		{
+			throw toWebApplicationException(new RuntimeException(e), MediaType.TEXT_PLAIN);
 		}
 	}
 
@@ -122,7 +135,7 @@ public class EbMSRestController implements WithController
 		{
 			return serviceHandler.resendMessage(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
@@ -158,7 +171,7 @@ public class EbMSRestController implements WithController
 							.build(),
 					maxNr);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
@@ -173,7 +186,7 @@ public class EbMSRestController implements WithController
 		{
 			return serviceHandler.getMessage(messageId, process);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e);
 		}
@@ -189,7 +202,7 @@ public class EbMSRestController implements WithController
 		{
 			return toMultipartBody(serviceHandler.getMessageMTOM(messageId, process));
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e, MediaType.MULTIPART_FORM_DATA);
 		}
@@ -199,7 +212,7 @@ public class EbMSRestController implements WithController
 	{
 		val attachments = new LinkedList<Attachment>();
 		attachments.add(toAttachment(message.getProperties()));
-		attachments.addAll(message.getDataSources().stream().map(this::toAttachment).collect(Collectors.toList()));
+		attachments.addAll(message.getDataSources().stream().map(this::toAttachment).toList());
 		return new MultipartBody(attachments, true);
 	}
 
@@ -221,7 +234,7 @@ public class EbMSRestController implements WithController
 		{
 			serviceHandler.processMessage(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e);
 		}
@@ -235,7 +248,7 @@ public class EbMSRestController implements WithController
 		{
 			return serviceHandler.getMessageStatus(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e);
 		}
@@ -273,7 +286,7 @@ public class EbMSRestController implements WithController
 					eventTypes,
 					maxNr);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e);
 		}
@@ -287,7 +300,7 @@ public class EbMSRestController implements WithController
 		{
 			serviceHandler.processMessageEvent(messageId);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw toWebApplicationException(e);
 		}

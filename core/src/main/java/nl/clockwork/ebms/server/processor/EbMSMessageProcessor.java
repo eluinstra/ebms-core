@@ -227,54 +227,21 @@ public class EbMSMessageProcessor
 		{
 			val message = EbMSMessageUtils.getEbMSMessage(request);
 			val requestMessageHeader = message.getMessageHeader();
-			if (message instanceof EbMSMessage requestMessage)
+			if (!(message instanceof EbMSMessage requestMessage))
 			{
-				if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
-					throw new EbMSProcessingException("No response received for message " + requestMessageHeader.getMessageData().getMessageId());
-
 				if (response != null)
-				{
-					xsdValidator.validate(response.getMessage());
-					val timestamp = Instant.now();
-					val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
-					if (responseMessage instanceof EbMSMessageError messageError)
-					{
-						if (!messageValidator.isSyncReply(requestMessage))
-							throw new EbMSProcessingException(
-									"No sync ErrorMessage expected for message "
-											+ requestMessage.getMessageHeader().getMessageData().getMessageId()
-											+ "\n"
-											+ DOMUtils.toString(response.getMessage()));
-						messageErrorProcessor.processMessageError(timestamp, response, requestMessage, messageError);
-					}
-					else if (responseMessage instanceof EbMSAcknowledgment acknowledgment)
-					{
-						if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
-							throw new EbMSProcessingException(
-									"No sync Acknowledgment expected for message "
-											+ requestMessageHeader.getMessageData().getMessageId()
-											+ "\n"
-											+ DOMUtils.toString(response.getMessage()));
-						acknowledgmentProcessor.processAcknowledgment(timestamp, response, requestMessage, acknowledgment);
-					}
-					else
-						throw new EbMSProcessingException(
-								"Unexpected response received for message "
-										+ requestMessageHeader.getMessageData().getMessageId()
-										+ "\n"
-										+ DOMUtils.toString(response.getMessage()));
-				}
-				else if (requestMessage.getAckRequested() == null && requestMessage.getSyncReply() != null)
-				{
-					processMessage(requestMessage);
-				}
+					throwUnexpectedResponse(requestMessageHeader.getMessageData().getMessageId(), response);
+				return;
 			}
-			else if (response != null)
-				throw new EbMSProcessingException(
-						"Unexpected response received for message "
-								+ requestMessageHeader.getMessageData().getMessageId()
-								+ "\n"
-								+ DOMUtils.toString(response.getMessage()));
+
+			validateExpectedResponse(requestMessage, requestMessageHeader.getMessageData().getMessageId(), response);
+			if (response == null)
+			{
+				handleNoResponse(requestMessage);
+				return;
+			}
+
+			processSyncResponse(requestMessage, response);
 		}
 		catch (ValidationException | JAXBException | SAXException | IOException | TransformerException e)
 		{
@@ -286,9 +253,70 @@ public class EbMSMessageProcessor
 		}
 	}
 
+	private void validateExpectedResponse(EbMSMessage requestMessage, String messageId, EbMSDocument response)
+	{
+		if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
+			throw new EbMSProcessingException("No response received for message " + messageId);
+	}
+
+	private void handleNoResponse(EbMSMessage requestMessage)
+	{
+		if (requestMessage.getAckRequested() == null && requestMessage.getSyncReply() != null)
+			processMessage(requestMessage);
+	}
+
+	private void processSyncResponse(EbMSMessage requestMessage, EbMSDocument response)
+			throws ValidationException, JAXBException, SAXException, IOException, TransformerException, XPathExpressionException, ParserConfigurationException
+	{
+		xsdValidator.validate(response.getMessage());
+		val timestamp = Instant.now();
+		val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
+		if (responseMessage instanceof EbMSMessageError messageError)
+		{
+			processSyncMessageErrorResponse(requestMessage, response, timestamp, messageError);
+			return;
+		}
+		if (responseMessage instanceof EbMSAcknowledgment acknowledgment)
+		{
+			processSyncAcknowledgmentResponse(requestMessage, response, timestamp, acknowledgment);
+			return;
+		}
+
+		throwUnexpectedResponse(requestMessage.getMessageHeader().getMessageData().getMessageId(), response);
+	}
+
+	private void processSyncMessageErrorResponse(EbMSMessage requestMessage, EbMSDocument response, Instant timestamp, EbMSMessageError messageError)
+			throws TransformerException
+	{
+		if (!messageValidator.isSyncReply(requestMessage))
+			throw new EbMSProcessingException(
+					"No sync ErrorMessage expected for message "
+							+ requestMessage.getMessageHeader().getMessageData().getMessageId()
+							+ "\n"
+							+ DOMUtils.toString(response.getMessage()));
+		messageErrorProcessor.processMessageError(timestamp, response, requestMessage, messageError);
+	}
+
+	private void processSyncAcknowledgmentResponse(EbMSMessage requestMessage, EbMSDocument response, Instant timestamp, EbMSAcknowledgment acknowledgment)
+			throws TransformerException, XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
+	{
+		if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
+			throw new EbMSProcessingException(
+					"No sync Acknowledgment expected for message "
+							+ requestMessage.getMessageHeader().getMessageData().getMessageId()
+							+ "\n"
+							+ DOMUtils.toString(response.getMessage()));
+		acknowledgmentProcessor.processAcknowledgment(timestamp, response, requestMessage, acknowledgment);
+	}
+
+	private void throwUnexpectedResponse(String messageId, EbMSDocument response) throws TransformerException
+	{
+		throw new EbMSProcessingException("Unexpected response received for message " + messageId + "\n" + DOMUtils.toString(response.getMessage()));
+	}
+
 	private EbMSDocument processMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
 			throws ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException,
-			TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
+			TransformerFactoryConfigurationError, TransformerException, XPathExpressionException, EbMSProcessorException
 	{
 		try
 		{

@@ -20,6 +20,7 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.XAConnectionFactory;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
@@ -75,7 +76,7 @@ public class JMSConfig
 
 	@Bean("jmsTransactionManager")
 	@Conditional(DefaultTransactionManagerType.class)
-	public PlatformTransactionManager jmsTransactionManager(ConnectionFactory connectionFactory)
+	public PlatformTransactionManager jmsTransactionManager(@NonNull ConnectionFactory connectionFactory)
 	{
 		return new JmsTransactionManager(connectionFactory);
 	}
@@ -89,11 +90,9 @@ public class JMSConfig
 		result.setUniqueResourceName(UUID.randomUUID().toString());
 		result.setXaConnectionFactory(createXAConnectionFactory());
 		result.setLocalTransactionMode(false);
-		result.setIgnoreSessionTransactedFlag(true);
 		result.setMinPoolSize(minPoolSize);
 		result.setMaxPoolSize(maxPoolSize);
 		result.setBorrowConnectionTimeout(30);
-		result.setIgnoreSessionTransactedFlag(true);
 		result.setMaintenanceInterval(60);
 		result.setMaxIdleTime(60);
 		result.setMaxLifetime(0);

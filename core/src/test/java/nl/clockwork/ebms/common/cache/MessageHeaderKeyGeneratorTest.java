@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common.cache;
 
+import java.util.Objects;
 import lombok.val;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class MessageHeaderKeyGeneratorTest
 		messageHeader.setTo(createToPartyId("type", "toPartyId"));
 		messageHeader.setService(createService("type", "service"));
 		messageHeader.setAction("action");
-		val key = keyGenerator.generate(null, method, messageHeader);
+		val key = keyGenerator.generate(this, Objects.requireNonNull(method), Objects.requireNonNull(messageHeader));
 		Assertions.assertThat(key).isEqualTo("toString[cpaId,[type:toPartyId],[type:fromPartyId],type:service,action]");
 	}
 

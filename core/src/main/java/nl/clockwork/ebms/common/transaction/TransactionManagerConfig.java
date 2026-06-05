@@ -49,7 +49,7 @@ public class TransactionManagerConfig
 
 	@Bean("dataSourceTransactionManager")
 	@Conditional(DefaultTransactionManagerType.class)
-	public PlatformTransactionManager dataSourceTransactionManager(DataSource dataSource)
+	public PlatformTransactionManager dataSourceTransactionManager(@org.springframework.lang.NonNull DataSource dataSource)
 	{
 		return new DataSourceTransactionManager(dataSource);
 	}
@@ -61,6 +61,7 @@ public class TransactionManagerConfig
 		return new JtaTransactionManager(createUserTransaction(), createTransactionManager());
 	}
 
+	@org.springframework.lang.NonNull
 	private UserTransactionImp createUserTransaction() throws SystemException
 	{
 		val result = new UserTransactionImp();
@@ -68,6 +69,7 @@ public class TransactionManagerConfig
 		return result;
 	}
 
+	@org.springframework.lang.NonNull
 	private UserTransactionManager createTransactionManager() throws SystemException
 	{
 		val result = new UserTransactionManager();
@@ -79,7 +81,7 @@ public class TransactionManagerConfig
 	public static class DefaultTransactionManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("transactionManager.type", TransactionManagerType.class, TransactionManagerType.DEFAULT)
 					== TransactionManagerType.DEFAULT;
@@ -89,7 +91,7 @@ public class TransactionManagerConfig
 	public static class AtomikosTransactionManagerType implements Condition
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("transactionManager.type", TransactionManagerType.class, TransactionManagerType.DEFAULT)
 					== TransactionManagerType.ATOMIKOS;

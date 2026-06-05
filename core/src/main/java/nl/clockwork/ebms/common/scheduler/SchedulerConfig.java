@@ -18,6 +18,7 @@ package nl.clockwork.ebms.common.scheduler;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
@@ -62,7 +63,11 @@ public class SchedulerConfig
 
 		public static String getClass(String jdbcUrl)
 		{
-			return Arrays.stream(values()).filter(l -> jdbcUrl.startsWith(l.jdbcUrl)).map(l -> l.driverDelegateClass).findFirst().get();
+			return Arrays.stream(values())
+					.filter(l -> jdbcUrl.startsWith(l.jdbcUrl))
+					.map(l -> l.driverDelegateClass)
+					.findFirst()
+					.orElseThrow(() -> new IllegalArgumentException("Unsupported jdbc url: " + jdbcUrl));
 		}
 	}
 
@@ -107,12 +112,12 @@ public class SchedulerConfig
 			DataSource dataSource)
 	{
 		val result = new SchedulerFactoryBean();
-		result.setQuartzProperties(quartzProperties());
-		result.setJobFactory(jobFactory);
-		result.setTransactionManager(dataSourceTransactionManager);
-		result.setDataSource(dataSource);
+		result.setQuartzProperties(Objects.requireNonNull(quartzProperties()));
+		result.setJobFactory(Objects.requireNonNull(jobFactory));
+		result.setTransactionManager(Objects.requireNonNull(dataSourceTransactionManager));
+		result.setDataSource(Objects.requireNonNull(dataSource));
 		if (deliveryTaskHandlerType == DeliveryTaskHandlerType.QUARTZ_JMS)
-			result.setNonTransactionalDataSource(hikariDataSource());
+			result.setNonTransactionalDataSource(Objects.requireNonNull(hikariDataSource()));
 		return result;
 	}
 
@@ -121,7 +126,7 @@ public class SchedulerConfig
 	public JobFactory jobFactory(ApplicationContext applicationContext)
 	{
 		val result = new AutowiringSpringBeanJobFactory();
-		result.setApplicationContext(applicationContext);
+		result.setApplicationContext(Objects.requireNonNull(applicationContext));
 		return result;
 	}
 

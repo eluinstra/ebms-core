@@ -24,6 +24,7 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Destination;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
@@ -62,7 +63,7 @@ public class MessageEventListenerConfig
 	@Bean
 	public MessageEventListener messageEventListener(ConnectionFactory connectionFactory, MessageEventDAO messageEventDAO, EbMSDAO ebMSDAO)
 	{
-		val jmsTemplate = new JmsTemplate(connectionFactory);
+		val jmsTemplate = new JmsTemplate(Objects.requireNonNull(connectionFactory));
 		val filter = Splitter.on(',')
 				.trimResults()
 				.omitEmptyStrings()
@@ -81,7 +82,7 @@ public class MessageEventListenerConfig
 	@Bean
 	public MessageEventDAO messageEventDAO(DataSource dataSource)
 	{
-		return new MessageEventDAOImpl(new JdbcTemplate(dataSource));
+		return new MessageEventDAOImpl(new JdbcTemplate(Objects.requireNonNull(dataSource)));
 	}
 
 	private Map<String, Destination> createMessageEventDestinations(JMSDestinationType jmsDestinationType)

@@ -119,7 +119,7 @@ public class EbMSMessageValidator
 									messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			return message.getSyncReply() != null;
 		}
@@ -127,7 +127,6 @@ public class EbMSMessageValidator
 
 	public boolean isDuplicateMessage(MessageHeader messageHeader)
 	{
-		return /* messageHeader.getDuplicateElimination()!= null && */
-		ebMSDAO.existsMessage(messageHeader.getMessageData().getMessageId());
+		return ebMSDAO.existsMessage(messageHeader.getMessageData().getMessageId());
 	}
 }
