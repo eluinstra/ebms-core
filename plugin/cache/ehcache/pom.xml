@@ -103,6 +103,8 @@
             <excludes>
               <exclude>org.projectlombok:lombok</exclude>
               <exclude>org.apache.geronimo.specs:geronimo-jta_1.1_spec</exclude>
+              <exclude>javax.cache:cache-api</exclude>
+              <exclude>org.slf4j:slf4j-api</exclude>
             </excludes>
           </artifactSet>
           <filters>

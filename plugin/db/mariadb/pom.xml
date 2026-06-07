@@ -43,16 +43,6 @@
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
       <version>3.5.8</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.checkerframework</groupId>
-          <artifactId>checker-qual</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.google.errorprone</groupId>
-          <artifactId>error_prone_annotations</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>nl.clockwork.ebms.common</groupId>
@@ -111,6 +101,7 @@
             <excludes>
               <exclude>org.projectlombok:lombok</exclude>
               <exclude>org.apache.geronimo.specs:geronimo-jta_1.1_spec</exclude>
+              <exclude>org.flywaydb:flyway-core</exclude>
             </excludes>
           </artifactSet>
           <filters>

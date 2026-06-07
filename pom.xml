@@ -329,32 +329,12 @@
         <artifactId>cxf-rt-frontend-jaxws</artifactId>
         <version>4.2.1</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-activation</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http-jetty</artifactId>
         <version>4.2.1</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-activation</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
@@ -367,24 +347,12 @@
         <artifactId>jetty-server</artifactId>
         <version>12.1.10</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.mail.glassfish</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
         <version>6.0.0</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
@@ -403,32 +371,12 @@
         <artifactId>mockito-core</artifactId>
         <version>5.23.0</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
         <version>6.0.0</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
