@@ -47,9 +47,11 @@ public class EbMSServlet extends GenericServlet
 	@Override
 	public void service(final ServletRequest request, ServletResponse response) throws ServletException, IOException
 	{
+		if (!(request instanceof HttpServletRequest httpRequest) || !(response instanceof HttpServletResponse httpResponse))
+			throw new ServletException("HTTP request/response required");
 		try
 		{
-			httpHandler.handle((HttpServletRequest)request, (HttpServletResponse)response);
+			httpHandler.handle(httpRequest, httpResponse);
 		}
 		catch (EbMSProcessorException e)
 		{

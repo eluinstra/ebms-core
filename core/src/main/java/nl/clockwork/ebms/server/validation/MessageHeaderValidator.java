@@ -277,7 +277,7 @@ class MessageHeaderValidator
 
 	private boolean isValid(List<PartyId> partyIds)
 	{
-																																																					// org.apache.commons.validator.UrlValidator.isValid(partyId.getValue())
+		// org.apache.commons.validator.UrlValidator.isValid(partyId.getValue())
 		return partyIds.stream().anyMatch(p -> !StringUtils.isEmpty(p.getType()) || isValidURI(p.getValue()));// FIXME replace by:
 	}
 
@@ -360,13 +360,13 @@ class MessageHeaderValidator
 			throw new ValidationException("Request PartyIds do not match response PartyIds");
 	}
 
-		// val request = new HashSet<PartyId>(requestPartyIds);
-		// val response = new HashSet<PartyId>(responsePartyIds);
-		// val allMatch = request.size() == response.size() && request.stream()
-		// .map(req -> EbMSMessageUtils.toString(req))
-		// .allMatch(req -> response.stream().map(res -> EbMSMessageUtils.toString(res)).anyMatch(res -> req.equals(res)));
-		// if (!allMatch)
-		// throw new ValidationException("Request PartyIds do not match response PartyIds");
+	// val request = new HashSet<PartyId>(requestPartyIds);
+	// val response = new HashSet<PartyId>(responsePartyIds);
+	// val allMatch = request.size() == response.size() && request.stream()
+	// .map(req -> EbMSMessageUtils.toString(req))
+	// .allMatch(req -> response.stream().map(res -> EbMSMessageUtils.toString(res)).anyMatch(res -> req.equals(res)));
+	// if (!allMatch)
+	// throw new ValidationException("Request PartyIds do not match response PartyIds");
 	private static String messageHeaderActionPath()
 	{
 		return "//Header/MessageHeader/" + "Action";

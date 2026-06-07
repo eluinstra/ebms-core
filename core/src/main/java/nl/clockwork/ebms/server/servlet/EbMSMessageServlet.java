@@ -50,13 +50,17 @@ public class EbMSMessageServlet extends GenericServlet
 	@Override
 	public void service(final ServletRequest request, final ServletResponse response) throws ServletException, IOException
 	{
+		if (!(request instanceof HttpServletRequest) || !(response instanceof HttpServletResponse))
+			throw new ServletException("HTTP request/response required");
+		val httpRequest = (HttpServletRequest)request;
+		val httpResponse = (HttpServletResponse)response;
 		val handler = new EbMSInputStreamHandler(ebMSMessageProcessor)
 		{
 			@Override
 			public List<String> getRequestHeaderNames()
 			{
 				val result = new ArrayList<String>();
-				val headerNames = ((HttpServletRequest)request).getHeaderNames();
+				val headerNames = httpRequest.getHeaderNames();
 				while (headerNames.hasMoreElements())
 					result.add((String)headerNames.nextElement());
 				return result;
@@ -66,7 +70,7 @@ public class EbMSMessageServlet extends GenericServlet
 			public List<String> getRequestHeaders(String headerName)
 			{
 				val result = new ArrayList<String>();
-				val headers = ((HttpServletRequest)request).getHeaders(headerName);
+				val headers = httpRequest.getHeaders(headerName);
 				while (headers.hasMoreElements())
 					result.add((String)headers.nextElement());
 				return result;
@@ -75,19 +79,25 @@ public class EbMSMessageServlet extends GenericServlet
 			@Override
 			public String getRequestHeader(String headerName)
 			{
-				return "Content-Type".equals(headerName) ? request.getContentType() : ((HttpServletRequest)request).getHeader(headerName);
+				return "Content-Type".equals(headerName) ? request.getContentType() : httpRequest.getHeader(headerName);
 			}
 
 			@Override
 			public String getRequestMethod()
 			{
-				return ((HttpServletRequest)request).getMethod();
+				return httpRequest.getMethod();
+			}
+
+			@Override
+			public long getRequestContentLength()
+			{
+				return httpRequest.getContentLengthLong();
 			}
 
 			@Override
 			public void writeResponseStatus(int statusCode)
 			{
-				((HttpServletResponse)response).setStatus(statusCode);
+				httpResponse.setStatus(statusCode);
 			}
 
 			@Override
@@ -96,7 +106,7 @@ public class EbMSMessageServlet extends GenericServlet
 				if ("Content-Type".equals(name))
 					response.setContentType(value);
 				else
-					((HttpServletResponse)response).setHeader(name, value);
+					httpResponse.setHeader(name, value);
 			}
 
 			@Override

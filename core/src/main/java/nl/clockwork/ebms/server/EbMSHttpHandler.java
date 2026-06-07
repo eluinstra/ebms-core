@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -30,17 +29,30 @@ import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
 public class EbMSHttpHandler
 {
 	@NonNull
 	EbMSMessageProcessor messageProcessor;
+	long maxRequestBytes;
+	int maxLoggedPayloadChars;
+
+	public EbMSHttpHandler(@NonNull EbMSMessageProcessor messageProcessor)
+	{
+		this(messageProcessor, EbMSInputStreamHandler.DEFAULT_MAX_REQUEST_BYTES, EbMSInputStreamHandler.DEFAULT_MAX_LOGGED_PAYLOAD_CHARS);
+	}
+
+	public EbMSHttpHandler(@NonNull EbMSMessageProcessor messageProcessor, long maxRequestBytes, int maxLoggedPayloadChars)
+	{
+		this.messageProcessor = messageProcessor;
+		this.maxRequestBytes = maxRequestBytes;
+		this.maxLoggedPayloadChars = maxLoggedPayloadChars;
+	}
 
 	public void handle(final HttpServletRequest request, final HttpServletResponse response) throws EbMSProcessorException
 	{
 		try
 		{
-			val inputStreamHandler = new EbMSInputStreamHandler(messageProcessor)
+			val inputStreamHandler = new EbMSInputStreamHandler(messageProcessor, maxRequestBytes, maxLoggedPayloadChars)
 			{
 				@Override
 				public List<String> getRequestHeaderNames()
@@ -75,6 +87,12 @@ public class EbMSHttpHandler
 				public String getRequestMethod()
 				{
 					return request.getMethod();
+				}
+
+				@Override
+				public long getRequestContentLength()
+				{
+					return request.getContentLengthLong();
 				}
 
 				@Override
