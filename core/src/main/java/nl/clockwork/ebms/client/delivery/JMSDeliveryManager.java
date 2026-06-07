@@ -106,7 +106,8 @@ public class JMSDeliveryManager implements DeliveryManager
 		try
 		{
 			jmsTemplate.setReceiveTimeout(3L * Constants.MINUTE_IN_MILLIS);
-			val result = jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME, "JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'");
+			val selector = createCorrelationIdSelector(messageHeader.getMessageData().getMessageId());
+			val result = jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME, selector);
 			transactionManager.commit(status);
 			return Optional.ofNullable((EbMSResponseMessage)result);
 		}
@@ -115,6 +116,17 @@ public class JMSDeliveryManager implements DeliveryManager
 			transactionManager.rollback(status);
 			throw new EbMSProcessorException(e);
 		}
+	}
+
+	static String createCorrelationIdSelector(String messageId)
+	{
+		val nonNullMessageId = java.util.Objects.requireNonNull(messageId, "messageId");
+		if (nonNullMessageId.trim().isEmpty())
+			throw new IllegalArgumentException("messageId must not be blank");
+		if (nonNullMessageId.indexOf('\n') >= 0 || nonNullMessageId.indexOf('\r') >= 0)
+			throw new IllegalArgumentException("messageId must not contain CR or LF");
+		val escapedMessageId = nonNullMessageId.replace("'", "''");
+		return "JMSCorrelationID='" + escapedMessageId + "'";
 	}
 
 	@Override
