@@ -510,6 +510,9 @@
               <excludes>
                 <exclude>org.projectlombok:lombok</exclude>
                 <exclude>org.apache.geronimo.specs:geronimo-jta_1.1_spec</exclude>
+                <exclude>commons-logging:commons-logging</exclude>
+                <exclude>jakarta.jws:jakarta.jws-api</exclude>
+                <exclude>jakarta.activation:jakarta.activation</exclude>
               </excludes>
             </artifactSet>
             <filters>
@@ -520,6 +523,16 @@
                   <exclude>META-INF/*.DSA</exclude>
                   <exclude>META-INF/*.RSA</exclude>
                   <exclude>META-INF/LICENSE</exclude>
+                  <exclude>META-INF/LICENSE.*</exclude>
+                  <exclude>META-INF/NOTICE.*</exclude>
+                  <exclude>META-INF/README.*</exclude>
+                  <exclude>META-INF/DEPENDENCIES</exclude>
+                  <exclude>META-INF/FastDoubleParser-LICENSE</exclude>
+                  <exclude>META-INF/wsdl.plugin.xml</exclude>
+                  <exclude>META-INF/attribution.txt</exclude>
+                  <exclude>THIRD-PARTY.txt</exclude>
+                  <exclude>attribution.txt</exclude>
+                  <exclude>org/apache/cxf/endpoint/dynamic/simple-binding.xjb</exclude>
                   <exclude>**/module-info.class</exclude>
                 </excludes>
               </filter>
