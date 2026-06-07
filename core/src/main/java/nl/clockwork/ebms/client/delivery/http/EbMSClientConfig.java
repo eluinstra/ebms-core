@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.security.EbMSKeyStore;
 import nl.clockwork.ebms.common.security.EbMSTrustStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -66,15 +67,17 @@ public class EbMSClientConfig
 
 	@Bean
 	@DependsOn("ebMSProxyFactory")
-	public
-			EbMSHttpClientFactory
-			ebMSClientFactory(EbMSProxy ebMSProxy, SSLParameters sslParameters, @Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore, EbMSTrustStore trustStore)
+	public EbMSHttpClientFactory ebMSClientFactory(
+			ObjectProvider<EbMSProxy> ebMSProxyProvider,
+			SSLParameters sslParameters,
+			@Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore,
+			EbMSTrustStore trustStore)
 	{
 		return EbMSHttpClientFactory.builder()
 				.connectTimeout(connectTimeout)
 				.readTimeout(readTimeout)
 				.maxThreads(maxThreads)
-				.proxy(ebMSProxy)
+				.proxy(ebMSProxyProvider.getIfAvailable())
 				.uuidHeader(uuidHeader)
 				.sslParameters(sslParameters)
 				.verifyHostnames(verifyHostnames)

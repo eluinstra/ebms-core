@@ -107,6 +107,13 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <version>12.1.10</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-broker</artifactId>
         <version>6.2.6</version>
@@ -209,7 +216,7 @@
       <dependency>
         <groupId>jakarta.ws.rs</groupId>
         <artifactId>jakarta.ws.rs-api</artifactId>
-        <version>3.1.0</version>
+        <version>4.0.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
@@ -219,12 +226,12 @@
       <dependency>
         <groupId>jakarta.xml.soap</groupId>
         <artifactId>jakarta.xml.soap-api</artifactId>
-        <version>2.0.1</version>
+        <version>3.0.2</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.ws</groupId>
         <artifactId>jakarta.xml.ws-api</artifactId>
-        <version>3.0.1</version>
+        <version>4.0.3</version>
       </dependency>
       <dependency>
         <groupId>org.projectlombok</groupId>
@@ -250,27 +257,27 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jms</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>com.atomikos</groupId>
@@ -352,13 +359,13 @@
       <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-webapp</artifactId>
-        <version>12.1.8</version>
+        <version>12.1.10</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
-        <version>12.1.8</version>
+        <version>12.1.10</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -432,7 +439,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
         <scope>test</scope>
       </dependency>
       <dependency>
