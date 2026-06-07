@@ -49,7 +49,6 @@ import nl.clockwork.ebms.common.model.EbMSPong;
 import nl.clockwork.ebms.common.model.EbMSStatusRequest;
 import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.common.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils.Status;
 import nl.clockwork.ebms.common.validation.EbMSValidationException;
@@ -230,7 +229,7 @@ public class EbMSMessageProcessor
 			if (!(message instanceof EbMSMessage requestMessage))
 			{
 				if (response != null)
-					throwUnexpectedResponse(requestMessageHeader.getMessageData().getMessageId(), response);
+					throwUnexpectedResponse(requestMessageHeader.getMessageData().getMessageId());
 				return;
 			}
 
@@ -282,36 +281,28 @@ public class EbMSMessageProcessor
 			return;
 		}
 
-		throwUnexpectedResponse(requestMessage.getMessageHeader().getMessageData().getMessageId(), response);
+		throwUnexpectedResponse(requestMessage.getMessageHeader().getMessageData().getMessageId());
 	}
 
 	private void processSyncMessageErrorResponse(EbMSMessage requestMessage, EbMSDocument response, Instant timestamp, EbMSMessageError messageError)
 			throws TransformerException
 	{
 		if (!messageValidator.isSyncReply(requestMessage))
-			throw new EbMSProcessingException(
-					"No sync ErrorMessage expected for message "
-							+ requestMessage.getMessageHeader().getMessageData().getMessageId()
-							+ "\n"
-							+ DOMUtils.toString(response.getMessage()));
+			throw new EbMSProcessingException("No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 		messageErrorProcessor.processMessageError(timestamp, response, requestMessage, messageError);
 	}
 
 	private void processSyncAcknowledgmentResponse(EbMSMessage requestMessage, EbMSDocument response, Instant timestamp, EbMSAcknowledgment acknowledgment)
-			throws TransformerException, XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
+			throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
 	{
 		if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
-			throw new EbMSProcessingException(
-					"No sync Acknowledgment expected for message "
-							+ requestMessage.getMessageHeader().getMessageData().getMessageId()
-							+ "\n"
-							+ DOMUtils.toString(response.getMessage()));
+			throw new EbMSProcessingException("No sync Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 		acknowledgmentProcessor.processAcknowledgment(timestamp, response, requestMessage, acknowledgment);
 	}
 
-	private void throwUnexpectedResponse(String messageId, EbMSDocument response) throws TransformerException
+	private void throwUnexpectedResponse(String messageId)
 	{
-		throw new EbMSProcessingException("Unexpected response received for message " + messageId + "\n" + DOMUtils.toString(response.getMessage()));
+		throw new EbMSProcessingException("Unexpected response received for message " + messageId);
 	}
 
 	private EbMSDocument processMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
