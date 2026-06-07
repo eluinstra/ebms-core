@@ -27,16 +27,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.mindrot.jbcrypt.BCrypt;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BasicAuthenticationFilter implements Filter
@@ -80,39 +79,28 @@ public class BasicAuthenticationFilter implements Filter
 
 	private boolean validate(Map<String, String> users, String authorization) throws ServletException
 	{
-		try
+		if (authorization != null && authorization.toLowerCase().startsWith("basic"))
 		{
-			if (authorization != null && authorization.toLowerCase().startsWith("basic"))
-			{
-				authorization = authorization.substring("basic".length()).trim();
-				authorization = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
-				val credenitals = StringUtils.split(authorization, ":");
-				if (credenitals.length == 2)
-					return validate(users.get(credenitals[0]), credenitals[1]);
-			}
+			authorization = authorization.substring("basic".length()).trim();
+			authorization = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
+			val credenitals = StringUtils.split(authorization, ":");
+			if (credenitals.length == 2)
+				return validate(users.get(credenitals[0]), credenitals[1]);
+		}
+		return false;
+	}
+
+	private boolean validate(String savedPassword, String password)
+	{
+		if (savedPassword == null)
 			return false;
-		}
-		catch (NoSuchAlgorithmException e)
-		{
-			throw new ServletException(e);
-		}
-	}
-
-	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException
-	{
+		if (savedPassword.startsWith("$2"))
+			return BCrypt.checkpw(password, savedPassword);
 		if (savedPassword.startsWith("MD5:"))
-			return toMD5(password).equals(savedPassword);
-		else if (savedPassword.startsWith("OBF:"))
-			throw new NoSuchAlgorithmException("OBF");
-		else if (savedPassword.startsWith("CRYPT:"))
-			throw new NoSuchAlgorithmException("CRYPT");
-		else
-			return password.equals(savedPassword);
-	}
-
-	private String toMD5(String s)
-	{
-		return "MD5:" + DigestUtils.md5Hex(s);
+			return false;
+		// Unsupported legacy formats and plaintext are rejected.
+		// This avoids continuing insecure password schemes.
+		return false;
 	}
 
 	@Override
