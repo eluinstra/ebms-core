@@ -30,7 +30,7 @@ class SSLFactoryManagerTest
 {
 	private static final KeyStoreType KEY_STORE_TYPE = KeyStoreType.PKCS12;
 	private static final String KEY_STORE_PATH = "nl/clockwork/ebms/keystore.p12";
-	private static final String KEY_STORE_PASSWORD = "password";
+	private static final String KEY_STORE_PASSWORD = "my-secret-password";
 
 	@Test
 	void shouldSetOnlyCipherSuitesWhenProtocolsAreNotConfigured() throws Exception

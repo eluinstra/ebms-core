@@ -28,6 +28,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -60,7 +61,7 @@ public class CPARestController implements WithController
 			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(new BadRequestException(e));
 		}
-		catch (IOException | JAXBException e)
+		catch (IOException | JAXBException | ParserConfigurationException e)
 		{
 			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(e);
@@ -87,7 +88,7 @@ public class CPARestController implements WithController
 			log.error("InsertCPA\n" + cpa, e);
 			throw toWebApplicationException(new BadRequestException(e), MediaType.TEXT_PLAIN);
 		}
-		catch (IOException | JAXBException e)
+		catch (IOException | JAXBException | ParserConfigurationException e)
 		{
 			log.error("InsertCPA\n" + cpa, e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);

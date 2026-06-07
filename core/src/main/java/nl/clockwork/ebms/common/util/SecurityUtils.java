@@ -129,8 +129,6 @@ public class SecurityUtils
 				return generateKey("AES", KEYSIZE_192);
 			case XMLCipher.AES_256:
 				return generateKey("AES", KEYSIZE_256);
-			case XMLCipher.TRIPLEDES:
-				return generateKey("DESede", KEYSIZE_192);
 			default:
 				throw new NoSuchAlgorithmException(encryptionAlgorithm);
 		}

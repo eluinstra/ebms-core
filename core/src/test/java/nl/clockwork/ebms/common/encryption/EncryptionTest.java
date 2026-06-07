@@ -68,7 +68,7 @@ class EncryptionTest
 	String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
 	String keyStorePath = "nl/clockwork/ebms/keystore.jks";
-	String keyStorePassword = "password";
+	String keyStorePassword = "my-secret-password";
 	EbMSMessageEncrypter messageEncrypter;
 	EbMSMessageDecrypter messageDecrypter;
 
@@ -154,7 +154,7 @@ class EncryptionTest
 				initCpaRepository(),
 				(cpaId, certificate) -> certificate,
 				url -> url,
-				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"),
+				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "my-secret-password", "my-secret-password"),
 				false);
 	}
 

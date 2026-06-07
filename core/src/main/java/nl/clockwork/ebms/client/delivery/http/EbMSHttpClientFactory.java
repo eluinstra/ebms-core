@@ -69,7 +69,8 @@ public class EbMSHttpClientFactory
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
 		this.httpErrors = httpErrors;
-		System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.toString(!verifyHostnames));
+		if (!verifyHostnames)
+			throw new IllegalArgumentException("Disabling hostname verification is not supported");
 	}
 
 	public EbMSClient getEbMSClient(String clientAlias)

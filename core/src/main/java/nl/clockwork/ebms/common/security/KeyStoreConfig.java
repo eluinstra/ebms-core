@@ -59,28 +59,57 @@ public class KeyStoreConfig
 	String encryptionKeyStorePassword;
 	@Value("${encryption.keystore.keyPassword}")
 	String encryptionKeyStoreKeyPassword;
+	@Value("${ebms.security.allowDefaultSecrets:false}")
+	boolean allowDefaultSecrets;
 
 	@Bean
 	public EbMSTrustStore trustStore()
 	{
+		validateSecrets();
 		return EbMSTrustStore.of(trustStoretype, trustStorepath, trustStorepassword);
 	}
 
 	@Bean("clientKeyStore")
 	public EbMSKeyStore clientKeyStore()
 	{
+		validateSecrets();
 		return EbMSKeyStore.of(clientKeyStoreType, clientKeyStorePath, clientKeyStorePassword, clientKeyStoreKeyPassword, clientKeyStoreDefaultAlias);
 	}
 
 	@Bean("signatureKeyStore")
 	public EbMSKeyStore signatureKeyStore()
 	{
+		validateSecrets();
 		return EbMSKeyStore.of(signatureKeyStoreType, signatureKeyStorePath, signatureKeyStorePassword, signatureKeyStoreKeyPassword);
 	}
 
 	@Bean("encryptionKeyStore")
 	public EbMSKeyStore encryptionKeyStore()
 	{
+		validateSecrets();
 		return EbMSKeyStore.of(encryptionKeyStoreType, encryptionKeyStorePath, encryptionKeyStorePassword, encryptionKeyStoreKeyPassword);
+	}
+
+	private void validateSecrets()
+	{
+		if (allowDefaultSecrets)
+			return;
+
+		validateSecret("truststore.password", trustStorepassword);
+		validateSecret("client.keystore.password", clientKeyStorePassword);
+		validateSecret("client.keystore.keyPassword", clientKeyStoreKeyPassword);
+		validateSecret("signature.keystore.password", signatureKeyStorePassword);
+		validateSecret("signature.keystore.keyPassword", signatureKeyStoreKeyPassword);
+		validateSecret("encryption.keystore.password", encryptionKeyStorePassword);
+		validateSecret("encryption.keystore.keyPassword", encryptionKeyStoreKeyPassword);
+	}
+
+	private void validateSecret(String propertyName, String value)
+	{
+		if (value == null || value.trim().isEmpty() || "password".equals(value) || value.startsWith("CHANGE_ME"))
+			throw new IllegalStateException(
+					"Unsafe value configured for "
+							+ propertyName
+							+ ". Provide a strong secret or set ebms.security.allowDefaultSecrets=true explicitly for local/test use.");
 	}
 }
