@@ -26,6 +26,9 @@ import nl.clockwork.ebms.common.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
 import org.apache.commons.lang3.StringUtils;
+import org.jgroups.JChannel;
+import org.jgroups.raft.RaftHandle;
+import org.jgroups.raft.util.CounterStateMachine;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -70,6 +73,10 @@ public class DeliveryTaskHandlerConfig
 	int maxTasks;
 	@Value("${deliveryTaskHandler.default.executionInterval}")
 	int taskHandlerExecutionInterval;
+	@Value("${deliveryTaskHandler.default.leaderCheckIntervalMillis:1000}")
+	long leaderCheckIntervalMillis;
+	@Value("${deliveryTaskHandler.default.taskAwaitTimeoutMillis:60000}")
+	long taskAwaitTimeoutMillis;
 	@Value("${deliveryTaskHandler.task.executionInterval}")
 	int taskHandlerTaskExecutionInterval;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
@@ -93,15 +100,26 @@ public class DeliveryTaskHandlerConfig
 
 	@Bean
 	@Conditional(DefaultTaskHandlerType.class)
-	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskHandler deliveryTaskHandler)
+	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskHandler deliveryTaskHandler) throws Exception
 	{
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.deliveryTaskHandler(deliveryTaskHandler)
+				.raftHandle(raftHandle())
 				.timedTask(new TimedTask(taskHandlerExecutionInterval))
 				.maxTasks(maxTasks)
 				.serverId(serverId)
+				.leaderCheckIntervalMillis(leaderCheckIntervalMillis)
+				.taskAwaitTimeoutMillis(taskAwaitTimeoutMillis)
 				.build();
+	}
+
+	public RaftHandle raftHandle() throws Exception
+	{
+		val ch = new JChannel("raft.xml");
+		val handle = new RaftHandle(ch, new CounterStateMachine());
+		ch.connect("ebms-cluster");
+		return handle;
 	}
 
 	@Bean
@@ -152,7 +170,7 @@ public class DeliveryTaskHandlerConfig
 	public static class DefaultTaskHandlerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
 					&& context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
@@ -163,7 +181,7 @@ public class DeliveryTaskHandlerConfig
 	public static class JmsTaskHandlerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
 					&& (context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
@@ -176,7 +194,7 @@ public class DeliveryTaskHandlerConfig
 	public static class QuartzTaskHandlerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
 					&& (context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)

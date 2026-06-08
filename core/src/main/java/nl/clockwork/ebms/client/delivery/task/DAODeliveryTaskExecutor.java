@@ -15,78 +15,165 @@
  */
 package nl.clockwork.ebms.client.delivery.task;
 
-import io.vavr.control.Try;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+
+import org.jgroups.raft.RaftHandle;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-class DAODeliveryTaskExecutor implements Runnable
+class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 {
+	private static final long DEFAULT_LEADER_CHECK_INTERVAL_MILLIS = 1_000L;
+	private static final long DEFAULT_TASK_AWAIT_TIMEOUT_MILLIS = 60_000L;
+	private static final int WORKER_AWAIT_TERMINATION_SECONDS = 30;
+
 	@NonNull
 	DeliveryTaskDAO deliveryTaskDAO;
 	@NonNull
 	DeliveryTaskHandler deliveryTaskHandler;
 	@NonNull
+	RaftHandle raftHandle;
+	@NonNull
 	TimedTask timedTask;
 	int maxTasks;
 	String serverId;
+	long leaderCheckIntervalMillis;
+	long taskAwaitTimeoutMillis;
+	ThreadPoolTaskExecutor workerExecutor;
 
 	@Builder
 	public DAODeliveryTaskExecutor(
 			@NonNull DeliveryTaskDAO deliveryTaskDAO,
 			@NonNull DeliveryTaskHandler deliveryTaskHandler,
+			@NonNull RaftHandle raftHandle,
 			@NonNull TimedTask timedTask,
 			int maxTasks,
-			String serverId)
+			String serverId,
+			long leaderCheckIntervalMillis,
+			long taskAwaitTimeoutMillis)
 	{
 		this.deliveryTaskDAO = deliveryTaskDAO;
 		this.deliveryTaskHandler = deliveryTaskHandler;
+		this.raftHandle = raftHandle;
 		this.timedTask = timedTask;
 		this.maxTasks = maxTasks;
 		this.serverId = serverId;
-		val executor = new ThreadPoolTaskExecutor();
-		executor.setDaemon(true);
-		executor.setMaxPoolSize(1);
-		executor.afterPropertiesSet();
-		executor.execute(this);
+		this.leaderCheckIntervalMillis = leaderCheckIntervalMillis > 0 ? leaderCheckIntervalMillis : DEFAULT_LEADER_CHECK_INTERVAL_MILLIS;
+		this.taskAwaitTimeoutMillis = taskAwaitTimeoutMillis > 0 ? taskAwaitTimeoutMillis : DEFAULT_TASK_AWAIT_TIMEOUT_MILLIS;
+		this.workerExecutor = new ThreadPoolTaskExecutor();
+		workerExecutor.setDaemon(true);
+		workerExecutor.setMaxPoolSize(1);
+		workerExecutor.setWaitForTasksToCompleteOnShutdown(false);
+		workerExecutor.setAwaitTerminationSeconds(WORKER_AWAIT_TERMINATION_SECONDS);
+		workerExecutor.afterPropertiesSet();
+		workerExecutor.execute(this);
 	}
 
+	@Override
 	public void run()
 	{
-		while (true)
+		while (!Thread.currentThread().isInterrupted())
 		{
-			Runnable runnable = () ->
-			{
-				val futures = new ArrayList<Future<?>>();
-				try
-				{
-					val timestamp = Instant.now();
-					val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp, serverId, maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp, serverId);
-					tasks.forEach(task -> futures.add(deliveryTaskHandler.handleAsync(task)));
-				}
-				catch (RuntimeException e)
-				{
-					log.error("", e);
-				}
-				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("", e)));
-			};
+			if (raftHandle.isLeader())
+				runLeaderCycle();
+			else if (!sleep(leaderCheckIntervalMillis))
+				return;
+		}
+	}
+
+	@Override
+	public void destroy()
+	{
+		workerExecutor.shutdown();
+	}
+
+	private void runLeaderCycle()
+	{
+		try
+		{
+			timedTask.run(() -> awaitAll(pollAndDispatch()));
+		}
+		catch (RuntimeException e)
+		{
+			log.error("Delivery task polling cycle failed", e);
+		}
+	}
+
+	private List<Future<?>> pollAndDispatch()
+	{
+		val futures = new ArrayList<Future<?>>();
+		try
+		{
+			val timestamp = Instant.now();
+			val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp, serverId, maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp, serverId);
+			tasks.forEach(task -> futures.add(deliveryTaskHandler.handleAsync(task)));
+		}
+		catch (RuntimeException e)
+		{
+			log.error("Failed to fetch or dispatch delivery tasks", e);
+		}
+		return futures;
+	}
+
+	private void awaitAll(List<Future<?>> futures)
+	{
+		for (int i = 0; i < futures.size(); i++)
+		{
+			val f = futures.get(i);
 			try
 			{
-				timedTask.run(runnable);
+				f.get(taskAwaitTimeoutMillis, TimeUnit.MILLISECONDS);
 			}
-			catch (RuntimeException e)
+			catch (InterruptedException e)
 			{
-				log.error("", e);
+				Thread.currentThread().interrupt();
+				cancelRemaining(futures, i);
+				return;
 			}
+			catch (TimeoutException e)
+			{
+				log.error("Delivery task did not complete within {} ms; cancelling", taskAwaitTimeoutMillis);
+				f.cancel(true);
+			}
+			catch (CancellationException | ExecutionException e)
+			{
+				log.error("Delivery task execution failed", e);
+			}
+		}
+	}
+
+	private static void cancelRemaining(List<Future<?>> futures, int from)
+	{
+		for (int i = from; i < futures.size(); i++)
+			futures.get(i).cancel(true);
+	}
+
+	private static boolean sleep(long millis)
+	{
+		try
+		{
+			Thread.sleep(millis);
+			return true;
+		}
+		catch (InterruptedException e)
+		{
+			Thread.currentThread().interrupt();
+			return false;
 		}
 	}
 }
