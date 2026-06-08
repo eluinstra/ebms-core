@@ -22,9 +22,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.api.ebms.model.MessageRequestProperties;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
+import nl.clockwork.ebms.common.model.Party;
+import nl.clockwork.ebms.common.validation.ValidationException;
+import nl.clockwork.ebms.common.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

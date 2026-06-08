@@ -16,10 +16,10 @@
 package nl.clockwork.ebms.client.delivery;
 
 import java.util.Optional;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.model.EbMSRequestMessage;
-import nl.clockwork.ebms.model.EbMSResponseMessage;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.common.model.EbMSBaseMessage;
+import nl.clockwork.ebms.common.model.EbMSRequestMessage;
+import nl.clockwork.ebms.common.model.EbMSResponseMessage;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 
 public interface DeliveryManager
 {

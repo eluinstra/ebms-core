@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery.client;
+package nl.clockwork.ebms.client.delivery.http;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -32,7 +32,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import org.junit.jupiter.api.Test;
 
 class MultipartBodyPublisherTest

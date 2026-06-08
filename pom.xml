@@ -905,7 +905,7 @@
         <configuration>
           <instrumentation>
             <ignores>
-              <ignore>nl.clockwork.ebms.dao.*</ignore>
+              <ignore>nl.clockwork.ebms.common.dao.*</ignore>
             </ignores>
           </instrumentation>
           <systemProperties>

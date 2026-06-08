@@ -25,7 +25,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.Duration;
-import nl.clockwork.ebms.jaxb.DurationAdapter;
+import nl.clockwork.ebms.common.jaxb.DurationAdapter;
 
 /**
  * <p>

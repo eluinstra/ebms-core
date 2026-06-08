@@ -31,8 +31,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.security.EbMSKeyStore;
-import nl.clockwork.ebms.security.EbMSTrustStore;
+import nl.clockwork.ebms.common.security.EbMSKeyStore;
+import nl.clockwork.ebms.common.security.EbMSTrustStore;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class SSLFactoryManager

@@ -19,7 +19,7 @@ import jakarta.jms.ConnectionFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
+import nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

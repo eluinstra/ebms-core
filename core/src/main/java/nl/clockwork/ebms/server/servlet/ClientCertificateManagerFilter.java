@@ -33,7 +33,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.validation.ClientCertificateManager;
+import nl.clockwork.ebms.server.validation.ClientCertificateManager;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j

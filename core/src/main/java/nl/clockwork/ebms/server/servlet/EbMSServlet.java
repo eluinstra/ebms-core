@@ -26,7 +26,7 @@ import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSHttpHandler;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 

@@ -24,7 +24,7 @@ import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.Instant;
-import nl.clockwork.ebms.jaxb.InstantAdapter;
+import nl.clockwork.ebms.common.jaxb.InstantAdapter;
 
 /**
  * <p>

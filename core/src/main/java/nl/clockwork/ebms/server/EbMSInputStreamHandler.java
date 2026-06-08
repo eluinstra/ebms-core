@@ -31,14 +31,14 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.EbMSMessageReader;
-import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.util.DOMUtils;
-import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.common.Constants;
+import nl.clockwork.ebms.common.message.EbMSMessageReader;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
+import nl.clockwork.ebms.common.model.EbMSDocument;
+import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.server.processor.EbMSProcessingException;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.validation.ValidationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
 import org.slf4j.Logger;
@@ -131,7 +131,7 @@ public abstract class EbMSInputStreamHandler
 		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + "=" + h)).collect(Collectors.joining("\n"));
 	}
 
-	private void returnResponse(final nl.clockwork.ebms.model.EbMSDocument responseDocument) throws TransformerException, IOException
+	private void returnResponse(final nl.clockwork.ebms.common.model.EbMSDocument responseDocument) throws TransformerException, IOException
 	{
 		if (responseDocument == null)
 		{

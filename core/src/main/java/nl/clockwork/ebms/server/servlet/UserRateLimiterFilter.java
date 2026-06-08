@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.validation.ClientCertificateManager;
+import nl.clockwork.ebms.server.validation.ClientCertificateManager;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRateLimiterFilter implements Filter

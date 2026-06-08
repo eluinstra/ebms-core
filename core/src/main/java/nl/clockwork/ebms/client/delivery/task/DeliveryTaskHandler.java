@@ -24,21 +24,21 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.client.EbMSDAO;
-import nl.clockwork.ebms.client.delivery.client.EbMSClient;
-import nl.clockwork.ebms.client.delivery.client.EbMSHttpClientFactory;
-import nl.clockwork.ebms.client.delivery.client.EbMSResponseException;
-import nl.clockwork.ebms.client.delivery.client.EbMSUnrecoverableResponseException;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.client.delivery.EbMSDAO;
+import nl.clockwork.ebms.client.delivery.http.EbMSClient;
+import nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory;
+import nl.clockwork.ebms.client.delivery.http.EbMSResponseException;
+import nl.clockwork.ebms.client.delivery.http.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
-import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
-import nl.clockwork.ebms.event.MessageEventListener;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.util.LoggingUtils;
-import nl.clockwork.ebms.util.LoggingUtils.Status;
-import nl.clockwork.ebms.util.StreamUtils;
+import nl.clockwork.ebms.common.encryption.EbMSMessageEncrypter;
+import nl.clockwork.ebms.common.event.MessageEventListener;
+import nl.clockwork.ebms.common.model.EbMSDocument;
+import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.common.util.LoggingUtils;
+import nl.clockwork.ebms.common.util.LoggingUtils.Status;
+import nl.clockwork.ebms.common.util.StreamUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -194,7 +194,7 @@ class DeliveryTaskHandler
 			DeliveryChannel receiveDeliveryChannel,
 			final String url,
 			EbMSDocument requestDocument,
-			final nl.clockwork.ebms.model.EbMSDocument responseDocument)
+			final nl.clockwork.ebms.common.model.EbMSDocument responseDocument)
 	{
 		Runnable runnable = () ->
 		{
