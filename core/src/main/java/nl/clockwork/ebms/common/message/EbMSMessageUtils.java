@@ -109,7 +109,7 @@ public class EbMSMessageUtils
 				Manifest.class,
 				StatusRequest.class,
 				StatusResponse.class);
-		val envelope = jaxbParser.handleUnsafe(document);
+		val envelope = jaxbParser.handle(document);
 		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilderHeader(builder, e));
 		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilderBody(builder, e));
 		builder.attachments(attachments);

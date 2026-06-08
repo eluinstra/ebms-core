@@ -18,6 +18,7 @@ package nl.clockwork.ebms.common.cpa;
 import jakarta.xml.bind.JAXBException;
 import java.util.List;
 import java.util.Optional;
+import javax.xml.parsers.ParserConfigurationException;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -62,13 +64,13 @@ class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPAR
 		try
 		{
 			val result = jdbcTemplate.queryForObject("select cpa from cpa where cpa_id = ?", String.class, cpaId);
-			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(result));
+			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(result));
 		}
 		catch (EmptyResultDataAccessException e)
 		{
 			return Optional.empty();
 		}
-		catch (JAXBException e)
+		catch (JAXBException | SAXException | ParserConfigurationException e)
 		{
 			throw new DataRetrievalFailureException("", e);
 		}

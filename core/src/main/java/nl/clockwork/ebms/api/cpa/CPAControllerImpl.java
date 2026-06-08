@@ -18,6 +18,7 @@ package nl.clockwork.ebms.api.cpa;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -50,7 +51,7 @@ class CPAControllerImpl implements CPAController
 			log.error("ValidateCPA\n" + cpa, e);
 			throw e;
 		}
-		catch (SAXException | IOException | JAXBException e)
+		catch (SAXException | IOException | ParserConfigurationException | JAXBException e)
 		{
 			log.error("ValidateCPA\n" + cpa, e);
 			throw new CPAControllerException(e);
@@ -62,11 +63,11 @@ class CPAControllerImpl implements CPAController
 		}
 	}
 
-	protected void validateCPAImpl(String cpa) throws SAXException, IOException, JAXBException
+	protected void validateCPAImpl(String cpa) throws SAXException, IOException, ParserConfigurationException, JAXBException
 	{
 		log.debug("ValidateCPA");
 		xsdValidator.validate(cpa);
-		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 		log.info("Validating CPA " + parsedCpa.getCpaid());
 		CPAValidator.validate(parsedCpa);
 	}
@@ -83,7 +84,7 @@ class CPAControllerImpl implements CPAController
 			log.error("InsertCPA\n" + cpa, e);
 			throw e;
 		}
-		catch (SAXException | IOException | JAXBException e)
+		catch (SAXException | IOException | ParserConfigurationException | JAXBException e)
 		{
 			log.error("InsertCPA\n" + cpa, e);
 			throw new CPAControllerException(e);
@@ -95,11 +96,11 @@ class CPAControllerImpl implements CPAController
 		}
 	}
 
-	protected String insertCPAImpl(String cpa, Boolean overwrite) throws SAXException, IOException, JAXBException
+	protected String insertCPAImpl(String cpa, Boolean overwrite) throws SAXException, IOException, ParserConfigurationException, JAXBException
 	{
 		log.debug("InsertCPA");
 		xsdValidator.validate(cpa);
-		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+		val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 		CPAValidator.validate(parsedCpa);
 		setCPA(parsedCpa, overwrite);
 		log.debug("InsertCPA done");
