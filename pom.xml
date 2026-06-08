@@ -107,6 +107,13 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <version>12.1.10</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-broker</artifactId>
         <version>6.2.6</version>
@@ -209,7 +216,7 @@
       <dependency>
         <groupId>jakarta.ws.rs</groupId>
         <artifactId>jakarta.ws.rs-api</artifactId>
-        <version>3.1.0</version>
+        <version>4.0.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
@@ -219,12 +226,12 @@
       <dependency>
         <groupId>jakarta.xml.soap</groupId>
         <artifactId>jakarta.xml.soap-api</artifactId>
-        <version>2.0.1</version>
+        <version>3.0.2</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.ws</groupId>
         <artifactId>jakarta.xml.ws-api</artifactId>
-        <version>3.0.1</version>
+        <version>4.0.3</version>
       </dependency>
       <dependency>
         <groupId>org.projectlombok</groupId>
@@ -250,27 +257,27 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jms</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
       </dependency>
       <dependency>
         <groupId>com.atomikos</groupId>
@@ -322,62 +329,30 @@
         <artifactId>cxf-rt-frontend-jaxws</artifactId>
         <version>4.2.1</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-activation</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http-jetty</artifactId>
         <version>4.2.1</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-activation</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-webapp</artifactId>
-        <version>12.1.8</version>
+        <version>12.1.10</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
-        <version>12.1.8</version>
+        <version>12.1.10</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.mail.glassfish</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
         <version>6.0.0</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
@@ -396,32 +371,12 @@
         <artifactId>mockito-core</artifactId>
         <version>5.23.0</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
         <version>6.0.0</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -432,7 +387,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>6.2.18</version>
+        <version>7.0.7</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -503,6 +458,9 @@
               <excludes>
                 <exclude>org.projectlombok:lombok</exclude>
                 <exclude>org.apache.geronimo.specs:geronimo-jta_1.1_spec</exclude>
+                <exclude>commons-logging:commons-logging</exclude>
+                <exclude>jakarta.jws:jakarta.jws-api</exclude>
+                <exclude>jakarta.activation:jakarta.activation</exclude>
               </excludes>
             </artifactSet>
             <filters>
@@ -513,6 +471,16 @@
                   <exclude>META-INF/*.DSA</exclude>
                   <exclude>META-INF/*.RSA</exclude>
                   <exclude>META-INF/LICENSE</exclude>
+                  <exclude>META-INF/LICENSE.*</exclude>
+                  <exclude>META-INF/NOTICE.*</exclude>
+                  <exclude>META-INF/README.*</exclude>
+                  <exclude>META-INF/DEPENDENCIES</exclude>
+                  <exclude>META-INF/FastDoubleParser-LICENSE</exclude>
+                  <exclude>META-INF/wsdl.plugin.xml</exclude>
+                  <exclude>META-INF/attribution.txt</exclude>
+                  <exclude>THIRD-PARTY.txt</exclude>
+                  <exclude>attribution.txt</exclude>
+                  <exclude>org/apache/cxf/endpoint/dynamic/simple-binding.xjb</exclude>
                   <exclude>**/module-info.class</exclude>
                 </excludes>
               </filter>
@@ -586,7 +554,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.14</version>
+        <version>0.8.15</version>
         <executions>
           <execution>
             <goals>
@@ -791,7 +759,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.14</version>
+        <version>1.7.0</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -802,7 +770,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.6.0</version>
         <configuration>
           <formats>
             <format>
@@ -924,7 +892,7 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>12.2.1</version>
+        <version>12.2.2</version>
         <reportSets>
           <reportSet>
             <reports>
@@ -1014,7 +982,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
         <configuration>
           <tags>
             <tag>TODO</tag>
@@ -1042,7 +1010,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.2.8</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>

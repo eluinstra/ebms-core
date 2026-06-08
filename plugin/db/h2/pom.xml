@@ -101,6 +101,7 @@
             <excludes>
               <exclude>org.projectlombok:lombok</exclude>
               <exclude>org.apache.geronimo.specs:geronimo-jta_1.1_spec</exclude>
+              <exclude>org.flywaydb:flyway-core</exclude>
             </excludes>
           </artifactSet>
           <filters>
