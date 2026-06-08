@@ -103,7 +103,7 @@ public class CPAManagerTest
 				cpaRepository,
 				(cpaId, certificate) -> certificate,
 				url -> url,
-				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "password", "password"),
+				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "my-secret-password", "my-secret-password"),
 				false);
 	}
 
