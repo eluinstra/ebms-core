@@ -65,22 +65,7 @@ public class JAXBParser<T>
 	}
 
 	@SuppressWarnings("unchecked")
-	@Deprecated
-	public T handleUnsafe(String xml) throws JAXBException
-	{
-		try
-		{
-			return handle(xml);
-		}
-		catch (SAXException | ParserConfigurationException e)
-		{
-			throw new JAXBException("Unsafe XML parsing is not allowed", e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	public T handleUnsafe(Node n) throws JAXBException
+	public T handle(Node n) throws JAXBException
 	{
 		if (n == null)
 			return null;

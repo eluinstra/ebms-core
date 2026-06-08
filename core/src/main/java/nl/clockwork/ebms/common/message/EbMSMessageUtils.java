@@ -109,7 +109,7 @@ public class EbMSMessageUtils
 				Manifest.class,
 				StatusRequest.class,
 				StatusResponse.class);
-		val envelope = jaxbParser.handleUnsafe(document);
+		val envelope = jaxbParser.handle(document);
 		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilderHeader(builder, e));
 		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilderBody(builder, e));
 		builder.attachments(attachments);
@@ -166,9 +166,7 @@ public class EbMSMessageUtils
 	{
 		switch (channel.getMessagingCharacteristics().getSyncReplyMode())
 		{
-			case MSH_SIGNALS_ONLY:
-			case SIGNALS_ONLY:
-			case SIGNALS_AND_RESPONSE:
+			case MSH_SIGNALS_ONLY, SIGNALS_ONLY, SIGNALS_AND_RESPONSE:
 				SyncReply syncReply = new SyncReply();
 				syncReply.setVersion(Constants.EBMS_VERSION);
 				syncReply.setMustUnderstand(true);
@@ -245,7 +243,6 @@ public class EbMSMessageUtils
 		val result = new Reference();
 		result.setHref(Constants.CID + contentId);
 		result.setType("simple");
-		// reference.setRole("XLinkRole");
 		return result;
 	}
 

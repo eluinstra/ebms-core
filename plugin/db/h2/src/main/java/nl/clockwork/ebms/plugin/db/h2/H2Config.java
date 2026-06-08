@@ -36,7 +36,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.lang.NonNull;
 
 @Slf4j
 @Configuration
@@ -106,7 +105,7 @@ public class H2Config
 	public static class StartDatabaseServerType implements Condition
 	{
 		@Override
-		public boolean matches(@NonNull ConditionContext context, @NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("database.start", Boolean.class, false);
 		}

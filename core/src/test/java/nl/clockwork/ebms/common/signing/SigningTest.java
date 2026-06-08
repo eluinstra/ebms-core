@@ -24,7 +24,6 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
@@ -62,7 +61,7 @@ import org.xml.sax.SAXException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SigningTest
+class SigningTest
 {
 	CPAManager cpaManager;
 	EbMSMessageFactory messageFactory;
@@ -74,7 +73,7 @@ public class SigningTest
 	EbMSSignatureValidator signatureValidator;
 
 	@BeforeAll
-	public void init() throws Exception
+	void init()
 	{
 		MockitoAnnotations.openMocks(this);
 		Init.init();
@@ -85,8 +84,8 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException,
-			IOException, TransformerFactoryConfigurationError, TransformerException
+	void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException,
+			TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
@@ -95,7 +94,7 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+	void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
 			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
@@ -106,8 +105,8 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException,
-			ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
@@ -124,11 +123,11 @@ public class SigningTest
 		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
-	private CPAManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
+	private CPAManager initCPAManager()
 	{
 		return new CPAManager(
 				initCpaRepository(),
-				(cpaId, certificate) -> certificate,
+				(ignoredCpaId, certificate) -> certificate,
 				url -> url,
 				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "my-secret-password", "my-secret-password"),
 				false);
@@ -146,12 +145,12 @@ public class SigningTest
 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
-	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
+	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager)
 	{
 		return new EbMSSignatureGenerator(cpaManager, EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword));
 	}
 
-	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
+	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager)
 	{
 		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
 		return new EbMSSignatureValidator(cpaManager, trustStore);
@@ -160,8 +159,7 @@ public class SigningTest
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
 		val message = createMessage(cpaId);
-		val result = messageFactory.createEbMSMessage(message);
-		return result;
+		return messageFactory.createEbMSMessage(message);
 	}
 
 	private MessageRequest createMessage(String cpaId)

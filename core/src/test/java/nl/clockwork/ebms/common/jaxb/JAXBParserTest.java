@@ -32,7 +32,7 @@ class JAXBParserTest
 	void shouldHandleSimpleXmlThroughUnsafeStringApi() throws Exception
 	{
 		var parser = JAXBParser.getInstance(SampleMessage.class);
-		var result = parser.handleUnsafe("<sampleMessage><value>ok</value></sampleMessage>");
+		var result = parser.handle("<sampleMessage><value>ok</value></sampleMessage>");
 
 		assertNotNull(result);
 		assertEquals("ok", result.value);
@@ -44,7 +44,7 @@ class JAXBParserTest
 		var parser = JAXBParser.getInstance(SampleMessage.class);
 		var xml = "<!DOCTYPE sampleMessage [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>" + "<sampleMessage><value>&xxe;</value></sampleMessage>";
 
-		assertThrows(JAXBException.class, () -> parser.handleUnsafe(xml));
+		assertThrows(JAXBException.class, () -> parser.handle(xml));
 	}
 
 	@XmlRootElement(name = "sampleMessage")

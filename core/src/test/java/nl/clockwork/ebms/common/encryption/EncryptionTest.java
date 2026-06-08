@@ -21,10 +21,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
@@ -73,7 +71,7 @@ class EncryptionTest
 	EbMSMessageDecrypter messageDecrypter;
 
 	@BeforeAll
-	void init() throws Exception
+	void init()
 	{
 		MockitoAnnotations.openMocks(this);
 		Init.init();
@@ -148,11 +146,11 @@ class EncryptionTest
 								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
-	private CPAManager initCPAManager() throws IOException, JAXBException, GeneralSecurityException
+	private CPAManager initCPAManager()
 	{
 		return new CPAManager(
 				initCpaRepository(),
-				(cpaId, certificate) -> certificate,
+				(ignoredCpaId, certificate) -> certificate,
 				url -> url,
 				EbMSKeyStore.of(KeyStoreType.PKCS12, "nl/clockwork/ebms/keystore.p12", "my-secret-password", "my-secret-password"),
 				false);
@@ -170,13 +168,13 @@ class EncryptionTest
 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
-	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager) throws Exception
+	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager)
 	{
 		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
 		return new EbMSMessageEncrypter(cpaManager, trustStore);
 	}
 
-	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager) throws Exception
+	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager)
 	{
 		val keyStore = EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword);
 		return new EbMSMessageDecrypter(cpaManager, keyStore);

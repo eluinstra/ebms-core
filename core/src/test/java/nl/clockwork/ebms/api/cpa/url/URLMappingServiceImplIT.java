@@ -59,11 +59,7 @@ class URLMappingServiceImplIT implements WithFile
 
 	static Stream<Arguments> invalidURLMappings()
 	{
-		return Stream.of(
-				// FIXME
-				// arguments(new URLMapping(null,null), "source is marked non-null but is null"),
-				arguments(new URLMapping("", ""), "Source invalid"),
-				arguments(new URLMapping("source", "destination"), "Source invalid"));
+		return Stream.of(arguments(new URLMapping("", ""), "Source invalid"), arguments(new URLMapping("source", "destination"), "Source invalid"));
 	}
 
 	@ParameterizedTest
@@ -76,7 +72,6 @@ class URLMappingServiceImplIT implements WithFile
 	static Stream<Arguments> validURLMappings()
 	{
 		return Stream.of(
-				// FIXME
 				arguments(new URLMapping("http://www.example.com:8080", "http://localhost:8090")),
 				arguments(new URLMapping("http://www.example.com:8090", "http://localhost:8090")));
 	}

@@ -55,6 +55,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageData;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
@@ -275,9 +276,51 @@ class EbMSMessageUtilsTest
 	}
 
 	@Test
-	void getEbMSDocument()
+	void getEbMSDocument() throws Exception
 	{
-		// TODO: implement test
+		val dataSource = new DataSource()
+		{
+			@Override
+			public OutputStream getOutputStream() throws IOException
+			{
+				return null;
+			}
+
+			@Override
+			public String getName()
+			{
+				return "test.txt";
+			}
+
+			@Override
+			public InputStream getInputStream() throws IOException
+			{
+				return null;
+			}
+
+			@Override
+			public String getContentType()
+			{
+				return "text/plain";
+			}
+		};
+		val attachment = EbMSAttachmentFactory.createEbMSAttachment("cid1", dataSource);
+		val messageHeader = createMessageHeader();
+		val messageData = new MessageData();
+		messageData.setMessageId("content-id");
+		messageHeader.setMessageData(messageData);
+		val message = EbMSMessage.builder()
+				.messageHeader(messageHeader)
+				.ackRequested(createAckRequested())
+				.manifest(EbMSMessageUtils.createManifest())
+				.attachments(Collections.singletonList(attachment))
+				.build();
+
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		assertEquals(messageHeader.getMessageData().getMessageId(), document.getContentId());
+		assertEquals(1, document.getAttachments().size());
+		assertNotNull(document.getMessage());
+		assertTrue(documentToString(document.getMessage()).contains("AckRequested"));
 	}
 
 	@Test
