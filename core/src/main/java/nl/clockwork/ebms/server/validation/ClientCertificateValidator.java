@@ -15,9 +15,6 @@
  */
 package nl.clockwork.ebms.server.validation;
 
-
-import nl.clockwork.ebms.common.validation.ValidationException;
-import nl.clockwork.ebms.common.validation.ValidatorException;
 import java.security.cert.X509Certificate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,6 +25,8 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.common.validation.ValidationException;
+import nl.clockwork.ebms.common.validation.ValidatorException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

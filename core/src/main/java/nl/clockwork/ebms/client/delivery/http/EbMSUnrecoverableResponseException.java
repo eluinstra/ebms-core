@@ -21,14 +21,14 @@ public class EbMSUnrecoverableResponseException extends EbMSResponseException
 {
 	private static final long serialVersionUID = 1L;
 
-	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse)
+	public EbMSUnrecoverableResponseException(HttpResponse<String> response)
 	{
-		super(repsonse);
+		super(response);
 	}
 
-	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse, String message)
+	public EbMSUnrecoverableResponseException(HttpResponse<String> response, String message)
 	{
-		super(repsonse, message);
+		super(response, message);
 	}
 
 }

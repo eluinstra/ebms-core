@@ -15,9 +15,6 @@
  */
 package nl.clockwork.ebms.server.validation;
 
-
-import nl.clockwork.ebms.common.validation.EbMSValidationException;
-import nl.clockwork.ebms.common.validation.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -30,12 +27,14 @@ import lombok.val;
 import nl.clockwork.ebms.common.Constants;
 import nl.clockwork.ebms.common.EbMSAction;
 import nl.clockwork.ebms.common.EbMSErrorCode;
-import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.dao.EbMSDAO;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSMessage;
+import nl.clockwork.ebms.common.validation.EbMSValidationException;
+import nl.clockwork.ebms.common.validation.ValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -69,7 +68,6 @@ class MessageHeaderValidator
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
-		// TODO: remove???
 		cpaManager
 				.getSendDeliveryChannel(
 						messageHeader.getCPAId(),

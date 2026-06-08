@@ -15,12 +15,6 @@
  */
 package nl.clockwork.ebms.common.message;
 
-
-import nl.clockwork.ebms.common.Constants;
-import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
-import nl.clockwork.ebms.common.EbMSErrorCode;
-import nl.clockwork.ebms.common.Predicates;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
@@ -44,6 +38,10 @@ import javax.xml.xpath.XPathExpressionException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import nl.clockwork.ebms.common.Constants;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSErrorCode;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.common.jaxb.JAXBParser;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSAttachment;

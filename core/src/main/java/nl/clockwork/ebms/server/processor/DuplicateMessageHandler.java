@@ -23,8 +23,8 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.common.EbMSAction;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
+import nl.clockwork.ebms.common.EbMSAction;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
@@ -34,8 +34,8 @@ import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.model.EbMSMessageError;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.common.validation.ValidationException;
+import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 
 @Slf4j
 @Builder

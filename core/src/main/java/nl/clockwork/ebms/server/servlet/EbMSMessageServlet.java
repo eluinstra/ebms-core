@@ -29,8 +29,8 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.server.EbMSInputStreamHandler;
+import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)

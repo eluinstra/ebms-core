@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.server.validation;
 
-
-import nl.clockwork.ebms.common.validation.EbMSValidationException;
 import java.time.Instant;
 import java.util.function.BiPredicate;
 import lombok.AccessLevel;
@@ -27,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.common.EbMSErrorCode;
 import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSMessage;
+import nl.clockwork.ebms.common.validation.EbMSValidationException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
