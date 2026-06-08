@@ -27,22 +27,27 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.mindrot.jbcrypt.BCrypt;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BasicAuthenticationFilter implements Filter
 {
 	String realm;
 	Map<String, String> users;
+	ConcurrentMap<String, AttemptState> attempts = new ConcurrentHashMap<>();
+	int maxFailedAttempts;
+	long lockoutBaseMillis;
+	long lockoutMaxMillis;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
@@ -50,6 +55,9 @@ public class BasicAuthenticationFilter implements Filter
 		try
 		{
 			realm = filterConfig.getInitParameter("realm");
+			maxFailedAttempts = parseInt(filterConfig.getInitParameter("maxFailedAttempts"), 5);
+			lockoutBaseMillis = parseLong(filterConfig.getInitParameter("lockoutBaseMillis"), 1000L);
+			lockoutMaxMillis = parseLong(filterConfig.getInitParameter("lockoutMaxMillis"), 300000L);
 			val realmFile = new File(filterConfig.getInitParameter("realmFile"));
 			val lines = FileUtils.readLines(realmFile, Charset.defaultCharset());
 			users = lines.stream()
@@ -68,8 +76,9 @@ public class BasicAuthenticationFilter implements Filter
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
-		val authorization = ((HttpServletRequest)request).getHeader("Authorization");
-		if (validate(users, authorization))
+		val httpRequest = (HttpServletRequest)request;
+		val authorization = httpRequest.getHeader("Authorization");
+		if (validate(users, authorization, httpRequest.getRemoteAddr()))
 			chain.doFilter(request, response);
 		else
 		{
@@ -78,47 +87,117 @@ public class BasicAuthenticationFilter implements Filter
 		}
 	}
 
-	private boolean validate(Map<String, String> users, String authorization) throws ServletException
+	private boolean validate(Map<String, String> users, String authorization, String remoteAddress)
 	{
+		val credentials = getCredentials(authorization);
+		if (credentials == null)
+			return false;
+		val username = credentials[0];
+		val password = credentials[1];
+		val lockKey = remoteAddress + ":" + username;
+		if (isLocked(lockKey))
+			return false;
+		val valid = validate(users.get(username), password);
+		if (valid)
+			attempts.remove(lockKey);
+		else
+			onFailedAttempt(lockKey);
+		return valid;
+	}
+
+	private String[] getCredentials(String authorization)
+	{
+		if (authorization == null || !authorization.toLowerCase().startsWith("basic"))
+			return null;
 		try
 		{
-			if (authorization != null && authorization.toLowerCase().startsWith("basic"))
-			{
-				authorization = authorization.substring("basic".length()).trim();
-				authorization = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
-				val credenitals = StringUtils.split(authorization, ":");
-				if (credenitals.length == 2)
-					return validate(users.get(credenitals[0]), credenitals[1]);
-			}
-			return false;
+			authorization = authorization.substring("basic".length()).trim();
+			authorization = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
 		}
-		catch (NoSuchAlgorithmException e)
+		catch (IllegalArgumentException e)
 		{
-			throw new ServletException(e);
+			return null;
+		}
+		val credentials = StringUtils.split(authorization, ":");
+		if (credentials == null || credentials.length != 2)
+			return null;
+		return credentials;
+	}
+
+	private boolean isLocked(String key)
+	{
+		val state = attempts.get(key);
+		return state != null && state.lockedUntilEpochMillis > System.currentTimeMillis();
+	}
+
+	private void onFailedAttempt(String key)
+	{
+		attempts.compute(key, (k, current) ->
+		{
+			val state = current == null ? new AttemptState() : current;
+			state.failedAttempts++;
+			if (state.failedAttempts >= maxFailedAttempts)
+			{
+				val step = Math.max(0, state.failedAttempts - maxFailedAttempts);
+				val lockMillis = Math.min(lockoutMaxMillis, lockoutBaseMillis << Math.min(step, 20));
+				state.lockedUntilEpochMillis = System.currentTimeMillis() + lockMillis;
+			}
+			return state;
+		});
+	}
+
+	private static int parseInt(String value, int defaultValue)
+	{
+		if (StringUtils.isBlank(value))
+			return defaultValue;
+		try
+		{
+			return Integer.parseInt(value);
+		}
+		catch (NumberFormatException e)
+		{
+			return defaultValue;
 		}
 	}
 
-	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException
+	private static long parseLong(String value, long defaultValue)
 	{
-		if (savedPassword.startsWith("MD5:"))
-			return toMD5(password).equals(savedPassword);
-		else if (savedPassword.startsWith("OBF:"))
-			throw new NoSuchAlgorithmException("OBF");
-		else if (savedPassword.startsWith("CRYPT:"))
-			throw new NoSuchAlgorithmException("CRYPT");
-		else
-			return password.equals(savedPassword);
+		if (StringUtils.isBlank(value))
+			return defaultValue;
+		try
+		{
+			return Long.parseLong(value);
+		}
+		catch (NumberFormatException e)
+		{
+			return defaultValue;
+		}
 	}
 
-	private String toMD5(String s)
+	private boolean validate(String savedPassword, String password)
 	{
-		return "MD5:" + DigestUtils.md5Hex(s);
+		if (savedPassword == null)
+			return false;
+		if (savedPassword.startsWith("$2"))
+			return BCrypt.checkpw(password, savedPassword);
+		if (savedPassword.startsWith("MD5:"))
+			return false;
+		// Unsupported legacy formats and plaintext are rejected.
+		// This avoids continuing insecure password schemes.
+		return false;
 	}
 
 	@Override
 	public void destroy()
 	{
 		// do nothing
+	}
+
+	@FieldDefaults(level = AccessLevel.PRIVATE)
+	private static class AttemptState
+	{
+		int failedAttempts;
+		long lockedUntilEpochMillis;
 	}
 
 }
