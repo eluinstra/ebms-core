@@ -103,6 +103,8 @@
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <revision>2.20.7-SNAPSHOT</revision>
+    <!-- Provide an absolute path for legacy POMs that reference ${tools.jar} -->
+    <tools.jar>${java.home}/../lib/tools.jar</tools.jar>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -576,23 +578,27 @@
         <version>5.0.0</version>
         <configuration>
           <strictCheck>true</strictCheck>
-          <header>${maven-parent.basedir}/resources/license/header.txt</header>
           <failIfMissing>true</failIfMissing>
           <aggregate>true</aggregate>
-          <includes>
-            <include>pom.xml</include>
-            <include>src/main/java/**/*.java</include>
-            <include>src/main/resources/**/*</include>
-            <include>src/test/java/**/*.java</include>
-            <include>src/test/resources/**/*</include>
-          </includes>
-          <excludes>
-            <exclude>src/**/*.jks</exclude>
-            <exclude>src/**/*.p12</exclude>
-            <exclude>src/**/*.crt</exclude>
-            <exclude>src/**/*.pem</exclude>
-            <exclude>src/main/resources/nl/clockwork/ebms/xsd/**/*</exclude>
-          </excludes>
+          <licenseSets>
+            <licenseSet>
+              <header>${maven-parent.basedir}/resources/license/header.txt</header>
+              <includes>
+                <include>pom.xml</include>
+                <include>src/main/java/**/*.java</include>
+                <include>src/main/resources/**/*</include>
+                <include>src/test/java/**/*.java</include>
+                <include>src/test/resources/**/*</include>
+              </includes>
+              <excludes>
+                <exclude>src/**/*.jks</exclude>
+                <exclude>src/**/*.p12</exclude>
+                <exclude>src/**/*.crt</exclude>
+                <exclude>src/**/*.pem</exclude>
+                <exclude>src/main/resources/nl/clockwork/ebms/xsd/**/*</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
         </configuration>
         <executions>
           <execution>

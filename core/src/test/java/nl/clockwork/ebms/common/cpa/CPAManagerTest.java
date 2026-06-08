@@ -24,8 +24,6 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.val;
@@ -90,7 +88,7 @@ public class CPAManagerTest
 	CPAManager cpaManager;
 
 	@BeforeAll
-	void init() throws GeneralSecurityException, IOException
+	void init()
 	{
 		MockitoAnnotations.openMocks(this);
 		when(cpaRepository.existsCPA(DEFAULT_CPA_ID)).thenReturn(true);
@@ -259,7 +257,9 @@ public class CPAManagerTest
 	{
 		assertThat(cpaManager.getFromPartyInfo(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
 		{
-			/* TODO */});
+			assertThat(fromPartyInfo.getPartyIds()).isNotEmpty();
+			assertThat(fromPartyInfo.getCanSend()).isNotNull();
+		});
 	}
 
 	private static Stream<Arguments> getFromPartyInfo()
@@ -296,7 +296,9 @@ public class CPAManagerTest
 	{
 		assertThat(cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
 		{
-			/* TODO */});
+			assertThat(fromPartyInfo.getPartyIds()).isNotEmpty();
+			assertThat(fromPartyInfo.getCanReceive()).isNotNull();
+		});
 	}
 
 	private static Stream<Arguments> getToPartyInfoByFromPartyActionBinding()
@@ -333,7 +335,9 @@ public class CPAManagerTest
 	{
 		assertThat(cpaManager.getToPartyInfo(cpaId, fromParty, service, action)).hasValueSatisfying(fromPartyInfo ->
 		{
-			/* TODO */});
+			assertThat(fromPartyInfo.getPartyIds()).isNotEmpty();
+			assertThat(fromPartyInfo.getCanReceive()).isNotNull();
+		});
 	}
 
 	private static Stream<Arguments> getToPartyInfo()
@@ -360,7 +364,6 @@ public class CPAManagerTest
 				arguments(DEFAULT_CPA_ID, Party.of(OVERHEID_PARTY_ID.toString(), OVERHEID_ROLE), AANLEVEREN_SERVICE.toString(), AANLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE), AFLEVEREN_SERVICE.toString(), AFLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE), AANLEVEREN_SERVICE.toString(), BEVESTIG_AANLEVEREN_ACTION),
-				// arguments(DEFAULT_CPA_ID,Party.of(CPAUtils.toString(OVERHEID_PARTY_ID),OVERHEID_ROLE),null,BEVESTIG_AFLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, Party.of(OVERHEID_PARTY_ID.toString(), OVERHEID_ROLE), AFLEVEREN_SERVICE.toString(), null));
 	}
 
@@ -517,7 +520,8 @@ public class CPAManagerTest
 	{
 		assertThat(cpaManager.getSendDeliveryChannel(cpaId, partyId, role, service, action)).hasValueSatisfying(deliveryChannel ->
 		{
-			/* TODO */});
+			assertThat(deliveryChannel.getChannelId()).isNotBlank();
+		});
 	}
 
 	public static Stream<Arguments> getSendDeliveryChannel()
@@ -547,7 +551,6 @@ public class CPAManagerTest
 				arguments(DEFAULT_CPA_ID, emptyList(), DIGIPOORT_ROLE, AANLEVEREN_SERVICE, AANLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, asList(DIGIPOORT_PARTY_ID), null, AANLEVEREN_SERVICE, AANLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, asList(DIGIPOORT_PARTY_ID), DIGIPOORT_ROLE, null, AANLEVEREN_ACTION),
-				// FIXME: arguments(DEFAULT_CPA_ID,asList(DIGIPOORT_PARTY_ID),DIGIPOORT_ROLE,DEFAULT_SERVICE,null),
 				arguments(NOT_EXISTING_CPA_ID, asList(DIGIPOORT_PARTY_ID), DIGIPOORT_ROLE, AFLEVEREN_SERVICE, BEVESTIG_AFLEVEREN_ACTION));
 	}
 
@@ -557,7 +560,8 @@ public class CPAManagerTest
 	{
 		assertThat(cpaManager.getReceiveDeliveryChannel(cpaId, partyId, role, service, action)).hasValueSatisfying(deliveryChannel ->
 		{
-			/* TODO */});
+			assertThat(deliveryChannel.getChannelId()).isNotBlank();
+		});
 	}
 
 	public static Stream<Arguments> getReceiveDeliveryChannel()
@@ -587,7 +591,6 @@ public class CPAManagerTest
 				arguments(DEFAULT_CPA_ID, emptyList(), DIGIPOORT_ROLE, AANLEVEREN_SERVICE, AANLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, asList(DIGIPOORT_PARTY_ID), null, AANLEVEREN_SERVICE, AANLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, asList(DIGIPOORT_PARTY_ID), DIGIPOORT_ROLE, null, AANLEVEREN_ACTION),
-				// FIXME: arguments(DEFAULT_CPA_ID,asList(DIGIPOORT_PARTY_ID),DIGIPOORT_ROLE,DEFAULT_SERVICE,null),
 				arguments(NOT_EXISTING_CPA_ID, asList(DIGIPOORT_PARTY_ID), DIGIPOORT_ROLE, AFLEVEREN_SERVICE, BEVESTIG_AFLEVEREN_ACTION));
 	}
 

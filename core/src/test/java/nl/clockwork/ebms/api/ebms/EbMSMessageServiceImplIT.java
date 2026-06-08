@@ -195,7 +195,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 
 	@Test
 	@Order(6)
-	void getUnprocessedMessageIds() throws Exception
+	void getUnprocessedMessageIds()
 	{
 		RestAssured.with()
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -215,7 +215,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 
 	@Test
 	@Order(7)
-	void getMessage() throws Exception
+	void getMessage()
 	{
 		RestAssured.with()
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -241,7 +241,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 
 	@Test
 	@Order(8)
-	void processMessage() throws Exception
+	void processMessage()
 	{
 		RestAssured.with()
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -286,7 +286,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 
 	@Test
 	@Order(10)
-	void getUnprocessedMessageIdsAgain() throws Exception
+	void getUnprocessedMessageIdsAgain()
 	{
 		RestAssured.with()
 				.header("Content-Type", "text/xml; charset=UTF-8")

@@ -20,11 +20,13 @@ import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
+import javax.xml.parsers.ParserConfigurationException;
 import lombok.val;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.jaxb.JAXBParser;
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.xml.sax.SAXException;
 
 public class CPATestUtils
 {
@@ -35,9 +37,9 @@ public class CPATestUtils
 		try
 		{
 			val s = IOUtils.toString(CPAUtils.class.getResourceAsStream("/nl/clockwork/ebms/cpas/" + cpaId + ".xml"), Charset.forName("UTF-8"));
-			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(s));
+			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(s));
 		}
-		catch (IOException | JAXBException e)
+		catch (IOException | JAXBException | SAXException | ParserConfigurationException e)
 		{
 			return Optional.empty();
 		}

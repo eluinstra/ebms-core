@@ -18,6 +18,7 @@ package nl.clockwork.ebms.client.delivery.http;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.sun.net.httpserver.HttpServer;
 import java.io.ByteArrayInputStream;
@@ -117,6 +118,7 @@ class MultipartBodyPublisherTest
 			@Override
 			public void close()
 			{
+				// Test double: this stub channel does not own any resources.
 			}
 
 			@Override
@@ -137,7 +139,7 @@ class MultipartBodyPublisherTest
 			{
 				// nop
 			}
-			assertEquals(false, true);
+			fail("Expected read failure to propagate the original IOException");
 		}
 		catch (IOException e)
 		{
