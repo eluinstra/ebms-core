@@ -15,21 +15,12 @@
  */
 package nl.clockwork.ebms.common.datasource;
 
-import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.util.IsolationLevel;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.UUID;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.common.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
-import nl.clockwork.ebms.common.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
-import nl.clockwork.ebms.common.transaction.TransactionManagerConfig.TransactionManagerType;
-import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -46,10 +37,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {
-	@Value("${transactionManager.type}")
-	TransactionManagerType transactionManagerType;
-	@Value("${transactionManager.isolationLevel}")
-	IsolationLevel isolationLevel;
 	@Value("${ebms.jdbc.driverClassName}")
 	String driverClassName;
 	@Value("${ebms.jdbc.url}")
@@ -81,7 +68,6 @@ public class DataSourceConfig
 
 	@Bean(destroyMethod = "close")
 	@DependsOn("databaseServer")
-	@Conditional(DefaultTransactionManagerType.class)
 	public DataSource hikariDataSource()
 	{
 		val config = new HikariConfig();
@@ -106,59 +92,6 @@ public class DataSourceConfig
 		return new Object();
 	}
 
-	@Bean(destroyMethod = "close")
-	@Conditional(AtomikosTransactionManagerType.class)
-	public DataSource atomikosDataSourceBean() throws SQLException
-	{
-		val result = new AtomikosDataSourceBean();
-		result.setUniqueResourceName(UUID.randomUUID().toString());
-		// if (jdbcUrl.contains("db2"))
-		// createDB2XADataSource().ifPresentOrElse(result::setXaDataSource, () ->
-		// {
-		// throw new IllegalStateException("Error creating DB2XADataSource");
-		// });
-		// else
-		// {
-		result.setXaDataSourceClassName(driverClassName);
-		result.setXaProperties(createDriverProperties());
-		// }
-		if (isolationLevel != null)
-			result.setDefaultIsolationLevel(isolationLevel.getLevelId());
-		result.setLocalTransactionMode(true);
-		result.setMaxIdleTime(maxIdleTime);
-		result.setMaxLifetime(maxLifetime);
-		result.setMinPoolSize(minPoolSize);
-		result.setMaxPoolSize(maxPoolSize);
-		if (StringUtils.isNotEmpty(testQuery))
-			result.setTestQuery(testQuery);
-		result.setBorrowConnectionTimeout(30);
-		result.setConcurrentConnectionValidation(true);
-		result.setLoginTimeout(0);
-		result.setMaintenanceInterval(60);
-		result.init();
-		return result;
-	}
-
-	// private Optional<XADataSource> createDB2XADataSource()
-	// {
-	// return matchJdbcUrl(jdbcUrl).map(matcher ->
-	// {
-	// val result = new DB2XADataSource();
-	// result.setDatabaseName(matcher.group(3));
-	// result.setUser(username);
-	// result.setPassword(password);
-	// result.setServerName(matcher.group(1));
-	// result.setPortNumber(Integer.parseInt(matcher.group(2)));
-	// result.setDriverType(4);
-	// return result;
-	// });
-	// }
-	// private Optional<Matcher> matchJdbcUrl(String jdbcUrl)
-	// {
-	// val p = Pattern.compile("^jdbc:db2://([^:]+):(\\d+)/(.*)$");
-	// val m = p.matcher(jdbcUrl);
-	// return m.find() ? Optional.of(m) : Optional.empty();
-	// }
 	@EventListener(ContextRefreshedEvent.class)
 	public void init()
 	{
@@ -170,20 +103,6 @@ public class DataSourceConfig
 		}
 	}
 
-	private Properties createDriverProperties()
-	{
-		val result = new Properties();
-		if (driverClassName.contains("sqlserver"))
-			result.put("URL", jdbcUrl);
-		else if (driverClassName.contains("oracle") && driverClassName.contains("xa"))
-			result.put("URL", jdbcUrl);
-		else
-			result.put("url", jdbcUrl);
-		result.put("user", username);
-		result.put("password", password);
-		return result;
-	}
-
 	public static class NotStartDatabaseServerType implements Condition
 	{
 		@Override
@@ -192,5 +111,4 @@ public class DataSourceConfig
 			return !context.getEnvironment().getProperty("database.start", Boolean.class, false);
 		}
 	}
-
 }

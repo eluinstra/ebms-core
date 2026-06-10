@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.client.delivery.task;
 
-import jakarta.jms.ConnectionFactory;
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -25,26 +25,20 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.server.processor.EbMSMessageProcessor;
-import org.apache.commons.lang3.StringUtils;
 import org.jgroups.JChannel;
 import org.jgroups.raft.RaftHandle;
-import org.jgroups.raft.util.CounterStateMachine;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.jgroups.raft.StateMachine;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@ComponentScan(basePackageClasses = {nl.clockwork.ebms.client.delivery.task.DeliveryTaskJob.class, nl.clockwork.ebms.client.delivery.task.JMSJob.class})
 @EnableAsync
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
@@ -54,17 +48,15 @@ public class DeliveryTaskHandlerConfig
 
 	public enum DeliveryTaskHandlerType
 	{
-		DEFAULT, JMS, QUARTZ, QUARTZ_JMS;
+		DEFAULT;
 	}
 
 	@Value("${ebms.serverId:#{null}}")
 	String serverId;
-	@Value("${deliveryTaskHandler.jms.destinationName}")
-	String jmsDestinationName;
-	@Value("${deliveryTaskHandler.jms.receiveTimeout}")
-	long receiveTimeout;
 	@Value("${deliveryTaskHandler.start}")
 	boolean startTaskHandler;
+	@Value("${deliveryTaskHandler.type:DEFAULT}")
+	String configuredTaskHandlerType;
 	@Value("${deliveryTaskHandler.minThreads}")
 	int minThreads;
 	@Value("${deliveryTaskHandler.maxThreads}")
@@ -83,8 +75,28 @@ public class DeliveryTaskHandlerConfig
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	@Value("${http.uuid.headerName}")
 	String uuidHeader;
-	@Value("${deliveryTaskHandler.jms.destinationName}")
-	String destinationName;
+	@Value("${raft.configLocation:ebms-raft.xml}")
+	String raftConfigLocation;
+	@Value("${raft.clusterName:ebms-cluster}")
+	String raftClusterName;
+
+	@PostConstruct
+	public void validateConfiguration()
+	{
+		try
+		{
+			DeliveryTaskHandlerType.valueOf(configuredTaskHandlerType);
+		}
+		catch (IllegalArgumentException e)
+		{
+			throw new IllegalStateException(
+					"Unsupported value '"
+							+ configuredTaskHandlerType
+							+ "' for property '"
+							+ DELIVERY_TASK_HANDLER_TYPE
+							+ "'. JMS, QUARTZ and QUARTZ_JMS modes have been removed in favour of the Raft-leader DAO executor; only DEFAULT is supported.");
+		}
+	}
 
 	@Bean("deliveryTaskExecutor")
 	@Conditional(DefaultTaskHandlerType.class)
@@ -98,47 +110,36 @@ public class DeliveryTaskHandlerConfig
 		return result;
 	}
 
+	@Bean(destroyMethod = "close")
+	@Conditional(DefaultTaskHandlerType.class)
+	public JChannel raftChannel() throws Exception
+	{
+		val ch = new JChannel(raftConfigLocation);
+		ch.connect(raftClusterName);
+		return ch;
+	}
+
 	@Bean
 	@Conditional(DefaultTaskHandlerType.class)
-	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskHandler deliveryTaskHandler) throws Exception
+	public RaftHandle raftHandle(JChannel raftChannel)
+	{
+		return new RaftHandle(raftChannel, new NoOpStateMachine());
+	}
+
+	@Bean
+	@Conditional(DefaultTaskHandlerType.class)
+	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskHandler deliveryTaskHandler, RaftHandle raftHandle)
 	{
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.deliveryTaskHandler(deliveryTaskHandler)
-				.raftHandle(raftHandle())
+				.raftHandle(raftHandle)
 				.timedTask(new TimedTask(taskHandlerExecutionInterval))
 				.maxTasks(maxTasks)
 				.serverId(serverId)
 				.leaderCheckIntervalMillis(leaderCheckIntervalMillis)
 				.taskAwaitTimeoutMillis(taskAwaitTimeoutMillis)
 				.build();
-	}
-
-	public RaftHandle raftHandle() throws Exception
-	{
-		val ch = new JChannel("raft.xml");
-		val handle = new RaftHandle(ch, new CounterStateMachine());
-		ch.connect("ebms-cluster");
-		return handle;
-	}
-
-	@Bean
-	@Conditional(JmsTaskHandlerType.class)
-	public DefaultMessageListenerContainer jmsTaskProcessor(
-			ConnectionFactory connectionFactory,
-			@Qualifier("jmsTransactionManager") PlatformTransactionManager jmsTransactionManager,
-			DeliveryTaskHandler deliveryTaskHandler)
-	{
-		val result = new DefaultMessageListenerContainer();
-		result.setConnectionFactory(connectionFactory);
-		result.setTransactionManager(jmsTransactionManager);
-		result.setSessionTransacted(true);
-		result.setConcurrentConsumers(minThreads);
-		result.setMaxConcurrentConsumers(maxThreads);
-		result.setReceiveTimeout(receiveTimeout);
-		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSDeliveryTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
-		result.setMessageListener(new JMSDeliveryTaskListener(deliveryTaskHandler));
-		return result;
 	}
 
 	@Bean
@@ -173,34 +174,28 @@ public class DeliveryTaskHandlerConfig
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
-					&& context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-							== DeliveryTaskHandlerType.DEFAULT;
+					&& "DEFAULT".equalsIgnoreCase(context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, "DEFAULT"));
 		}
 	}
 
-	public static class JmsTaskHandlerType implements Condition
+	private static final class NoOpStateMachine implements StateMachine
 	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public byte[] apply(byte[] data, int offset, int length, boolean serializeResponse)
 		{
-			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
-					&& (context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-							== DeliveryTaskHandlerType.JMS
-							|| context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-									== DeliveryTaskHandlerType.QUARTZ_JMS);
+			return new byte[0];
 		}
-	}
 
-	public static class QuartzTaskHandlerType implements Condition
-	{
 		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		public void readContentFrom(java.io.DataInput in)
 		{
-			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true)
-					&& (context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-							== DeliveryTaskHandlerType.QUARTZ
-							|| context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_TYPE, DeliveryTaskHandlerType.class, DeliveryTaskHandlerType.DEFAULT)
-									== DeliveryTaskHandlerType.QUARTZ_JMS);
+			// no state to read
+		}
+
+		@Override
+		public void writeContentTo(java.io.DataOutput out)
+		{
+			// no state to write
 		}
 	}
 }

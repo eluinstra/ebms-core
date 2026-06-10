@@ -15,23 +15,14 @@
  */
 package nl.clockwork.ebms.common.jms;
 
-import com.atomikos.jms.AtomikosConnectionFactoryBean;
 import jakarta.jms.ConnectionFactory;
-import jakarta.jms.XAConnectionFactory;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.common.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
-import nl.clockwork.ebms.common.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
-import nl.clockwork.ebms.common.transaction.TransactionManagerConfig.TransactionManagerType;
-import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.jms.connection.JmsTransactionManager;
@@ -41,20 +32,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JMSConfig
 {
-	@Value("${transactionManager.type}")
-	TransactionManagerType transactionManagerType;
 	@Value("${jms.broker.start}")
 	boolean jmsBrokerStart;
 	@Value("${jms.broker.config}")
 	String jmsBrokerConfig;
 	@Value("${jms.brokerURL}")
 	String jmsBrokerUrl;
-	@Value("${jms.broker.username}")
-	String username;
-	@Value("${jms.broker.password}")
-	String password;
-	@Value("${jms.pool.minPoolSize}")
-	int minPoolSize;
 	@Value("${jms.pool.maxPoolSize}")
 	int maxPoolSize;
 
@@ -65,7 +48,6 @@ public class JMSConfig
 	}
 
 	@Bean
-	@Conditional(DefaultTransactionManagerType.class)
 	@DependsOn("brokerFactory")
 	public ConnectionFactory pooledConnectionFactor() throws Exception
 	{
@@ -75,38 +57,8 @@ public class JMSConfig
 	}
 
 	@Bean("jmsTransactionManager")
-	@Conditional(DefaultTransactionManagerType.class)
 	public PlatformTransactionManager jmsTransactionManager(@NonNull ConnectionFactory connectionFactory)
 	{
 		return new JmsTransactionManager(connectionFactory);
-	}
-
-	@Bean(initMethod = "init", destroyMethod = "close")
-	@Conditional(AtomikosTransactionManagerType.class)
-	@DependsOn("brokerFactory")
-	public ConnectionFactory atomikosConnectionFactoryBean()
-	{
-		val result = new AtomikosConnectionFactoryBean();
-		result.setUniqueResourceName(UUID.randomUUID().toString());
-		result.setXaConnectionFactory(createXAConnectionFactory());
-		result.setLocalTransactionMode(false);
-		result.setMinPoolSize(minPoolSize);
-		result.setMaxPoolSize(maxPoolSize);
-		result.setBorrowConnectionTimeout(30);
-		result.setMaintenanceInterval(60);
-		result.setMaxIdleTime(60);
-		result.setMaxLifetime(0);
-		return result;
-	}
-
-	private XAConnectionFactory createXAConnectionFactory()
-	{
-		val result = new ActiveMQXAConnectionFactory(jmsBrokerUrl);
-		if (StringUtils.isNotEmpty(username))
-		{
-			result.setUserName(username);
-			result.setPassword(password);
-		}
-		return result;
 	}
 }
