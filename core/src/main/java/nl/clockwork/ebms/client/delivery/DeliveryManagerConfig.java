@@ -35,7 +35,7 @@ public class DeliveryManagerConfig
 {
 	public enum DeliveryManagerType
 	{
-		DEFAULT, JMS;
+		DEFAULT, JMS, KAFKA;
 	}
 
 	@Value("${deliveryManager.minThreads}")
@@ -72,7 +72,7 @@ public class DeliveryManagerConfig
 	public static class DefaultDeliveryManagerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT)
 					== DeliveryManagerType.DEFAULT;

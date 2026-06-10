@@ -34,7 +34,7 @@ public class MessageEventListenerConfig
 {
 	public enum EventListenerType
 	{
-		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT
+		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT, SIMPLE_KAFKA, KAFKA, KAFKA_TEXT
 	}
 
 	@Value("${eventListener.filter}")
@@ -69,7 +69,7 @@ public class MessageEventListenerConfig
 	public static class DefaultEventListenerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return "DEFAULT".equalsIgnoreCase(context.getEnvironment().getProperty("eventListener.type", "DEFAULT"));
 		}
@@ -78,7 +78,7 @@ public class MessageEventListenerConfig
 	public static class DaoEventListenerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return "DAO".equalsIgnoreCase(context.getEnvironment().getProperty("eventListener.type", "DEFAULT"));
 		}

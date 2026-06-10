@@ -84,7 +84,7 @@ class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappi
 		return jdbcTemplate.query("select source, destination from url_mapping order by source asc", new RowMapper<URLMapping>()
 		{
 			@Override
-			public URLMapping mapRow(@org.springframework.lang.NonNull ResultSet rs, int nr) throws SQLException
+			public URLMapping mapRow(@org.jspecify.annotations.NonNull ResultSet rs, int nr) throws SQLException
 			{
 				return new URLMapping(rs.getString("source"), rs.getString("destination"));
 			}

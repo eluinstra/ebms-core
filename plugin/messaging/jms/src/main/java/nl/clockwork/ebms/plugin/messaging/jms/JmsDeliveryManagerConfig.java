@@ -39,7 +39,7 @@ public class JmsDeliveryManagerConfig
 	@Bean
 	@Conditional(JmsDeliveryManagerType.class)
 	public DeliveryManager jmsDeliveryManager(
-			@org.springframework.lang.NonNull ConnectionFactory connectionFactory,
+			@org.jspecify.annotations.NonNull ConnectionFactory connectionFactory,
 			CPAManager cpaManager,
 			EbMSHttpClientFactory ebMSClientFactory,
 			@Qualifier("jmsTransactionManager") PlatformTransactionManager transactionManager)
@@ -55,7 +55,7 @@ public class JmsDeliveryManagerConfig
 	public static class JmsDeliveryManagerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
 		}

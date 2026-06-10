@@ -40,7 +40,7 @@ public class CertificateMappingConfig
 	}
 
 	@Bean
-	public CertificateMappingRepositoryImpl certificateMappingRepository(@org.springframework.lang.NonNull DataSource dataSource)
+	public CertificateMappingRepositoryImpl certificateMappingRepository(@org.jspecify.annotations.NonNull DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new CertificateMappingRepositoryImpl(jdbcTemplate);

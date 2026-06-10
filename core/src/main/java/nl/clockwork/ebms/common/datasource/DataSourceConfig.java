@@ -106,7 +106,7 @@ public class DataSourceConfig
 	public static class NotStartDatabaseServerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return !context.getEnvironment().getProperty("database.start", Boolean.class, false);
 		}

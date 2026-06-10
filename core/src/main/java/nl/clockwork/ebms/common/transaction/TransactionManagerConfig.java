@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class TransactionManagerConfig
 {
 	@Bean("dataSourceTransactionManager")
-	public PlatformTransactionManager dataSourceTransactionManager(@org.springframework.lang.NonNull DataSource dataSource)
+	public PlatformTransactionManager dataSourceTransactionManager(@org.jspecify.annotations.NonNull DataSource dataSource)
 	{
 		return new DataSourceTransactionManager(dataSource);
 	}

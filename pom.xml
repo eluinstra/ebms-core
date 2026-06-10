@@ -74,6 +74,7 @@
     <module>plugin/db/oracle</module>
     <module>plugin/db/postgres</module>
     <module>plugin/messaging/jms</module>
+    <module>plugin/messaging/kafka</module>
   </modules>
   <scm>
     <connection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</connection>
@@ -177,6 +178,11 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>nl.clockwork.ebms.plugin.messaging</groupId>
+        <artifactId>ebms-kafka-messaging-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>nl.clockwork.ebms.plugin.db</groupId>
         <artifactId>ebms-postgres-db-plugin</artifactId>
         <version>${project.version}</version>
@@ -252,6 +258,11 @@
         <version>1.1.0.Final</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka-clients</artifactId>
+        <version>4.0.0</version>
+      </dependency>
+      <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>1.18.46</version>
@@ -286,6 +297,11 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-jms</artifactId>
         <version>7.0.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.kafka</groupId>
+        <artifactId>spring-kafka</artifactId>
+        <version>4.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -388,6 +404,12 @@
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-junit-jupiter</artifactId>
+        <version>2.0.5</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-kafka</artifactId>
         <version>2.0.5</version>
         <scope>test</scope>
       </dependency>

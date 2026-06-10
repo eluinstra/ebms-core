@@ -48,7 +48,7 @@ public class DeliveryTaskHandlerConfig
 
 	public enum DeliveryTaskHandlerType
 	{
-		DEFAULT, JMS;
+		DEFAULT, JMS, KAFKA;
 	}
 
 	@Value("${ebms.serverId:#{null}}")
@@ -94,7 +94,7 @@ public class DeliveryTaskHandlerConfig
 							+ configuredTaskHandlerType
 							+ "' for property '"
 							+ DELIVERY_TASK_HANDLER_TYPE
-							+ "'. Supported values are DEFAULT (Raft-leader DAO executor sending directly via HTTP) and JMS (requires the JMS messaging plugin).");
+							+ "'. Supported values are DEFAULT (Raft-leader DAO executor sending directly via HTTP), JMS (requires the JMS messaging plugin) and KAFKA (requires the Kafka messaging plugin).");
 		}
 	}
 

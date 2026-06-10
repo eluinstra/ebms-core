@@ -45,7 +45,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, Boolean>>
 	{
 		@Override
-		public Tuple2<X509Certificate, Boolean> mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
+		public Tuple2<X509Certificate, Boolean> mapRow(@org.jspecify.annotations.NonNull ResultSet rs, int rowNum) throws SQLException
 		{
 			try
 			{
@@ -109,7 +109,7 @@ class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.cert
 		return jdbcTemplate.query("select source, destination, cpa_id from certificate_mapping", new RowMapper<CertificateMapping>()
 		{
 			@Override
-			public CertificateMapping mapRow(@org.springframework.lang.NonNull ResultSet rs, int nr) throws SQLException
+			public CertificateMapping mapRow(@org.jspecify.annotations.NonNull ResultSet rs, int nr) throws SQLException
 			{
 				try
 				{

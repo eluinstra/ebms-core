@@ -44,7 +44,7 @@ public class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 		String messageId;
 
 		@Override
-		public @org.springframework.lang.NonNull Message createMessage(@org.springframework.lang.NonNull Session session) throws JMSException
+		public @org.jspecify.annotations.NonNull Message createMessage(@org.jspecify.annotations.NonNull Session session) throws JMSException
 		{
 			val result = session.createMessage();
 			result.setStringProperty("messageId", messageId);
@@ -57,7 +57,7 @@ public class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	@NonNull
 	Map<String, Destination> destinations;
 
-	private @org.springframework.lang.NonNull Destination getDestination(MessageEventType messageEventType)
+	private @org.jspecify.annotations.NonNull Destination getDestination(MessageEventType messageEventType)
 	{
 		return java.util.Objects.requireNonNull(destinations.get(messageEventType.name()));
 	}

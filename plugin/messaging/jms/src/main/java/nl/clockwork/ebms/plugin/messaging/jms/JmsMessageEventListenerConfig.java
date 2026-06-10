@@ -81,7 +81,7 @@ public class JmsMessageEventListenerConfig
 	public static class SimpleJmsEventListenerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return "SIMPLE_JMS".equalsIgnoreCase(context.getEnvironment().getProperty("eventListener.type", "DEFAULT"));
 		}
@@ -90,7 +90,7 @@ public class JmsMessageEventListenerConfig
 	public static class JmsEventListenerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return "JMS".equalsIgnoreCase(context.getEnvironment().getProperty("eventListener.type", "DEFAULT"));
 		}
@@ -99,7 +99,7 @@ public class JmsMessageEventListenerConfig
 	public static class JmsTextEventListenerType implements Condition
 	{
 		@Override
-		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		public boolean matches(@org.jspecify.annotations.NonNull ConditionContext context, @org.jspecify.annotations.NonNull AnnotatedTypeMetadata metadata)
 		{
 			return "JMS_TEXT".equalsIgnoreCase(context.getEnvironment().getProperty("eventListener.type", "DEFAULT"));
 		}

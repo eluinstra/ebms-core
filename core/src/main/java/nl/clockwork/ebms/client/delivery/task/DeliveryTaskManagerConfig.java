@@ -43,7 +43,7 @@ public class DeliveryTaskManagerConfig
 	}
 
 	@Bean
-	public DeliveryTaskDAO deliveryTaskDAO(@org.springframework.lang.NonNull DataSource dataSource)
+	public DeliveryTaskDAO deliveryTaskDAO(@org.jspecify.annotations.NonNull DataSource dataSource)
 	{
 		return new DeliveryTaskDAOImpl(new JdbcTemplate(dataSource));
 	}

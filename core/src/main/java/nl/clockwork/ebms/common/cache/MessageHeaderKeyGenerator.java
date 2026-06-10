@@ -19,9 +19,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.lang.NonNull;
 
 public class MessageHeaderKeyGenerator implements KeyGenerator
 {

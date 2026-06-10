@@ -36,7 +36,7 @@ public class URLMappingConfig
 	}
 
 	@Bean
-	public URLMappingRepositoryImpl urlMappingRepository(@org.springframework.lang.NonNull DataSource dataSource)
+	public URLMappingRepositoryImpl urlMappingRepository(@org.jspecify.annotations.NonNull DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new URLMappingRepositoryImpl(jdbcTemplate);

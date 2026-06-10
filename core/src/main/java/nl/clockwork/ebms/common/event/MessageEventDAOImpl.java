@@ -44,7 +44,7 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 	{
 		@Override
 		@Nullable
-		public MessageEvent mapRow(@org.springframework.lang.NonNull ResultSet rs, int nr) throws SQLException
+		public MessageEvent mapRow(@org.jspecify.annotations.NonNull ResultSet rs, int nr) throws SQLException
 		{
 			return new MessageEvent(rs.getString("message_id"), MessageEventType.values()[rs.getInt("event_type")]);
 		}
@@ -71,7 +71,7 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 				parameters.toArray(new Object[0]));
 	}
 
-	@org.springframework.lang.NonNull
+	@org.jspecify.annotations.NonNull
 	private String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 	{
 		return "select message_event.message_id, message_event.event_type"

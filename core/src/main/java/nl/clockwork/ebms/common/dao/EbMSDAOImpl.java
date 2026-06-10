@@ -89,7 +89,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 				+ " status";
 
 		@Override
-		public EbMSMessageProperties mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
+		public EbMSMessageProperties mapRow(@org.jspecify.annotations.NonNull ResultSet rs, int rowNum) throws SQLException
 		{
 			return EbMSMessageProperties.builder()
 					.cpaId(rs.getString("cpa_id"))
@@ -124,7 +124,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 				+ " status";
 
 		@Override
-		public MessageProperties mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
+		public MessageProperties mapRow(@org.jspecify.annotations.NonNull ResultSet rs, int rowNum) throws SQLException
 		{
 			return MessageProperties.builder()
 					.cpaId(rs.getString("cpa_id"))
@@ -334,7 +334,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 							new RowMapper<EbMSDocument>()
 							{
 								@Override
-								public EbMSDocument mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException
+								public EbMSDocument mapRow(@org.jspecify.annotations.NonNull ResultSet rs, int rowNum) throws SQLException
 								{
 									try
 									{
@@ -482,7 +482,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 				new BatchPreparedStatementSetter()
 				{
 					@Override
-					public void setValues(@org.springframework.lang.NonNull PreparedStatement ps, int i) throws SQLException
+					public void setValues(@org.jspecify.annotations.NonNull PreparedStatement ps, int i) throws SQLException
 					{
 						try
 						{
@@ -524,7 +524,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.EbMSDAO, nl.clo
 		return jdbcTemplate.update("delete from ebms_attachment" + " where message_id = ?", messageId);
 	}
 
-	protected <T> List<T> getAttachments(String messageId, @org.springframework.lang.NonNull RowMapper<T> rowMapper)
+	protected <T> List<T> getAttachments(String messageId, @org.jspecify.annotations.NonNull RowMapper<T> rowMapper)
 	{
 		return jdbcTemplate.query(
 				"select name, content_id, content_type, content" + " from ebms_attachment" + " where message_id = ?" + " order by order_nr",
