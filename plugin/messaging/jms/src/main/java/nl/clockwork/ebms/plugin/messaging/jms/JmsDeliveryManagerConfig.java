@@ -13,69 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
+import jakarta.jms.ConnectionFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
+import nl.clockwork.ebms.client.delivery.DeliveryManager;
+import nl.clockwork.ebms.client.delivery.DeliveryManagerConfig.DeliveryManagerType;
 import nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DeliveryManagerConfig
+public class JmsDeliveryManagerConfig
 {
-	public enum DeliveryManagerType
-	{
-		DEFAULT, JMS;
-	}
-
-	@Value("${deliveryManager.minThreads}")
-	Integer minThreads;
-	@Value("${deliveryManager.maxThreads}")
-	Integer maxThreads;
-	@Value("${messageQueue.maxEntries}")
-	int maxEntries;
-	@Value("${messageQueue.timeout}")
-	int timeout;
-
-	@Bean("deliveryManagerTaskExecutor")
-	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor()
-	{
-		val result = new ThreadPoolTaskExecutor();
-		result.setCorePoolSize(minThreads);
-		result.setMaxPoolSize(maxThreads);
-		result.setQueueCapacity(maxThreads * 2);
-		result.setWaitForTasksToCompleteOnShutdown(true);
-		return result;
-	}
-
 	@Bean
-	@Conditional(DefaultDeliveryManagerType.class)
-	public DeliveryManager defaultDeliveryManager(CPAManager cpaManager, EbMSHttpClientFactory ebMSClientFactory)
+	@Conditional(JmsDeliveryManagerType.class)
+	public DeliveryManager jmsDeliveryManager(
+			@org.springframework.lang.NonNull ConnectionFactory connectionFactory,
+			CPAManager cpaManager,
+			EbMSHttpClientFactory ebMSClientFactory,
+			@Qualifier("jmsTransactionManager") PlatformTransactionManager transactionManager)
 	{
-		return DefaultDeliveryManager.builder()
-				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
+		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
+				.transactionManager(transactionManager)
+				.jmsTemplate(new JmsTemplate(connectionFactory))
 				.build();
 	}
 
-	public static class DefaultDeliveryManagerType implements Condition
+	public static class JmsDeliveryManagerType implements Condition
 	{
 		@Override
 		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT)
-					== DeliveryManagerType.DEFAULT;
+			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
 		}
 	}
 }

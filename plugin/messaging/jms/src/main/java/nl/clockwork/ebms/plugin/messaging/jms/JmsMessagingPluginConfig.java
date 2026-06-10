@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery.task;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
-import java.util.concurrent.Future;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 
-public interface DeliveryTaskDispatcher
+@Configuration
+@PropertySource("classpath:nl/clockwork/ebms/plugin/messaging/jms/default.properties")
+@Import({JmsBrokerConfig.class, JmsDeliveryTaskHandlerConfig.class, JmsDeliveryManagerConfig.class, JmsMessageEventListenerConfig.class})
+public class JmsMessagingPluginConfig
 {
-	Future<Void> dispatch(DeliveryTask task);
 }

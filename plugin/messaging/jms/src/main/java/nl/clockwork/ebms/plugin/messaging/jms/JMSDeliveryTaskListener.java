@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery.task;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
@@ -25,11 +25,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import nl.clockwork.ebms.client.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandler;
 
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class JMSDeliveryTaskListener implements MessageListener
+public class JMSDeliveryTaskListener implements MessageListener
 {
 	@NonNull
 	DeliveryTaskHandler deliveryTaskHandler;

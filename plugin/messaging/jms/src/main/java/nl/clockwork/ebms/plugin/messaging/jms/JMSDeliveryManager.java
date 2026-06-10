@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
@@ -29,6 +29,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import nl.clockwork.ebms.client.delivery.DeliveryManager;
 import nl.clockwork.ebms.client.delivery.http.EbMSClient;
 import nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.Constants;
@@ -140,7 +141,6 @@ public class JMSDeliveryManager implements DeliveryManager
 			jmsTemplate.convertAndSend(JMS_DESTINATION_NAME, java.util.Objects.requireNonNull(message), m ->
 			{
 				m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
-				// m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
 				return m;
 			});
 			transactionManager.commit(status);

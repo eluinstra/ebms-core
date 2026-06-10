@@ -15,29 +15,18 @@
  */
 package nl.clockwork.ebms.common.event;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
-
-import com.google.common.base.Splitter;
-import jakarta.jms.ConnectionFactory;
-import jakarta.jms.Destination;
-import java.util.EnumSet;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
-import nl.clockwork.ebms.client.delivery.EbMSDAO;
-import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jms.core.JmsTemplate;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -48,35 +37,21 @@ public class MessageEventListenerConfig
 		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT
 	}
 
-	public enum JMSDestinationType
-	{
-		QUEUE, TOPIC;
-	}
-
-	@Value("${eventListener.type}")
-	EventListenerType eventListenerType;
 	@Value("${eventListener.filter}")
 	String eventListenerFilter;
-	@Value("${eventListener.jms.destinationType}")
-	JMSDestinationType jmsDestinationType;
 
 	@Bean
-	public MessageEventListener messageEventListener(ConnectionFactory connectionFactory, MessageEventDAO messageEventDAO, EbMSDAO ebMSDAO)
+	@Conditional(DefaultEventListenerType.class)
+	public MessageEventListener defaultMessageEventListener()
 	{
-		val jmsTemplate = new JmsTemplate(Objects.requireNonNull(connectionFactory));
-		val filter = Splitter.on(',')
-				.trimResults()
-				.omitEmptyStrings()
-				.splitToStream(eventListenerFilter)
-				.map(MessageEventType::valueOf)
-				.collect(Collectors.toCollection(() -> EnumSet.noneOf(MessageEventType.class)));
-		val eventListener = Match(eventListenerType).of(
-				Case($(EventListenerType.DAO), o -> new DAOMessageEventListener(messageEventDAO)),
-				Case($(EventListenerType.SIMPLE_JMS), o -> new SimpleJMSMessageEventListener(jmsTemplate, createMessageEventDestinations(jmsDestinationType))),
-				Case($(EventListenerType.JMS), o -> new JMSMessageEventListener(ebMSDAO, jmsTemplate, createMessageEventDestinations(jmsDestinationType))),
-				Case($(EventListenerType.JMS_TEXT), o -> new JMSTextMessageEventListener(ebMSDAO, jmsTemplate, createMessageEventDestinations(jmsDestinationType))),
-				Case($(), o -> new LoggingMessageEventListener()));
-		return filter.size() > 0 ? new MessageEventListenerFilter(filter, eventListener) : eventListener;
+		return new LoggingMessageEventListener();
+	}
+
+	@Bean
+	@Conditional(DaoEventListenerType.class)
+	public MessageEventListener daoMessageEventListener(MessageEventDAO messageEventDAO)
+	{
+		return new DAOMessageEventListener(messageEventDAO);
 	}
 
 	@Bean
@@ -85,13 +60,27 @@ public class MessageEventListenerConfig
 		return new MessageEventDAOImpl(new JdbcTemplate(Objects.requireNonNull(dataSource)));
 	}
 
-	private Map<String, Destination> createMessageEventDestinations(JMSDestinationType jmsDestinationType)
+	@Bean
+	public MessageEventListenerFilterProcessor messageEventListenerFilterProcessor()
 	{
-		return MessageEventType.stream().collect(Collectors.toMap(Enum::name, e -> createDestination(jmsDestinationType, e)));
+		return new MessageEventListenerFilterProcessor(eventListenerFilter);
 	}
 
-	private Destination createDestination(JMSDestinationType jmsDestinationType, MessageEventType e)
+	public static class DefaultEventListenerType implements Condition
 	{
-		return jmsDestinationType == JMSDestinationType.QUEUE ? new ActiveMQQueue(e.name()) : new ActiveMQTopic("VirtualTopic." + e.name());
+		@Override
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		{
+			return "DEFAULT".equalsIgnoreCase(context.getEnvironment().getProperty("eventListener.type", "DEFAULT"));
+		}
+	}
+
+	public static class DaoEventListenerType implements Condition
+	{
+		@Override
+		public boolean matches(@org.springframework.lang.NonNull ConditionContext context, @org.springframework.lang.NonNull AnnotatedTypeMetadata metadata)
+		{
+			return "DAO".equalsIgnoreCase(context.getEnvironment().getProperty("eventListener.type", "DEFAULT"));
+		}
 	}
 }

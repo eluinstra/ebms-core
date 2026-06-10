@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.event;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
 import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
@@ -26,6 +26,9 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.client.delivery.EbMSDAO;
+import nl.clockwork.ebms.common.event.LoggingMessageEventListener;
+import nl.clockwork.ebms.common.event.MessageEventException;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
@@ -33,7 +36,7 @@ import org.springframework.jms.core.MessageCreator;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class JMSTextMessageEventListener extends LoggingMessageEventListener
+public class JMSTextMessageEventListener extends LoggingMessageEventListener
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor

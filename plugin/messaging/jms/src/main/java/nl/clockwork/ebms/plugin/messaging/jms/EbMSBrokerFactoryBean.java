@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.jms;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
 import java.util.Objects;
 import org.apache.activemq.xbean.BrokerFactoryBean;
@@ -22,7 +22,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-class EbMSBrokerFactoryBean implements DisposableBean
+public class EbMSBrokerFactoryBean implements DisposableBean
 {
 	private BrokerFactoryBean brokerFactoryBean;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.jms;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
 import jakarta.jms.ConnectionFactory;
 import lombok.AccessLevel;
@@ -30,7 +30,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class JMSConfig
+public class JmsBrokerConfig
 {
 	@Value("${jms.broker.start}")
 	boolean jmsBrokerStart;
@@ -49,7 +49,7 @@ public class JMSConfig
 
 	@Bean
 	@DependsOn("brokerFactory")
-	public ConnectionFactory pooledConnectionFactor() throws Exception
+	public ConnectionFactory pooledConnectionFactory() throws Exception
 	{
 		val result = new PooledConnectionFactory(jmsBrokerUrl);
 		result.setMaxConnections(maxPoolSize);

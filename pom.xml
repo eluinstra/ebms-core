@@ -73,6 +73,7 @@
     <module>plugin/db/mssql</module>
     <module>plugin/db/oracle</module>
     <module>plugin/db/postgres</module>
+    <module>plugin/messaging/jms</module>
   </modules>
   <scm>
     <connection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</connection>
@@ -168,6 +169,11 @@
       <dependency>
         <groupId>nl.clockwork.ebms.common</groupId>
         <artifactId>ebms-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.clockwork.ebms.plugin.messaging</groupId>
+        <artifactId>ebms-jms-messaging-plugin</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

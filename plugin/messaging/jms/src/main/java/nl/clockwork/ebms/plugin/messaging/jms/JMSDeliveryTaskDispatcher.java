@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery.task;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -22,12 +22,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.client.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.client.delivery.task.DeliveryTaskDispatcher;
 import org.springframework.jms.core.JmsTemplate;
 
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class JMSDeliveryTaskDispatcher implements DeliveryTaskDispatcher
+public class JMSDeliveryTaskDispatcher implements DeliveryTaskDispatcher
 {
 	@NonNull
 	JmsTemplate jmsTemplate;

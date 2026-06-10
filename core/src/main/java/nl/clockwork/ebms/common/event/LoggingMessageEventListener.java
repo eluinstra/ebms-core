@@ -18,7 +18,7 @@ package nl.clockwork.ebms.common.event;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class LoggingMessageEventListener implements MessageEventListener
+public class LoggingMessageEventListener implements MessageEventListener
 {
 	@Override
 	public void onMessageReceived(String messageId) throws MessageEventException

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.event;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
 import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
@@ -25,43 +25,33 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.delivery.EbMSDAO;
-import nl.clockwork.ebms.common.model.EbMSMessageProperties;
+import nl.clockwork.ebms.common.event.LoggingMessageEventListener;
+import nl.clockwork.ebms.common.event.MessageEventException;
+import nl.clockwork.ebms.common.event.MessageEventType;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class JMSMessageEventListener extends LoggingMessageEventListener
+public class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
 	public class EventMessageCreator implements MessageCreator
 	{
 		@NonNull
-		EbMSMessageProperties messageProperties;
+		String messageId;
 
 		@Override
 		public @org.springframework.lang.NonNull Message createMessage(@org.springframework.lang.NonNull Session session) throws JMSException
 		{
 			val result = session.createMessage();
-			result.setStringProperty("cpaId", messageProperties.getCpaId());
-			result.setStringProperty("fromPartyId", messageProperties.getFromParty().getPartyId());
-			result.setStringProperty("fromRole", messageProperties.getFromParty().getRole());
-			result.setStringProperty("toPartyId", messageProperties.getToParty().getPartyId());
-			result.setStringProperty("toRole", messageProperties.getToParty().getRole());
-			result.setStringProperty("service", messageProperties.getService());
-			result.setStringProperty("action", messageProperties.getAction());
-			result.setStringProperty("conversationId", messageProperties.getConversationId());
-			result.setStringProperty("messageId", messageProperties.getMessageId());
-			result.setStringProperty("refToMessageId", messageProperties.getRefToMessageId());
+			result.setStringProperty("messageId", messageId);
 			return result;
 		}
 	}
 
-	@NonNull
-	EbMSDAO ebMSDAO;
 	@NonNull
 	JmsTemplate jmsTemplate;
 	@NonNull
@@ -77,7 +67,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.RECEIVED), new EventMessageCreator(p)));
+			jmsTemplate.send(getDestination(MessageEventType.RECEIVED), new EventMessageCreator(messageId));
 			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
@@ -91,7 +81,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.DELIVERED), new EventMessageCreator(p)));
+			jmsTemplate.send(getDestination(MessageEventType.DELIVERED), new EventMessageCreator(messageId));
 			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
@@ -105,7 +95,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.FAILED), new EventMessageCreator(p)));
+			jmsTemplate.send(getDestination(MessageEventType.FAILED), new EventMessageCreator(messageId));
 			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
@@ -119,7 +109,7 @@ class JMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> jmsTemplate.send(getDestination(MessageEventType.EXPIRED), new EventMessageCreator(p)));
+			jmsTemplate.send(getDestination(MessageEventType.EXPIRED), new EventMessageCreator(messageId));
 			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)

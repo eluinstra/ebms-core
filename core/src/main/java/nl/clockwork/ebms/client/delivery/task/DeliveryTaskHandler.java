@@ -48,7 +48,7 @@ import org.springframework.scheduling.annotation.Async;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class DeliveryTaskHandler
+public class DeliveryTaskHandler
 {
 	@NonNull
 	MessageEventListener messageEventListener;

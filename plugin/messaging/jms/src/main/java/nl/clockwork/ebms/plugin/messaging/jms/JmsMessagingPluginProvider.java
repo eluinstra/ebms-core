@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery.task;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
-import java.util.concurrent.Future;
+import nl.clockwork.ebms.PluginProvider;
 
-public interface DeliveryTaskDispatcher
+public class JmsMessagingPluginProvider extends PluginProvider
 {
-	Future<Void> dispatch(DeliveryTask task);
+	@Override
+	public String getName()
+	{
+		return "EbMS JMS Messaging Plugin";
+	}
+
+	@Override
+	public Class<?> getSpringConfigurationClass()
+	{
+		return JmsMessagingPluginConfig.class;
+	}
 }

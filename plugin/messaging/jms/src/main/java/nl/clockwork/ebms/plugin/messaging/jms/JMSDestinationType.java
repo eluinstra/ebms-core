@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client.delivery.task;
+package nl.clockwork.ebms.plugin.messaging.jms;
 
-import java.util.concurrent.Future;
-
-public interface DeliveryTaskDispatcher
+public enum JMSDestinationType
 {
-	Future<Void> dispatch(DeliveryTask task);
+	QUEUE, TOPIC
 }
