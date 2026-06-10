@@ -45,7 +45,7 @@ class DAODeliveryTaskExecutorTest
 	@Mock
 	DeliveryTaskDAO deliveryTaskDAO;
 	@Mock
-	DeliveryTaskHandler deliveryTaskHandler;
+	DeliveryTaskDispatcher dispatcher;
 	@Mock
 	RaftHandle raftHandle;
 
@@ -70,7 +70,7 @@ class DAODeliveryTaskExecutorTest
 	{
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
-				.deliveryTaskHandler(deliveryTaskHandler)
+				.dispatcher(dispatcher)
 				.raftHandle(raftHandle)
 				.timedTask(new TimedTask(executionIntervalMillis))
 				.maxTasks(0)
@@ -132,7 +132,7 @@ class DAODeliveryTaskExecutorTest
 				return List.of(task);
 			return Collections.emptyList();
 		});
-		lenient().when(deliveryTaskHandler.handleAsync(task)).thenAnswer(inv ->
+		lenient().when(dispatcher.dispatch(task)).thenAnswer(inv ->
 		{
 			handed.countDown();
 			return stuck;

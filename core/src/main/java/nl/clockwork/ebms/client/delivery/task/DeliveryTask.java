@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.client.delivery.task;
 
+import java.io.Serializable;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +25,10 @@ import lombok.NonNull;
 @Builder
 @Data
 @AllArgsConstructor
-public class DeliveryTask
+public class DeliveryTask implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	@NonNull
 	String cpaId;
 	String sendDeliveryChannelId;

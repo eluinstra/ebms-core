@@ -45,7 +45,7 @@ class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 	@NonNull
 	DeliveryTaskDAO deliveryTaskDAO;
 	@NonNull
-	DeliveryTaskHandler deliveryTaskHandler;
+	DeliveryTaskDispatcher dispatcher;
 	@NonNull
 	RaftHandle raftHandle;
 	@NonNull
@@ -59,7 +59,7 @@ class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 	@Builder
 	public DAODeliveryTaskExecutor(
 			@NonNull DeliveryTaskDAO deliveryTaskDAO,
-			@NonNull DeliveryTaskHandler deliveryTaskHandler,
+			@NonNull DeliveryTaskDispatcher dispatcher,
 			@NonNull RaftHandle raftHandle,
 			@NonNull TimedTask timedTask,
 			int maxTasks,
@@ -68,7 +68,7 @@ class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 			long taskAwaitTimeoutMillis)
 	{
 		this.deliveryTaskDAO = deliveryTaskDAO;
-		this.deliveryTaskHandler = deliveryTaskHandler;
+		this.dispatcher = dispatcher;
 		this.raftHandle = raftHandle;
 		this.timedTask = timedTask;
 		this.maxTasks = maxTasks;
@@ -121,7 +121,7 @@ class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 		{
 			val timestamp = Instant.now();
 			val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp, serverId, maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp, serverId);
-			tasks.forEach(task -> futures.add(deliveryTaskHandler.handleAsync(task)));
+			tasks.forEach(task -> futures.add(dispatcher.dispatch(task)));
 		}
 		catch (RuntimeException e)
 		{
