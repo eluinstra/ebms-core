@@ -75,6 +75,7 @@
     <module>plugin/db/postgres</module>
     <module>plugin/messaging/jms</module>
     <module>plugin/messaging/kafka</module>
+    <module>server</module>
   </modules>
   <scm>
     <connection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</connection>
