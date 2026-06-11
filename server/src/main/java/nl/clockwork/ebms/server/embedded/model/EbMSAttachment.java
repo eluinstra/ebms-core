@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.server.embedded.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,12 +34,14 @@ public class EbMSAttachment implements Serializable
 	private static final long serialVersionUID = 1L;
 	@NonFinal
 	@Setter
+	@JsonIgnore
 	EbMSMessage message;
 	String name;
 	@NonNull
 	String contentId;
 	@NonNull
 	String contentType;
+	@JsonIgnore
 	CachedOutputStream content;
 
 	public EbMSAttachment(String name, @NonNull String contentId, @NonNull String contentType)

@@ -1,0 +1,370 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "EbMS Admin REST API",
+    "description" : "Read-only administrative access to the EbMS server: browse CPAs, messages, attachments and traffic statistics.",
+    "contact" : { },
+    "license" : {
+      "name" : "Apache 2.0 License",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/cpas" : {
+      "get" : {
+        "operationId" : "getCPAs",
+        "parameters" : [ {
+          "name" : "first",
+          "in" : "query",
+          "schema" : { "type" : "integer", "format" : "int64", "default" : 0 }
+        }, {
+          "name" : "count",
+          "in" : "query",
+          "description" : "Page size. Defaults to 50, capped server-side at 500.",
+          "schema" : { "type" : "integer", "format" : "int32", "default" : 50 }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : { "type" : "array", "items" : { "$ref" : "#/components/schemas/CPA" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cpas/ids" : {
+      "get" : {
+        "operationId" : "getCPAIds",
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : { "type" : "array", "items" : { "type" : "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cpas/count" : {
+      "get" : {
+        "operationId" : "countCPAs",
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { "schema" : { "type" : "integer", "format" : "int64" } }
+            }
+          }
+        }
+      }
+    },
+    "/cpas/{cpaId}" : {
+      "get" : {
+        "operationId" : "getCPA",
+        "parameters" : [ {
+          "name" : "cpaId",
+          "in" : "path",
+          "required" : true,
+          "schema" : { "type" : "string" }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "CPA found",
+            "content" : {
+              "application/json" : { "schema" : { "$ref" : "#/components/schemas/CPA" } }
+            }
+          },
+          "404" : { "description" : "CPA not found" }
+        }
+      }
+    },
+    "/messages" : {
+      "get" : {
+        "operationId" : "getMessages",
+        "parameters" : [
+          { "$ref" : "#/components/parameters/cpaId" },
+          { "$ref" : "#/components/parameters/fromPartyId" },
+          { "$ref" : "#/components/parameters/fromRole" },
+          { "$ref" : "#/components/parameters/toPartyId" },
+          { "$ref" : "#/components/parameters/toRole" },
+          { "$ref" : "#/components/parameters/service" },
+          { "$ref" : "#/components/parameters/action" },
+          { "$ref" : "#/components/parameters/conversationId" },
+          { "$ref" : "#/components/parameters/messageId" },
+          { "$ref" : "#/components/parameters/refToMessageId" },
+          { "$ref" : "#/components/parameters/serviceMessage" },
+          { "$ref" : "#/components/parameters/statuses" },
+          { "$ref" : "#/components/parameters/fromTs" },
+          { "$ref" : "#/components/parameters/toTs" },
+          { "name" : "first", "in" : "query", "schema" : { "type" : "integer", "format" : "int64", "default" : 0 } },
+          { "name" : "count", "in" : "query", "description" : "Page size. Defaults to 50, capped server-side at 500.", "schema" : { "type" : "integer", "format" : "int32", "default" : 50 } }
+        ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : { "type" : "array", "items" : { "$ref" : "#/components/schemas/EbMSMessage" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/count" : {
+      "get" : {
+        "operationId" : "countMessages",
+        "parameters" : [
+          { "$ref" : "#/components/parameters/cpaId" },
+          { "$ref" : "#/components/parameters/fromPartyId" },
+          { "$ref" : "#/components/parameters/fromRole" },
+          { "$ref" : "#/components/parameters/toPartyId" },
+          { "$ref" : "#/components/parameters/toRole" },
+          { "$ref" : "#/components/parameters/service" },
+          { "$ref" : "#/components/parameters/action" },
+          { "$ref" : "#/components/parameters/conversationId" },
+          { "$ref" : "#/components/parameters/messageId" },
+          { "$ref" : "#/components/parameters/refToMessageId" },
+          { "$ref" : "#/components/parameters/serviceMessage" },
+          { "$ref" : "#/components/parameters/statuses" },
+          { "$ref" : "#/components/parameters/fromTs" },
+          { "$ref" : "#/components/parameters/toTs" }
+        ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : { "schema" : { "type" : "integer", "format" : "int64" } }
+            }
+          }
+        }
+      }
+    },
+    "/messages/ids" : {
+      "get" : {
+        "operationId" : "getMessageIds",
+        "parameters" : [
+          { "name" : "cpaId", "in" : "query", "schema" : { "type" : "string" } },
+          { "name" : "fromRole", "in" : "query", "schema" : { "type" : "string" } },
+          { "name" : "toRole", "in" : "query", "schema" : { "type" : "string" } },
+          { "name" : "status", "in" : "query", "schema" : { "type" : "array", "items" : { "$ref" : "#/components/schemas/EbMSMessageStatus" } } }
+        ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : { "type" : "array", "items" : { "type" : "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/traffic" : {
+      "get" : {
+        "operationId" : "getMessageTraffic",
+        "parameters" : [
+          { "name" : "from", "in" : "query", "schema" : { "type" : "string", "format" : "date-time" } },
+          { "name" : "to", "in" : "query", "schema" : { "type" : "string", "format" : "date-time" } },
+          { "name" : "unit", "in" : "query", "schema" : { "type" : "string", "enum" : [ "HOUR", "DAY", "MONTH", "YEAR" ], "default" : "DAY" } },
+          { "name" : "status", "in" : "query", "schema" : { "type" : "array", "items" : { "$ref" : "#/components/schemas/EbMSMessageStatus" } } }
+        ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "application/json" : {
+                "schema" : { "type" : "object", "additionalProperties" : { "type" : "integer", "format" : "int32" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/export.csv" : {
+      "get" : {
+        "operationId" : "exportMessagesCsv",
+        "parameters" : [
+          { "$ref" : "#/components/parameters/cpaId" },
+          { "$ref" : "#/components/parameters/fromPartyId" },
+          { "$ref" : "#/components/parameters/fromRole" },
+          { "$ref" : "#/components/parameters/toPartyId" },
+          { "$ref" : "#/components/parameters/toRole" },
+          { "$ref" : "#/components/parameters/service" },
+          { "$ref" : "#/components/parameters/action" },
+          { "$ref" : "#/components/parameters/conversationId" },
+          { "$ref" : "#/components/parameters/messageId" },
+          { "$ref" : "#/components/parameters/refToMessageId" },
+          { "$ref" : "#/components/parameters/serviceMessage" },
+          { "$ref" : "#/components/parameters/statuses" },
+          { "$ref" : "#/components/parameters/fromTs" },
+          { "$ref" : "#/components/parameters/toTs" }
+        ],
+        "responses" : {
+          "default" : {
+            "description" : "default response",
+            "content" : {
+              "text/csv" : { "schema" : { "type" : "string", "format" : "binary" } }
+            }
+          }
+        }
+      }
+    },
+    "/messages/{messageId}" : {
+      "get" : {
+        "operationId" : "getMessage",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : { "type" : "string" }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Message found",
+            "content" : {
+              "application/json" : { "schema" : { "$ref" : "#/components/schemas/EbMSMessage" } }
+            }
+          },
+          "404" : { "description" : "Message not found" }
+        }
+      }
+    },
+    "/messages/{messageId}/response" : {
+      "get" : {
+        "operationId" : "getResponseMessage",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : { "type" : "string" }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Response message found",
+            "content" : {
+              "application/json" : { "schema" : { "$ref" : "#/components/schemas/EbMSMessage" } }
+            }
+          },
+          "404" : { "description" : "No response message for the given message" }
+        }
+      }
+    },
+    "/messages/{messageId}/export" : {
+      "get" : {
+        "operationId" : "exportMessage",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : { "type" : "string" }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ZIP archive containing the message and its attachments",
+            "content" : {
+              "application/zip" : { "schema" : { "type" : "string", "format" : "binary" } }
+            }
+          },
+          "404" : { "description" : "Message not found" }
+        }
+      }
+    },
+    "/messages/{messageId}/attachments/{contentId}" : {
+      "get" : {
+        "operationId" : "getAttachment",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "required" : true,
+          "schema" : { "type" : "string" }
+        }, {
+          "name" : "contentId",
+          "in" : "path",
+          "required" : true,
+          "schema" : { "type" : "string" }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Attachment binary stream (Content-Type from the attachment)",
+            "content" : {
+              "*/*" : { "schema" : { "type" : "string", "format" : "binary" } }
+            }
+          },
+          "404" : { "description" : "Attachment not found" }
+        }
+      }
+    }
+  },
+  "components" : {
+    "parameters" : {
+      "cpaId"          : { "name" : "cpaId",          "in" : "query", "schema" : { "type" : "string" } },
+      "fromPartyId"    : { "name" : "fromPartyId",    "in" : "query", "schema" : { "type" : "string" } },
+      "fromRole"       : { "name" : "fromRole",       "in" : "query", "schema" : { "type" : "string" } },
+      "toPartyId"      : { "name" : "toPartyId",      "in" : "query", "schema" : { "type" : "string" } },
+      "toRole"         : { "name" : "toRole",         "in" : "query", "schema" : { "type" : "string" } },
+      "service"        : { "name" : "service",        "in" : "query", "schema" : { "type" : "string" } },
+      "action"         : { "name" : "action",         "in" : "query", "schema" : { "type" : "string" } },
+      "conversationId" : { "name" : "conversationId", "in" : "query", "schema" : { "type" : "string" } },
+      "messageId"      : { "name" : "messageId",      "in" : "query", "schema" : { "type" : "string" } },
+      "refToMessageId" : { "name" : "refToMessageId", "in" : "query", "schema" : { "type" : "string" } },
+      "serviceMessage" : { "name" : "serviceMessage", "in" : "query", "schema" : { "type" : "boolean" } },
+      "statuses"       : { "name" : "status",         "in" : "query", "schema" : { "type" : "array", "items" : { "$ref" : "#/components/schemas/EbMSMessageStatus" } } },
+      "fromTs"         : { "name" : "from",           "in" : "query", "schema" : { "type" : "string", "format" : "date-time" } },
+      "toTs"           : { "name" : "to",             "in" : "query", "schema" : { "type" : "string", "format" : "date-time" } }
+    },
+    "schemas" : {
+      "EbMSMessageStatus" : {
+        "type" : "string",
+        "enum" : [
+          "CREATED", "RECEIVED", "PROCESSED", "FORWARDED", "FAILED", "DELIVERED", "DELIVERY_FAILED", "EXPIRED", "UNAUTHORIZED", "NOT_RECOGNIZED"
+        ]
+      },
+      "CPA" : {
+        "type" : "object",
+        "properties" : {
+          "cpaId" : { "type" : "string" },
+          "content" : { "type" : "string", "description" : "Raw CPA XML" }
+        }
+      },
+      "EbMSAttachment" : {
+        "type" : "object",
+        "properties" : {
+          "name" : { "type" : "string" },
+          "contentId" : { "type" : "string" },
+          "contentType" : { "type" : "string" }
+        }
+      },
+      "EbMSMessage" : {
+        "type" : "object",
+        "properties" : {
+          "messageId" : { "type" : "string" },
+          "conversationId" : { "type" : "string" },
+          "refToMessageId" : { "type" : "string" },
+          "cpaId" : { "type" : "string" },
+          "fromPartyId" : { "type" : "string" },
+          "fromRole" : { "type" : "string" },
+          "toPartyId" : { "type" : "string" },
+          "toRole" : { "type" : "string" },
+          "service" : { "type" : "string" },
+          "action" : { "type" : "string" },
+          "timestamp" : { "type" : "string", "format" : "date-time" },
+          "status" : { "$ref" : "#/components/schemas/EbMSMessageStatus" },
+          "statusTime" : { "type" : "string", "format" : "date-time" },
+          "content" : { "type" : "string", "description" : "Raw message XML" },
+          "attachments" : {
+            "type" : "array",
+            "items" : { "$ref" : "#/components/schemas/EbMSAttachment" }
+          }
+        }
+      }
+    }
+  }
+}

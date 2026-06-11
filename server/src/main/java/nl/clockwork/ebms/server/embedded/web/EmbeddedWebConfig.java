@@ -40,6 +40,8 @@ import nl.clockwork.ebms.api.cpa.url.URLMappingRestController;
 import nl.clockwork.ebms.api.ebms.EbMSController;
 import nl.clockwork.ebms.api.ebms.EbMSControllerMTOM;
 import nl.clockwork.ebms.api.ebms.EbMSRestController;
+import nl.clockwork.ebms.server.embedded.dao.EbMSDAO;
+import nl.clockwork.ebms.server.embedded.web.admin.AdminRestController;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
@@ -52,6 +54,7 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -157,6 +160,18 @@ public class EmbeddedWebConfig
 	public Server createEbMSRestServer(EbMSRestController ebMSMessageRestService)
 	{
 		return createRestServer(EbMSRestController.class, ebMSMessageRestService, "/ebms");
+	}
+
+	@Bean
+	public AdminRestController adminRestController(@Qualifier("ebMSAdminDAO") EbMSDAO ebMSDAO)
+	{
+		return new AdminRestController(ebMSDAO);
+	}
+
+	@Bean
+	public Server createAdminRestServer(AdminRestController adminRestService)
+	{
+		return createRestServer(AdminRestController.class, adminRestService, "/admin");
 	}
 
 	public Server createRestServer(Class<?> resourceClass, Object resourceObject, String path)
