@@ -38,7 +38,6 @@ import nl.clockwork.ebms.common.message.CommonConfig;
 import nl.clockwork.ebms.common.security.KeyStoreConfig;
 import nl.clockwork.ebms.common.signing.SigningConfig;
 import nl.clockwork.ebms.common.transaction.TransactionManagerConfig;
-import nl.clockwork.ebms.querydsl.model.QueryDSLConfig;
 import nl.clockwork.ebms.server.EbMSServerConfig;
 import nl.clockwork.ebms.server.embedded.dao.AdminDAOConfig;
 import nl.clockwork.ebms.server.embedded.web.EmbeddedWebConfig;
@@ -55,7 +54,7 @@ import org.springframework.core.io.Resource;
 @Import({AdminDAOConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, CacheConfig.class, CommonConfig.class, CPAConfig.class,
 		CPAControllerConfig.class, DAOConfig.class, DataSourceConfig.class, DeliveryManagerConfig.class, DeliveryTaskManagerConfig.class,
 		DeliveryTaskHandlerConfig.class, EbMSClientConfig.class, EbMSControllerConfig.class, EbMSProcessorConfig.class, EbMSServerConfig.class,
-		EmbeddedWebConfig.class, EncryptionConfig.class, KeyStoreConfig.class, MessageEventListenerConfig.class, QueryDSLConfig.class, SigningConfig.class,
+		EmbeddedWebConfig.class, EncryptionConfig.class, KeyStoreConfig.class, MessageEventListenerConfig.class, SigningConfig.class,
 		TransactionManagerConfig.class, URLMappingConfig.class, URLMappingControllerConfig.class, ValidationConfig.class})
 @PropertySource(
 		value = {"classpath:nl/clockwork/ebms/default.properties", "classpath:nl/clockwork/ebms/server/default.properties",

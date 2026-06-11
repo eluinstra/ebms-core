@@ -181,16 +181,6 @@
       <artifactId>lombok</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.querydsl</groupId>
-      <artifactId>querydsl-sql</artifactId>
-      <version>5.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.querydsl</groupId>
-      <artifactId>querydsl-sql-spring</artifactId>
-      <version>5.1.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
     </dependency>

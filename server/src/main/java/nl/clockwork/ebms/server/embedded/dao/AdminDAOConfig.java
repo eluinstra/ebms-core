@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server.embedded.dao;
 
-import com.querydsl.sql.SQLQueryFactory;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -29,9 +28,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class AdminDAOConfig
 {
 	@Bean("ebMSAdminDAO")
-	public EbMSDAO ebMSDAO(@org.jspecify.annotations.NonNull DataSource dataSource, SQLQueryFactory queryFactory)
+	public EbMSDAO ebMSDAO(@org.jspecify.annotations.NonNull DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSDAOImpl(jdbcTemplate, queryFactory);
+		return new EbMSDAOImpl(jdbcTemplate);
 	}
 }

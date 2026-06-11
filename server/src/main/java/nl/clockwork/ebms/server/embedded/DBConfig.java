@@ -20,13 +20,12 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.dao.DAOConfig;
 import nl.clockwork.ebms.common.datasource.DataSourceConfig;
 import nl.clockwork.ebms.common.transaction.TransactionManagerConfig;
-import nl.clockwork.ebms.querydsl.model.QueryDSLConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@Import({DAOConfig.class, DataSourceConfig.class, QueryDSLConfig.class, TransactionManagerConfig.class})
+@Import({DAOConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 @PropertySource(
 		value = {"classpath:nl/clockwork/ebms/default.properties", "classpath:nl/clockwork/ebms/admin/default.properties",
 				"file:${ebms.configDir}ebms-admin.embedded.advanced.properties", "file:${ebms.configDir}ebms-admin.embedded.properties"},

@@ -15,55 +15,84 @@
  */
 package nl.clockwork.ebms.server.embedded.dao;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.StringPath;
+import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import lombok.val;
 import nl.clockwork.ebms.api.ebms.model.Party;
-import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
+import nl.clockwork.ebms.common.EbMSAction;
+import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.web.message.EbMSMessageFilter;
 
 public interface WithMessageFilter
 {
-	default BooleanBuilder applyFilter(QEbmsMessage table, EbMSMessageFilter messageContext, BooleanBuilder builder)
+	default String getMessageFilter(EbMSMessageFilter filter, List<Object> parameters)
 	{
-		if (messageContext == null)
-			return builder;
-		addIfNotNull(messageContext.getCpaId(), builder::and, table.cpaId::eq);
-		applyPathFilter(table.fromPartyId, table.fromRole, messageContext.getFromParty(), builder);
-		applyPathFilter(table.toPartyId, table.toRole, messageContext.getToParty(), builder);
-		addIfNotNull(messageContext.getService(), builder::and, table.service::eq);
-		addIfNotNull(messageContext.getAction(), builder::and, table.action::eq);
-		addIfNotNull(messageContext.getConversationId(), builder::and, table.conversationId::eq);
-		addIfNotNull(messageContext.getMessageId(), builder::and, table.messageId::eq);
-		addIfNotNull(messageContext.getRefToMessageId(), builder::and, table.refToMessageId::eq);
-		addIfNotEmpty(messageContext.getStatuses(), builder::and, table.status::in);
-		return builder;
+		if (filter == null)
+			return "";
+		val result = new StringBuilder();
+		appendEquals(result, parameters, filter.getCpaId(), "cpa_id");
+		appendParty(result, parameters, filter.getFromParty(), "from_party_id", "from_role");
+		appendParty(result, parameters, filter.getToParty(), "to_party_id", "to_role");
+		appendEquals(result, parameters, filter.getService(), "service");
+		appendEquals(result, parameters, filter.getAction(), "action");
+		appendEquals(result, parameters, filter.getConversationId(), "conversation_id");
+		appendEquals(result, parameters, filter.getMessageId(), "message_id");
+		appendEquals(result, parameters, filter.getRefToMessageId(), "ref_to_message_id");
+		appendStatuses(result, filter.getStatuses());
+		appendServiceMessage(result, filter.getServiceMessage());
+		appendTimestampRange(result, parameters, filter);
+		return result.toString();
 	}
 
-	default <T> void addIfNotNull(
-			T value,
-			java.util.function.Consumer<com.querydsl.core.types.Predicate> consumer,
-			java.util.function.Function<T, com.querydsl.core.types.Predicate> predicateFactory)
+	private static void appendEquals(StringBuilder result, List<Object> parameters, Object value, String column)
 	{
-		if (value != null)
-			consumer.accept(predicateFactory.apply(value));
+		if (value == null)
+			return;
+		parameters.add(value);
+		result.append(" and ").append(column).append(" = ?");
 	}
 
-	default <T extends java.util.Collection<?>> void addIfNotEmpty(
-			T value,
-			java.util.function.Consumer<com.querydsl.core.types.Predicate> consumer,
-			java.util.function.Function<T, com.querydsl.core.types.Predicate> predicateFactory)
+	private static void appendParty(StringBuilder result, List<Object> parameters, Party party, String partyIdColumn, String roleColumn)
 	{
-		if (value != null && !value.isEmpty())
-			consumer.accept(predicateFactory.apply(value));
+		if (party == null)
+			return;
+		appendEquals(result, parameters, party.getPartyId(), partyIdColumn);
+		appendEquals(result, parameters, party.getRole(), roleColumn);
 	}
 
-	default void applyPathFilter(StringPath partyId, StringPath role, Party party, BooleanBuilder builder)
+	private static void appendStatuses(StringBuilder result, List<EbMSMessageStatus> statuses)
 	{
-		if (party != null)
+		if (statuses == null || statuses.isEmpty())
+			return;
+		result.append(" and status in (").append(statuses.stream().map(EbMSMessageStatus::getId).map(String::valueOf).collect(Collectors.joining(","))).append(")");
+	}
+
+	private static void appendServiceMessage(StringBuilder result, Boolean serviceMessage)
+	{
+		if (serviceMessage == null)
+			return;
+		result.append(" and service ").append(Boolean.TRUE.equals(serviceMessage) ? "= '" : "<> '").append(EbMSAction.EBMS_SERVICE_URI).append("'");
+	}
+
+	private static void appendTimestampRange(StringBuilder result, List<Object> parameters, EbMSMessageFilter filter)
+	{
+		if (filter.getFrom() != null)
 		{
-			builder.and(partyId.eq(party.getPartyId()));
-			if (party.getRole() != null)
-				builder.and(role.eq(party.getRole()));
+			parameters.add(Timestamp.from(filter.getFrom().atZone(ZoneId.systemDefault()).toInstant()));
+			result.append(" and time_stamp >= ?");
 		}
+		if (filter.getTo() != null)
+		{
+			parameters.add(Timestamp.from(filter.getTo().atZone(ZoneId.systemDefault()).toInstant()));
+			result.append(" and time_stamp < ?");
+		}
+	}
+
+	default String joinStatusIds(EbMSMessageStatus[] statuses)
+	{
+		return Stream.of(statuses).map(EbMSMessageStatus::getId).map(String::valueOf).collect(Collectors.joining(","));
 	}
 }
