@@ -27,8 +27,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.common.Constants;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
+import nl.clockwork.ebms.common.protocol.Constants;
 import org.apache.xml.security.signature.XMLSignatureInput;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

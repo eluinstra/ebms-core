@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.signing;
+package nl.clockwork.ebms.common.security;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
@@ -34,11 +34,10 @@ import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.common.security.EbMSTrustStore;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.common.validation.ValidationException;
-import nl.clockwork.ebms.common.validation.ValidatorException;
+import nl.clockwork.ebms.common.util.ValidationException;
+import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.common.xml.dsig.EbMSAttachmentResolver;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;

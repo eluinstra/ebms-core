@@ -28,7 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.dao.EbMSDAO;
 import nl.clockwork.ebms.server.embedded.model.CPA;
 import nl.clockwork.ebms.server.embedded.model.EbMSAttachment;

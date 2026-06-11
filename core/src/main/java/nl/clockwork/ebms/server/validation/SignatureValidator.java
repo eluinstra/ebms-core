@@ -20,17 +20,17 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.common.EbMSErrorCode;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.common.signing.EbMSSignatureValidator;
+import nl.clockwork.ebms.common.protocol.EbMSErrorCode;
+import nl.clockwork.ebms.common.security.EbMSSignatureValidator;
+import nl.clockwork.ebms.common.util.EbMSValidationException;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.common.validation.EbMSValidationException;
-import nl.clockwork.ebms.common.validation.ValidationException;
-import nl.clockwork.ebms.common.validation.ValidatorException;
+import nl.clockwork.ebms.common.util.ValidationException;
+import nl.clockwork.ebms.common.util.ValidatorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

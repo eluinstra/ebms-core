@@ -37,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.common.security.EbMSKeyStore;
 import nl.clockwork.ebms.common.security.EbMSTrustStore;
-import nl.clockwork.ebms.common.validation.ValidationException;
 import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 import org.apache.xml.security.encryption.XMLCipher;
 

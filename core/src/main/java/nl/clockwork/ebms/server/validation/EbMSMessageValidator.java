@@ -24,15 +24,15 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.dao.EbMSDAO;
-import nl.clockwork.ebms.common.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.model.EbMSMessageError;
 import nl.clockwork.ebms.common.model.EbMSRequestMessage;
+import nl.clockwork.ebms.common.security.EbMSMessageDecrypter;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.common.validation.ValidatorException;
+import nl.clockwork.ebms.common.util.ValidatorException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 

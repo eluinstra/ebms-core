@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.server.validation;
 
-import nl.clockwork.ebms.common.validation.ValidationException;
+import nl.clockwork.ebms.common.util.ValidationException;
 
 public class DuplicateMessageException extends ValidationException
 {

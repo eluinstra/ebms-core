@@ -13,36 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.validation;
+package nl.clockwork.ebms.common.security;
 
-import jakarta.xml.bind.JAXBException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.jaxb.JAXBParser;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Error;
+import nl.clockwork.ebms.common.cpa.CPAManager;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Configuration
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@Getter
-public class EbMSValidationException extends ValidationException
+public class SigningConfig
 {
-	private static final long serialVersionUID = 1L;
-	@NonNull
-	final Error error;
+	CPAManager cpaManager;
 
-	@Override
-	public String getMessage()
+	@Bean
+	public EbMSSignatureGenerator signatureGenerator(@Qualifier("signatureKeyStore") EbMSKeyStore keyStore)
 	{
-		try
-		{
-			return JAXBParser.getInstance(Error.class).handle(error);
-		}
-		catch (JAXBException e)
-		{
-			return error.getErrorCode();
-		}
+		return new EbMSSignatureGenerator(cpaManager, keyStore);
+	}
+
+	@Bean
+	public EbMSSignatureValidator signatureValidator(EbMSTrustStore trustStore)
+	{
+		return new EbMSSignatureValidator(cpaManager, trustStore);
 	}
 }

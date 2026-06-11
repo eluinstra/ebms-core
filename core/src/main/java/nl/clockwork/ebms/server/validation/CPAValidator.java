@@ -22,10 +22,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.common.EbMSErrorCode;
 import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.common.validation.EbMSValidationException;
+import nl.clockwork.ebms.common.protocol.EbMSErrorCode;
+import nl.clockwork.ebms.common.util.EbMSValidationException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)

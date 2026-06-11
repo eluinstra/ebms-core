@@ -21,10 +21,10 @@ import java.util.Optional;
 import nl.clockwork.ebms.api.ebms.model.MTOMMessage;
 import nl.clockwork.ebms.api.ebms.model.Message;
 import nl.clockwork.ebms.api.ebms.model.MessageFilter;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import org.w3c.dom.Document;
 
 public interface EbMSDAO

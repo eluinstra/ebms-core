@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.encryption;
+package nl.clockwork.ebms.common.security;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,20 +25,19 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.common.EbMSErrorCode;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.common.security.EbMSKeyStore;
+import nl.clockwork.ebms.common.protocol.EbMSErrorCode;
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.EbMSValidationException;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.common.validation.EbMSValidationException;
-import nl.clockwork.ebms.common.validation.ValidationException;
-import nl.clockwork.ebms.common.validation.ValidatorException;
+import nl.clockwork.ebms.common.util.ValidationException;
+import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;

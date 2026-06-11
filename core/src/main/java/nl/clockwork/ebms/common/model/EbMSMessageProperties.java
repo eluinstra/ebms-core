@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 
 @Builder
 @Value

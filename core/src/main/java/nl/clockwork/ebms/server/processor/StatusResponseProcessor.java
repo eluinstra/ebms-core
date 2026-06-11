@@ -27,15 +27,15 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.client.delivery.DeliveryManager;
-import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.message.EbMSMessageFactory;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
 import nl.clockwork.ebms.common.model.EbMSStatusRequest;
 import nl.clockwork.ebms.common.model.EbMSStatusResponse;
-import nl.clockwork.ebms.common.validation.ValidatorException;
+import nl.clockwork.ebms.common.protocol.EbMSAction;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
+import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 

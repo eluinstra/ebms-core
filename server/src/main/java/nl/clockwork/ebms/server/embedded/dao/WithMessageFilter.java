@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.val;
 import nl.clockwork.ebms.api.ebms.model.Party;
-import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.protocol.EbMSAction;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.web.message.EbMSMessageFilter;
 
 public interface WithMessageFilter

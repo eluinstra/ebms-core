@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.signing;
+package nl.clockwork.ebms.common.security;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.cpa.CPAManager;
-import nl.clockwork.ebms.common.security.EbMSKeyStore;
-import nl.clockwork.ebms.common.security.EbMSTrustStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,19 +26,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class SigningConfig
+public class EncryptionConfig
 {
 	CPAManager cpaManager;
 
 	@Bean
-	public EbMSSignatureGenerator signatureGenerator(@Qualifier("signatureKeyStore") EbMSKeyStore keyStore)
+	public EbMSMessageEncrypter messageEncrypter(EbMSTrustStore trustStore)
 	{
-		return new EbMSSignatureGenerator(cpaManager, keyStore);
+		return new EbMSMessageEncrypter(cpaManager, trustStore);
 	}
 
 	@Bean
-	public EbMSSignatureValidator signatureValidator(EbMSTrustStore trustStore)
+	public EbMSMessageDecrypter messageDecrypter(@Qualifier("encryptionKeyStore") EbMSKeyStore keyStore)
 	{
-		return new EbMSSignatureValidator(cpaManager, trustStore);
+		return new EbMSMessageDecrypter(cpaManager, keyStore);
 	}
 }

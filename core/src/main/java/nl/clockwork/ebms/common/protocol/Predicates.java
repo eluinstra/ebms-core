@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common;
+package nl.clockwork.ebms.common.protocol;
 
+import java.util.Arrays;
+import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Constants
+public final class Predicates
 {
-	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";
-	public static final String EBMS_VERSION = "2.0";
-	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
+	public static Predicate<String> contains(String...values)
+	{
+		return obj -> Arrays.stream(values).anyMatch(obj::contains);
+	}
 
-	public static final String NSURI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";
-	public static final String NSURI_SOAP_NEXT_ACTOR = "http://schemas.xmlsoap.org/soap/actor/next";
-	public static final String CID = "cid:";
+	public static Predicate<String> startsWith(String value)
+	{
+		return obj -> obj.startsWith(value);
+	}
 
-	public static final int MINUTE_IN_MILLIS = 60000;
-
-	public static final String MESSAGE_LOG = "nl.clockwork.ebms.message";
+	public static Predicate<String> endsWith(String value)
+	{
+		return obj -> obj.endsWith(value);
+	}
 }

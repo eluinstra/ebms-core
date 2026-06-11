@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.encryption;
+package nl.clockwork.ebms.common.security;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -40,12 +40,11 @@ import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.common.security.EbMSTrustStore;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.common.validation.ValidationException;
-import nl.clockwork.ebms.common.validation.ValidatorException;
+import nl.clockwork.ebms.common.util.ValidationException;
+import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 import nl.clockwork.ebms.server.processor.EbMSProcessorException;
 import org.apache.cxf.io.CachedOutputStream;

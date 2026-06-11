@@ -16,10 +16,10 @@
 package nl.clockwork.ebms.client.delivery;
 
 import java.util.Optional;
-import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
+import nl.clockwork.ebms.common.protocol.EbMSAction;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 
 public interface EbMSDAO
 {

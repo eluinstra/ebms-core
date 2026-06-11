@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.encryption;
+package nl.clockwork.ebms.common.security;
 
 import static nl.clockwork.ebms.api.cpa.CPATestUtils.cpaCache;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -39,16 +41,13 @@ import nl.clockwork.ebms.common.cpa.CPARepository;
 import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.message.EbMSIdGenerator;
 import nl.clockwork.ebms.common.message.EbMSMessageFactory;
+import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
+import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.common.security.EbMSKeyStore;
-import nl.clockwork.ebms.common.security.EbMSTrustStore;
-import nl.clockwork.ebms.common.security.KeyStoreType;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.common.validation.EbMSValidationException;
-import nl.clockwork.ebms.common.validation.ValidatorException;
+import nl.clockwork.ebms.common.util.ValidationException;
+import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.processor.EbMSProcessorException;
-import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -59,16 +58,16 @@ import org.xml.sax.SAXException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-class EncryptionTest
+class SigningTest
 {
 	CPAManager cpaManager;
 	EbMSMessageFactory messageFactory;
-	String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
+	String cpaId = "cpaStubEBF.rm.https.signed";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
 	String keyStorePath = "nl/clockwork/ebms/keystore.jks";
 	String keyStorePassword = "my-secret-password";
-	EbMSMessageEncrypter messageEncrypter;
-	EbMSMessageDecrypter messageDecrypter;
+	EbMSSignatureGenerator signatureGenerator;
+	EbMSSignatureValidator signatureValidator;
 
 	@BeforeAll
 	void init()
@@ -77,73 +76,48 @@ class EncryptionTest
 		Init.init();
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
-		messageEncrypter = initMessageEncrypter(cpaManager);
-		messageDecrypter = initMessageDecrypter(cpaManager);
+		signatureGenerator = initSignatureGenerator(cpaManager);
+		signatureValidator = initSignatureValidator(cpaManager);
 	}
 
 	@Test
-	void testEncryption() throws EbMSProcessorException, ValidatorException, IOException
+	void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException,
+			TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
-		messageEncrypter.encrypt(message);
-		messageDecrypter.decrypt(message);
-		assertThat(IOUtils.toString(message.getAttachments().get(0).getInputStream(), Charset.forName("UTF-8"))).isEqualTo("Dit is een test.");
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document, message);
+		signatureValidator.validate(document, message);
 	}
 
 	@Test
-	void testEncryptionAttachmentValidationFailure()
-			throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
+	void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
-		messageEncrypter.encrypt(message);
-		changeAttachment(message);
-		assertThatThrownBy(() -> messageDecrypter.decrypt(message)).isInstanceOf(EbMSValidationException.class);
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document, message);
+		changeConversationId(document);
+		assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
 	}
 
 	@Test
-	void testEncryptionAttachmentValidationFailure1()
-			throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
+	void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
-		messageEncrypter.encrypt(message);
-		changeAttachment1(message);
-		assertThatThrownBy(() -> messageDecrypter.decrypt(message)).isInstanceOf(EbMSValidationException.class);
-	}
-
-	@Test
-	void testEncryptionAttachmentNotEncrypted() throws EbMSProcessorException, ValidatorException
-	{
-		val message = createMessage();
-		messageEncrypter.encrypt(message);
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document, message);
 		message.getAttachments().clear();
 		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		assertThatThrownBy(() -> messageDecrypter.decrypt(message)).isInstanceOf(EbMSValidationException.class);
+		assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
 	}
 
-	private void changeAttachment(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
+	private void changeConversationId(EbMSDocument message)
 	{
-		val attachment = message.getAttachments().get(0);
-		val d = DOMUtils.read(attachment.getInputStream());
-		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "CipherValue").item(0);
-		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
-		message.getAttachments().remove(0);
-		message.getAttachments()
-				.add(
-						EbMSAttachmentFactory
-								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
-	}
-
-	private void changeAttachment1(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
-	{
-		val attachment = message.getAttachments().get(0);
-		val d = DOMUtils.read(attachment.getInputStream());
-		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "CipherValue").item(1);
-		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
-		message.getAttachments().remove(0);
-		message.getAttachments()
-				.add(
-						EbMSAttachmentFactory
-								.createEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", DOMUtils.toString(d).getBytes("UTF-8")));
+		val d = message.getMessage();
+		val conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", "ConversationId").item(0);
+		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
 	private CPAManager initCPAManager()
@@ -168,16 +142,15 @@ class EncryptionTest
 		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
-	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager)
+	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager)
 	{
-		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
-		return new EbMSMessageEncrypter(cpaManager, trustStore);
+		return new EbMSSignatureGenerator(cpaManager, EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword));
 	}
 
-	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager)
+	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager)
 	{
-		val keyStore = EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword);
-		return new EbMSMessageDecrypter(cpaManager, keyStore);
+		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
+		return new EbMSSignatureValidator(cpaManager, trustStore);
 	}
 
 	private EbMSMessage createMessage() throws EbMSProcessorException

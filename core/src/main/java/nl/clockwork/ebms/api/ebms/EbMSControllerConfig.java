@@ -22,7 +22,7 @@ import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.event.MessageEventDAO;
 import nl.clockwork.ebms.common.message.EbMSMessageFactory;
-import nl.clockwork.ebms.common.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.common.security.EbMSSignatureGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

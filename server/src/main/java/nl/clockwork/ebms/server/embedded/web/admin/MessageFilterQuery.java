@@ -23,7 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.api.ebms.model.Party;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.web.message.EbMSMessageFilter;
 
 @Getter

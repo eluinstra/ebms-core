@@ -24,7 +24,7 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.message.EbMSMessageFactory;
-import nl.clockwork.ebms.common.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.common.security.EbMSSignatureGenerator;
 import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

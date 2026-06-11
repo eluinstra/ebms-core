@@ -18,12 +18,12 @@ package nl.clockwork.ebms.common.dao;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import nl.clockwork.ebms.common.EbMSAction;
-import nl.clockwork.ebms.common.EbMSMessageStatus;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
+import nl.clockwork.ebms.common.protocol.EbMSAction;
+import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import org.w3c.dom.Document;
 
 public interface EbMSDAO

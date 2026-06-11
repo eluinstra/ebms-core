@@ -13,31 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.ebms.model;
+package nl.clockwork.ebms.common.util;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import java.io.Serializable;
-import java.time.Instant;
+import jakarta.xml.bind.JAXBException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
+import nl.clockwork.ebms.common.jaxb.JAXBParser;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Error;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class MessageStatus implements Serializable
+@Getter
+public class EbMSValidationException extends ValidationException
 {
 	private static final long serialVersionUID = 1L;
-	Instant timestamp;
-	@XmlElement(required = true)
 	@NonNull
-	EbMSMessageStatus status;
+	final Error error;
+
+	@Override
+	public String getMessage()
+	{
+		try
+		{
+			return JAXBParser.getInstance(Error.class).handle(error);
+		}
+		catch (JAXBException e)
+		{
+			return error.getErrorCode();
+		}
+	}
 }
