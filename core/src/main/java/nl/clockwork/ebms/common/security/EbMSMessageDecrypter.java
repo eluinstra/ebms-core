@@ -15,11 +15,11 @@
  */
 package nl.clockwork.ebms.common.security;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -32,18 +32,12 @@ import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.protocol.EbMSErrorCode;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.EbMSValidationException;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.processor.EbMSProcessingException;
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.utils.EncryptionConstants;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -100,32 +94,18 @@ public class EbMSMessageDecrypter
 		}
 	}
 
-	private XMLCipher createXmlCipher(KeyPair keyPair) throws XMLEncryptionException, GeneralSecurityException
-	{
-		val result = XMLCipher.getInstance();
-		result.init(XMLCipher.DECRYPT_MODE, null);
-		result.setKEK(keyPair.getPrivate());
-		return result;
-	}
-
 	private EbMSAttachment decrypt(KeyPair keyPair, EbMSAttachment attachment) throws ValidatorException
 	{
-		try
+		try (InputStream in = attachment.getInputStream())
 		{
-			val document = DOMUtils.read((attachment.getInputStream()));
-			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS, EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
-				throw new ValidationException("Attachment " + attachment.getContentId() + " not encrypted!");
-			val encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS, EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-			val xmlCipher = createXmlCipher(keyPair);
-			val buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
-			val contentType = encryptedDataElement.getAttribute("MimeType");
-			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(), attachment.getContentId(), contentType, new ByteArrayInputStream(buffer));
+			val result = StreamingXmlDecrypter.decrypt(in, keyPair.getPrivate());
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(), attachment.getContentId(), result.getMimeType(), result.getContent());
 		}
-		catch (ParserConfigurationException | GeneralSecurityException e)
+		catch (ValidationException e)
 		{
-			throw new ValidatorException(e);
+			throw new ValidationException("Attachment " + attachment.getContentId() + " not encrypted!");
 		}
-		catch (SAXException | IOException | XMLEncryptionException | IllegalArgumentException e)
+		catch (XMLStreamException | IOException | GeneralSecurityException | IllegalArgumentException e)
 		{
 			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(), EbMSErrorCode.SECURITY_FAILURE, e.getMessage()));
 		}

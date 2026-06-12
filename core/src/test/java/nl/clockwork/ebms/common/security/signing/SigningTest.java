@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common.security;
+package nl.clockwork.ebms.common.security.signing;
 
 import static nl.clockwork.ebms.api.cpa.CPATestUtils.cpaCache;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -45,6 +46,11 @@ import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
+import nl.clockwork.ebms.common.security.EbMSKeyStore;
+import nl.clockwork.ebms.common.security.EbMSSignatureGenerator;
+import nl.clockwork.ebms.common.security.EbMSSignatureValidator;
+import nl.clockwork.ebms.common.security.EbMSTrustStore;
+import nl.clockwork.ebms.common.security.KeyStoreType;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.processor.EbMSProcessorException;
@@ -113,6 +119,41 @@ class SigningTest
 		assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
 	}
 
+	@Test
+	void testSigningLargeAttachmentRoundTrip() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		val payload = new byte[4 * 1024 * 1024];
+		new Random(0xC0FFEE).nextBytes(payload);
+		val message = createMessage(List.of(new DataSource("large.bin", null, "application/octet-stream", payload)));
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document, message);
+		signatureValidator.validate(document, message);
+	}
+
+	@Test
+	void testSigningMultipleAttachmentsRoundTrip() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		val dataSources = new ArrayList<DataSource>();
+		for (int i = 0; i < 25; i++)
+			dataSources.add(new DataSource("part-" + i + ".txt", null, "plain/text; charset=utf-8", ("payload " + i).getBytes(Charset.forName("UTF-8"))));
+		val message = createMessage(dataSources);
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document, message);
+		signatureValidator.validate(document, message);
+	}
+
+	@Test
+	void testSigningEmptyAttachmentRoundTrip() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		val message = createMessage(List.of(new DataSource("empty.bin", null, "application/octet-stream", new byte[0])));
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document, message);
+		signatureValidator.validate(document, message);
+	}
+
 	private void changeConversationId(EbMSDocument message)
 	{
 		val d = message.getMessage();
@@ -156,6 +197,14 @@ class SigningTest
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
 		val message = createMessage(cpaId);
+		return messageFactory.createEbMSMessage(message);
+	}
+
+	private EbMSMessage createMessage(List<DataSource> dataSources) throws EbMSProcessorException
+	{
+		val message = new MessageRequest();
+		message.setProperties(createMessageProperties(cpaId));
+		message.setDataSources(dataSources);
 		return messageFactory.createEbMSMessage(message);
 	}
 

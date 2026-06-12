@@ -16,19 +16,12 @@
 package nl.clockwork.ebms.common.security;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.security.Key;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.ArrayList;
-import javax.crypto.SecretKey;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -40,24 +33,13 @@ import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.model.EbMSAttachment;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.processor.EbMSProcessingException;
 import nl.clockwork.ebms.server.processor.EbMSProcessorException;
-import org.apache.cxf.io.CachedOutputStream;
-import org.apache.xml.security.encryption.EncryptedKey;
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.KeyName;
-import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -99,7 +81,7 @@ public class EbMSMessageEncrypter
 				val certificate = CPAUtils.getX509Certificate(nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionCertificate(deliveryChannel));
 				SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
 				val encryptionAlgorithm = nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-				message.getAttachments().replaceAll(a -> encrypt(createDocument(), certificate, encryptionAlgorithm, a));
+				message.getAttachments().replaceAll(a -> encrypt(certificate, encryptionAlgorithm, a));
 			}
 		}
 		catch (KeyStoreException e)
@@ -120,11 +102,11 @@ public class EbMSMessageEncrypter
 			SecurityUtils.validateCertificate(trustStore, certificate, Instant.now());
 			val encryptionAlgorithm = nl.clockwork.ebms.common.cpa.CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			val attachments = new ArrayList<EbMSAttachment>();
-			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(), certificate, encryptionAlgorithm, a)));
+			message.getAttachments().forEach(a -> attachments.add(encrypt(certificate, encryptionAlgorithm, a)));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}
-		catch (TransformerFactoryConfigurationError | KeyStoreException e)
+		catch (KeyStoreException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
@@ -134,72 +116,20 @@ public class EbMSMessageEncrypter
 		}
 	}
 
-	private XMLCipher createXmlCipher(String encryptionAlgorithm, SecretKey secretKey) throws XMLEncryptionException
+	private EbMSAttachment encrypt(X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws ValidatorException
 	{
-		val result = XMLCipher.getInstance(encryptionAlgorithm);
-		result.init(XMLCipher.ENCRYPT_MODE, secretKey);
-		return result;
-	}
-
-	private EbMSAttachment encrypt(Document document, X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment)
-			throws ValidatorException
-	{
-		try
+		try (InputStream in = attachment.getInputStream())
 		{
-			val secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
-			val xmlCipher = createXmlCipher(encryptionAlgorithm, secretKey);
-			val encryptedKey = createEncryptedKey(document, certificate.getPublicKey(), secretKey);
-			setEncryptedData(document, xmlCipher, encryptedKey, certificate, attachment);
-			val encryptedData = xmlCipher.encryptData(document, null, attachment.getInputStream());
-			val content = new CachedOutputStream();
-			val transformer = DOMUtils.getTransformer();
-			transformer.transform(new DOMSource(xmlCipher.martial(document, encryptedData)), new StreamResult(content));
-			content.lockOutputStream();
+			val content = StreamingXmlEncrypter.encrypt(in, certificate, encryptionAlgorithm, attachment.getContentId(), attachment.getContentType());
 			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(), attachment.getContentId(), "application/xml", content);
 		}
-		catch (NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException | TransformerFactoryConfigurationError e)
+		catch (GeneralSecurityException e)
 		{
 			throw new ValidatorException(e);
 		}
-		catch (Exception e)
+		catch (IOException | RuntimeException e)
 		{
 			throw new ValidationException(e);
 		}
 	}
-
-	private EncryptedKey createEncryptedKey(Document document, Key publicKey, SecretKey secretKey) throws XMLEncryptionException
-	{
-		val keyCipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
-		keyCipher.init(XMLCipher.WRAP_MODE, publicKey);
-		return keyCipher.encryptKey(document, secretKey);
-	}
-
-	private void setEncryptedData(Document document, XMLCipher xmlCipher, EncryptedKey encryptedKey, X509Certificate certificate, EbMSAttachment attachment)
-			throws XMLEncryptionException
-	{
-		val encryptedData = xmlCipher.getEncryptedData();
-		val encryptedKeyInfo = new KeyInfo(document);
-		encryptedKeyInfo.add(new KeyName(document, certificate.getSubjectX500Principal().getName()));
-		encryptedKey.setKeyInfo(encryptedKeyInfo);
-		val keyInfo = new KeyInfo(document);
-		keyInfo.add(encryptedKey);
-		encryptedData.setKeyInfo(keyInfo);
-		encryptedData.setId(attachment.getContentId());
-		encryptedData.setMimeType(attachment.getContentType());
-		encryptedData.setType(EncryptionConstants.TYPE_ELEMENT);
-	}
-
-	private Document createDocument() throws EbMSProcessorException
-	{
-		try
-		{
-			val builder = DOMUtils.getDocumentBuilder();
-			return builder.parse(new InputSource(new StringReader("<root></root>")));
-		}
-		catch (ParserConfigurationException | SAXException | IOException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-	}
-
 }
