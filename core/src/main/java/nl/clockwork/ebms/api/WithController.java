@@ -29,12 +29,12 @@ import jakarta.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.val;
-import nl.clockwork.ebms.api.cpa.BadRequestException;
-import nl.clockwork.ebms.api.cpa.CPAControllerException;
-import nl.clockwork.ebms.api.cpa.CPANotFoundException;
-import nl.clockwork.ebms.api.cpa.certificate.CertificateNotFoundException;
-import nl.clockwork.ebms.api.cpa.url.URLNotFoundException;
-import nl.clockwork.ebms.api.ebms.NotFoundException;
+import nl.clockwork.ebms.api.certificate.exception.CertificateNotFoundException;
+import nl.clockwork.ebms.api.cpa.exception.BadRequestException;
+import nl.clockwork.ebms.api.cpa.exception.CPAControllerException;
+import nl.clockwork.ebms.api.cpa.exception.CPANotFoundException;
+import nl.clockwork.ebms.api.ebms.exception.NotFoundException;
+import nl.clockwork.ebms.api.url.exception.URLNotFoundException;
 
 public interface WithController
 {

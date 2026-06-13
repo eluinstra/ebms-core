@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CPA"})
-class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.CPARepository, CPARepository
+class CPARepositoryImpl implements nl.clockwork.ebms.api.cpa.repository.CPARepository, CPARepository
 {
 	@NonNull
 	JdbcTemplate jdbcTemplate;

@@ -15,10 +15,10 @@
  */
 package nl.clockwork.ebms;
 
-import nl.clockwork.ebms.api.cpa.CPAControllerConfig;
-import nl.clockwork.ebms.api.cpa.certificate.CertificateMappingControllerConfig;
-import nl.clockwork.ebms.api.cpa.url.URLMappingControllerConfig;
-import nl.clockwork.ebms.api.ebms.EbMSControllerConfig;
+import nl.clockwork.ebms.api.certificate.soap.CertificateMappingControllerConfig;
+import nl.clockwork.ebms.api.cpa.soap.CPAControllerConfig;
+import nl.clockwork.ebms.api.ebms.soap.EbMSControllerConfig;
+import nl.clockwork.ebms.api.url.soap.URLMappingControllerConfig;
 import nl.clockwork.ebms.client.delivery.DeliveryManagerConfig;
 import nl.clockwork.ebms.client.delivery.http.EbMSClientConfig;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManagerConfig;

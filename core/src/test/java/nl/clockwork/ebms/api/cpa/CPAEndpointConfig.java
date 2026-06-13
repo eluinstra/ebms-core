@@ -17,6 +17,7 @@ package nl.clockwork.ebms.api.cpa;
 
 import jakarta.xml.ws.Endpoint;
 import javax.xml.namespace.QName;
+import nl.clockwork.ebms.api.cpa.soap.CPAController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

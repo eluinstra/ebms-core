@@ -39,7 +39,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.api.WithController;
-import nl.clockwork.ebms.api.ebms.NotFoundException;
+import nl.clockwork.ebms.api.ebms.exception.NotFoundException;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.dao.EbMSDAO;
 import nl.clockwork.ebms.server.embedded.model.CPA;

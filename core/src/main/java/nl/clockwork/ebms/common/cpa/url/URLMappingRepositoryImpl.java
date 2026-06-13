@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.RowMapper;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"URLMapping"})
-class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.url.URLMappingRepository, URLMappingRepository
+class URLMappingRepositoryImpl implements nl.clockwork.ebms.api.url.repository.URLMappingRepository, URLMappingRepository
 {
 	@NonNull
 	JdbcTemplate jdbcTemplate;

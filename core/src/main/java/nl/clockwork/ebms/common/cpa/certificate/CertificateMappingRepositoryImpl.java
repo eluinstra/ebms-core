@@ -40,7 +40,7 @@ import org.springframework.jdbc.core.RowMapper;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"CertificateMapping"})
-class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.cpa.certificate.CertificateMappingRepository, CertificateMappingRepository
+class CertificateMappingRepositoryImpl implements nl.clockwork.ebms.api.certificate.repository.CertificateMappingRepository, CertificateMappingRepository
 {
 	private static class CertificateRowMapper implements RowMapper<Tuple2<X509Certificate, Boolean>>
 	{

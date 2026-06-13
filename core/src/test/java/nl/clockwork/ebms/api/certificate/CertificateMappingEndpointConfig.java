@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.ebms;
+package nl.clockwork.ebms.api.certificate;
 
 import jakarta.xml.ws.Endpoint;
 import javax.xml.namespace.QName;
-import nl.clockwork.ebms.api.ebms.soap.EbMSController;
+import nl.clockwork.ebms.api.certificate.soap.CertificateMappingController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EbMSEndpointConfig
+public class CertificateMappingEndpointConfig
 {
-	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/2.18", "CPAService");
-	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/2.18", "CPAPort");
-	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/ebms";
+	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/certificateMapping/2.18", "CertificateMappingService");
+	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/certificateMapping/2.18", "CertificateMappingPort");
+	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/certificateMapping";
 
-	@Bean(name = "ebMSEndpoint")
-	Endpoint publishEndpoint(EbMSController messageService)
+	@Bean(name = "certificateMappingEndpoint")
+	Endpoint publishEndpoint(CertificateMappingController mappingService)
 	{
-		return Endpoint.publish(SERVICE_ENDPOINT, messageService);
+		return Endpoint.publish(SERVICE_ENDPOINT, mappingService);
 	}
 }

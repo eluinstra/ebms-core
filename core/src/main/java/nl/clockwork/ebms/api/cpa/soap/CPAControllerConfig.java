@@ -13,24 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.api.ebms;
+package nl.clockwork.ebms.api.cpa.soap;
 
-import jakarta.xml.ws.Endpoint;
-import javax.xml.namespace.QName;
-import nl.clockwork.ebms.api.ebms.soap.EbMSController;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.api.cpa.repository.CPARepository;
+import nl.clockwork.ebms.api.cpa.rest.CPARestController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EbMSEndpointConfig
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class CPAControllerConfig
 {
-	static final QName SERVICE_NAME = new QName("http://www.ordina.nl/cpa/2.18", "CPAService");
-	static final QName PORT_NAME = new QName("http://www.ordina.nl/cpa/2.18", "CPAPort");
-	static final String SERVICE_ENDPOINT = "http://localhost:8080/service/ebms";
-
-	@Bean(name = "ebMSEndpoint")
-	Endpoint publishEndpoint(EbMSController messageService)
+	@Bean
+	public CPAController cpaController(CPARepository cpaRepository)
 	{
-		return Endpoint.publish(SERVICE_ENDPOINT, messageService);
+		return new CPAControllerImpl(cpaRepository);
+	}
+
+	@Bean
+	public CPARestController cpaRestController(CPARepository cpaRepository)
+	{
+		return new CPARestController(new CPAControllerImpl(cpaRepository));
 	}
 }

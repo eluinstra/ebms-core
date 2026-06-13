@@ -1,0 +1,146 @@
+/*
+ * Copyright 2011 Clockwork
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nl.clockwork.ebms.api.certificate.soap;
+
+import java.security.cert.X509Certificate;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import nl.clockwork.ebms.api.certificate.exception.CertificateMappingControllerException;
+import nl.clockwork.ebms.api.certificate.exception.CertificateNotFoundException;
+import nl.clockwork.ebms.api.certificate.repository.CertificateMappingRepository;
+
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+public class CertificateMappingControllerImpl implements CertificateMappingController
+{
+	CertificateMappingRepository certificateMappingRepository;
+
+	@Override
+	public void setCertificateMapping(nl.clockwork.ebms.common.cpa.certificate.CertificateMapping certificateMapping) throws CertificateMappingControllerException
+	{
+		try
+		{
+			setCertificateMappingImpl(certificateMapping);
+		}
+		catch (CertificateMappingControllerException e)
+		{
+			log.error("SetCertificateMapping", e);
+			throw e;
+		}
+		catch (RuntimeException e)
+		{
+			log.error("SetCertificateMapping " + certificateMapping, e);
+			throw new CertificateMappingControllerException(e);
+		}
+	}
+
+	public void setCertificateMappingImpl(nl.clockwork.ebms.common.cpa.certificate.CertificateMapping certificateMapping)
+	{
+		if (log.isDebugEnabled())
+			log.debug("SetCertificateMapping " + certificateMapping);
+		setCertificateMapping1(certificateMapping);
+	}
+
+	public void setCertificateMapping1(nl.clockwork.ebms.common.cpa.certificate.CertificateMapping mapping)
+	{
+		if (certificateMappingRepository.existsCertificateMapping(mapping.getId(), mapping.getCpaId()))
+			certificateMappingRepository.updateCertificateMapping(mapping);
+		else
+			certificateMappingRepository.insertCertificateMapping(mapping);
+	}
+
+	@Override
+	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingControllerException
+	{
+		try
+		{
+			deleteCertificateMappingImpl(source, cpaId);
+		}
+		catch (CertificateMappingControllerException e)
+		{
+			log.error("DeleteCertificateMapping", e);
+			throw e;
+		}
+		catch (RuntimeException e)
+		{
+			log.error("DeleteCertificateMapping " + source, e);
+			throw new CertificateMappingControllerException(e);
+		}
+	}
+
+	public void deleteCertificateMappingImpl(X509Certificate source, String cpaId)
+	{
+		if (log.isDebugEnabled())
+			log.debug("DeleteCertificateMapping " + source);
+		if (deleteCertificateMapping1(source, cpaId) == 0)
+			throw new CertificateNotFoundException();
+	}
+
+	private int deleteCertificateMapping1(X509Certificate source, String cpaId)
+	{
+		val id = nl.clockwork.ebms.common.cpa.certificate.CertificateMapping.getCertificateId(source);
+		return certificateMappingRepository.deleteCertificateMapping(id, cpaId);
+	}
+
+	@Override
+	public List<nl.clockwork.ebms.common.cpa.certificate.CertificateMapping> getCertificateMappings() throws CertificateMappingControllerException
+	{
+		try
+		{
+			return getCertificateMappingsImpl();
+		}
+		catch (CertificateMappingControllerException e)
+		{
+			log.error("GetCertificateMappings", e);
+			throw e;
+		}
+		catch (RuntimeException e)
+		{
+			log.error("GetCertificateMappings", e);
+			throw new CertificateMappingControllerException(e);
+		}
+	}
+
+	public List<nl.clockwork.ebms.common.cpa.certificate.CertificateMapping> getCertificateMappingsImpl()
+	{
+		log.debug("GetCertificateMappings");
+		return certificateMappingRepository.getCertificateMappings();
+	}
+
+	@Override
+	public void deleteCache() throws CertificateMappingControllerException
+	{
+		try
+		{
+			deleteCacheImpl();
+		}
+		catch (RuntimeException e)
+		{
+			log.error("DeleteCache", e);
+			throw new CertificateMappingControllerException(e);
+		}
+	}
+
+	public void deleteCacheImpl()
+	{
+		certificateMappingRepository.clearCache();
+	}
+}
