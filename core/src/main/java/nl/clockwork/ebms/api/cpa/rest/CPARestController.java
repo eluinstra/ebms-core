@@ -60,17 +60,14 @@ public class CPARestController implements WithController
 		}
 		catch (SAXException | IllegalArgumentException e)
 		{
-			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(new BadRequestException(e));
 		}
 		catch (IOException | JAXBException | ParserConfigurationException e)
 		{
-			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(e);
 		}
 		catch (RuntimeException e)
 		{
-			log.error("ValidateCPA\n" + cpa, e);
 			throw toWebApplicationException(e);
 		}
 	}
@@ -87,17 +84,14 @@ public class CPARestController implements WithController
 		}
 		catch (SAXException | IllegalArgumentException e)
 		{
-			log.error("InsertCPA\n" + cpa, e);
 			throw toWebApplicationException(new BadRequestException(e), MediaType.TEXT_PLAIN);
 		}
 		catch (IOException | JAXBException | ParserConfigurationException e)
 		{
-			log.error("InsertCPA\n" + cpa, e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 		catch (RuntimeException e)
 		{
-			log.error("InsertCPA\n" + cpa, e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
@@ -106,30 +100,14 @@ public class CPARestController implements WithController
 	@Path("{cpaId}")
 	public void deleteCPA(@PathParam("cpaId") String cpaId)
 	{
-		try
-		{
-			cpaController.deleteCPAImpl(cpaId);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("DeleteCPA " + cpaId, e);
-			throw toWebApplicationException(e);
-		}
+		cpaController.deleteCPAImpl(cpaId);
 	}
 
 	@GET
 	@Path("")
 	public List<String> getCPAIds()
 	{
-		try
-		{
-			return cpaController.getCPAIdsImpl();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetCPAIds", e);
-			throw toWebApplicationException(e);
-		}
+		return cpaController.getCPAIdsImpl();
 	}
 
 	@GET
@@ -143,12 +121,6 @@ public class CPARestController implements WithController
 		}
 		catch (JAXBException e)
 		{
-			log.error("GetCPAId " + cpaId, e);
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetCPAId " + cpaId, e);
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
 	}
@@ -157,14 +129,6 @@ public class CPARestController implements WithController
 	@Path("cache")
 	public void deleteCache()
 	{
-		try
-		{
-			cpaController.deleteCacheImpl();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("DeleteCache", e);
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
+		cpaController.deleteCacheImpl();
 	}
 }

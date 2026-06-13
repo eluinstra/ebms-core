@@ -32,12 +32,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.api.WithController;
 import nl.clockwork.ebms.api.certificate.model.CertificateMapping;
 import nl.clockwork.ebms.api.certificate.soap.CertificateMappingControllerImpl;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
@@ -51,15 +49,7 @@ public class CertificateMappingRestController implements WithController
 	@Path("")
 	public void setCertificateMapping(CertificateMapping certificateMapping)
 	{
-		try
-		{
-			mappingService.setCertificateMappingImpl(certificateMapping.toCertificateMapping());
-		}
-		catch (RuntimeException e)
-		{
-			log.error("SetCertificateMapping " + certificateMapping, e);
-			throw toWebApplicationException(e);
-		}
+		mappingService.setCertificateMappingImpl(certificateMapping.toCertificateMapping());
 	}
 
 	@DELETE
@@ -73,13 +63,7 @@ public class CertificateMappingRestController implements WithController
 		}
 		catch (CertificateException e)
 		{
-			log.error("DeleteCertificateMapping " + source, e);
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("DeleteCertificateMapping " + source, e);
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -87,29 +71,13 @@ public class CertificateMappingRestController implements WithController
 	@Path("")
 	public List<CertificateMapping> getCertificateMappings()
 	{
-		try
-		{
-			return mappingService.getCertificateMappingsImpl().stream().map(CertificateMapping::of).toList();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetCertificateMappings", e);
-			throw toWebApplicationException(e);
-		}
+		return mappingService.getCertificateMappingsImpl().stream().map(CertificateMapping::of).toList();
 	}
 
 	@DELETE
 	@Path("cache")
 	public void deleteCache()
 	{
-		try
-		{
-			mappingService.deleteCacheImpl();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("DeleteCache", e);
-			throw toWebApplicationException(e);
-		}
+		mappingService.deleteCacheImpl();
 	}
 }

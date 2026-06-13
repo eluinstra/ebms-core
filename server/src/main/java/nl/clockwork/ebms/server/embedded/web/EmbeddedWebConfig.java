@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.api.EbMSExceptionMapper;
 import nl.clockwork.ebms.api.certificate.rest.CertificateMappingRestController;
 import nl.clockwork.ebms.api.certificate.soap.CertificateMappingController;
 import nl.clockwork.ebms.api.cpa.rest.CPARestController;
@@ -179,7 +180,7 @@ public class EmbeddedWebConfig
 		val sf = new JAXRSServerFactoryBean();
 		sf.setBus(cxf());
 		sf.setAddress("/rest/v19" + path);
-		sf.setProviders(Arrays.asList(createCrossOriginResourceSharingFilter(), createJacksonJsonProvider()));
+		sf.setProviders(Arrays.asList(new EbMSExceptionMapper(), createCrossOriginResourceSharingFilter(), createJacksonJsonProvider()));
 		sf.setFeatures(Arrays.asList(createOpenApiFeature()));
 		sf.setResourceClasses(resourceClass);
 		sf.setResourceProvider(resourceClass, new SingletonResourceProvider(resourceObject));

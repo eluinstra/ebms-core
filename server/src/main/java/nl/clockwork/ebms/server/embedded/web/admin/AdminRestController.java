@@ -36,7 +36,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.api.WithController;
 import nl.clockwork.ebms.api.ebms.exception.NotFoundException;
@@ -49,7 +48,6 @@ import nl.clockwork.ebms.server.embedded.web.message.TimeUnit;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
@@ -66,63 +64,31 @@ public class AdminRestController implements WithController
 	@Path("cpas")
 	public List<CPA> getCPAs(@QueryParam("first") @DefaultValue("0") long first, @QueryParam("count") @DefaultValue("50") int count)
 	{
-		try
-		{
-			return ebMSDAO.selectCPAs(Math.max(first, 0), capPageSize(count));
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetCPAs", e);
-			throw toWebApplicationException(e);
-		}
+		return ebMSDAO.selectCPAs(Math.max(first, 0), capPageSize(count));
 	}
 
 	@GET
 	@Path("cpas/ids")
 	public List<String> getCPAIds()
 	{
-		try
-		{
-			return ebMSDAO.selectCPAIds();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetCPAIds", e);
-			throw toWebApplicationException(e);
-		}
+		return ebMSDAO.selectCPAIds();
 	}
 
 	@GET
 	@Path("cpas/count")
 	public long countCPAs()
 	{
-		try
-		{
-			return ebMSDAO.countCPAs();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("CountCPAs", e);
-			throw toWebApplicationException(e);
-		}
+		return ebMSDAO.countCPAs();
 	}
 
 	@GET
 	@Path("cpas/{cpaId}")
 	public CPA getCPA(@PathParam("cpaId") String cpaId)
 	{
-		try
-		{
-			val cpa = ebMSDAO.findCPA(cpaId);
-			if (cpa == null)
-				throw new NotFoundException("CPA not found: " + cpaId);
-			return cpa;
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetCPA {}", cpaId, e);
-			throw toWebApplicationException(e);
-		}
+		val cpa = ebMSDAO.findCPA(cpaId);
+		if (cpa == null)
+			throw new NotFoundException("CPA not found: " + cpaId);
+		return cpa;
 	}
 
 	@GET
@@ -131,30 +97,14 @@ public class AdminRestController implements WithController
 			List<EbMSMessage>
 			getMessages(@BeanParam MessageFilterQuery filter, @QueryParam("first") @DefaultValue("0") long first, @QueryParam("count") @DefaultValue("50") int count)
 	{
-		try
-		{
-			return ebMSDAO.selectMessages(filter.toFilter(), Math.max(first, 0), capPageSize(count));
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetMessages", e);
-			throw toWebApplicationException(e);
-		}
+		return ebMSDAO.selectMessages(filter.toFilter(), Math.max(first, 0), capPageSize(count));
 	}
 
 	@GET
 	@Path("messages/count")
 	public long countMessages(@BeanParam MessageFilterQuery filter)
 	{
-		try
-		{
-			return ebMSDAO.countMessages(filter.toFilter());
-		}
-		catch (RuntimeException e)
-		{
-			log.error("CountMessages", e);
-			throw toWebApplicationException(e);
-		}
+		return ebMSDAO.countMessages(filter.toFilter());
 	}
 
 	@GET
@@ -165,16 +115,8 @@ public class AdminRestController implements WithController
 			@QueryParam("toRole") String toRole,
 			@QueryParam("status") List<EbMSMessageStatus> statuses)
 	{
-		try
-		{
-			val statusArray = statuses == null ? new EbMSMessageStatus[0] : statuses.toArray(new EbMSMessageStatus[0]);
-			return ebMSDAO.selectMessageIds(cpaId, fromRole, toRole, statusArray);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetMessageIds", e);
-			throw toWebApplicationException(e);
-		}
+		val statusArray = statuses == null ? new EbMSMessageStatus[0] : statuses.toArray(new EbMSMessageStatus[0]);
+		return ebMSDAO.selectMessageIds(cpaId, fromRole, toRole, statusArray);
 	}
 
 	@GET
@@ -185,16 +127,8 @@ public class AdminRestController implements WithController
 			@QueryParam("unit") @DefaultValue("DAY") TimeUnit unit,
 			@QueryParam("status") List<EbMSMessageStatus> statuses)
 	{
-		try
-		{
-			val statusArray = statuses == null ? new EbMSMessageStatus[0] : statuses.toArray(new EbMSMessageStatus[0]);
-			return ebMSDAO.selectMessageTraffic(from, to, unit, statusArray);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetMessageTraffic", e);
-			throw toWebApplicationException(e);
-		}
+		val statusArray = statuses == null ? new EbMSMessageStatus[0] : statuses.toArray(new EbMSMessageStatus[0]);
+		return ebMSDAO.selectMessageTraffic(from, to, unit, statusArray);
 	}
 
 	@GET
@@ -217,35 +151,19 @@ public class AdminRestController implements WithController
 	@Path("messages/{messageId}")
 	public EbMSMessage getMessage(@PathParam("messageId") String messageId)
 	{
-		try
-		{
-			val message = ebMSDAO.findMessage(messageId);
-			if (message == null)
-				throw new NotFoundException("Message not found: " + messageId);
-			return message;
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetMessage {}", messageId, e);
-			throw toWebApplicationException(e);
-		}
+		val message = ebMSDAO.findMessage(messageId);
+		if (message == null)
+			throw new NotFoundException("Message not found: " + messageId);
+		return message;
 	}
 
 	@GET
 	@Path("messages/{messageId}/response")
 	public EbMSMessage getResponseMessage(@PathParam("messageId") String messageId)
 	{
-		try
-		{
-			if (!ebMSDAO.existsResponseMessage(messageId))
-				throw new NotFoundException("Response message not found for: " + messageId);
-			return ebMSDAO.findResponseMessage(messageId);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetResponseMessage {}", messageId, e);
-			throw toWebApplicationException(e);
-		}
+		if (!ebMSDAO.existsResponseMessage(messageId))
+			throw new NotFoundException("Response message not found for: " + messageId);
+		return ebMSDAO.findResponseMessage(messageId);
 	}
 
 	@GET
@@ -253,16 +171,8 @@ public class AdminRestController implements WithController
 	@Produces("application/zip")
 	public Response exportMessage(@PathParam("messageId") String messageId)
 	{
-		try
-		{
-			if (ebMSDAO.findMessage(messageId) == null)
-				throw new NotFoundException("Message not found: " + messageId);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("ExportMessage {}", messageId, e);
-			throw toWebApplicationException(e);
-		}
+		if (ebMSDAO.findMessage(messageId) == null)
+			throw new NotFoundException("Message not found: " + messageId);
 		StreamingOutput output = stream ->
 		{
 			try (val zip = new ZipOutputStream(stream))
@@ -278,18 +188,9 @@ public class AdminRestController implements WithController
 	@Produces(MediaType.WILDCARD)
 	public Response getAttachment(@PathParam("messageId") String messageId, @PathParam("contentId") String contentId)
 	{
-		EbMSAttachment attachment;
-		try
-		{
-			attachment = ebMSDAO.findAttachment(messageId, contentId);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetAttachment {} {}", messageId, contentId, e);
-			throw toWebApplicationException(e);
-		}
+		EbMSAttachment attachment = ebMSDAO.findAttachment(messageId, contentId);
 		if (attachment == null || attachment.getContent() == null)
-			throw toWebApplicationException(new NotFoundException("Attachment not found: " + messageId + "/" + contentId));
+			throw new NotFoundException("Attachment not found: " + messageId + "/" + contentId);
 		val content = attachment.getContent();
 		StreamingOutput output = stream ->
 		{

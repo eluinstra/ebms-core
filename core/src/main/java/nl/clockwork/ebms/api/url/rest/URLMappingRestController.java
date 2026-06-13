@@ -28,12 +28,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.api.WithController;
 import nl.clockwork.ebms.api.url.soap.URLMappingController;
 import nl.clockwork.ebms.common.cpa.url.URLMapping;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
@@ -47,59 +45,27 @@ public class URLMappingRestController implements WithController
 	@Path("")
 	public void setURLMapping(URLMapping urlMapping)
 	{
-		try
-		{
-			mappingController.setURLMapping(urlMapping);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("SetURLMapping " + urlMapping, e);
-			throw toWebApplicationException(e);
-		}
+		mappingController.setURLMapping(urlMapping);
 	}
 
 	@DELETE
 	@Path("{id}")
 	public void deleteURLMapping(@PathParam("id") String source)
 	{
-		try
-		{
-			mappingController.deleteURLMapping(source);
-		}
-		catch (RuntimeException e)
-		{
-			log.error("DeleteURLMapping " + source, e);
-			throw toWebApplicationException(e);
-		}
+		mappingController.deleteURLMapping(source);
 	}
 
 	@GET
 	@Path("")
 	public List<URLMapping> getURLMappings()
 	{
-		try
-		{
-			return mappingController.getURLMappings();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("GetURLMappings", e);
-			throw toWebApplicationException(e);
-		}
+		return mappingController.getURLMappings();
 	}
 
 	@DELETE
 	@Path("cache")
 	public void deleteCache()
 	{
-		try
-		{
-			mappingController.deleteCache();
-		}
-		catch (RuntimeException e)
-		{
-			log.error("DeleteCache", e);
-			throw toWebApplicationException(e);
-		}
+		mappingController.deleteCache();
 	}
 }

@@ -22,12 +22,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import nl.clockwork.ebms.api.ebms.exception.NotFoundException;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.dao.EbMSDAO;
 import nl.clockwork.ebms.server.embedded.model.CPA;
@@ -105,24 +104,22 @@ class AdminRestControllerTest
 	void getCPAMissingYields404()
 	{
 		when(ebMSDAO.findCPA("missing")).thenReturn(null);
-		assertThatThrownBy(() -> controller.getCPA("missing")).isInstanceOf(WebApplicationException.class)
-				.satisfies(e -> assertThat(((WebApplicationException)e).getResponse().getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode()));
+		assertThatThrownBy(() -> controller.getCPA("missing")).isInstanceOf(NotFoundException.class).hasMessageContaining("CPA not found: missing");
 	}
 
 	@Test
 	void getMessageMissingYields404()
 	{
 		when(ebMSDAO.findMessage("missing")).thenReturn(null);
-		assertThatThrownBy(() -> controller.getMessage("missing")).isInstanceOf(WebApplicationException.class)
-				.satisfies(e -> assertThat(((WebApplicationException)e).getResponse().getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode()));
+		assertThatThrownBy(() -> controller.getMessage("missing")).isInstanceOf(NotFoundException.class).hasMessageContaining("Message not found: missing");
 	}
 
 	@Test
 	void getResponseMessageMissingYields404()
 	{
 		when(ebMSDAO.existsResponseMessage("missing")).thenReturn(false);
-		assertThatThrownBy(() -> controller.getResponseMessage("missing")).isInstanceOf(WebApplicationException.class)
-				.satisfies(e -> assertThat(((WebApplicationException)e).getResponse().getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode()));
+		assertThatThrownBy(() -> controller.getResponseMessage("missing")).isInstanceOf(NotFoundException.class)
+				.hasMessageContaining("Response message not found for: missing");
 	}
 
 	@Test
@@ -186,16 +183,15 @@ class AdminRestControllerTest
 	void getAttachmentMissingYields404()
 	{
 		when(ebMSDAO.findAttachment("m-1", "missing")).thenReturn(null);
-		assertThatThrownBy(() -> controller.getAttachment("m-1", "missing")).isInstanceOf(WebApplicationException.class)
-				.satisfies(e -> assertThat(((WebApplicationException)e).getResponse().getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode()));
+		assertThatThrownBy(() -> controller.getAttachment("m-1", "missing")).isInstanceOf(NotFoundException.class)
+				.hasMessageContaining("Attachment not found: m-1/missing");
 	}
 
 	@Test
 	void exportMessageMissingYields404()
 	{
 		when(ebMSDAO.findMessage("missing")).thenReturn(null);
-		assertThatThrownBy(() -> controller.exportMessage("missing")).isInstanceOf(WebApplicationException.class)
-				.satisfies(e -> assertThat(((WebApplicationException)e).getResponse().getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode()));
+		assertThatThrownBy(() -> controller.exportMessage("missing")).isInstanceOf(NotFoundException.class).hasMessageContaining("Message not found: missing");
 	}
 
 	@Test

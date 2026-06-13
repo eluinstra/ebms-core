@@ -72,14 +72,7 @@ public class EbMSRestController implements WithController
 	@Path("ping/{cpaId}/from/{fromPartyId}/to/{toPartyId}")
 	public void ping(@PathParam("cpaId") String cpaId, @PathParam("fromPartyId") String fromPartyId, @PathParam("toPartyId") String toPartyId)
 	{
-		try
-		{
-			serviceHandler.ping(cpaId, fromPartyId, toPartyId);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e);
-		}
+		serviceHandler.ping(cpaId, fromPartyId, toPartyId);
 	}
 
 	@POST
@@ -91,7 +84,7 @@ public class EbMSRestController implements WithController
 		{
 			return serviceHandler.sendMessage(messageRequest);
 		}
-		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException | RuntimeException e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
 		{
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
@@ -111,7 +104,7 @@ public class EbMSRestController implements WithController
 		{
 			return serviceHandler.sendMessageMTOM(new MTOMMessageRequest(requestProperties, attachments.stream().map(toMTOMDataSource()).toList()));
 		}
-		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException | RuntimeException e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
 		{
 			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
 		}
@@ -131,14 +124,7 @@ public class EbMSRestController implements WithController
 	@Produces(MediaType.TEXT_PLAIN)
 	public String resendMessage(@PathParam("messageId") String messageId)
 	{
-		try
-		{
-			return serviceHandler.resendMessage(messageId);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
+		return serviceHandler.resendMessage(messageId);
 	}
 
 	@GET
@@ -156,56 +142,33 @@ public class EbMSRestController implements WithController
 			@QueryParam("refToMessageId") String refToMessageId,
 			@QueryParam("maxNr") @DefaultValue("0") Integer maxNr)
 	{
-		try
-		{
-			return serviceHandler.getUnprocessedMessageIds(
-					MessageFilter.builder()
-							.cpaId(cpaId)
-							.fromParty(fromPartyId == null ? null : new Party(fromPartyId, fromRole))
-							.toParty(toPartyId == null ? null : new Party(toPartyId, toRole))
-							.service(service)
-							.action(action)
-							.conversationId(conversationId)
-							.messageId(messageId)
-							.refToMessageId(refToMessageId)
-							.build(),
-					maxNr);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
+		return serviceHandler.getUnprocessedMessageIds(
+				MessageFilter.builder()
+						.cpaId(cpaId)
+						.fromParty(fromPartyId == null ? null : new Party(fromPartyId, fromRole))
+						.toParty(toPartyId == null ? null : new Party(toPartyId, toRole))
+						.service(service)
+						.action(action)
+						.conversationId(conversationId)
+						.messageId(messageId)
+						.refToMessageId(refToMessageId)
+						.build(),
+				maxNr);
 	}
 
 	@GET
 	@Path("messages/{messageId}")
 	public Message getMessage(@PathParam("messageId") final String messageId, @QueryParam("process") @DefaultValue("false") Boolean process)
-
 	{
-		try
-		{
-			return serviceHandler.getMessage(messageId, process);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e);
-		}
+		return serviceHandler.getMessage(messageId, process);
 	}
 
 	@GET
 	@Path("messages/mtom/{messageId}")
 	@Produces(MediaType.MULTIPART_FORM_DATA)
 	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @QueryParam("process") @DefaultValue("false") Boolean process)
-
 	{
-		try
-		{
-			return toMultipartBody(serviceHandler.getMessageMTOM(messageId, process));
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e, MediaType.MULTIPART_FORM_DATA);
-		}
+		return toMultipartBody(serviceHandler.getMessageMTOM(messageId, process));
 	}
 
 	private MultipartBody toMultipartBody(MTOMMessage message)
@@ -230,28 +193,14 @@ public class EbMSRestController implements WithController
 	@Path("messages/{messageId}")
 	public void processMessage(@PathParam("messageId") final String messageId)
 	{
-		try
-		{
-			serviceHandler.processMessage(messageId);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e);
-		}
+		serviceHandler.processMessage(messageId);
 	}
 
 	@GET
 	@Path("messages/{messageId}/status")
 	public MessageStatus getMessageStatus(@PathParam("messageId") String messageId)
 	{
-		try
-		{
-			return serviceHandler.getMessageStatus(messageId);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e);
-		}
+		return serviceHandler.getMessageStatus(messageId);
 	}
 
 	@GET
@@ -296,13 +245,6 @@ public class EbMSRestController implements WithController
 	@Path("events/{messageId}")
 	public void processMessageEvent(@PathParam("messageId") final String messageId)
 	{
-		try
-		{
-			serviceHandler.processMessageEvent(messageId);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e);
-		}
+		serviceHandler.processMessageEvent(messageId);
 	}
 }
