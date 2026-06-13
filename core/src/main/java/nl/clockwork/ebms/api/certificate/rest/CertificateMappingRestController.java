@@ -49,7 +49,7 @@ public class CertificateMappingRestController implements WithController
 	@Path("")
 	public void setCertificateMapping(CertificateMapping certificateMapping)
 	{
-		mappingService.setCertificateMappingImpl(certificateMapping.toCertificateMapping());
+		execute(() -> mappingService.setCertificateMappingImpl(certificateMapping.toCertificateMapping()));
 	}
 
 	@DELETE
@@ -57,27 +57,30 @@ public class CertificateMappingRestController implements WithController
 	@Consumes(MediaType.TEXT_PLAIN)
 	public void deleteCertificateMapping(String source, @QueryParam("cpaId") String cpaId)
 	{
-		try
+		execute(() ->
 		{
-			mappingService.deleteCertificateMappingImpl(parseCertificate(decodeBase64(source)), cpaId);
-		}
-		catch (CertificateException e)
-		{
-			throw new RuntimeException(e);
-		}
+			try
+			{
+				mappingService.deleteCertificateMappingImpl(parseCertificate(decodeBase64(source)), cpaId);
+			}
+			catch (CertificateException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}, MediaType.TEXT_PLAIN);
 	}
 
 	@GET
 	@Path("")
 	public List<CertificateMapping> getCertificateMappings()
 	{
-		return mappingService.getCertificateMappingsImpl().stream().map(CertificateMapping::of).toList();
+		return execute(() -> mappingService.getCertificateMappingsImpl().stream().map(CertificateMapping::of).toList());
 	}
 
 	@DELETE
 	@Path("cache")
 	public void deleteCache()
 	{
-		mappingService.deleteCacheImpl();
+		execute(mappingService::deleteCacheImpl);
 	}
 }

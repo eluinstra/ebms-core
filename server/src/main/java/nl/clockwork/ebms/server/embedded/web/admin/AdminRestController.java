@@ -87,7 +87,7 @@ public class AdminRestController implements WithController
 	{
 		val cpa = ebMSDAO.findCPA(cpaId);
 		if (cpa == null)
-			throw new NotFoundException("CPA not found: " + cpaId);
+			throw toWebApplicationException(new NotFoundException("CPA not found: " + cpaId));
 		return cpa;
 	}
 
@@ -153,7 +153,7 @@ public class AdminRestController implements WithController
 	{
 		val message = ebMSDAO.findMessage(messageId);
 		if (message == null)
-			throw new NotFoundException("Message not found: " + messageId);
+			throw toWebApplicationException(new NotFoundException("Message not found: " + messageId));
 		return message;
 	}
 
@@ -162,7 +162,7 @@ public class AdminRestController implements WithController
 	public EbMSMessage getResponseMessage(@PathParam("messageId") String messageId)
 	{
 		if (!ebMSDAO.existsResponseMessage(messageId))
-			throw new NotFoundException("Response message not found for: " + messageId);
+			throw toWebApplicationException(new NotFoundException("Response message not found for: " + messageId));
 		return ebMSDAO.findResponseMessage(messageId);
 	}
 
@@ -172,7 +172,7 @@ public class AdminRestController implements WithController
 	public Response exportMessage(@PathParam("messageId") String messageId)
 	{
 		if (ebMSDAO.findMessage(messageId) == null)
-			throw new NotFoundException("Message not found: " + messageId);
+			throw toWebApplicationException(new NotFoundException("Message not found: " + messageId));
 		StreamingOutput output = stream ->
 		{
 			try (val zip = new ZipOutputStream(stream))
@@ -190,7 +190,7 @@ public class AdminRestController implements WithController
 	{
 		EbMSAttachment attachment = ebMSDAO.findAttachment(messageId, contentId);
 		if (attachment == null || attachment.getContent() == null)
-			throw new NotFoundException("Attachment not found: " + messageId + "/" + contentId);
+			throw toWebApplicationException(new NotFoundException("Attachment not found: " + messageId + "/" + contentId));
 		val content = attachment.getContent();
 		StreamingOutput output = stream ->
 		{

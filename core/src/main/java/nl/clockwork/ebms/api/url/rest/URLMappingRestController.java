@@ -45,27 +45,27 @@ public class URLMappingRestController implements WithController
 	@Path("")
 	public void setURLMapping(URLMapping urlMapping)
 	{
-		mappingController.setURLMapping(urlMapping);
+		execute(() -> mappingController.setURLMapping(urlMapping));
 	}
 
 	@DELETE
 	@Path("{id}")
 	public void deleteURLMapping(@PathParam("id") String source)
 	{
-		mappingController.deleteURLMapping(source);
+		execute(() -> mappingController.deleteURLMapping(source));
 	}
 
 	@GET
 	@Path("")
 	public List<URLMapping> getURLMappings()
 	{
-		return mappingController.getURLMappings();
+		return execute(() -> mappingController.getURLMappings());
 	}
 
 	@DELETE
 	@Path("cache")
 	public void deleteCache()
 	{
-		mappingController.deleteCache();
+		execute(mappingController::deleteCache);
 	}
 }

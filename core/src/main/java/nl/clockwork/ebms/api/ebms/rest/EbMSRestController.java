@@ -80,18 +80,18 @@ public class EbMSRestController implements WithController
 	@Produces(MediaType.TEXT_PLAIN)
 	public String sendMessage(MessageRequest messageRequest)
 	{
-		try
+		return execute(() ->
 		{
-			return serviceHandler.sendMessage(messageRequest);
-		}
-		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
-		{
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
-		catch (TransformerFactoryConfigurationError e)
-		{
-			throw toWebApplicationException(new RuntimeException(e), MediaType.TEXT_PLAIN);
-		}
+			try
+			{
+				return serviceHandler.sendMessage(messageRequest);
+			}
+			catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException
+					| TransformerFactoryConfigurationError e)
+			{
+				throw new RuntimeException(e);
+			}
+		}, MediaType.TEXT_PLAIN);
 	}
 
 	@POST
@@ -100,18 +100,18 @@ public class EbMSRestController implements WithController
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public String sendMessage(@Multipart("requestProperties") MessageRequestProperties requestProperties, @Multipart("attachment") List<Attachment> attachments)
 	{
-		try
+		return execute(() ->
 		{
-			return serviceHandler.sendMessageMTOM(new MTOMMessageRequest(requestProperties, attachments.stream().map(toMTOMDataSource()).toList()));
-		}
-		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
-		{
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
-		catch (TransformerFactoryConfigurationError e)
-		{
-			throw toWebApplicationException(new RuntimeException(e), MediaType.TEXT_PLAIN);
-		}
+			try
+			{
+				return serviceHandler.sendMessageMTOM(new MTOMMessageRequest(requestProperties, attachments.stream().map(toMTOMDataSource()).toList()));
+			}
+			catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException
+					| TransformerFactoryConfigurationError e)
+			{
+				throw new RuntimeException(e);
+			}
+		}, MediaType.TEXT_PLAIN);
 	}
 
 	private Function<Attachment, MTOMDataSource> toMTOMDataSource()
@@ -219,26 +219,20 @@ public class EbMSRestController implements WithController
 			@QueryParam("eventTypes") MessageEventType[] eventTypes,
 			@QueryParam("maxNr") @DefaultValue("0") Integer maxNr)
 	{
-		try
-		{
-			return serviceHandler.getUnprocessedMessageEvents(
-					MessageFilter.builder()
-							.cpaId(cpaId)
-							.fromParty(fromPartyId == null ? null : new Party(fromPartyId, fromRole))
-							.toParty(toPartyId == null ? null : new Party(toPartyId, toRole))
-							.service(service)
-							.action(action)
-							.conversationId(conversationId)
-							.messageId(messageId)
-							.refToMessageId(refToMessageId)
-							.build(),
-					eventTypes,
-					maxNr);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e);
-		}
+		return execute(
+				() -> serviceHandler.getUnprocessedMessageEvents(
+						MessageFilter.builder()
+								.cpaId(cpaId)
+								.fromParty(fromPartyId == null ? null : new Party(fromPartyId, fromRole))
+								.toParty(toPartyId == null ? null : new Party(toPartyId, toRole))
+								.service(service)
+								.action(action)
+								.conversationId(conversationId)
+								.messageId(messageId)
+								.refToMessageId(refToMessageId)
+								.build(),
+						eventTypes,
+						maxNr));
 	}
 
 	@PATCH

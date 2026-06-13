@@ -33,13 +33,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.api.WithController;
-import nl.clockwork.ebms.api.cpa.exception.BadRequestException;
 import nl.clockwork.ebms.api.cpa.soap.CPAControllerImpl;
 import org.xml.sax.SAXException;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Consumes(MediaType.APPLICATION_JSON)
@@ -54,22 +51,21 @@ public class CPARestController implements WithController
 	@Consumes(MediaType.TEXT_PLAIN)
 	public void validateCPA(String cpa)
 	{
-		try
+		execute(() ->
 		{
-			cpaController.validateCPAImpl(cpa);
-		}
-		catch (SAXException | IllegalArgumentException e)
-		{
-			throw toWebApplicationException(new BadRequestException(e));
-		}
-		catch (IOException | JAXBException | ParserConfigurationException e)
-		{
-			throw toWebApplicationException(e);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e);
-		}
+			try
+			{
+				cpaController.validateCPAImpl(cpa);
+			}
+			catch (SAXException | IllegalArgumentException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (IOException | JAXBException | ParserConfigurationException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}, MediaType.TEXT_PLAIN);
 	}
 
 	@POST
@@ -78,22 +74,21 @@ public class CPARestController implements WithController
 	@Produces({MediaType.TEXT_PLAIN})
 	public String insertCPA(String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite)
 	{
-		try
+		return execute(() ->
 		{
-			return cpaController.insertCPAImpl(cpa, overwrite);
-		}
-		catch (SAXException | IllegalArgumentException e)
-		{
-			throw toWebApplicationException(new BadRequestException(e), MediaType.TEXT_PLAIN);
-		}
-		catch (IOException | JAXBException | ParserConfigurationException e)
-		{
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
-		catch (RuntimeException e)
-		{
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
+			try
+			{
+				return cpaController.insertCPAImpl(cpa, overwrite);
+			}
+			catch (SAXException | IllegalArgumentException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (IOException | JAXBException | ParserConfigurationException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}, MediaType.TEXT_PLAIN);
 	}
 
 	@DELETE
@@ -115,14 +110,17 @@ public class CPARestController implements WithController
 	@Produces({MediaType.TEXT_PLAIN})
 	public String getCPA(@PathParam("cpaId") String cpaId)
 	{
-		try
+		return execute(() ->
 		{
-			return cpaController.getCPAImpl(cpaId);
-		}
-		catch (JAXBException e)
-		{
-			throw toWebApplicationException(e, MediaType.TEXT_PLAIN);
-		}
+			try
+			{
+				return cpaController.getCPAImpl(cpaId);
+			}
+			catch (JAXBException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}, MediaType.TEXT_PLAIN);
 	}
 
 	@DELETE
