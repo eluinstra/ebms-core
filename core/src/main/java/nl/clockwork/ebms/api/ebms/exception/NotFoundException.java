@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.api.ebms.exception;
 
-import nl.clockwork.ebms.server.processor.EbMSProcessingException;
+import nl.clockwork.ebms.server.processing.EbMSProcessingException;
 
 public class NotFoundException extends EbMSProcessingException
 {

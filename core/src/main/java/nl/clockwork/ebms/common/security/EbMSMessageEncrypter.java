@@ -37,8 +37,8 @@ import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
-import nl.clockwork.ebms.server.processor.EbMSProcessingException;
-import nl.clockwork.ebms.server.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processing.EbMSProcessingException;
+import nl.clockwork.ebms.server.processing.EbMSProcessorException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

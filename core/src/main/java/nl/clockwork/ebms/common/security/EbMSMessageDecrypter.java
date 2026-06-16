@@ -37,7 +37,7 @@ import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
-import nl.clockwork.ebms.server.processor.EbMSProcessingException;
+import nl.clockwork.ebms.server.processing.EbMSProcessingException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

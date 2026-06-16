@@ -24,7 +24,7 @@ import lombok.val;
 import nl.clockwork.ebms.api.ebms.model.Party;
 import nl.clockwork.ebms.common.protocol.EbMSAction;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
-import nl.clockwork.ebms.server.embedded.web.message.EbMSMessageFilter;
+import nl.clockwork.ebms.server.model.embedded.web.EbMSMessageFilter;
 
 public interface WithMessageFilter
 {

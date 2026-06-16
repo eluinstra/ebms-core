@@ -53,7 +53,7 @@ import nl.clockwork.ebms.common.security.EbMSTrustStore;
 import nl.clockwork.ebms.common.security.KeyStoreType;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
-import nl.clockwork.ebms.server.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processing.EbMSProcessorException;
 import org.apache.xml.security.Init;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

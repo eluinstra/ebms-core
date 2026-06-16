@@ -29,8 +29,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import lombok.val;
-import nl.clockwork.ebms.server.EbMSHttpHandler;
-import nl.clockwork.ebms.server.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.http.EbMSHttpHandler;
+import nl.clockwork.ebms.server.processing.EbMSProcessorException;
 import org.junit.jupiter.api.Test;
 
 class EbMSServletTest

@@ -33,17 +33,17 @@ import nl.clockwork.ebms.common.security.EncryptionConfig;
 import nl.clockwork.ebms.common.security.KeyStoreConfig;
 import nl.clockwork.ebms.common.security.SigningConfig;
 import nl.clockwork.ebms.common.transaction.TransactionManagerConfig;
-import nl.clockwork.ebms.server.processor.EbMSProcessorConfig;
+import nl.clockwork.ebms.server.config.EbMSMessageProcessorConfig;
 import nl.clockwork.ebms.server.validation.ValidationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({PropertiesConfig.class, EmbeddedWebConfig.class, nl.clockwork.ebms.server.EbMSServerConfig.class, EbMSControllerConfig.class,
-		EbMSProcessorConfig.class, MessageEventListenerConfig.class, CommonConfig.class, DeliveryManagerConfig.class, EbMSClientConfig.class, KeyStoreConfig.class,
-		CertificateMappingConfig.class, CertificateMappingControllerConfig.class, DAOConfig.class, DeliveryTaskManagerConfig.class, ValidationConfig.class,
-		EncryptionConfig.class, SigningConfig.class, CPAControllerConfig.class, CPAConfig.class, URLMappingConfig.class, URLMappingControllerConfig.class,
-		DataSourceConfig.class, TransactionManagerConfig.class})
+@Import({PropertiesConfig.class, EmbeddedWebConfig.class, nl.clockwork.ebms.server.config.EbMSServerConfig.class, EbMSControllerConfig.class,
+		EbMSMessageProcessorConfig.class, MessageEventListenerConfig.class, CommonConfig.class, DeliveryManagerConfig.class, EbMSClientConfig.class,
+		KeyStoreConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, DAOConfig.class, DeliveryTaskManagerConfig.class,
+		ValidationConfig.class, EncryptionConfig.class, SigningConfig.class, CPAControllerConfig.class, CPAConfig.class, URLMappingConfig.class,
+		URLMappingControllerConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 public class EbMSServerConfig
 {
 

@@ -32,8 +32,8 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.model.EbMSDocument;
-import nl.clockwork.ebms.server.processor.EbMSProcessingException;
-import nl.clockwork.ebms.server.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.processing.EbMSProcessingException;
+import nl.clockwork.ebms.server.processing.EbMSProcessorException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
