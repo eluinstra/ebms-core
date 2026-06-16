@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskStatus;
+import nl.clockwork.ebms.client.api.DeliveryTaskStatus;
 import nl.clockwork.ebms.common.protocol.EbMSAction;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.web.Utils;

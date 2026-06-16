@@ -28,7 +28,7 @@ import jakarta.jms.Session;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
-import nl.clockwork.ebms.client.delivery.EbMSDAO;
+import nl.clockwork.ebms.client.sync.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventType;
 import nl.clockwork.ebms.common.model.EbMSMessageProperties;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;

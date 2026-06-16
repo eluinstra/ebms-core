@@ -20,8 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTask;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandler;
+import nl.clockwork.ebms.client.api.DeliveryTask;
+import nl.clockwork.ebms.client.async.handler.DeliveryTaskHandler;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.listener.MessageListener;
 

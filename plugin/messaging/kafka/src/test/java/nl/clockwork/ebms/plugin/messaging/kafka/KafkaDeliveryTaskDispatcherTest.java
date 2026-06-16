@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.client.api.DeliveryTask;
 import org.junit.jupiter.api.Test;
 import org.springframework.kafka.core.KafkaTemplate;
 

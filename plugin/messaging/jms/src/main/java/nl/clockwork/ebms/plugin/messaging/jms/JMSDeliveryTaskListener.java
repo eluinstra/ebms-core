@@ -25,8 +25,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTask;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandler;
+import nl.clockwork.ebms.client.api.DeliveryTask;
+import nl.clockwork.ebms.client.async.handler.DeliveryTaskHandler;
 
 @Slf4j
 @RequiredArgsConstructor

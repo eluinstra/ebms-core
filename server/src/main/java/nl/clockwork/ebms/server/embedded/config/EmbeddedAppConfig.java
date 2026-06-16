@@ -22,10 +22,10 @@ import nl.clockwork.ebms.api.certificate.soap.CertificateMappingControllerConfig
 import nl.clockwork.ebms.api.cpa.soap.CPAControllerConfig;
 import nl.clockwork.ebms.api.ebms.soap.EbMSControllerConfig;
 import nl.clockwork.ebms.api.url.soap.URLMappingControllerConfig;
-import nl.clockwork.ebms.client.delivery.DeliveryManagerConfig;
-import nl.clockwork.ebms.client.delivery.http.EbMSClientConfig;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskHandlerConfig;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManagerConfig;
+import nl.clockwork.ebms.client.async.handler.DeliveryTaskHandlerConfig;
+import nl.clockwork.ebms.client.async.handler.DeliveryTaskManagerConfig;
+import nl.clockwork.ebms.client.sync.DeliveryManagerConfig;
+import nl.clockwork.ebms.client.transport.http.EbMSClientConfig;
 import nl.clockwork.ebms.common.cache.CacheConfig;
 import nl.clockwork.ebms.common.cpa.CPAConfig;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingConfig;

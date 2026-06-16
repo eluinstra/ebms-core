@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.ObjectMessage;
 import java.time.Instant;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.client.api.DeliveryTask;
 import org.junit.jupiter.api.Test;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;

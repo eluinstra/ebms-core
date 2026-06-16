@@ -21,8 +21,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTask;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskDispatcher;
+import nl.clockwork.ebms.client.api.DeliveryTask;
+import nl.clockwork.ebms.client.api.DeliveryTaskDispatcher;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
-import nl.clockwork.ebms.client.delivery.DeliveryManagerConfig.DeliveryManagerType;
+import nl.clockwork.ebms.client.sync.DeliveryManagerConfig.DeliveryManagerType;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Environment;

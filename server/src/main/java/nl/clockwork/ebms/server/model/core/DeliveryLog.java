@@ -23,7 +23,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskStatus;
+import nl.clockwork.ebms.client.api.DeliveryTaskStatus;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)

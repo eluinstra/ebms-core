@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.delivery.EbMSDAO;
+import nl.clockwork.ebms.client.sync.EbMSDAO;
 import nl.clockwork.ebms.common.event.LoggingMessageEventListener;
 import nl.clockwork.ebms.common.event.MessageEventException;
 import nl.clockwork.ebms.common.event.MessageEventType;

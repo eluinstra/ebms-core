@@ -31,7 +31,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.client.delivery.task.DeliveryTaskManager;
+import nl.clockwork.ebms.client.api.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.dao.EbMSDAO;

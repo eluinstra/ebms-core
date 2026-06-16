@@ -22,7 +22,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory;
+import nl.clockwork.ebms.client.transport.http.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.model.EbMSPong;
 import nl.clockwork.ebms.common.model.EbMSResponseMessage;

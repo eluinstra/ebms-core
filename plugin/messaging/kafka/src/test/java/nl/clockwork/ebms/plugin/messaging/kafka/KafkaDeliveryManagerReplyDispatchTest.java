@@ -31,7 +31,7 @@ class KafkaDeliveryManagerReplyDispatchTest
 		final KafkaTemplate<String, Object> template = mock(KafkaTemplate.class);
 		final KafkaDeliveryManager manager = KafkaDeliveryManager.kafkaDeliveryManagerBuilder()
 				.cpaManager(mock(nl.clockwork.ebms.common.cpa.CPAManager.class))
-				.ebMSClientFactory(mock(nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory.class))
+				.ebMSClientFactory(mock(nl.clockwork.ebms.client.transport.http.EbMSHttpClientFactory.class))
 				.kafkaTemplate(template)
 				.replyTopic("ebms-message-replies")
 				.replyTimeoutMs(1000)
@@ -48,7 +48,7 @@ class KafkaDeliveryManagerReplyDispatchTest
 		final KafkaTemplate<String, Object> template = mock(KafkaTemplate.class);
 		final KafkaDeliveryManager manager = KafkaDeliveryManager.kafkaDeliveryManagerBuilder()
 				.cpaManager(mock(nl.clockwork.ebms.common.cpa.CPAManager.class))
-				.ebMSClientFactory(mock(nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory.class))
+				.ebMSClientFactory(mock(nl.clockwork.ebms.client.transport.http.EbMSHttpClientFactory.class))
 				.kafkaTemplate(template)
 				.replyTopic("ebms-message-replies")
 				.replyTimeoutMs(1000)
@@ -64,7 +64,7 @@ class KafkaDeliveryManagerReplyDispatchTest
 		final KafkaTemplate<String, Object> template = mock(KafkaTemplate.class);
 		final KafkaDeliveryManager manager = KafkaDeliveryManager.kafkaDeliveryManagerBuilder()
 				.cpaManager(mock(nl.clockwork.ebms.common.cpa.CPAManager.class))
-				.ebMSClientFactory(mock(nl.clockwork.ebms.client.delivery.http.EbMSHttpClientFactory.class))
+				.ebMSClientFactory(mock(nl.clockwork.ebms.client.transport.http.EbMSHttpClientFactory.class))
 				.kafkaTemplate(template)
 				.replyTopic("ebms-message-replies")
 				.replyTimeoutMs(1000)
