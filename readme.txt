@@ -25,3 +25,23 @@ Notes:
 - DB schema and SQL changes should be reflected in plugin/db and test resources
 	under core/resources/test.
 - For broader project docs, see https://eluinstra.github.io/ebms-admin/
+
+Dependency Vulnerability Check:
+
+Run dependency check to scan for known vulnerabilities in dependencies:
+
+	mvn -f ebms-core/pom.xml -B dependency-check:aggregate
+
+The check fails if any vulnerability with CVSS score >= 7 (HIGH) is found.
+
+Optional: Add NVD API key for faster updates (required for production CI/CD):
+
+	mvn -f ebms-core/pom.xml -B dependency-check:aggregate -Dnvd.apikey=YOUR_API_KEY
+
+Configure API key in ~/.m2/settings.xml:
+
+	<settings>
+	  <properties>
+	    <nvd.apikey>YOUR_API_KEY</nvd.apikey>
+	  </properties>
+	</settings>

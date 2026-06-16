@@ -524,6 +524,24 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>12.2.2</version>
+        <configuration>
+          <failBuildOnCVSS>7</failBuildOnCVSS>
+          <nvdApiKey>${nvd.apikey}</nvdApiKey>
+          <retryTimeout>120</retryTimeout>
+          <autoUpdate>false</autoUpdate>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.commonjava.maven.plugins</groupId>
         <artifactId>directory-maven-plugin</artifactId>
         <version>1.0</version>
@@ -915,6 +933,12 @@
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
         <version>12.2.2</version>
+        <configuration>
+          <suppressionFiles>
+            <suppressionFile>${session.executionRootDirectory}/dependency-check-suppressions.xml</suppressionFile>
+          </suppressionFiles>
+          <failBuildOnCVSS>7</failBuildOnCVSS>
+        </configuration>
         <reportSets>
           <reportSet>
             <reports>
