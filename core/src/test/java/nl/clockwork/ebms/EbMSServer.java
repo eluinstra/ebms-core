@@ -33,8 +33,8 @@ public class EbMSServer
 {
 	public Server createServer() throws Exception
 	{
-		var result = new Server();
-		var handlerCollection = new Handler.Sequence();
+		val result = new Server();
+		val handlerCollection = new Handler.Sequence();
 		result.setHandler(handlerCollection);
 		try (val context = new AnnotationConfigWebApplicationContext())
 		{

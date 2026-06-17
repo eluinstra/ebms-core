@@ -18,13 +18,14 @@ package nl.clockwork.ebms;
 import io.restassured.internal.multipart.MultiPartSpecificationImpl;
 import io.restassured.specification.MultiPartSpecification;
 import java.util.Map;
+import lombok.val;
 
 public interface WithRestAssured
 {
 
 	default MultiPartSpecification createEbMSPart(String content)
 	{
-		var result = new MultiPartSpecificationImpl();
+		val result = new MultiPartSpecificationImpl();
 		result.setHeaders(Map.of());
 		result.setMimeType("text/xml");
 		result.setContent(content);
@@ -33,7 +34,7 @@ public interface WithRestAssured
 
 	default MultiPartSpecification createAfleverberichtAttachment(String cid, String content)
 	{
-		var result = new MultiPartSpecificationImpl();
+		val result = new MultiPartSpecificationImpl();
 		result.setHeaders(Map.of());
 		result.setControlName(cid);
 		result.setMimeType("text/xml");

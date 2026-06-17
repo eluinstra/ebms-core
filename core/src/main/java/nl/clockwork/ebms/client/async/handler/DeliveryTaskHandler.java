@@ -43,7 +43,7 @@ import nl.clockwork.ebms.common.security.EbMSMessageEncrypter;
 import nl.clockwork.ebms.common.util.LoggingUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils.Status;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.server.processing.EbMSMessageProcessor;
+import nl.clockwork.ebms.server.processing.message.EbMSMessageProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;

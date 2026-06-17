@@ -28,7 +28,7 @@ import nl.clockwork.ebms.client.transport.http.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.security.EbMSMessageEncrypter;
-import nl.clockwork.ebms.server.processing.EbMSMessageProcessor;
+import nl.clockwork.ebms.server.processing.message.EbMSMessageProcessor;
 import org.jgroups.JChannel;
 import org.jgroups.raft.RaftHandle;
 import org.jgroups.raft.StateMachine;

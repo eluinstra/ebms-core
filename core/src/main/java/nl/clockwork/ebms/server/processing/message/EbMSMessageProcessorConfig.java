@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.server.config;
+package nl.clockwork.ebms.server.processing.message;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -25,8 +25,9 @@ import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.message.EbMSMessageFactory;
 import nl.clockwork.ebms.common.security.EbMSSignatureGenerator;
-import nl.clockwork.ebms.server.processing.MessageRouter;
+import nl.clockwork.ebms.server.processing.acknowledgment.AcknowledgmentProcessor;
 import nl.clockwork.ebms.server.processing.duplicate.DuplicateMessageHandler;
+import nl.clockwork.ebms.server.processing.error.MessageErrorProcessor;
 import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -40,13 +41,13 @@ public class EbMSMessageProcessorConfig
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Bean
-	public MessageRouter messageProcessor(
-			DeliveryTaskManager deliveryTaskManager,
+	public EbMSMessageProcessor ebMSMessageProcessor(
 			MessageEventListener messageEventListener,
 			EbMSDAO ebMSDAO,
 			CPAManager cpaManager,
 			EbMSMessageFactory ebMSMessageFactory,
 			DeliveryManager deliveryManager,
+			DeliveryTaskManager deliveryTaskManager,
 			EbMSSignatureGenerator signatureGenerator,
 			EbMSMessageValidator messageValidator)
 	{
@@ -56,17 +57,37 @@ public class EbMSMessageProcessorConfig
 				.deliveryTaskManager(deliveryTaskManager)
 				.messageValidator(messageValidator)
 				.build();
-		return MessageRouter.builder()
-				.deliveryManager(deliveryManager)
+		val messageErrorProcessor = MessageErrorProcessor.builder()
+				.ebMSDAO(ebMSDAO)
+				.cpaManager(cpaManager)
+				.deliveryTaskManager(deliveryTaskManager)
+				.messageValidator(messageValidator)
+				.duplicateMessageHandler(duplicateMessageHandler)
+				.ebMSMessageFactory(ebMSMessageFactory)
+				.signatureGenerator(signatureGenerator)
+				.messageEventListener(messageEventListener)
+				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
+				.build();
+		val acknowledgmentProcessor = AcknowledgmentProcessor.builder()
+				.ebMSDAO(ebMSDAO)
+				.cpaManager(cpaManager)
+				.deliveryTaskManager(deliveryTaskManager)
+				.messageValidator(messageValidator)
+				.duplicateMessageHandler(duplicateMessageHandler)
+				.ebMSMessageFactory(ebMSMessageFactory)
+				.signatureGenerator(signatureGenerator)
+				.messageEventListener(messageEventListener)
+				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
+				.build();
+		return EbMSMessageProcessor.builder()
 				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.ebMSMessageFactory(ebMSMessageFactory)
-				.deliveryTaskManager(deliveryTaskManager)
-				.signatureGenerator(signatureGenerator)
 				.messageValidator(messageValidator)
 				.duplicateMessageHandler(duplicateMessageHandler)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
+				.messageErrorProcessor(messageErrorProcessor)
+				.acknowledgmentProcessor(acknowledgmentProcessor)
 				.build();
 	}
 }

@@ -36,6 +36,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
 
+import lombok.val;
+
 /**
  * Verifies the reply-correlation path of {@link KafkaDeliveryManager}: registered futures are completed when a record with the matching key lands on the reply
  * topic, and outbound replies produced via {@code handleResponseMessage} are keyed by {@code refToMessageId} on the configured topic.
@@ -68,8 +70,8 @@ class KafkaDeliveryManagerIT
 	@Test
 	void handleResponseMessagePublishesToReplyTopic() throws Exception
 	{
-		final KafkaTemplate<String, Object> template = KafkaTestSupport.newTemplate(KAFKA.getBootstrapServers());
-		final KafkaDeliveryManager manager = KafkaDeliveryManager.kafkaDeliveryManagerBuilder()
+		val template = KafkaTestSupport.newTemplate(KAFKA.getBootstrapServers());
+		val manager = KafkaDeliveryManager.kafkaDeliveryManagerBuilder()
 				.cpaManager(mock(CPAManager.class))
 				.ebMSClientFactory(mock(EbMSHttpClientFactory.class))
 				.kafkaTemplate(template)
@@ -77,14 +79,14 @@ class KafkaDeliveryManagerIT
 				.replyTimeoutMs(10_000)
 				.build();
 
-		final EbMSPong pong = EbMSPong.builder().messageHeader(newMessageHeader("msg-ref-2")).build();
+		val pong = EbMSPong.builder().messageHeader(newMessageHeader("msg-ref-2")).build();
 		manager.handleResponseMessage(pong);
 
 		try (KafkaConsumer<String, Object> consumer =
 				new KafkaConsumer<>(KafkaTestSupport.consumerProps(KAFKA.getBootstrapServers(), KafkaTestSupport.randomGroupId("it-mgr"))))
 		{
 			consumer.subscribe(Collections.singletonList("ebms-message-replies"));
-			final var record = KafkaTestSupport.awaitOne(consumer, Duration.ofSeconds(30));
+			val record = KafkaTestSupport.awaitOne(consumer, Duration.ofSeconds(30));
 			assertThat(record.key()).isEqualTo("msg-ref-2");
 			assertThat(record.value()).isInstanceOf(EbMSPong.class);
 		}
@@ -92,8 +94,8 @@ class KafkaDeliveryManagerIT
 
 	private static MessageHeader newMessageHeader(String refToMessageId)
 	{
-		final MessageHeader header = new MessageHeader();
-		final MessageData data = new MessageData();
+		val header = new MessageHeader();
+		val data = new MessageData();
 		data.setRefToMessageId(refToMessageId);
 		header.setMessageData(data);
 		return header;

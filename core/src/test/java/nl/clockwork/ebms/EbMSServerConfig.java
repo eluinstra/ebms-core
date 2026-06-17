@@ -34,6 +34,7 @@ import nl.clockwork.ebms.common.security.KeyStoreConfig;
 import nl.clockwork.ebms.common.security.SigningConfig;
 import nl.clockwork.ebms.common.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.server.config.EbMSMessageProcessorConfig;
+import nl.clockwork.ebms.server.processing.message.EbMSMessageProcessorConfig;
 import nl.clockwork.ebms.server.validation.ValidationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;

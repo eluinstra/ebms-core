@@ -37,8 +37,8 @@ import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.protocol.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.ValidationException;
-import nl.clockwork.ebms.server.processing.EbMSMessageProcessor;
 import nl.clockwork.ebms.server.processing.EbMSProcessingException;
+import nl.clockwork.ebms.server.processing.MessageRouter;
 import org.apache.james.mime4j.MimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,16 +53,16 @@ public abstract class EbMSInputStreamHandler
 
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
-	EbMSMessageProcessor messageProcessor;
+	MessageRouter messageProcessor;
 	long maxRequestBytes;
 	int maxLoggedPayloadChars;
 
-	protected EbMSInputStreamHandler(@NonNull EbMSMessageProcessor messageProcessor)
+	protected EbMSInputStreamHandler(@NonNull MessageRouter messageProcessor)
 	{
 		this(messageProcessor, DEFAULT_MAX_REQUEST_BYTES, DEFAULT_MAX_LOGGED_PAYLOAD_CHARS);
 	}
 
-	protected EbMSInputStreamHandler(@NonNull EbMSMessageProcessor messageProcessor, long maxRequestBytes, int maxLoggedPayloadChars)
+	protected EbMSInputStreamHandler(@NonNull MessageRouter messageProcessor, long maxRequestBytes, int maxLoggedPayloadChars)
 	{
 		this.messageProcessor = messageProcessor;
 		this.maxRequestBytes = maxRequestBytes;

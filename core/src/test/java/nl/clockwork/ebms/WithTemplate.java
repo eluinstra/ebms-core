@@ -63,7 +63,7 @@ public interface WithTemplate
 
 	default Context ebMSPingContext(String uuid)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("timeToLive", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date(System.currentTimeMillis() + 3600 * 1000)));
@@ -77,7 +77,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageContext(String uuid)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -100,7 +100,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageContextWithAttachments(String uuid, List<String> cids)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -124,7 +124,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageStatusContext(String uuid, String refToMessageId)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -189,7 +189,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidCPAIdContext(String uuid, String cpaId)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", cpaId);
@@ -207,7 +207,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidFromPartyIdContext(String uuid, String fromPartyId)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -225,7 +225,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidFromPartyTypeContext(String uuid, String partyType)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -248,7 +248,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidFromRoleContext(String uuid, String fromRole)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -271,7 +271,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidToPartyIdContext(String uuid, String toPartyId)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -289,7 +289,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidToPartyTypeContext(String uuid, String partyType)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -312,7 +312,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidToRoleContext(String uuid, String toRole)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -330,7 +330,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidServiceContext(String uuid, String service)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -348,7 +348,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidServiceTypeContext(String uuid, String serviceType)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -366,7 +366,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageInvalidActionContext(String uuid, String action)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date()));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");
@@ -389,7 +389,7 @@ public interface WithTemplate
 
 	default Context ebMSMessageTimeToLiveExpiredContext(String uuid)
 	{
-		var result = new Context();
+		val result = new Context();
 		result.setVariable("uuid", uuid);
 		result.setVariable("timestamp", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date(System.currentTimeMillis() - 3600 * 1000)));
 		result.setVariable("cpaId", "cpaStubEBF.rm.http.unsigned.sync");

@@ -25,23 +25,23 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.server.processing.EbMSMessageProcessor;
 import nl.clockwork.ebms.server.processing.EbMSProcessorException;
+import nl.clockwork.ebms.server.processing.MessageRouter;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSHttpHandler
 {
 	@NonNull
-	EbMSMessageProcessor messageProcessor;
+	MessageRouter messageProcessor;
 	long maxRequestBytes;
 	int maxLoggedPayloadChars;
 
-	public EbMSHttpHandler(@NonNull EbMSMessageProcessor messageProcessor)
+	public EbMSHttpHandler(@NonNull MessageRouter messageProcessor)
 	{
 		this(messageProcessor, EbMSInputStreamHandler.DEFAULT_MAX_REQUEST_BYTES, EbMSInputStreamHandler.DEFAULT_MAX_LOGGED_PAYLOAD_CHARS);
 	}
 
-	public EbMSHttpHandler(@NonNull EbMSMessageProcessor messageProcessor, long maxRequestBytes, int maxLoggedPayloadChars)
+	public EbMSHttpHandler(@NonNull MessageRouter messageProcessor, long maxRequestBytes, int maxLoggedPayloadChars)
 	{
 		this.messageProcessor = messageProcessor;
 		this.maxRequestBytes = maxRequestBytes;

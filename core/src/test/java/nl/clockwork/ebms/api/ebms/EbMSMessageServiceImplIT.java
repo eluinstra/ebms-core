@@ -136,7 +136,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(4)
 	void ebMSMessage()
 	{
-		var response = RestAssured.with()
+		val response = RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
 				.body(ebMSMessage(templateEngine, ebMSMessageContext(messageId)))
@@ -169,7 +169,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(5)
 	void ebMSMessageStatus()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -260,7 +260,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(9)
 	void ebMSMessageStatusAgain()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -338,7 +338,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(12)
 	void ebMSMessageInvalidMessageHeaderVersion()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -370,7 +370,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(13)
 	void ebMSMessageInvalidCPAId()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -388,7 +388,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(14)
 	void ebMSMessageInvalidFromPartyId()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -420,7 +420,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(15)
 	void ebMSMessageInvalidFromPartyType()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -452,7 +452,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(16)
 	void ebMSMessageMissingFromPartyId()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -468,7 +468,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(17)
 	void ebMSMessageInvalidFromRole()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -500,7 +500,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(18)
 	void ebMSMessageMissingFromRole()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -532,7 +532,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(19)
 	void ebMSMessageInvalidToPartyId()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -564,7 +564,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(20)
 	void ebMSMessageInvalidToPartyType()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -596,7 +596,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(21)
 	void ebMSMessageInvalidToRole()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -628,7 +628,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(22)
 	void ebMSMessageInvalidService()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -660,7 +660,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(23)
 	void ebMSMessageInvalidServiceType()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -692,7 +692,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(24)
 	void ebMSMessageInvalidAction()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -724,7 +724,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(25)
 	void ebMSMessageInvalidRefToMessageId()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -756,7 +756,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(26)
 	void ebMSMessageTimeToLiveExpired()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -787,7 +787,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(27)
 	void ebMSMessageMissingDuplicateElimination()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -819,7 +819,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(28)
 	void ebMSMessageMissingAckRequested()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -851,7 +851,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(29)
 	void ebMSMessageInvalidAckRequestedVersion()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -883,7 +883,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(30)
 	void ebMSMessageNextMshAckRequested()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -915,7 +915,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(31)
 	void ebMSMessageInvalidAckRequestedActor()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -947,7 +947,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(32)
 	void ebMSMessageInvalidAckRequestedSigned()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -979,7 +979,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(33)
 	void ebMSMessageMissingSyncReply()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1011,7 +1011,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(34)
 	void ebMSMessageInvalidSyncReplyVersion()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1043,7 +1043,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(35)
 	void ebMSMessageInvalidSyncReplyActor()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1075,7 +1075,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(36)
 	void ebMSMessageMessageOrder()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1107,7 +1107,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(37)
 	void ebMSMessageMissingManifest()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1136,7 +1136,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(38)
 	void ebMSMessageInvalidManifestVersion()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1168,7 +1168,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(39)
 	void ebMSMessageInvalidCID()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1200,7 +1200,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(40)
 	void ebMSMessageUnknownCID()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1232,7 +1232,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(41)
 	void ebMSMessageMissingReference()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1248,7 +1248,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(42)
 	void ebMSMessageInvalidReference()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")
@@ -1280,7 +1280,7 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 	@Order(43)
 	void ebMSPingXXE()
 	{
-		var uuid = randomUUID().toString();
+		val uuid = randomUUID().toString();
 		RestAssured.with()
 				.header("SOAPAction", "\"ebXML\"")
 				.header("Content-Type", "text/xml; charset=UTF-8")

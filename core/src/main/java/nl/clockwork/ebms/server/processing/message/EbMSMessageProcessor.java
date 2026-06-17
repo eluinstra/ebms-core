@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.server.processing;
+package nl.clockwork.ebms.server.processing.message;
 
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.soap.SOAPException;
@@ -30,37 +30,27 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import nl.clockwork.ebms.client.api.DeliveryManager;
-import nl.clockwork.ebms.client.api.DeliveryTaskManager;
-import nl.clockwork.ebms.client.api.DeliveryTaskManager;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventListener;
-import nl.clockwork.ebms.common.message.EbMSMessageFactory;
 import nl.clockwork.ebms.common.message.EbMSMessageUtils;
 import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.common.model.EbMSBaseMessage;
 import nl.clockwork.ebms.common.model.EbMSDocument;
 import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.model.EbMSMessageError;
 import nl.clockwork.ebms.common.model.EbMSMessageResponse;
-import nl.clockwork.ebms.common.model.EbMSPing;
-import nl.clockwork.ebms.common.model.EbMSPong;
-import nl.clockwork.ebms.common.model.EbMSStatusRequest;
-import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
-import nl.clockwork.ebms.common.security.EbMSSignatureGenerator;
 import nl.clockwork.ebms.common.util.EbMSValidationException;
 import nl.clockwork.ebms.common.util.LoggingUtils;
 import nl.clockwork.ebms.common.util.LoggingUtils.Status;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.common.util.XSDValidator;
+import nl.clockwork.ebms.server.processing.EbMSProcessingException;
+import nl.clockwork.ebms.server.processing.EbMSProcessorException;
 import nl.clockwork.ebms.server.processing.acknowledgment.AcknowledgmentProcessor;
 import nl.clockwork.ebms.server.processing.duplicate.DuplicateMessageHandler;
 import nl.clockwork.ebms.server.processing.error.MessageErrorProcessor;
-import nl.clockwork.ebms.server.processing.pong.PongProcessor;
-import nl.clockwork.ebms.server.processing.status.StatusResponseProcessor;
 import nl.clockwork.ebms.server.validation.DuplicateMessageException;
 import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import org.slf4j.MDC;
@@ -82,23 +72,21 @@ public class EbMSMessageProcessor
 	DuplicateMessageHandler duplicateMessageHandler;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
+	@NonNull
 	MessageErrorProcessor messageErrorProcessor;
+	@NonNull
 	AcknowledgmentProcessor acknowledgmentProcessor;
-	StatusResponseProcessor statusResponseProcessor;
-	PongProcessor pongProcessor;
 
 	@Builder
 	public EbMSMessageProcessor(
-			@NonNull DeliveryManager deliveryManager,
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,
 			@NonNull CPAManager cpaManager,
-			@NonNull EbMSMessageFactory ebMSMessageFactory,
-			@NonNull DeliveryTaskManager deliveryTaskManager,
-			@NonNull EbMSSignatureGenerator signatureGenerator,
 			@NonNull EbMSMessageValidator messageValidator,
 			@NonNull DuplicateMessageHandler duplicateMessageHandler,
-			boolean deleteEbMSAttachmentsOnMessageProcessed)
+			boolean deleteEbMSAttachmentsOnMessageProcessed,
+			MessageErrorProcessor messageErrorProcessor,
+			AcknowledgmentProcessor acknowledgmentProcessor)
 	{
 		super();
 		this.messageEventListener = messageEventListener;
@@ -107,56 +95,23 @@ public class EbMSMessageProcessor
 		this.messageValidator = messageValidator;
 		this.duplicateMessageHandler = duplicateMessageHandler;
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
-		this.messageErrorProcessor = MessageErrorProcessor.builder()
-				.ebMSDAO(ebMSDAO)
-				.cpaManager(cpaManager)
-				.deliveryTaskManager(deliveryTaskManager)
-				.messageValidator(messageValidator)
-				.duplicateMessageHandler(duplicateMessageHandler)
-				.ebMSMessageFactory(ebMSMessageFactory)
-				.signatureGenerator(signatureGenerator)
-				.messageEventListener(messageEventListener)
-				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
-				.build();
-		this.acknowledgmentProcessor = AcknowledgmentProcessor.builder()
-				.ebMSDAO(ebMSDAO)
-				.cpaManager(cpaManager)
-				.deliveryTaskManager(deliveryTaskManager)
-				.messageValidator(messageValidator)
-				.duplicateMessageHandler(duplicateMessageHandler)
-				.ebMSMessageFactory(ebMSMessageFactory)
-				.signatureGenerator(signatureGenerator)
-				.messageEventListener(messageEventListener)
-				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
-				.build();
-		this.statusResponseProcessor = StatusResponseProcessor.builder()
-				.ebMSDAO(ebMSDAO)
-				.cpaManager(cpaManager)
-				.messageValidator(messageValidator)
-				.ebMSMessageFactory(ebMSMessageFactory)
-				.deliveryManager(deliveryManager)
-				.build();
-		this.pongProcessor = PongProcessor.builder()
-				.cpaManager(cpaManager)
-				.messageValidator(messageValidator)
-				.ebMSMessageFactory(ebMSMessageFactory)
-				.deliveryManager(deliveryManager)
-				.build();
+		this.messageErrorProcessor = messageErrorProcessor;
+		this.acknowledgmentProcessor = acknowledgmentProcessor;
 	}
 
-	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
+	public EbMSDocument processRequest(Instant timestamp, EbMSDocument document, EbMSMessage message)
+			throws ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException,
+			TransformerFactoryConfigurationError, TransformerException, XPathExpressionException, EbMSProcessorException
 	{
 		try
 		{
 			xsdValidator.validate(document.getMessage());
-			val timestamp = Instant.now();
-			val message = EbMSMessageUtils.getEbMSMessage(document);
 			if (LoggingUtils.mdc == Status.ENABLED)
 				LoggingUtils.getPropertyMap(message.getMessageHeader()).forEach(MDC::put);
 			val cpaId = message.getMessageHeader().getCPAId();
 			if (!cpaManager.existsCPA(cpaId))
 				throw new ValidationException("CPA " + cpaId + " not found!");
-			return processRequest(timestamp, document, message);
+			return processMessage(timestamp, document, message);
 		}
 		catch (JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
@@ -171,59 +126,6 @@ public class EbMSMessageProcessor
 			if (LoggingUtils.mdc == Status.ENABLED)
 				LoggingUtils.getProperties().forEach(MDC::remove);
 		}
-	}
-
-	private EbMSDocument processRequest(Instant timestamp, EbMSDocument document, EbMSBaseMessage message)
-			throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException,
-			TransformerFactoryConfigurationError, TransformerException, XPathExpressionException
-	{
-		if (message instanceof EbMSMessage ebMSMessage)
-			return processMessage(timestamp, document, ebMSMessage);
-		else if (message instanceof EbMSMessageError messageError)
-		{
-			val requestMessage = getRequestMessage(messageError);
-			if (requestMessage.getSyncReply() != null)
-				throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-			messageErrorProcessor.processMessageError(timestamp, document, requestMessage, messageError);
-			return null;
-		}
-		else if (message instanceof EbMSAcknowledgment acknowledgment)
-		{
-			val requestMessage = getRequestMessage(acknowledgment);
-			if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
-				throw new EbMSProcessingException("No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-			acknowledgmentProcessor.processAcknowledgment(timestamp, document, requestMessage, acknowledgment);
-			return null;
-		}
-		else if (message instanceof EbMSStatusRequest statusRequest)
-		{
-			return processStatusRequest(statusRequest);
-		}
-		else if (message instanceof EbMSStatusResponse statusResponse)
-		{
-			statusResponseProcessor.processStatusResponse(statusResponse);
-			return null;
-		}
-		else if (message instanceof EbMSPing ping)
-		{
-			return processPing(ping);
-		}
-		else if (message instanceof EbMSPong pong)
-		{
-			pongProcessor.processPong(pong);
-			return null;
-		}
-		else
-			throw new EbMSProcessingException(
-					"Unable to process message!"
-							+ "\nCPAId="
-							+ message.getMessageHeader().getCPAId()
-							+ "\nand MessageId="
-							+ message.getMessageHeader().getMessageData().getMessageId()
-							+ "\nand Service="
-							+ message.getMessageHeader().getService()
-							+ "\nand Action="
-							+ message.getMessageHeader().getAction());
 	}
 
 	public void processResponse(EbMSDocument request, EbMSDocument response) throws EbMSProcessorException
@@ -366,34 +268,6 @@ public class EbMSMessageProcessor
 			}
 		};
 		ebMSDAO.executeTransaction(updateMessage);
-	}
-
-	private EbMSDocument processStatusRequest(EbMSStatusRequest statusRequest)
-			throws JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
-	{
-		messageValidator.validate(statusRequest);
-		val statusResponse = statusResponseProcessor.createStatusResponse(statusRequest);
-		if (messageValidator.isSyncReply(statusRequest))
-			return EbMSMessageUtils.getEbMSDocument(statusResponse);
-		else
-		{
-			statusResponseProcessor.sendStatusResponse(statusResponse);
-			return null;
-		}
-	}
-
-	private EbMSDocument processPing(EbMSPing ping)
-			throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
-	{
-		messageValidator.validate(ping);
-		val pong = pongProcessor.createPong(ping);
-		if (messageValidator.isSyncReply(ping))
-			return EbMSMessageUtils.getEbMSDocument(pong);
-		else
-		{
-			pongProcessor.sendPong(pong);
-			return null;
-		}
 	}
 
 	private EbMSMessage getRequestMessage(EbMSMessageResponse messageResponse) throws EbMSProcessingException

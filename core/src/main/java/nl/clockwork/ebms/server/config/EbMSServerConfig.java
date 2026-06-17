@@ -18,7 +18,7 @@ package nl.clockwork.ebms.server.config;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.server.http.EbMSHttpHandler;
-import nl.clockwork.ebms.server.processing.EbMSMessageProcessor;
+import nl.clockwork.ebms.server.processing.MessageRouter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,7 @@ public class EbMSServerConfig
 {
 	@Bean
 	public EbMSHttpHandler httpHandler(
-			EbMSMessageProcessor messageProcessor,
+			MessageRouter messageProcessor,
 			@Value("${ebms.request.maxBytes:5242880}") long maxRequestBytes,
 			@Value("${ebms.logging.maxPayloadChars:8192}") int maxLoggedPayloadChars)
 	{
