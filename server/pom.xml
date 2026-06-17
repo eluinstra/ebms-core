@@ -240,11 +240,7 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-nop</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!-- slf4j-nop excluded; logging provided by log4j-slf4j2-impl above -->
   </dependencies>
   <build>
     <plugins>

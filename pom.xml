@@ -264,6 +264,16 @@
         <version>4.0.0</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.26.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j2-impl</artifactId>
+        <version>2.26.0</version>
+      </dependency>
+      <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>1.18.46</version>
@@ -529,8 +539,11 @@
         <configuration>
           <failBuildOnCVSS>7</failBuildOnCVSS>
           <nvdApiKey>${nvd.apikey}</nvdApiKey>
-          <retryTimeout>120</retryTimeout>
           <autoUpdate>false</autoUpdate>
+          <!-- OSS Index Analyzer is disabled - requires authentication token -->
+          <ossindex>false</ossindex>
+          <!-- .NET Assembly Analyzer is disabled - dotnet not available -->
+          <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
         </configuration>
         <executions>
           <execution>
@@ -937,6 +950,10 @@
             <suppressionFile>${session.executionRootDirectory}/dependency-check-suppressions.xml</suppressionFile>
           </suppressionFiles>
           <failBuildOnCVSS>7</failBuildOnCVSS>
+          <!-- OSS Index Analyzer is disabled - requires authentication token -->
+          <ossindex>false</ossindex>
+          <!-- .NET Assembly Analyzer is disabled - dotnet not available -->
+          <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
         </configuration>
         <reportSets>
           <reportSet>
