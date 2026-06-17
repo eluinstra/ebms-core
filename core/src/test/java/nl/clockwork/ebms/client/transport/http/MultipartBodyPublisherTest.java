@@ -32,7 +32,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
-import lombok.val;
 import nl.clockwork.ebms.common.message.EbMSAttachmentFactory;
 import org.junit.jupiter.api.Test;
 
@@ -41,13 +40,13 @@ class MultipartBodyPublisherTest
 	@Test
 	void testXmlPart() throws IOException
 	{
-		val contentId = "contentId";
-		val value = "<content/>";
-		val part = new XmlPart(contentId, value);
+		var contentId = "contentId";
+		var value = "<content/>";
+		var part = new XmlPart(contentId, value);
 
 		assertEquals(part.getContentId(), contentId);
-		val buf = ByteBuffer.allocate(value.length());
-		val input = part.open();
+		var buf = ByteBuffer.allocate(value.length());
+		var input = part.open();
 		assertEquals(value.length(), input.read(buf));
 		assertArrayEquals(value.getBytes(), buf.array());
 
@@ -57,18 +56,18 @@ class MultipartBodyPublisherTest
 	@Test
 	void testAttachmentPart() throws Exception
 	{
-		val contentId = "test";
-		val filename = "test.txt";
-		val value = "Hello world!";
-		val contentType = "text/plain";
-		val part = new AttachmentPart(contentId, filename, () ->
+		var contentId = "test";
+		var filename = "test.txt";
+		var value = "Hello world!";
+		var contentType = "text/plain";
+		var part = new AttachmentPart(contentId, filename, () ->
 		{
 			return Channels.newChannel(new ByteArrayInputStream(value.getBytes()));
 		}, contentType);
 
 		assertEquals(part.getContentId(), contentId);
-		val buf = ByteBuffer.allocate(value.length());
-		val input = part.open();
+		var buf = ByteBuffer.allocate(value.length());
+		var input = part.open();
 		while (input.read(buf) != -1 && buf.hasRemaining())
 		{
 			// nop
@@ -82,14 +81,14 @@ class MultipartBodyPublisherTest
 	@Test
 	void testMultipartFormDataChannel() throws Exception
 	{
-		val value = "<content/>";
-		val channel = new MultipartChannel("boundary", List.<Part>of(new XmlPart("contentId", value)), UTF_8);
+		var value = "<content/>";
+		var channel = new MultipartChannel("boundary", List.<Part>of(new XmlPart("contentId", value)), UTF_8);
 		assertEquals(true, channel.isOpen());
-		val content = new StringBuilder();
+		var content = new StringBuilder();
 		try (channel)
 		{
-			val r = Channels.newReader(channel, UTF_8);
-			val buf = new char[1024 * 8];
+			var r = Channels.newReader(channel, UTF_8);
+			var buf = new char[1024 * 8];
 			int n;
 			while ((n = r.read(buf)) != -1)
 			{
@@ -98,7 +97,7 @@ class MultipartBodyPublisherTest
 		}
 		assertEquals(false, channel.isOpen());
 
-		val expect = """
+		var expect = """
 				--boundary\r
 				Content-Type: text/xml; charset=UTF-8\r
 				Content-ID: <contentId>\r
@@ -112,8 +111,8 @@ class MultipartBodyPublisherTest
 	@Test
 	void testMultipartFormDataChannelException() throws Exception
 	{
-		val exception = new IOException();
-		val channel = new MultipartChannel("boundary", List.<Part>of(new AttachmentPart("contentId", "test.txt", () -> new ReadableByteChannel()
+		var exception = new IOException();
+		var channel = new MultipartChannel("boundary", List.<Part>of(new AttachmentPart("contentId", "test.txt", () -> new ReadableByteChannel()
 		{
 			@Override
 			public void close()
@@ -150,15 +149,15 @@ class MultipartBodyPublisherTest
 	@Test
 	void testMultipartFormData() throws Exception
 	{
-		val httpd = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
+		var httpd = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
 		new Thread(() -> httpd.start()).start();
 		try
 		{
 			EbMSAttachmentFactory.init(null, 1024, null);
-			val publisher = new MultipartBodyPublisher("contentId").addXml("contentId", "<content/>")
+			var publisher = new MultipartBodyPublisher("contentId").addXml("contentId", "<content/>")
 					.addAttachment(EbMSAttachmentFactory.createEbMSAttachment("test.txt", "test", "text/plain", "Hello world!".getBytes()));
-			val client = HttpClient.newHttpClient();
-			val request = HttpRequest.newBuilder(new URI("http", null, "localhost", httpd.getAddress().getPort(), "/", null, null))
+			var client = HttpClient.newHttpClient();
+			var request = HttpRequest.newBuilder(new URI("http", null, "localhost", httpd.getAddress().getPort(), "/", null, null))
 					.header("Content-Type", publisher.contentType())
 					.POST(publisher)
 					.build();

@@ -22,7 +22,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 import nl.clockwork.ebms.api.certificate.soap.CertificateMappingController;
 import nl.clockwork.ebms.api.cpa.soap.CPAController;
 import nl.clockwork.ebms.api.ebms.soap.EbMSController;
@@ -88,7 +87,7 @@ public class EmbeddedWebConfig
 	@Bean
 	public Endpoint ebMSMessageServiceMTOMEndpoint()
 	{
-		val result = new EndpointImpl(cxf(), ebMSMessageServiceMTOM);
+		var result = new EndpointImpl(cxf(), ebMSMessageServiceMTOM);
 		result.setAddress("/ebmsMTOM");
 		result.setServiceName(new QName("http://www.ordina.nl/ebms/2.18", "EbMSMessageService"));
 		result.setEndpointName(new QName("http://www.ordina.nl/ebms/2.18", "EbMSMessagePort"));
@@ -99,28 +98,28 @@ public class EmbeddedWebConfig
 
 	private void enableMTOM(final org.apache.cxf.jaxws.EndpointImpl result)
 	{
-		val binding = (SOAPBinding)result.getBinding();
+		var binding = (SOAPBinding)result.getBinding();
 		binding.setMTOMEnabled(true);
 	}
 
 	@Bean
 	public SpringBus cxf()
 	{
-		val result = new SpringBus();
+		var result = new SpringBus();
 		result.setFeatures(Collections.singletonList(createLoggingFeature()));
 		return result;
 	}
 
 	private LoggingFeature createLoggingFeature()
 	{
-		val result = new LoggingFeature();
+		var result = new LoggingFeature();
 		result.setPrettyLogging(true);
 		return result;
 	}
 
 	private Endpoint publishEndpoint(Object service, String address, String namespaceUri, String serviceName, String endpointName)
 	{
-		val result = new EndpointImpl(cxf(), service);
+		var result = new EndpointImpl(cxf(), service);
 		result.setAddress(address);
 		result.setServiceName(new QName(namespaceUri, serviceName));
 		result.setEndpointName(new QName(namespaceUri, endpointName));

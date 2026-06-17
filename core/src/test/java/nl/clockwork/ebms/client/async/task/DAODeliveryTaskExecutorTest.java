@@ -32,7 +32,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.val;
 import nl.clockwork.ebms.client.api.DeliveryTask;
 import nl.clockwork.ebms.client.api.DeliveryTaskDispatcher;
 import nl.clockwork.ebms.client.async.handler.DAODeliveryTaskExecutor;
@@ -92,7 +91,7 @@ class DAODeliveryTaskExecutorTest
 	@Test
 	void doesNotPollWhenNotLeader() throws Exception
 	{
-		val leaderChecks = new CountDownLatch(5);
+		var leaderChecks = new CountDownLatch(5);
 		when(raftHandle.isLeader()).thenAnswer(inv ->
 		{
 			leaderChecks.countDown();
@@ -107,13 +106,13 @@ class DAODeliveryTaskExecutorTest
 	@Test
 	void pollsAgainAfterLeaderRegained() throws Exception
 	{
-		val callCount = new AtomicInteger();
+		var callCount = new AtomicInteger();
 		when(raftHandle.isLeader()).thenAnswer(inv ->
 		{
 			int n = callCount.getAndIncrement();
 			return n == 0 || n >= 3;
 		});
-		val polled = new CountDownLatch(2);
+		var polled = new CountDownLatch(2);
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
 		{
 			polled.countDown();
@@ -127,9 +126,9 @@ class DAODeliveryTaskExecutorTest
 	void cancelsFutureExceedingTimeout() throws Exception
 	{
 		when(raftHandle.isLeader()).thenReturn(true);
-		val task = sampleTask();
-		val stuck = new CompletableFuture<Void>();
-		val handed = new CountDownLatch(1);
+		var task = sampleTask();
+		var stuck = new CompletableFuture<Void>();
+		var handed = new CountDownLatch(1);
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
 		{
 			if (handed.getCount() > 0)
@@ -149,7 +148,7 @@ class DAODeliveryTaskExecutorTest
 	void destroyTerminatesWorkerQuickly() throws Exception
 	{
 		when(raftHandle.isLeader()).thenReturn(true);
-		val polled = new CountDownLatch(1);
+		var polled = new CountDownLatch(1);
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
 		{
 			polled.countDown();
@@ -157,9 +156,9 @@ class DAODeliveryTaskExecutorTest
 		});
 		executor = build(50, 200);
 		assertTrue(polled.await(2, TimeUnit.SECONDS), "expected worker to start polling before destroy");
-		val start = System.currentTimeMillis();
+		var start = System.currentTimeMillis();
 		executor.destroy();
-		val elapsed = System.currentTimeMillis() - start;
+		var elapsed = System.currentTimeMillis() - start;
 		executor = null;
 		assertTrue(elapsed < 5_000, "destroy() took too long: " + elapsed + " ms");
 	}
@@ -168,8 +167,8 @@ class DAODeliveryTaskExecutorTest
 	void recoversFromDaoFailure() throws Exception
 	{
 		when(raftHandle.isLeader()).thenReturn(true);
-		val invocations = new AtomicInteger();
-		val polled = new CountDownLatch(2);
+		var invocations = new AtomicInteger();
+		var polled = new CountDownLatch(2);
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
 		{
 			int n = invocations.getAndIncrement();

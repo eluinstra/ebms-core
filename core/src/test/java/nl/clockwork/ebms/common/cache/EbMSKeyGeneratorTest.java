@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-import lombok.val;
 import nl.clockwork.ebms.common.model.Party;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -43,7 +42,7 @@ class EbMSKeyGeneratorTest
 
 	public static Stream<Arguments> validInput() throws NoSuchMethodException, SecurityException
 	{
-		val method = Object.class.getMethod("toString");
+		var method = Object.class.getMethod("toString");
 		return Stream.of(
 				of(method, new Object[]{}, "toString[]"),
 				of(method, new Object[]{null}, "toString[]"),
@@ -66,7 +65,7 @@ class EbMSKeyGeneratorTest
 
 	private static PartyId createPartyId(String value, String type)
 	{
-		val partyId = new PartyId();
+		var partyId = new PartyId();
 		partyId.setValue(value);
 		partyId.setType(type);
 		return partyId;

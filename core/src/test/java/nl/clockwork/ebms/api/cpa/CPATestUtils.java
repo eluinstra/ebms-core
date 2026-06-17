@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
-import lombok.val;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
 import nl.clockwork.ebms.common.jaxb.JAXBParser;
 import org.apache.commons.io.IOUtils;
@@ -36,7 +35,7 @@ public class CPATestUtils
 	{
 		try
 		{
-			val s = IOUtils.toString(CPAUtils.class.getResourceAsStream("/nl/clockwork/ebms/cpas/" + cpaId + ".xml"), Charset.forName("UTF-8"));
+			var s = IOUtils.toString(CPAUtils.class.getResourceAsStream("/nl/clockwork/ebms/cpas/" + cpaId + ".xml"), Charset.forName("UTF-8"));
 			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(s));
 		}
 		catch (IOException | JAXBException | SAXException | ParserConfigurationException e)

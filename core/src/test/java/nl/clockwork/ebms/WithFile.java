@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import lombok.val;
 
 public interface WithFile
 {
@@ -34,7 +33,7 @@ public interface WithFile
 	{
 		try
 		{
-			val filePath = Paths.get(ClassLoader.getSystemResource(path).toURI());
+			var filePath = Paths.get(ClassLoader.getSystemResource(path).toURI());
 			return filePath.toFile();
 		}
 		catch (URISyntaxException e)
@@ -47,9 +46,9 @@ public interface WithFile
 	{
 		try
 		{
-			val filePath = Paths.get(ClassLoader.getSystemResource(path).toURI());
-			val contentBuilder = new StringBuilder();
-			try (val stream = Files.lines(filePath, StandardCharsets.UTF_8))
+			var filePath = Paths.get(ClassLoader.getSystemResource(path).toURI());
+			var contentBuilder = new StringBuilder();
+			try (var stream = Files.lines(filePath, StandardCharsets.UTF_8))
 			{
 				stream.forEach(s -> contentBuilder.append(s).append("\n"));
 			}

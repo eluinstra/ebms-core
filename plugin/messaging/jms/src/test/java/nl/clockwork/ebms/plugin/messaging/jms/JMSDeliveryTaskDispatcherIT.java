@@ -19,8 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.ObjectMessage;
-import lombok.val;
-
 import java.time.Instant;
 import nl.clockwork.ebms.client.api.DeliveryTask;
 import org.junit.jupiter.api.Test;
@@ -32,15 +30,15 @@ class JMSDeliveryTaskDispatcherIT
 	@Test
 	void dispatchedTaskIsReceivedFromQueueWithMatchingCorrelationId() throws Exception
 	{
-		val destination = "DELIVERY_TASK";
-		val rawFactory = JmsTestSupport.newConnectionFactory(JmsTestSupport.randomBrokerName("dispatcher-it"));
-		val factory = new SingleConnectionFactory(rawFactory);
+		final String destination = "DELIVERY_TASK";
+		final ConnectionFactory rawFactory = JmsTestSupport.newConnectionFactory(JmsTestSupport.randomBrokerName("dispatcher-it"));
+		final SingleConnectionFactory factory = new SingleConnectionFactory(rawFactory);
 		try
 		{
-			val template = JmsTestSupport.newJmsTemplate(factory);
-			val dispatcher = new JMSDeliveryTaskDispatcher(template, destination);
+			final JmsTemplate template = JmsTestSupport.newJmsTemplate(factory);
+			final JMSDeliveryTaskDispatcher dispatcher = new JMSDeliveryTaskDispatcher(template, destination);
 
-			val task = DeliveryTask.builder()
+			final DeliveryTask task = DeliveryTask.builder()
 					.cpaId("cpa-it")
 					.receiveDeliveryChannelId("rcv")
 					.messageId("msg-it-dispatch")
@@ -49,14 +47,14 @@ class JMSDeliveryTaskDispatcherIT
 
 			assertThat(dispatcher.dispatch(task).get()).isNull();
 
-			val received = template.receive(destination);
+			final var received = template.receive(destination);
 			assertThat(received).isInstanceOf(ObjectMessage.class);
-			val objectMessage = (ObjectMessage)received;
+			final ObjectMessage objectMessage = (ObjectMessage)received;
 			assertThat(objectMessage).isNotNull();
 			assertThat(objectMessage.getJMSCorrelationID()).isEqualTo("msg-it-dispatch");
-			val payload = objectMessage.getObject();
+			final Object payload = objectMessage.getObject();
 			assertThat(payload).isInstanceOf(DeliveryTask.class);
-			val receivedTask = (DeliveryTask)payload;
+			final DeliveryTask receivedTask = (DeliveryTask)payload;
 			assertThat(receivedTask.getMessageId()).isEqualTo("msg-it-dispatch");
 			assertThat(receivedTask.getCpaId()).isEqualTo("cpa-it");
 		}

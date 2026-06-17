@@ -18,7 +18,6 @@ package nl.clockwork.ebms;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 import nl.clockwork.ebms.server.servlet.EbMSServlet;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
@@ -31,15 +30,15 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSServer
 {
-	public Server createServer() throws Exception
+	public Server createServer()
 	{
-		val result = new Server();
-		val handlerCollection = new Handler.Sequence();
+		var result = new Server();
+		var handlerCollection = new Handler.Sequence();
 		result.setHandler(handlerCollection);
-		try (val context = new AnnotationConfigWebApplicationContext())
+		try (var context = new AnnotationConfigWebApplicationContext())
 		{
 			context.register(EbMSServerConfig.class);
-			val contextLoaderListener = new ContextLoaderListener(context);
+			var contextLoaderListener = new ContextLoaderListener(context);
 			result.addConnector(createConnector(result, "web", 8080));
 			handlerCollection.addHandler(webEndpointHandler("web", contextLoaderListener));
 			result.addConnector(createConnector(result, "ebms", 8888));
@@ -50,7 +49,7 @@ public class EbMSServer
 
 	private ServerConnector createConnector(Server server, String name, int port)
 	{
-		val result = new ServerConnector(server);
+		var result = new ServerConnector(server);
 		result.setName(name);
 		result.setPort(port);
 		return result;
@@ -58,7 +57,7 @@ public class EbMSServer
 
 	private ServletContextHandler webEndpointHandler(String name, ContextLoaderListener contextLoaderListener)
 	{
-		val result = new ServletContextHandler();
+		var result = new ServletContextHandler();
 		result.setVirtualHosts(List.of("@" + name));
 		result.setContextPath("/");
 		result.addServlet(CXFServlet.class, "/service/*");
@@ -68,7 +67,7 @@ public class EbMSServer
 
 	private ServletContextHandler ebMSEndpointHandler(String name, ContextLoaderListener contextLoaderListener)
 	{
-		val result = new ServletContextHandler();
+		var result = new ServletContextHandler();
 		result.setVirtualHosts(List.of("@" + name));
 		result.setContextPath("/");
 		result.addServlet(EbMSServlet.class, "/ebms");
@@ -78,7 +77,7 @@ public class EbMSServer
 
 	public static void main(String[] args) throws Exception
 	{
-		val server = new EbMSServer().createServer();
+		var server = new EbMSServer().createServer();
 		server.start();
 		server.join();
 	}

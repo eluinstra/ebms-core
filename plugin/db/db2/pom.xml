@@ -42,7 +42,6 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>nl.clockwork.ebms.common</groupId>

@@ -24,7 +24,6 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class JAXBParserTest
@@ -32,8 +31,8 @@ class JAXBParserTest
 	@Test
 	void shouldHandleSimpleXmlThroughUnsafeStringApi() throws Exception
 	{
-		val parser = JAXBParser.getInstance(SampleMessage.class);
-		val result = parser.handle("<sampleMessage><value>ok</value></sampleMessage>");
+		var parser = JAXBParser.getInstance(SampleMessage.class);
+		var result = parser.handle("<sampleMessage><value>ok</value></sampleMessage>");
 
 		assertNotNull(result);
 		assertEquals("ok", result.value);
@@ -42,8 +41,8 @@ class JAXBParserTest
 	@Test
 	void shouldRejectDocTypeInUnsafeStringApi() throws Exception
 	{
-		val parser = JAXBParser.getInstance(SampleMessage.class);
-		val xml = "<!DOCTYPE sampleMessage [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>" + "<sampleMessage><value>&xxe;</value></sampleMessage>";
+		var parser = JAXBParser.getInstance(SampleMessage.class);
+		var xml = "<!DOCTYPE sampleMessage [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>" + "<sampleMessage><value>&xxe;</value></sampleMessage>";
 
 		assertThrows(JAXBException.class, () -> parser.handle(xml));
 	}

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.Stream;
-import lombok.val;
 import nl.clockwork.ebms.common.model.EbMSPartyInfo;
 import nl.clockwork.ebms.common.model.Party;
 import nl.clockwork.ebms.common.security.EbMSKeyStore;
@@ -112,7 +111,7 @@ public class CPAManagerTest
 
 	private static Service createService(String type, String value)
 	{
-		val result = new Service();
+		var result = new Service();
 		result.setType(type);
 		result.setValue(value);
 		return result;
@@ -224,7 +223,7 @@ public class CPAManagerTest
 
 	private static PartyId createPartyId(String type, String value)
 	{
-		val result = new PartyId();
+		var result = new PartyId();
 		result.setType(type);
 		result.setValue(value);
 		return result;

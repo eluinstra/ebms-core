@@ -18,7 +18,6 @@ package nl.clockwork.ebms.client.transport.http;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import lombok.val;
 import nl.clockwork.ebms.client.transport.ssl.SSLParametersFactory;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +26,8 @@ class SSLParametersFactoryTest
 	@Test
 	void shouldSetOnlyCipherSuitesWhenProtocolsAreNotConfigured()
 	{
-		val cipherSuites = new String[]{"TLS_AES_256_GCM_SHA384"};
-		val result = new SSLParametersFactory(null, cipherSuites).getObject();
+		var cipherSuites = new String[]{"TLS_AES_256_GCM_SHA384"};
+		var result = new SSLParametersFactory(null, cipherSuites).getObject();
 
 		assertNull(result.getProtocols());
 		assertArrayEquals(cipherSuites, result.getCipherSuites());
@@ -37,9 +36,9 @@ class SSLParametersFactoryTest
 	@Test
 	void shouldSetConfiguredProtocolsAndCipherSuites()
 	{
-		val protocols = new String[]{"TLSv1.3", "TLSv1.2"};
-		val cipherSuites = new String[]{"TLS_AES_128_GCM_SHA256"};
-		val result = new SSLParametersFactory(protocols, cipherSuites).getObject();
+		var protocols = new String[]{"TLSv1.3", "TLSv1.2"};
+		var cipherSuites = new String[]{"TLS_AES_128_GCM_SHA256"};
+		var result = new SSLParametersFactory(protocols, cipherSuites).getObject();
 
 		assertArrayEquals(protocols, result.getProtocols());
 		assertArrayEquals(cipherSuites, result.getCipherSuites());
