@@ -25,7 +25,7 @@ import nl.clockwork.ebms.common.dao.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.message.EbMSMessageFactory;
 import nl.clockwork.ebms.common.security.EbMSSignatureGenerator;
-import nl.clockwork.ebms.server.processing.MessageRouter;
+import nl.clockwork.ebms.server.processing.EbMSMessageRouter;
 import nl.clockwork.ebms.server.processing.duplicate.DuplicateMessageHandler;
 import nl.clockwork.ebms.server.validation.EbMSMessageValidator;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +40,7 @@ public class EbMSMessageProcessorConfig
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Bean
-	public MessageRouter messageProcessor(
+	public EbMSMessageRouter messageProcessor(
 			DeliveryTaskManager deliveryTaskManager,
 			MessageEventListener messageEventListener,
 			EbMSDAO ebMSDAO,
@@ -56,7 +56,7 @@ public class EbMSMessageProcessorConfig
 				.deliveryTaskManager(deliveryTaskManager)
 				.messageValidator(messageValidator)
 				.build();
-		return MessageRouter.builder()
+		return EbMSMessageRouter.builder()
 				.deliveryManager(deliveryManager)
 				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)

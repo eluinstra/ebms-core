@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class MessageRouter
+public class EbMSMessageRouter
 {
 	@NonNull
 	MessageEventListener messageEventListener;
@@ -85,7 +85,7 @@ public class MessageRouter
 	PongProcessor pongProcessor;
 
 	@Builder
-	public MessageRouter(
+	public EbMSMessageRouter(
 			@NonNull DeliveryManager deliveryManager,
 			@NonNull MessageEventListener messageEventListener,
 			@NonNull EbMSDAO ebMSDAO,

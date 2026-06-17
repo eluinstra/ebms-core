@@ -30,21 +30,21 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.server.http.EbMSInputStreamHandler;
-import nl.clockwork.ebms.server.processing.MessageRouter;
+import nl.clockwork.ebms.server.processing.EbMSMessageRouter;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSMessageServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
-	transient MessageRouter ebMSMessageProcessor;
+	transient EbMSMessageRouter ebMSMessageProcessor;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
 	{
 		super.init(config);
 		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(java.util.Objects.requireNonNull(getServletContext()));
-		ebMSMessageProcessor = wac.getBean(MessageRouter.class);
+		ebMSMessageProcessor = wac.getBean(EbMSMessageRouter.class);
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class EbMSMessageServlet extends GenericServlet
 		handler.handle(request.getInputStream());
 	}
 
-	public void setEbMSMessageProcessor(MessageRouter ebMSMessageProcessor)
+	public void setEbMSMessageProcessor(EbMSMessageRouter ebMSMessageProcessor)
 	{
 		this.ebMSMessageProcessor = ebMSMessageProcessor;
 	}

@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.val;
-import nl.clockwork.ebms.server.processing.MessageRouter;
+import nl.clockwork.ebms.server.processing.EbMSMessageRouter;
 import org.junit.jupiter.api.Test;
 
 class EbMSInputStreamHandlerTest
@@ -35,7 +35,7 @@ class EbMSInputStreamHandlerTest
 	@Test
 	void handleRejectsRequestLargerThanConfiguredLimit()
 	{
-		val messageProcessor = mock(MessageRouter.class);
+		val messageProcessor = mock(EbMSMessageRouter.class);
 		val handler = new TestHandler(messageProcessor, 16, 128, "POST", 17, "\"ebXML\"");
 
 		handler.handle(new ByteArrayInputStream("x".getBytes(StandardCharsets.UTF_8)));
@@ -55,7 +55,7 @@ class EbMSInputStreamHandlerTest
 		int statusCode;
 		String contentType;
 
-		TestHandler(MessageRouter messageProcessor, long maxRequestBytes, int maxLoggedPayloadChars, String method, long contentLength, String soapAction)
+		TestHandler(EbMSMessageRouter messageProcessor, long maxRequestBytes, int maxLoggedPayloadChars, String method, long contentLength, String soapAction)
 		{
 			super(messageProcessor, maxRequestBytes, maxLoggedPayloadChars);
 			this.method = method;
