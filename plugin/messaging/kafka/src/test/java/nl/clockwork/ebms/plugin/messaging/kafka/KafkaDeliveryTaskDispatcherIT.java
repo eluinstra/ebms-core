@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
-import nl.clockwork.ebms.client.api.DeliveryTask;
+import nl.clockwork.ebms.client.client.DeliveryTask;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.Test;
 import org.springframework.kafka.core.KafkaTemplate;

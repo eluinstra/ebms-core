@@ -22,9 +22,9 @@ import nl.clockwork.ebms.api.certificate.soap.CertificateMappingControllerConfig
 import nl.clockwork.ebms.api.cpa.soap.CPAControllerConfig;
 import nl.clockwork.ebms.api.ebms.soap.EbMSControllerConfig;
 import nl.clockwork.ebms.api.url.soap.URLMappingControllerConfig;
-import nl.clockwork.ebms.client.async.handler.DeliveryTaskHandlerConfig;
-import nl.clockwork.ebms.client.async.handler.DeliveryTaskManagerConfig;
-import nl.clockwork.ebms.client.sync.DeliveryManagerConfig;
+import nl.clockwork.ebms.client.delivery.DeliveryManagerConfig;
+import nl.clockwork.ebms.client.delivery.handler.DeliveryTaskHandlerConfig;
+import nl.clockwork.ebms.client.delivery.handler.DeliveryTaskManagerConfig;
 import nl.clockwork.ebms.client.transport.http.EbMSClientConfig;
 import nl.clockwork.ebms.common.cache.CacheConfig;
 import nl.clockwork.ebms.common.cpa.CPAConfig;
@@ -41,7 +41,6 @@ import nl.clockwork.ebms.common.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.server.config.EbMSServerConfig;
 import nl.clockwork.ebms.server.embedded.dao.AdminDAOConfig;
 import nl.clockwork.ebms.server.embedded.web.EmbeddedWebConfig;
-import nl.clockwork.ebms.server.validation.ValidationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
@@ -53,9 +52,9 @@ import org.springframework.core.io.Resource;
 @Import({AdminDAOConfig.class, CertificateMappingConfig.class, CertificateMappingControllerConfig.class, CacheConfig.class, CommonConfig.class, CPAConfig.class,
 		CPAControllerConfig.class, DAOConfig.class, DataSourceConfig.class, DeliveryManagerConfig.class, DeliveryTaskManagerConfig.class,
 		DeliveryTaskHandlerConfig.class, EbMSClientConfig.class, EbMSControllerConfig.class, nl.clockwork.ebms.server.config.EbMSMessageProcessorConfig.class,
-		EbMSServerConfig.class, nl.clockwork.ebms.server.processing.message.EbMSMessageProcessorConfig.class, EmbeddedWebConfig.class, EncryptionConfig.class,
-		KeyStoreConfig.class, MessageEventListenerConfig.class, SigningConfig.class, TransactionManagerConfig.class, URLMappingConfig.class,
-		URLMappingControllerConfig.class, ValidationConfig.class})
+		EbMSServerConfig.class, nl.clockwork.ebms.server.message.processor.message.EbMSMessageProcessorConfig.class, EmbeddedWebConfig.class,
+		EncryptionConfig.class, KeyStoreConfig.class, MessageEventListenerConfig.class, SigningConfig.class, TransactionManagerConfig.class, URLMappingConfig.class,
+		URLMappingControllerConfig.class, nl.clockwork.ebms.server.security.certificate.ValidationConfig.class})
 @PropertySource(
 		value = {"classpath:nl/clockwork/ebms/default.properties", "classpath:nl/clockwork/ebms/server/default.properties",
 				"file:${ebms.configDir}ebms-server.advanced.properties", "file:${ebms.configDir}ebms-server.properties"},

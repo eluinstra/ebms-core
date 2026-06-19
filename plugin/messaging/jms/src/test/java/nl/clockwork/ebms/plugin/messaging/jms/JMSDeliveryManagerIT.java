@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import jakarta.jms.ConnectionFactory;
-import nl.clockwork.ebms.client.api.DeliveryManager;
+import nl.clockwork.ebms.client.client.DeliveryManager;
 import nl.clockwork.ebms.client.transport.http.EbMSHttpClientFactory;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.model.EbMSPong;

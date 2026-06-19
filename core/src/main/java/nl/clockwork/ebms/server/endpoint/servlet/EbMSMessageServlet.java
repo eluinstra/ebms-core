@@ -1,0 +1,126 @@
+/*
+ * Copyright 2011 Clockwork
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nl.clockwork.ebms.server.endpoint.servlet;
+
+import jakarta.servlet.GenericServlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.server.endpoint.http.EbMSInputStreamHandler;
+import nl.clockwork.ebms.server.message.processor.EbMSMessageRouter;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class EbMSMessageServlet extends GenericServlet
+{
+	private static final long serialVersionUID = 1L;
+	transient EbMSMessageRouter ebMSMessageProcessor;
+
+	@Override
+	public void init(ServletConfig config) throws ServletException
+	{
+		super.init(config);
+		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(java.util.Objects.requireNonNull(getServletContext()));
+		ebMSMessageProcessor = wac.getBean(EbMSMessageRouter.class);
+	}
+
+	@Override
+	public void service(final ServletRequest request, final ServletResponse response) throws ServletException, IOException
+	{
+		if (!(request instanceof HttpServletRequest) || !(response instanceof HttpServletResponse))
+			throw new ServletException("HTTP request/response required");
+		val httpRequest = (HttpServletRequest)request;
+		val httpResponse = (HttpServletResponse)response;
+		val handler = new EbMSInputStreamHandler(ebMSMessageProcessor)
+		{
+			@Override
+			public List<String> getRequestHeaderNames()
+			{
+				val result = new ArrayList<String>();
+				val headerNames = httpRequest.getHeaderNames();
+				while (headerNames.hasMoreElements())
+					result.add((String)headerNames.nextElement());
+				return result;
+			}
+
+			@Override
+			public List<String> getRequestHeaders(String headerName)
+			{
+				val result = new ArrayList<String>();
+				val headers = httpRequest.getHeaders(headerName);
+				while (headers.hasMoreElements())
+					result.add((String)headers.nextElement());
+				return result;
+			}
+
+			@Override
+			public String getRequestHeader(String headerName)
+			{
+				return "Content-Type".equals(headerName) ? request.getContentType() : httpRequest.getHeader(headerName);
+			}
+
+			@Override
+			public String getRequestMethod()
+			{
+				return httpRequest.getMethod();
+			}
+
+			@Override
+			public long getRequestContentLength()
+			{
+				return httpRequest.getContentLengthLong();
+			}
+
+			@Override
+			public void writeResponseStatus(int statusCode)
+			{
+				httpResponse.setStatus(statusCode);
+			}
+
+			@Override
+			public void writeResponseHeader(String name, String value)
+			{
+				if ("Content-Type".equals(name))
+					response.setContentType(value);
+				else
+					httpResponse.setHeader(name, value);
+			}
+
+			@Override
+			public OutputStream getOutputStream() throws IOException
+			{
+				return response.getOutputStream();
+			}
+		};
+		handler.handle(request.getInputStream());
+	}
+
+	public void setEbMSMessageProcessor(EbMSMessageRouter ebMSMessageProcessor)
+	{
+		this.ebMSMessageProcessor = ebMSMessageProcessor;
+	}
+
+}

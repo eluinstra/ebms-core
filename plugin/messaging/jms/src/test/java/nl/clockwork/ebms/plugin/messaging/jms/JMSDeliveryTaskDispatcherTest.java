@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 
 import jakarta.jms.Message;
 import java.time.Instant;
-import nl.clockwork.ebms.client.api.DeliveryTask;
+import nl.clockwork.ebms.client.client.DeliveryTask;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.jms.core.JmsTemplate;

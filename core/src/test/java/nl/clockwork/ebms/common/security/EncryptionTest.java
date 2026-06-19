@@ -52,7 +52,7 @@ import nl.clockwork.ebms.common.model.EbMSMessage;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.EbMSValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
-import nl.clockwork.ebms.server.processing.EbMSProcessorException;
+import nl.clockwork.ebms.server.message.processor.EbMSProcessorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.xml.security.Init;

@@ -27,7 +27,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.api.EbMSClient;
+import nl.clockwork.ebms.client.client.EbMSClient;
 import nl.clockwork.ebms.client.transport.ssl.SSLContextFactory;
 import nl.clockwork.ebms.common.security.EbMSKeyStore;
 import nl.clockwork.ebms.common.security.EbMSTrustStore;

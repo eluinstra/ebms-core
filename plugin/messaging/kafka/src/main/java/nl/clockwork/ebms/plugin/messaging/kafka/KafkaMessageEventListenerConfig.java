@@ -17,7 +17,7 @@ package nl.clockwork.ebms.plugin.messaging.kafka;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.client.sync.EbMSDAO;
+import nl.clockwork.ebms.client.delivery.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

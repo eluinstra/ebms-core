@@ -24,8 +24,8 @@ import static org.mockito.Mockito.when;
 import jakarta.jms.ObjectMessage;
 import jakarta.jms.TextMessage;
 import java.time.Instant;
-import nl.clockwork.ebms.client.api.DeliveryTask;
-import nl.clockwork.ebms.client.async.handler.DeliveryTaskHandler;
+import nl.clockwork.ebms.client.client.DeliveryTask;
+import nl.clockwork.ebms.client.delivery.handler.DeliveryTaskHandler;
 import org.junit.jupiter.api.Test;
 
 class JMSDeliveryTaskListenerTest

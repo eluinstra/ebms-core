@@ -31,7 +31,7 @@ import nl.clockwork.ebms.server.embedded.config.CustomErrorHandler;
 import nl.clockwork.ebms.server.embedded.config.EbMSKeyStore;
 import nl.clockwork.ebms.server.embedded.config.EmbeddedAppConfig;
 import nl.clockwork.ebms.server.embedded.utils.Utils;
-import nl.clockwork.ebms.server.servlet.EbMSServlet;
+import nl.clockwork.ebms.server.endpoint.servlet.EbMSServlet;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;

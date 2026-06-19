@@ -18,7 +18,7 @@ package nl.clockwork.ebms;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.server.servlet.EbMSServlet;
+import nl.clockwork.ebms.server.endpoint.servlet.EbMSServlet;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Handler;

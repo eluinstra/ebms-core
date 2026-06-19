@@ -33,7 +33,7 @@ import nl.clockwork.ebms.common.model.EbMSPong;
 import nl.clockwork.ebms.common.model.EbMSStatusRequest;
 import nl.clockwork.ebms.common.model.EbMSStatusResponse;
 import nl.clockwork.ebms.common.protocol.EbMSAction;
-import nl.clockwork.ebms.server.processing.EbMSProcessingException;
+import nl.clockwork.ebms.server.message.processor.EbMSProcessingException;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;

@@ -31,11 +31,11 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.api.EbMSClient;
+import nl.clockwork.ebms.client.client.EbMSClient;
 import nl.clockwork.ebms.client.transport.ssl.SSLContextFactory;
 import nl.clockwork.ebms.common.model.EbMSDocument;
-import nl.clockwork.ebms.server.processing.EbMSProcessingException;
-import nl.clockwork.ebms.server.processing.EbMSProcessorException;
+import nl.clockwork.ebms.server.message.processor.EbMSProcessingException;
+import nl.clockwork.ebms.server.message.processor.EbMSProcessorException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 

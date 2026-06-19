@@ -19,8 +19,8 @@ import nl.clockwork.ebms.api.certificate.soap.CertificateMappingControllerConfig
 import nl.clockwork.ebms.api.cpa.soap.CPAControllerConfig;
 import nl.clockwork.ebms.api.ebms.soap.EbMSControllerConfig;
 import nl.clockwork.ebms.api.url.soap.URLMappingControllerConfig;
-import nl.clockwork.ebms.client.async.handler.DeliveryTaskManagerConfig;
-import nl.clockwork.ebms.client.sync.DeliveryManagerConfig;
+import nl.clockwork.ebms.client.delivery.DeliveryManagerConfig;
+import nl.clockwork.ebms.client.delivery.handler.DeliveryTaskManagerConfig;
 import nl.clockwork.ebms.client.transport.http.EbMSClientConfig;
 import nl.clockwork.ebms.common.cpa.CPAConfig;
 import nl.clockwork.ebms.common.cpa.certificate.CertificateMappingConfig;
@@ -34,7 +34,7 @@ import nl.clockwork.ebms.common.security.KeyStoreConfig;
 import nl.clockwork.ebms.common.security.SigningConfig;
 import nl.clockwork.ebms.common.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.server.config.EbMSMessageProcessorConfig;
-import nl.clockwork.ebms.server.validation.ValidationConfig;
+import nl.clockwork.ebms.server.security.certificate.ValidationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 

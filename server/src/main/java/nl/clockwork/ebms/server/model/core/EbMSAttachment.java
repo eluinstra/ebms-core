@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.server.model.core;
+package nl.clockwork.ebms.server.message.model.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;

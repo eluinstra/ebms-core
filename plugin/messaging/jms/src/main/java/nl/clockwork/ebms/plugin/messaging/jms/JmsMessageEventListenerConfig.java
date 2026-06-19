@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.client.sync.EbMSDAO;
+import nl.clockwork.ebms.client.delivery.EbMSDAO;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.event.MessageEventType;
 import org.apache.activemq.command.ActiveMQQueue;

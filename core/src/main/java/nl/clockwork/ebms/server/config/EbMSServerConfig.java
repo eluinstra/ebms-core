@@ -17,8 +17,8 @@ package nl.clockwork.ebms.server.config;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.server.http.EbMSHttpHandler;
-import nl.clockwork.ebms.server.processing.EbMSMessageRouter;
+import nl.clockwork.ebms.server.endpoint.http.EbMSHttpHandler;
+import nl.clockwork.ebms.server.message.processor.EbMSMessageRouter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

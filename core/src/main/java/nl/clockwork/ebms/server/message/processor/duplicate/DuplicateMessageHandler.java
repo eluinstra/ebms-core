@@ -1,0 +1,161 @@
+/*
+ * Copyright 2011 Clockwork
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nl.clockwork.ebms.server.message.processor.duplicate;
+
+import javax.xml.transform.TransformerException;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import nl.clockwork.ebms.client.client.DeliveryTaskManager;
+import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.dao.EbMSDAO;
+import nl.clockwork.ebms.common.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.common.model.EbMSBaseMessage;
+import nl.clockwork.ebms.common.model.EbMSDocument;
+import nl.clockwork.ebms.common.model.EbMSMessage;
+import nl.clockwork.ebms.common.model.EbMSMessageError;
+import nl.clockwork.ebms.common.protocol.EbMSAction;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.common.util.ValidationException;
+import nl.clockwork.ebms.server.message.processor.EbMSProcessingException;
+import nl.clockwork.ebms.server.security.certificate.EbMSMessageValidator;
+
+@Slf4j
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+public class DuplicateMessageHandler
+{
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
+	DeliveryTaskManager deliveryTaskManager;
+	@NonNull
+	EbMSMessageValidator messageValidator;
+
+	public EbMSDocument handleMessage(final EbMSMessage message) throws EbMSProcessingException
+	{
+		val messageHeader = message.getMessageHeader();
+		if (!isIdenticalMessage(message))
+			throw new EbMSProcessingException("MessageId " + messageHeader.getMessageData().getMessageId() + " already used!");
+
+		log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
+		if (messageValidator.isSyncReply(message))
+			return handleSyncDuplicateResponse(message);
+
+		handleAsyncDuplicateResponse(message);
+		return null;
+	}
+
+	private EbMSDocument handleSyncDuplicateResponse(EbMSMessage message)
+	{
+		val messageHeader = message.getMessageHeader();
+		val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
+				messageHeader.getCPAId(),
+				messageHeader.getMessageData().getMessageId(),
+				EbMSAction.MESSAGE_ERROR,
+				EbMSAction.ACKNOWLEDGMENT);
+		StreamUtils.ifNotPresent(result, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+		return result.orElse(null);
+	}
+
+	private void handleAsyncDuplicateResponse(EbMSMessage message) throws EbMSProcessingException
+	{
+		val messageHeader = message.getMessageHeader();
+		val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
+				messageHeader.getCPAId(),
+				messageHeader.getMessageData().getMessageId(),
+				EbMSAction.MESSAGE_ERROR,
+				EbMSAction.ACKNOWLEDGMENT);
+		StreamUtils
+				.ifNotPresent(messageProperties, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+
+		val sendDeliveryChannel =
+				cpaManager
+						.getSendDeliveryChannel(
+								messageHeader.getCPAId(),
+								messageHeader.getTo().getPartyId(),
+								messageHeader.getTo().getRole(),
+								nl.clockwork.ebms.common.cpa.CPAUtils.createEbMSMessageService(),
+								null)
+						.orElse(null);
+		val receiveDeliveryChannel =
+				cpaManager
+						.getReceiveDeliveryChannel(
+								messageHeader.getCPAId(),
+								messageHeader.getFrom().getPartyId(),
+								messageHeader.getFrom().getRole(),
+								nl.clockwork.ebms.common.cpa.CPAUtils.createEbMSMessageService(),
+								null)
+						.orElse(null);
+
+		Runnable storeMessage = () ->
+		{
+			if (receiveDeliveryChannel != null && messageProperties.isPresent())
+				deliveryTaskManager.insertTask(
+						deliveryTaskManager.createNewTask(
+								messageHeader.getCPAId(),
+								sendDeliveryChannel.getChannelId(),
+								receiveDeliveryChannel.getChannelId(),
+								messageProperties.get().getMessageId(),
+								messageHeader.getMessageData().getTimeToLive(),
+								messageProperties.get().getTimestamp(),
+								false));
+		};
+		ebMSDAO.executeTransaction(storeMessage);
+
+		if (receiveDeliveryChannel == null && messageProperties.isPresent())
+		{
+			try
+			{
+				val result = ebMSDAO.getDocument(messageProperties.get().getMessageId());
+				throw new ValidationException(DOMUtils.toString(result.get()));
+			}
+			catch (TransformerException e)
+			{
+				throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!", e);
+			}
+		}
+	}
+
+	public void handleMessageError(final EbMSMessageError responseMessage) throws EbMSProcessingException
+	{
+		if (isIdenticalMessage(responseMessage))
+			log.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
+		else
+			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
+	}
+
+	public void handleAcknowledgment(final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
+	{
+		if (isIdenticalMessage(responseMessage))
+			log.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
+		else
+			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
+	}
+
+	private boolean isIdenticalMessage(EbMSBaseMessage message)
+	{
+		return ebMSDAO.existsIdenticalMessage(message);
+	}
+}

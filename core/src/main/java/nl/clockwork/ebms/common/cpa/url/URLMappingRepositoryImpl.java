@@ -23,7 +23,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.client.api.URLMappingRepository;
+import nl.clockwork.ebms.client.client.URLMappingRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;

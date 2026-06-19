@@ -22,8 +22,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.client.api.DeliveryTask;
-import nl.clockwork.ebms.client.api.DeliveryTaskDispatcher;
+import nl.clockwork.ebms.client.client.DeliveryTask;
+import nl.clockwork.ebms.client.client.DeliveryTaskDispatcher;
 import org.springframework.jms.core.JmsTemplate;
 
 @Slf4j
