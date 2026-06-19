@@ -61,31 +61,29 @@ public class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId)
 	{
-		return jdbcTemplate.query(
-				EbMSEventRowMapper.SELECT
-						+ " from delivery_task"
-						+ " where time_stamp <= ?"
-						+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
-						+ " order by time_stamp asc",
-				new EbMSEventRowMapper(),
-				Timestamp.from(timestamp));
+		final String sql = EbMSEventRowMapper.SELECT
+				+ " from delivery_task"
+				+ " where time_stamp <= ?"
+				+ (serverId == null ? "" : " and server_id = ?")
+				+ " order by time_stamp asc";
+		return jdbcTemplate
+				.query(sql, new EbMSEventRowMapper(), serverId == null ? new Object[]{Timestamp.from(timestamp)} : new Object[]{Timestamp.from(timestamp), serverId});
 	}
 
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return jdbcTemplate.query(
-				EbMSEventRowMapper.SELECT
-						+ " from delivery_task"
-						+ " where time_stamp <= ?"
-						+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
-						+ " order by time_stamp asc"
-						+ " offset 0 rows"
-						+ " fetch first "
-						+ maxNr
-						+ " rows only",
-				new EbMSEventRowMapper(),
-				Timestamp.from(timestamp));
+		final String sql = EbMSEventRowMapper.SELECT
+				+ " from delivery_task"
+				+ " where time_stamp <= ?"
+				+ (serverId == null ? "" : " and server_id = ?")
+				+ " order by time_stamp asc"
+				+ " offset 0 rows"
+				+ " fetch first "
+				+ maxNr
+				+ " rows only";
+		return jdbcTemplate
+				.query(sql, new EbMSEventRowMapper(), serverId == null ? new Object[]{Timestamp.from(timestamp)} : new Object[]{Timestamp.from(timestamp), serverId});
 	}
 
 	@Override

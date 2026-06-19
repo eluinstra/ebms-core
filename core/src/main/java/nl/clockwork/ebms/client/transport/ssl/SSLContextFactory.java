@@ -100,7 +100,8 @@ public class SSLContextFactory
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
 		val kmf = createKeyManagerFactory(keyStore);
-		setClientAlias(kmf, clientAlias);
+		val validatedClientAlias = clientAlias == null || clientAlias.isEmpty() ? null : clientAlias;
+		setClientAlias(kmf, validatedClientAlias);
 		val tmf = createTrustManagerFactory(trustStore);
 		sslContext = createSSLContext(kmf, tmf);
 		createEngine(sslContext);
@@ -140,7 +141,17 @@ public class SSLContextFactory
 	{
 		val result = sslContext.createSSLEngine();
 		result.setUseClientMode(true);
-		// result.setSSLParameters(createSSLParameters());
+		result.setSSLParameters(createSSLParameters());
+		return result;
+	}
+
+	private javax.net.ssl.SSLParameters createSSLParameters()
+	{
+		val result = new javax.net.ssl.SSLParameters();
+		result.setProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
+		result.setCipherSuites(
+				new String[]{"TLS_AES_256_GCM_SHA384", "TLS_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+						"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"});
 		return result;
 	}
 }

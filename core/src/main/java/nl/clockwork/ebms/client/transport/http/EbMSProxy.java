@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.client.transport.http;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import lombok.NonNull;
 import lombok.Value;
@@ -48,6 +49,9 @@ public class EbMSProxy
 
 	public String getProxyAuthorizationValue()
 	{
-		return "Basic " + Base64.encodeBase64String((username + ":" + password).getBytes());
+		if (username == null || password == null)
+			return null;
+		String credentials = username + ":" + password;
+		return "Basic " + Base64.encodeBase64String(credentials.getBytes(StandardCharsets.UTF_8));
 	}
 }

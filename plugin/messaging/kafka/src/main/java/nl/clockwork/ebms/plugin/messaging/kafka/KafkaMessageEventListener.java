@@ -58,7 +58,7 @@ public class KafkaMessageEventListener extends LoggingMessageEventListener
 
 	private static void addHeader(Headers headers, String key, String value)
 	{
-		if (value != null)
+		if (value != null && !value.isEmpty())
 			headers.add(new RecordHeader(key, value.getBytes(StandardCharsets.UTF_8)));
 	}
 

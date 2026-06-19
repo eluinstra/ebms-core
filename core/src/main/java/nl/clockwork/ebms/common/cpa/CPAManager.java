@@ -192,6 +192,8 @@ public class CPAManager
 
 	private String toCertificateAlias(X509Certificate c)
 	{
+		if (c == null)
+			return null;
 		try
 		{
 			return keyStore.getCertificateAlias(c);

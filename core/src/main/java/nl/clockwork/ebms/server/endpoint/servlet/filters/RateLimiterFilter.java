@@ -26,6 +26,7 @@ import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RateLimiterFilter implements Filter
@@ -35,7 +36,12 @@ public class RateLimiterFilter implements Filter
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
 	{
-		val queriesPerSecond = Double.parseDouble(filterConfig.getInitParameter("queriesPerSecond"));
+		val queriesPerSecondParam = filterConfig.getInitParameter("queriesPerSecond");
+		if (StringUtils.isBlank(queriesPerSecondParam))
+			throw new ServletException("queriesPerSecond parameter is required");
+		val queriesPerSecond = Double.parseDouble(queriesPerSecondParam);
+		if (queriesPerSecond <= 0)
+			throw new ServletException("queriesPerSecond must be greater than 0");
 		rateLimiter = RateLimiter.create(queriesPerSecond);
 	}
 

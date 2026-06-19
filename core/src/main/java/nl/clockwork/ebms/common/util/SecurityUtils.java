@@ -25,7 +25,6 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -64,7 +63,7 @@ public class SecurityUtils
 	{
 		try
 		{
-			certificate.checkValidity(Date.from(date));
+			certificate.checkValidity();
 			val aliases = trustStore.aliases();
 			StreamUtils.toStream(aliases.asIterator())
 					.map(findCertificate(trustStore))
@@ -76,7 +75,7 @@ public class SecurityUtils
 		}
 		catch (CertificateExpiredException | CertificateNotYetValidException e)
 		{
-			throw new ValidationException(e);
+			throw new ValidationException("Certificate not valid: " + e.getMessage(), e);
 		}
 	}
 

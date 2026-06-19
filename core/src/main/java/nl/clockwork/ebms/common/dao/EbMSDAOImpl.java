@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import lombok.AccessLevel;
@@ -250,20 +249,11 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.dao.EbMSDAO, nl
 	{
 		return jdbcTemplate
 				.query(
-						EbMSMessageContextRowMapper.SELECT
-								+ " from ebms_message"
-								+ " where cpa_id = ?"
-								+ " and ref_to_message_id = ?"
-								+ (actions.length == 0
-										? ""
-										: " and service = '"
-												+ EbMSAction.EBMS_SERVICE_URI
-												+ "' and action in ('"
-												+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
-												+ "')"),
+						EbMSMessageContextRowMapper.SELECT + " from ebms_message" + " where cpa_id = ?" + " and ref_to_message_id = ?" + buildActionInClause(actions),
 						new EbMSMessageContextRowMapper(),
 						cpaId,
-						refToMessageId)
+						refToMessageId,
+						buildActionValues(actions))
 				.stream()
 				.findFirst();
 	}
@@ -320,17 +310,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.dao.EbMSDAO, nl
 		{
 			val document = java.util.Objects.requireNonNull(
 					jdbcTemplate.queryForObject(
-							"select message_id, content"
-									+ " from ebms_message"
-									+ " where cpa_id = ?"
-									+ " and ref_to_message_id = ?"
-									+ (actions.length == 0
-											? ""
-											: " and service = '"
-													+ EbMSAction.EBMS_SERVICE_URI
-													+ "' and action in ('"
-													+ Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','"))
-													+ "')"),
+							"select message_id, content" + " from ebms_message" + " where cpa_id = ?" + " and ref_to_message_id = ?" + buildActionInClause(actions),
 							new RowMapper<EbMSDocument>()
 							{
 								@Override
@@ -347,7 +327,8 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.dao.EbMSDAO, nl
 								}
 							},
 							cpaId,
-							refToMessageId));
+							refToMessageId,
+							buildActionValues(actions)));
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())
@@ -530,5 +511,22 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.dao.EbMSDAO, nl
 				"select name, content_id, content_type, content" + " from ebms_attachment" + " where message_id = ?" + " order by order_nr",
 				rowMapper,
 				messageId);
+	}
+
+	private String buildActionInClause(EbMSAction...actions)
+	{
+		if (actions.length == 0)
+			return "";
+		return " and service = '" + EbMSAction.EBMS_SERVICE_URI + "' and action in (" + buildActionPlaceholders(actions.length) + ")";
+	}
+
+	private String buildActionPlaceholders(int count)
+	{
+		return String.join(",", java.util.Collections.nCopies(count, "?"));
+	}
+
+	private Object[] buildActionValues(EbMSAction...actions)
+	{
+		return Arrays.stream(actions).map(EbMSAction::getAction).toArray();
 	}
 }

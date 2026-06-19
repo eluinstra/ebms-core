@@ -83,7 +83,6 @@ public class MessageQueue<T>
 		}
 		catch (InterruptedException e)
 		{
-			// ignore
 			Thread.currentThread().interrupt();
 		}
 		synchronized (queue)

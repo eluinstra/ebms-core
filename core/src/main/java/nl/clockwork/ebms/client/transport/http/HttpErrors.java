@@ -66,6 +66,18 @@ class HttpErrors
 
 	private static List<Integer> getIntegerList(String input)
 	{
-		return Arrays.stream(StringUtils.split(input, ',')).map(s -> Integer.parseInt(s.trim())).toList();
+		if (StringUtils.isBlank(input))
+			return Collections.emptyList();
+		return Arrays.stream(StringUtils.split(input, ',')).map(String::trim).filter(s -> !s.isEmpty()).map(s ->
+		{
+			try
+			{
+				return Integer.parseInt(s);
+			}
+			catch (NumberFormatException e)
+			{
+				throw new IllegalArgumentException("Invalid HTTP error code: " + s, e);
+			}
+		}).toList();
 	}
 }

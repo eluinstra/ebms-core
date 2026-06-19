@@ -40,6 +40,8 @@ public class KeyStoreUtils
 
 	public static InputStream getInputStream(String location) throws FileNotFoundException
 	{
+		if (location == null || location.trim().isEmpty())
+			throw new IllegalArgumentException("Location cannot be null or empty");
 		try
 		{
 			return new FileInputStream(location);
@@ -50,7 +52,7 @@ public class KeyStoreUtils
 			if (result == null)
 				result = KeyStoreUtils.class.getResourceAsStream("/" + location);
 			if (result == null)
-				throw e;
+				throw new FileNotFoundException("Resource not found: " + location);
 			return result;
 		}
 	}
