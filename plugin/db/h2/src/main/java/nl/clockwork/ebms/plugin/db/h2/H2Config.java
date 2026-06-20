@@ -48,23 +48,17 @@ public class H2Config
 	@Bean(name = "databaseServer")
 	@Conditional(StartDatabaseServerType.class)
 	public org.h2.tools.Server startH2DBServer(
-			@Value("${database.start:false}") boolean startDatabase,
 			@Value("${database.dir:./h2}") String databaseDir,
 			@Value("${ebms.jdbc.driverClassName}") String driverClassName,
 			@Value("${ebms.jdbc.url}") String jdbcUrl) throws IOException, URISyntaxException, SQLException
 	{
-		if (startDatabase)
-		{
-			return getH2JdbcUrl(driverClassName, jdbcUrl)
-					.map(unchecked(url -> createTcpServer("-baseDir", databaseDir, "-ifNotExists", "-tcp", "-tcpPort", url.getPort().toString())))
-					.stream()
-					.peek(server -> log.info("Starting H2DB Server on port {} in baseDir {}", server.getPort(), databaseDir))
-					.findFirst()
-					.map(unchecked(Server::start))
-					.orElse(null);
-		}
-		else
-			return null;
+		return getH2JdbcUrl(driverClassName, jdbcUrl)
+				.map(unchecked(url -> createTcpServer("-baseDir", databaseDir, "-ifNotExists", "-tcp", "-tcpPort", url.getPort().toString())))
+				.stream()
+				.peek(server -> log.info("Starting H2DB Server on port {} in baseDir {}", server.getPort(), databaseDir))
+				.findFirst()
+				.map(unchecked(Server::start))
+				.orElse(null);
 	}
 
 	private Optional<JdbcURL> getH2JdbcUrl(String driverClassName, String jdbcUrl) throws IOException
