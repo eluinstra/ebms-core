@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common.dao;
 
+import com.google.common.collect.ObjectArrays;
 import jakarta.activation.DataHandler;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -251,9 +252,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.dao.EbMSDAO, nl
 				.query(
 						EbMSMessageContextRowMapper.SELECT + " from ebms_message" + " where cpa_id = ?" + " and ref_to_message_id = ?" + buildActionInClause(actions),
 						new EbMSMessageContextRowMapper(),
-						cpaId,
-						refToMessageId,
-						buildActionValues(actions))
+						ObjectArrays.concat(new Object[]{cpaId, refToMessageId}, buildActionValues(actions), Object.class))
 				.stream()
 				.findFirst();
 	}
@@ -326,9 +325,7 @@ class EbMSDAOImpl implements EbMSDAO, nl.clockwork.ebms.api.ebms.dao.EbMSDAO, nl
 									}
 								}
 							},
-							cpaId,
-							refToMessageId,
-							buildActionValues(actions)));
+							ObjectArrays.concat(new Object[]{cpaId, refToMessageId}, buildActionValues(actions), Object.class)));
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())

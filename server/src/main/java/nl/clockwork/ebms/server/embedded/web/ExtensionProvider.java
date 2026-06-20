@@ -18,7 +18,8 @@ package nl.clockwork.ebms.server.embedded.web;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
-import nl.clockwork.ebms.server.message.model.embedded.web.MenuItem;
+
+import nl.clockwork.ebms.server.model.embedded.web.MenuItem;
 
 public abstract class ExtensionProvider
 {

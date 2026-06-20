@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,11 +30,11 @@ import java.util.Map;
 import nl.clockwork.ebms.api.ebms.exception.NotFoundException;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
 import nl.clockwork.ebms.server.embedded.dao.EbMSDAO;
-import nl.clockwork.ebms.server.message.model.core.CPA;
-import nl.clockwork.ebms.server.message.model.core.EbMSAttachment;
-import nl.clockwork.ebms.server.message.model.core.EbMSMessage;
-import nl.clockwork.ebms.server.message.model.embedded.web.EbMSMessageFilter;
-import nl.clockwork.ebms.server.message.model.embedded.web.MessageFilterQuery;
+import nl.clockwork.ebms.server.model.core.CPA;
+import nl.clockwork.ebms.server.model.core.EbMSAttachment;
+import nl.clockwork.ebms.server.model.core.EbMSMessage;
+import nl.clockwork.ebms.server.model.embedded.web.EbMSMessageFilter;
+import nl.clockwork.ebms.server.model.embedded.web.MessageFilterQuery;
 import org.apache.cxf.io.CachedOutputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -168,7 +169,7 @@ class AdminRestControllerTest
 		cached.write(payload);
 		cached.lockOutputStream();
 		var attachment = new EbMSAttachment("file.txt", "cid-1", "text/plain", cached);
-		when(ebMSDAO.findAttachment("m-1", "cid-1")).thenReturn(attachment);
+		doReturn(attachment).when(ebMSDAO.findAttachment("m-1", "cid-1"));
 
 		var response = controller.getAttachment("m-1", "cid-1");
 		assertThat(response.getMediaType().toString()).isEqualTo("text/plain");
@@ -198,7 +199,7 @@ class AdminRestControllerTest
 	@Test
 	void exportMessageReturnsZipStream()
 	{
-		when(ebMSDAO.findMessage("m-1")).thenReturn(new EbMSMessage());
+		doReturn(new EbMSMessage()).when(ebMSDAO.findMessage("m-1"));
 		var response = controller.exportMessage("m-1");
 		assertThat(response.getMediaType().toString()).isEqualTo("application/zip");
 		assertThat(response.getHeaderString("Content-Disposition")).contains("m-1.zip");

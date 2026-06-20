@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 import nl.clockwork.ebms.common.protocol.EbMSMessageStatus;
-import nl.clockwork.ebms.server.message.model.core.CPA;
-import nl.clockwork.ebms.server.message.model.core.EbMSAttachment;
-import nl.clockwork.ebms.server.message.model.core.EbMSMessage;
-import nl.clockwork.ebms.server.message.model.embedded.web.EbMSMessageFilter;
-import nl.clockwork.ebms.server.message.model.embedded.web.TimeUnit;
+import nl.clockwork.ebms.server.model.core.CPA;
+import nl.clockwork.ebms.server.model.core.EbMSAttachment;
+import nl.clockwork.ebms.server.model.core.EbMSMessage;
+import nl.clockwork.ebms.server.model.embedded.web.EbMSMessageFilter;
+import nl.clockwork.ebms.server.model.embedded.web.TimeUnit;
 import org.apache.commons.csv.CSVPrinter;
 
 public interface EbMSDAO
