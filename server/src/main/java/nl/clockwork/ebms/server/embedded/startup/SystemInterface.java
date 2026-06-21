@@ -15,11 +15,35 @@
  */
 package nl.clockwork.ebms.server.embedded.startup;
 
+import lombok.val;
+
 public interface SystemInterface
 {
 	default void setProperty(String key, String value)
 	{
 		System.setProperty(key, value);
+	}
+
+	default String getProperty(String key)
+	{
+		return System.getProperty(key);
+	}
+
+	default String getProperty(String key, String defaultValue)
+	{
+		return System.getProperty(key, defaultValue);
+	}
+
+	default int getIntegerProperty(String key, int defaultValue)
+	{
+		val value = System.getProperty(key);
+		return value != null ? Integer.parseInt(value) : defaultValue;
+	}
+
+	default boolean getBooleanProperty(String key, boolean defaultValue)
+	{
+		val value = System.getProperty(key);
+		return value != null ? Boolean.parseBoolean(value) : defaultValue;
 	}
 
 	default void println(String s)

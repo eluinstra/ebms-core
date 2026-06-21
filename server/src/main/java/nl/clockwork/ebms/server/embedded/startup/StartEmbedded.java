@@ -22,8 +22,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.common.security.KeyStoreType;
 import nl.clockwork.ebms.common.util.LoggingUtils;
@@ -32,7 +30,6 @@ import nl.clockwork.ebms.server.embedded.config.EbMSKeyStore;
 import nl.clockwork.ebms.server.embedded.config.EmbeddedAppConfig;
 import nl.clockwork.ebms.server.embedded.utils.Utils;
 import nl.clockwork.ebms.server.endpoint.servlet.EbMSServlet;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -47,19 +44,15 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-@FieldDefaults(level = AccessLevel.PROTECTED)
 public class StartEmbedded extends Start
 {
 	private static final String DELIVERY_TASK_HANDLER_START_PROPERTY = "deliveryTaskHandler.start";
-	private static final String DISABLE_EBMS_SERVER_OPTION = "disableEbMSServer";
-	private static final String DISABLE_EBMS_CLIENT_OPTION = "disableEbMSClient";
-
 	private static final String EBMS_HOST_PROPERTY = "ebms.host";
 	private static final String EBMS_PORT_PROPERTY = "ebms.port";
 	private static final String EBMS_PATH_PROPERTY = "ebms.path";
 	private static final String EBMS_CONNECTION_LIMIT_PROPERTY = "ebms.connectionLimit";
-	private static final String EBMS_USER_QUERIES_PER_SECOND_PROPERTY = "ebms.userQueriesPerSecond";
 	private static final String EBMS_QUERIES_PER_SECOND_PROPERTY = "ebms.queriesPerSecond";
+	private static final String EBMS_USER_QUERIES_PER_SECOND_PROPERTY = "ebms.userQueriesPerSecond";
 	private static final String EBMS_SSL_PROPERTY = "ebms.ssl";
 	private static final String EBMS_VERIFY_HOSTNAMES_PROPERTY = "ebms.verifyHostnames";
 	private static final String EBMS_ECHO_HEADER_NAMES_PROPERTY = "ebms.echoHeaderNames";
@@ -94,36 +87,35 @@ public class StartEmbedded extends Start
 	private void startEmbeddedService(String[] args) throws Exception
 	{
 		val options = createOptions();
-		val cmd = new DefaultParser().parse(options, args);
-		if (cmd.hasOption(HELP_OPTION))
+		if (containsHelpOption(options, args))
 			printUsage(options);
 		setProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", "*");
-		if (cmd.hasOption(DISABLE_EBMS_CLIENT_OPTION))
+		if (isEbmsClientDisabled())
 			setProperty(DELIVERY_TASK_HANDLER_START_PROPERTY, FALSE);
-		init(cmd);
+		init();
 		server.setHandler(handlerCollection);
 		server.addBean(new CustomErrorHandler());
 		val properties = getProperties();
-		if (cmd.hasOption(JMX_OPTION))
-			initJMX(cmd, server);
-		if (cmd.hasOption(SOAP_OPTION) || cmd.hasOption(HEALTH_OPTION) || !cmd.hasOption(HEADLESS_OPTION) || !cmd.hasOption(DISABLE_EBMS_SERVER_OPTION))
+		if (isJmxEnabled())
+			initJMX(server);
+		if (isSoapEnabled() || isHealthEnabled() || !isHeadless() || !isEbmsServerDisabled())
 			try (AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext())
 			{
 				context.scan("nl.clockwork.ebms");
 				getPluginConfigClasses().forEach(context::register);
 				getConfigClasses().forEach(context::register);
 				val contextLoaderListener = new ContextLoaderListener(context);
-				if (cmd.hasOption(SOAP_OPTION) || !cmd.hasOption(HEADLESS_OPTION))
+				if (isSoapEnabled() || !isHeadless())
 				{
-					initWebServer(cmd, server);
-					handlerCollection.addHandler(createWebContextHandler(cmd, contextLoaderListener));
+					initWebServer();
+					handlerCollection.addHandler(createWebContextHandler(contextLoaderListener));
 				}
-				if (cmd.hasOption(HEALTH_OPTION))
+				if (isHealthEnabled())
 				{
-					initHealthServer(cmd, server);
+					initHealthServer();
 					handlerCollection.addHandler(createHealthContextHandler());
 				}
-				if (!cmd.hasOption(DISABLE_EBMS_SERVER_OPTION))
+				if (!isEbmsServerDisabled())
 				{
 					initEbMSServer(properties, server);
 					handlerCollection.addHandler(createEbMSContextHandler(properties, contextLoaderListener));
@@ -156,15 +148,6 @@ public class StartEmbedded extends Start
 			}
 	}
 
-	@Override
-	protected Options createOptions()
-	{
-		val result = super.createOptions();
-		result.addOption(DISABLE_EBMS_SERVER_OPTION, false, "disable ebms server");
-		result.addOption(DISABLE_EBMS_CLIENT_OPTION, false, "disable ebms client");
-		return result;
-	}
-
 	private Properties getProperties() throws IOException
 	{
 		return EmbeddedAppConfig.PROPERTY_SOURCE.getProperties();
@@ -172,10 +155,8 @@ public class StartEmbedded extends Start
 
 	private void initEbMSServer(Properties properties, Server server) throws GeneralSecurityException, IOException
 	{
-
-		val connector = TRUE.equals(properties.getProperty(EBMS_SSL_PROPERTY))
-				? createEbMSHttpsConnector(properties, createEbMSSslContextFactory(properties))
-				: createEbMSHttpConnector(properties);
+		val connector =
+				isEbmsSslEnabled(properties) ? createEbMSHttpsConnector(properties, createEbMSSslContextFactory(properties)) : createEbMSHttpConnector(properties);
 		server.addConnector(connector);
 		val connectionLimit = properties.getProperty(EBMS_CONNECTION_LIMIT_PROPERTY);
 		if (StringUtils.isNotEmpty(connectionLimit))
@@ -204,7 +185,7 @@ public class StartEmbedded extends Start
 				properties.getProperty(KEYSTORE_PASSWORD_PROPERTY),
 				properties.getProperty(KEYSTORE_DEFAULT_ALIAS_PROPERTY));
 		addEbMSKeyStore(properties, result, ebMSKeyStore);
-		if (TRUE.equals(properties.getProperty(HTTPS_REQUIRE_CLIENT_AUTHENTICATION_PROPERTY)))
+		if (isEbmsClientAuthenticationEnabled(properties))
 			addEbMSTrustStore(properties, result);
 		return result;
 	}
@@ -242,7 +223,7 @@ public class StartEmbedded extends Start
 	{
 		val httpConfig = new HttpConfiguration();
 		httpConfig.setSendServerVersion(false);
-		httpConfig.addCustomizer(new SecureRequestCustomizer(TRUE.equals(properties.getProperty(EBMS_VERIFY_HOSTNAMES_PROPERTY))));
+		httpConfig.addCustomizer(new SecureRequestCustomizer(isEbmsHostnameVerificationEnabled(properties)));
 		val result = new ServerConnector(server, sslContextFactory, new HttpConnectionFactory(httpConfig));
 		result.setHost(StringUtils.isEmpty(properties.getProperty(EBMS_HOST_PROPERTY)) ? DEFAULT_HOST : properties.getProperty(EBMS_HOST_PROPERTY));
 		result.setPort(
@@ -262,8 +243,7 @@ public class StartEmbedded extends Start
 			result.addFilter(createEchoServletFilterHolder(properties.getProperty(EBMS_ECHO_HEADER_NAMES_PROPERTY)), "/*", EnumSet.allOf(DispatcherType.class));
 		if (StringUtils.isNotEmpty(properties.getProperty(LOGGING_MDC_HEADER_NAMES_PROPERTY)))
 			result.addFilter(createMDCServletFilterHolder(properties.getProperty(LOGGING_MDC_HEADER_NAMES_PROPERTY)), "/*", EnumSet.allOf(DispatcherType.class));
-		if (LoggingUtils.Status.ENABLED.name().equals(properties.getProperty(LOGGING_MDC_PROPERTY))
-				&& LoggingUtils.Status.ENABLED.name().equals(properties.getProperty(LOGGING_MDC_AUDIT_PROPERTY)))
+		if (isEbmsMdcAuditEnabled(properties))
 			result.addFilter(createRemoteAddressMDCFilterHolder(), "/*", EnumSet.allOf(DispatcherType.class));
 		if (!StringUtils.isEmpty(properties.getProperty(EBMS_QUERIES_PER_SECOND_PROPERTY)))
 			result.addFilter(createRateLimiterFilterHolder(properties.getProperty(EBMS_QUERIES_PER_SECOND_PROPERTY)), "/*", EnumSet.allOf(DispatcherType.class));
@@ -272,7 +252,7 @@ public class StartEmbedded extends Start
 					createUserRateLimiterFilterHolder(properties.getProperty(EBMS_USER_QUERIES_PER_SECOND_PROPERTY)),
 					"/*",
 					EnumSet.allOf(DispatcherType.class));
-		if (TRUE.equalsIgnoreCase(properties.getProperty(HTTPS_CLIENT_CERTIFICATE_AUTHENTICATION_PROPERTY)))
+		if (isEbmsClientCertificateAuthenticationEnabled(properties))
 			result.addFilter(
 					createClientCertificateManagerFilterHolder(properties.getProperty(HTTPS_CLIENT_CERTIFICATE_HEADER_PROPERTY)),
 					"/*",
@@ -280,5 +260,83 @@ public class StartEmbedded extends Start
 		result.addServlet(EbMSServlet.class, properties.getProperty(EBMS_PATH_PROPERTY));
 		result.addEventListener(contextLoaderListener);
 		return result;
+	}
+
+	private boolean isEbmsSslEnabled(Properties properties)
+	{
+		return TRUE.equals(properties.getProperty(EBMS_SSL_PROPERTY));
+	}
+
+	private boolean isEbmsClientAuthenticationEnabled(Properties properties)
+	{
+		return TRUE.equals(properties.getProperty(HTTPS_REQUIRE_CLIENT_AUTHENTICATION_PROPERTY));
+	}
+
+	private boolean isEbmsHostnameVerificationEnabled(Properties properties)
+	{
+		return TRUE.equals(properties.getProperty(EBMS_VERIFY_HOSTNAMES_PROPERTY));
+	}
+
+	private boolean isEbmsMdcAuditEnabled(Properties properties)
+	{
+		return LoggingUtils.Status.ENABLED.name().equals(properties.getProperty(LOGGING_MDC_PROPERTY))
+				&& LoggingUtils.Status.ENABLED.name().equals(properties.getProperty(LOGGING_MDC_AUDIT_PROPERTY));
+	}
+
+	private boolean isEbmsClientCertificateAuthenticationEnabled(Properties properties)
+	{
+		return TRUE.equalsIgnoreCase(properties.getProperty(HTTPS_CLIENT_CERTIFICATE_AUTHENTICATION_PROPERTY));
+	}
+
+	private boolean isEbmsServerDisabled() throws IOException
+	{
+		val properties = getProperties();
+		return Boolean.parseBoolean(properties.getProperty("ebms.server.disabled", "false"));
+	}
+
+	private boolean isEbmsClientDisabled() throws IOException
+	{
+		val properties = getProperties();
+		return Boolean.parseBoolean(properties.getProperty("ebms.client.disabled", "false"));
+	}
+
+	protected Options createOptions()
+	{
+		val result = new Options();
+		result.addOption(HELP_OPTION, false, "print this message");
+		return result;
+	}
+
+	protected boolean isJmxEnabled()
+	{
+		return getBooleanProperty("api.jmx.enabled", false);
+	}
+
+	protected boolean isSoapEnabled()
+	{
+		return getBooleanProperty("api.soap.enabled", true);
+	}
+
+	protected boolean isHealthEnabled()
+	{
+		return getBooleanProperty("api.health.enabled", false);
+	}
+
+	protected boolean isHeadless()
+	{
+		return getBooleanProperty("api.headless", false);
+	}
+
+	private boolean containsHelpOption(Options options, String[] args)
+	{
+		try
+		{
+			val cmd = new org.apache.commons.cli.DefaultParser().parse(options, args);
+			return cmd.hasOption(HELP_OPTION);
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
 	}
 }
