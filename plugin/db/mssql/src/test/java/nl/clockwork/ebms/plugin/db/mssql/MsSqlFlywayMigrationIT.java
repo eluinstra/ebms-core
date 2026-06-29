@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.output.MigrateResult;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.testcontainers.containers.MSSQLServerContainer;
@@ -28,11 +29,12 @@ import org.testcontainers.utility.DockerImageName;
 
 /**
  * Validates the Flyway migrations under {@code src/main/resources/db/migration/<variant>} by
- * applying them to a real SQL Server container. The {@code jdbc:tc:} URL style is not used here
- * because the official MS SQL Server image is amd64-only; we substitute the multi-arch
- * {@code azure-sql-edge} image instead. Replaces the former {@code validate-migrations.sh}
- * harness for this plugin.
+ * applying them to a real SQL Server container, using the multi-arch {@code azure-sql-edge}
+ * image as a compatible substitute for {@code mcr.microsoft.com/mssql/server}. Gated to arm64
+ * hosts because Microsoft does not publish an arm64 image of the official SQL Server; on amd64
+ * the companion {@link MsSqlServerFlywayMigrationIT} runs against the official image instead.
  */
+@EnabledIfSystemProperty(named = "os.arch", matches = "aarch64|arm64")
 @Testcontainers
 class MsSqlFlywayMigrationIT
 {
