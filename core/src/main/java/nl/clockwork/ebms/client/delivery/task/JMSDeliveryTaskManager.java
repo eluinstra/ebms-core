@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
@@ -36,8 +35,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-@AllArgsConstructor
-class JMSDeliveryTaskManager implements DeliveryTaskManager
+class JMSDeliveryTaskManager extends DeliveryTaskManager
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -70,14 +68,18 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	public static final String JMS_DESTINATION_NAME = "DELIVERY_TASK";
 	@NonNull
 	JmsTemplate jmsTemplate;
-	@NonNull
-	EbMSDAO ebMSDAO;
-	@NonNull
-	DeliveryTaskDAO deliveryTaskDAO;
-	@NonNull
-	CPAManager cpaManager;
-	int nrAutoRetries;
-	long autoRetryInterval;
+
+	public JMSDeliveryTaskManager(
+			@NonNull JmsTemplate jmsTemplate,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull DeliveryTaskDAO deliveryTaskDAO,
+			@NonNull CPAManager cpaManager,
+			int nrAutoRetries,
+			long autoRetryInterval)
+	{
+		super(ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
+		this.jmsTemplate = jmsTemplate;
+	}
 
 	@Override
 	public void insertTask(DeliveryTask task)
@@ -94,26 +96,25 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage)
 	{
+		updateTask(task, url, status, errorMessage, null);
+	}
+
+	@Override
+	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage, Exception e)
+	{
 		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
 				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
 		deliveryTaskDAO.insertLog(task.getMessageId(), task.getTimestamp(), url, status, errorMessage);
-		if (task.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
+		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
+		if (task.getTimeToLive() != null && reliableMessaging)
 		{
 			val nextTask = createNextTask(task, deliveryChannel);
 			jmsTemplate.send(JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(nextTask, calculateDelay(nextTask)));
 		}
-		else
+		else if (shouldRetryUnreliable(task, status, e, reliableMessaging))
 		{
-			ebMSDAO.getMessageAction(task.getMessageId())
-					.filter(action -> action == EbMSAction.ACKNOWLEDGMENT || action == EbMSAction.MESSAGE_ERROR)
-					.ifPresent(action ->
-					{
-						if (task.getRetries() < nrAutoRetries)
-						{
-							val nextTask = createNextTask(task, autoRetryInterval);
-							jmsTemplate.send(JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(nextTask, autoRetryInterval));
-						}
-					});
+			val nextTask = createNextTask(task, autoRetryInterval);
+			jmsTemplate.send(JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(nextTask, autoRetryInterval));
 		}
 	}
 

@@ -167,7 +167,7 @@ class DeliveryTaskHandler
 	{
 		Runnable runnable = () ->
 		{
-			deliveryTaskManager.updateTask(task, url, DeliveryTaskStatus.FAILED, errorMessage);
+			deliveryTaskManager.updateTask(task, url, DeliveryTaskStatus.FAILED, errorMessage, e);
 			if (((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
 					&& ebMSDAO.updateMessage(task.getMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERY_FAILED) > 0)
 			{

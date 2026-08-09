@@ -37,7 +37,7 @@ public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager
 			@NonNull DeliveryTaskDAO deliveryTaskDAO,
 			@NonNull CPAManager cpaManager,
 			int nrAutoRetries,
-			int autoRetryInterval,
+			long autoRetryInterval,
 			@NonNull JmsTemplate jmsTemplate)
 	{
 		super(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);

@@ -51,7 +51,7 @@ public class DeliveryTaskManagerConfig
 	@Value("${deliveryTaskManager.nrAutoRetries}")
 	int nrAutoRetries;
 	@Value("${deliveryTaskManager.autoRetryInterval}")
-	int autoRetryInterval;
+	long autoRetryInterval;
 	@Autowired
 	EbMSDAO ebMSDAO;
 

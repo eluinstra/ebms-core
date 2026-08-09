@@ -22,11 +22,9 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.client.EbMSDAO;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
@@ -41,19 +39,10 @@ import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
-public class QuartzDeliveryTaskManager implements DeliveryTaskManager
+public class QuartzDeliveryTaskManager extends DeliveryTaskManager
 {
 	@NonNull
 	Scheduler scheduler;
-	@NonNull
-	EbMSDAO ebMSDAO;
-	@NonNull
-	DeliveryTaskDAO deliveryTaskDAO;
-	@NonNull
-	CPAManager cpaManager;
-	int nrAutoRetries;
-	int autoRetryInterval;
 
 	public static DeliveryTask createDeliveryTask(final JobDataMap properties)
 	{
@@ -66,6 +55,18 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 				Instant.ofEpochMilli(properties.getLong("timestamp")),
 				properties.getBoolean("isConfidential"),
 				properties.getInt("retries"));
+	}
+
+	public QuartzDeliveryTaskManager(
+			@NonNull Scheduler scheduler,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull DeliveryTaskDAO deliveryTaskDAO,
+			@NonNull CPAManager cpaManager,
+			int nrAutoRetries,
+			long autoRetryInterval)
+	{
+		super(ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
+		this.scheduler = scheduler;
 	}
 
 	@Override
@@ -92,21 +93,21 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage)
 	{
+		updateTask(task, url, status, errorMessage, null);
+	}
+
+	@Override
+	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage, Exception e)
+	{
 		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
 				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
 		deliveryTaskDAO.insertLog(task.getMessageId(), task.getTimestamp(), url, status, errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
 			scheduleNextTask(task, deliveryChannel);
-		else
+		else if (shouldRetryUnreliable(task, status, e, reliableMessaging))
 		{
-			ebMSDAO.getMessageAction(task.getMessageId())
-					.filter(action -> action == EbMSAction.ACKNOWLEDGMENT || action == EbMSAction.MESSAGE_ERROR)
-					.ifPresent(action ->
-					{
-						if (!reliableMessaging && task.getRetries() < nrAutoRetries)
-							scheduleNextTask(task);
-					});
+			scheduleNextTask(task);
 		}
 	}
 
