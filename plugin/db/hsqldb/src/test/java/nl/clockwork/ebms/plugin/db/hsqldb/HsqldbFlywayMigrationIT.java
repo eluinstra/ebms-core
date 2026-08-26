@@ -23,9 +23,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Validates the Flyway migrations under {@code src/main/resources/db/migration/<variant>} by
- * applying them to an embedded in-memory HSQLDB database (no container required). Replaces the
- * former {@code validate-migrations.sh} harness for this plugin.
+ * Validates the Flyway migrations under {@code src/main/resources/db/migration/<variant>} by applying them to an embedded in-memory HSQLDB database (no
+ * container required). Replaces the former {@code validate-migrations.sh} harness for this plugin.
  */
 class HsqldbFlywayMigrationIT
 {
@@ -37,11 +36,7 @@ class HsqldbFlywayMigrationIT
 	@ValueSource(strings = {"default", "strict"})
 	void migrationsApplyCleanly(String variant)
 	{
-		Flyway flyway = Flyway.configure()
-				.dataSource(JDBC_URL, USER, PASSWORD)
-				.locations("classpath:db/migration/" + variant)
-				.cleanDisabled(false)
-				.load();
+		Flyway flyway = Flyway.configure().dataSource(JDBC_URL, USER, PASSWORD).locations("classpath:db/migration/" + variant).cleanDisabled(false).load();
 		flyway.clean();
 		MigrateResult result = flyway.migrate();
 		assertThat(result.success).as("flyway.migrate() success for variant '%s'", variant).isTrue();

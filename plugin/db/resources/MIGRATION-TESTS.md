@@ -28,15 +28,15 @@ to the `integration-test` / `verify` phases.
 
 ## Database images
 
-| flavour  | image / engine                                | URL                                           |
-|----------|-----------------------------------------------|-----------------------------------------------|
-| postgres | `postgres:16-alpine`                          | `jdbc:tc:postgresql:16-alpine:///ebms`        |
-| mariadb  | `mariadb:11`                                  | `jdbc:tc:mariadb:11:///ebms`                  |
-| mssql    | `mcr.microsoft.com/mssql/server:latest` (amd64) <br> `mcr.microsoft.com/azure-sql-edge:latest` (arm64) | typed `MSSQLServerContainer`, gated per architecture |
-| oracle   | `container-registry.oracle.com/database/free:latest` | typed `OracleContainer` (official Oracle 23ai Free image, multi-arch) |
-| db2      | `icr.io/db2_community/db2:11.5.0.0a`          | `jdbc:tc:db2:11.5.0.0a:///test` (amd64 only)  |
-| h2       | embedded                                      | `jdbc:h2:mem:ebms;DB_CLOSE_DELAY=-1;MODE=LEGACY` |
-| hsqldb   | embedded                                      | `jdbc:hsqldb:mem:ebms;hsqldb.tx=mvcc`         |
+| flavour  |                                             image / engine                                             |                                  URL                                  |
+|----------|--------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| postgres | `postgres:16-alpine`                                                                                   | `jdbc:tc:postgresql:16-alpine:///ebms`                                |
+| mariadb  | `mariadb:11`                                                                                           | `jdbc:tc:mariadb:11:///ebms`                                          |
+| mssql    | `mcr.microsoft.com/mssql/server:latest` (amd64) <br> `mcr.microsoft.com/azure-sql-edge:latest` (arm64) | typed `MSSQLServerContainer`, gated per architecture                  |
+| oracle   | `container-registry.oracle.com/database/free:latest`                                                   | typed `OracleContainer` (official Oracle 23ai Free image, multi-arch) |
+| db2      | `icr.io/db2_community/db2:11.5.0.0a`                                                                   | `jdbc:tc:db2:11.5.0.0a:///test` (amd64 only)                          |
+| h2       | embedded                                                                                               | `jdbc:h2:mem:ebms;DB_CLOSE_DELAY=-1;MODE=LEGACY`                      |
+| hsqldb   | embedded                                                                                               | `jdbc:hsqldb:mem:ebms;hsqldb.tx=mvcc`                                 |
 
 ### MSSQL
 
@@ -78,3 +78,4 @@ To force a run on arm64 (slow, requires QEMU registered for amd64):
 docker run --privileged --rm tonistiigi/binfmt --install all
 mvn -pl ebms-core/plugin/db/db2 -am verify -Dos.arch=amd64
 ```
+

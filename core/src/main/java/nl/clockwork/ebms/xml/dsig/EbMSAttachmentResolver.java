@@ -26,6 +26,7 @@ import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.signature.XMLSignatureStreamInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverContext;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
@@ -66,7 +67,7 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 								context.baseUri));
 		try
 		{
-			val input = new XMLSignatureInput(result.getInputStream());
+			val input = new XMLSignatureStreamInput(result.getInputStream());
 			input.setSourceURI(context.uriToResolve);
 			input.setMIMEType(result.getContentType());
 			return input;

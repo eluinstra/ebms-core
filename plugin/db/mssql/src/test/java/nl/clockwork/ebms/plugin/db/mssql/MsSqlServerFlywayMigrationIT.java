@@ -28,20 +28,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * Validates the Flyway migrations under {@code src/main/resources/db/migration/<variant>} by
- * applying them to a real SQL Server container, using the latest official
- * {@code mcr.microsoft.com/mssql/server} image. Gated to amd64 hosts because Microsoft does not
- * publish an arm64 build of this image; on arm64 the companion {@link MsSqlFlywayMigrationIT}
- * runs against the multi-arch {@code azure-sql-edge} substitute instead.
+ * Validates the Flyway migrations under {@code src/main/resources/db/migration/<variant>} by applying them to a real SQL Server container, using the latest
+ * official {@code mcr.microsoft.com/mssql/server} image. Gated to amd64 hosts because Microsoft does not publish an arm64 build of this image; on arm64 the
+ * companion {@link MsSqlFlywayMigrationIT} runs against the multi-arch {@code azure-sql-edge} substitute instead.
  */
 @EnabledIfSystemProperty(named = "os.arch", matches = "amd64|x86_64")
 @Testcontainers
 class MsSqlServerFlywayMigrationIT
 {
 	@Container
-	static final MSSQLServerContainer<?> MSSQL = new MSSQLServerContainer<>(
-			DockerImageName.parse("mcr.microsoft.com/mssql/server:latest"))
-			.acceptLicense();
+	static final MSSQLServerContainer<?> MSSQL = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:latest")).acceptLicense();
 
 	@ParameterizedTest(name = "mssql (official) migrations apply cleanly: {0}")
 	@ValueSource(strings = {"default"})

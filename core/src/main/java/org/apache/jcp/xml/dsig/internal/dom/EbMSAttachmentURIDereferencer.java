@@ -29,7 +29,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.signature.XMLSignatureStreamInput;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -49,11 +49,8 @@ public class EbMSAttachmentURIDereferencer implements URIDereferencer
 						.filter(a -> uriReference.getURI().substring(Constants.CID.length()).equals(a.getContentId()))
 						.findFirst()
 						.orElseThrow(() -> new URIReferenceException("Reference URI = " + uriReference.getURI() + " does not exist!"));
-				val in = new XMLSignatureInput(attachment.getInputStream());
-				if (in.isOctetStream())
-					return new ApacheOctetStreamData(in);
-				else
-					return new ApacheNodeSetData(in);
+				val in = new XMLSignatureStreamInput(attachment.getInputStream());
+				return new ApacheOctetStreamData(in);
 			}
 			else
 				return DOMURIDereferencer.INSTANCE.dereference(uriReference, context);

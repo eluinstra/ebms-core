@@ -93,18 +93,12 @@ public abstract class DeliveryTaskManager
 		return task.createNextTask(Instant.now().plusSeconds(60 * retryInterval));
 	}
 
-	public boolean shouldRetryUnreliable(
-			DeliveryTask task,
-			DeliveryTaskStatus status,
-			Exception e,
-			boolean reliableMessaging)
+	public boolean shouldRetryUnreliable(DeliveryTask task, DeliveryTaskStatus status, Exception e, boolean reliableMessaging)
 	{
 		return status != DeliveryTaskStatus.SUCCEEDED
 				&& !(e instanceof EbMSUnrecoverableResponseException)
 				&& !reliableMessaging
 				&& task.getRetries() < nrAutoRetries
-				&& ebMSDAO.getMessageAction(task.getMessageId())
-						.map(a -> a == EbMSAction.ACKNOWLEDGMENT || a == EbMSAction.MESSAGE_ERROR)
-						.orElse(false);
+				&& ebMSDAO.getMessageAction(task.getMessageId()).map(a -> a == EbMSAction.ACKNOWLEDGMENT || a == EbMSAction.MESSAGE_ERROR).orElse(false);
 	}
 }

@@ -21,7 +21,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.output.MigrateResult;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,23 +32,19 @@ import org.testcontainers.oracle.OracleContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * Validates the Flyway migrations under {@code src/main/resources/db/migration/<variant>} by
- * applying them to a real Oracle Database 23ai Free container. Uses the official Oracle image
- * published at {@code container-registry.oracle.com/database/free} (multi-arch, built from
- * <a href="https://github.com/oracle/docker-images/blob/main/OracleDatabase/SingleInstance/README.md">
- * oracle/docker-images SingleInstance</a>) instead of the {@code gvenzl/oracle-free} image that
- * the {@code testcontainers-oracle-free} module uses by default. The image is substituted via
- * {@link DockerImageName#asCompatibleSubstituteFor(String)} so the typed {@link OracleContainer}
- * still applies. Replaces the former {@code validate-migrations.sh} harness for this plugin.
- *
- * <p>Notes:
+ * Validates the Flyway migrations under {@code src/main/resources/db/migration/<variant>} by applying them to a real Oracle Database 23ai Free container. Uses
+ * the official Oracle image published at {@code container-registry.oracle.com/database/free} (multi-arch, built from
+ * <a href="https://github.com/oracle/docker-images/blob/main/OracleDatabase/SingleInstance/README.md"> oracle/docker-images SingleInstance</a>) instead of the
+ * {@code gvenzl/oracle-free} image that the {@code testcontainers-oracle-free} module uses by default. The image is substituted via
+ * {@link DockerImageName#asCompatibleSubstituteFor(String)} so the typed {@link OracleContainer} still applies. Replaces the former
+ * {@code validate-migrations.sh} harness for this plugin.
+ * <p>
+ * Notes:
  * <ul>
- *   <li>The official image is a prebuilt database, so {@code /opt/oracle/scripts/setup/} is not
- *       executed at start-up. Instead, we connect once as {@code system} after the container is
- *       ready and create a dedicated {@code ebms} user that Flyway then authenticates as.</li>
- *   <li>The image expects {@code ORACLE_PWD} (not {@code ORACLE_PASSWORD}) to set the
- *       sys/system/pdbadmin password.</li>
- *   <li>ORACLE_SID is fixed to {@code FREE} and the PDB is fixed to {@code FREEPDB1}.</li>
+ * <li>The official image is a prebuilt database, so {@code /opt/oracle/scripts/setup/} is not executed at start-up. Instead, we connect once as {@code system}
+ * after the container is ready and create a dedicated {@code ebms} user that Flyway then authenticates as.</li>
+ * <li>The image expects {@code ORACLE_PWD} (not {@code ORACLE_PASSWORD}) to set the sys/system/pdbadmin password.</li>
+ * <li>ORACLE_SID is fixed to {@code FREE} and the PDB is fixed to {@code FREEPDB1}.</li>
  * </ul>
  */
 @Testcontainers
@@ -60,11 +55,11 @@ class OracleFlywayMigrationIT
 	private static final String PASSWORD = "ebms";
 
 	@Container
-	static final OracleContainer ORACLE = new OracleContainer(
-			DockerImageName.parse("container-registry.oracle.com/database/free:latest").asCompatibleSubstituteFor("gvenzl/oracle-free"))
-			.withEnv("ORACLE_PWD", SYS_PASSWORD)
-			.withUsername(USER)
-			.withPassword(PASSWORD);
+	static final OracleContainer ORACLE =
+			new OracleContainer(DockerImageName.parse("container-registry.oracle.com/database/free:latest").asCompatibleSubstituteFor("gvenzl/oracle-free"))
+					.withEnv("ORACLE_PWD", SYS_PASSWORD)
+					.withUsername(USER)
+					.withPassword(PASSWORD);
 
 	@BeforeAll
 	static void createApplicationUser() throws SQLException
