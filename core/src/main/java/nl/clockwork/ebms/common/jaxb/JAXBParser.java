@@ -21,7 +21,9 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -41,7 +43,7 @@ import org.xml.sax.SAXNotSupportedException;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JAXBParser<T>
 {
-	private static final HashMap<Class<?>, JAXBParser<?>> xmlHandlers = new HashMap<>();
+	private static final HashMap<List<Class<?>>, JAXBParser<?>> xmlHandlers = new HashMap<>();
 	private static final SAXParserFactory saxParserFactory = initializeSaxParserFactory();
 	JAXBContext context;
 
@@ -117,19 +119,21 @@ public class JAXBParser<T>
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <L> JAXBParser<L> getInstance(Class<L> clazz) throws JAXBException
+	public static synchronized <L> JAXBParser<L> getInstance(Class<L> clazz) throws JAXBException
 	{
-		if (!xmlHandlers.containsKey(clazz))
-			xmlHandlers.put(clazz, new JAXBParser<>(JAXBContext.newInstance(clazz)));
-		return (JAXBParser<L>)xmlHandlers.get(clazz);
+		val key = List.<Class<?>>of(clazz);
+		if (!xmlHandlers.containsKey(key))
+			xmlHandlers.put(key, new JAXBParser<>(JAXBContext.newInstance(clazz)));
+		return (JAXBParser<L>)xmlHandlers.get(key);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <L> JAXBParser<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
+	public static synchronized <L> JAXBParser<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
 	{
-		if (!xmlHandlers.containsKey(clazz))
-			xmlHandlers.put(clazz, new JAXBParser<>(JAXBContext.newInstance(clazzes)));
-		return (JAXBParser<L>)xmlHandlers.get(clazz);
+		val key = Arrays.asList(clazzes);
+		if (!xmlHandlers.containsKey(key))
+			xmlHandlers.put(key, new JAXBParser<>(JAXBContext.newInstance(clazzes)));
+		return (JAXBParser<L>)xmlHandlers.get(key);
 	}
 
 }
