@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -169,7 +168,7 @@ class AdminRestControllerTest
 		cached.write(payload);
 		cached.lockOutputStream();
 		var attachment = new EbMSAttachment("file.txt", "cid-1", "text/plain", cached);
-		doReturn(attachment).when(ebMSDAO.findAttachment("m-1", "cid-1"));
+		when(ebMSDAO.findAttachment("m-1", "cid-1")).thenReturn(attachment);
 
 		var response = controller.getAttachment("m-1", "cid-1");
 		assertThat(response.getMediaType().toString()).isEqualTo("text/plain");
@@ -199,7 +198,7 @@ class AdminRestControllerTest
 	@Test
 	void exportMessageReturnsZipStream()
 	{
-		doReturn(new EbMSMessage()).when(ebMSDAO.findMessage("m-1"));
+		when(ebMSDAO.findMessage("m-1")).thenReturn(new EbMSMessage());
 		var response = controller.exportMessage("m-1");
 		assertThat(response.getMediaType().toString()).isEqualTo("application/zip");
 		assertThat(response.getHeaderString("Content-Disposition")).contains("m-1.zip");
