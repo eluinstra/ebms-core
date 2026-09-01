@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
@@ -33,15 +34,23 @@ import nl.clockwork.ebms.client.client.DeliveryTaskDispatcher;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskDAO;
 import org.jgroups.raft.RaftHandle;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-public class DAODeliveryTaskExecutor implements Runnable, DisposableBean
+public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<ContextRefreshedEvent>, Ordered, DisposableBean
 {
 	private static final long DEFAULT_LEADER_CHECK_INTERVAL_MILLIS = 1_000L;
 	private static final long DEFAULT_TASK_AWAIT_TIMEOUT_MILLIS = 60_000L;
 	private static final int WORKER_AWAIT_TERMINATION_SECONDS = 30;
+	/**
+	 * Ordered after the Flyway migration listener (which runs at {@code @Order(0)}) so the poller only starts once the schema exists. The first poll used to run
+	 * from the constructor, ahead of the migration, on a fresh database ({@code Table "DELIVERY_TASK" not found}).
+	 */
+	static final int START_ORDER = 1;
 
 	@NonNull
 	DeliveryTaskDAO deliveryTaskDAO;
@@ -56,6 +65,7 @@ public class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 	long leaderCheckIntervalMillis;
 	long taskAwaitTimeoutMillis;
 	ThreadPoolTaskExecutor workerExecutor;
+	final AtomicBoolean running = new AtomicBoolean();
 
 	@Builder
 	public DAODeliveryTaskExecutor(
@@ -82,7 +92,29 @@ public class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 		workerExecutor.setWaitForTasksToCompleteOnShutdown(false);
 		workerExecutor.setAwaitTerminationSeconds(WORKER_AWAIT_TERMINATION_SECONDS);
 		workerExecutor.afterPropertiesSet();
-		workerExecutor.execute(this);
+	}
+
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event)
+	{
+		// Deferred from the constructor so the worker only starts once the context is fully refreshed.
+		// The Flyway migration also runs on ContextRefreshedEvent but is ordered earlier, so the schema
+		// is guaranteed to exist before the first poll.
+		if (running.compareAndSet(false, true))
+			workerExecutor.execute(this);
+	}
+
+	@Override
+	public int getOrder()
+	{
+		return START_ORDER;
+	}
+
+	@Override
+	public void destroy()
+	{
+		if (running.compareAndSet(true, false))
+			workerExecutor.shutdown();
 	}
 
 	@Override
@@ -95,12 +127,6 @@ public class DAODeliveryTaskExecutor implements Runnable, DisposableBean
 			else if (!sleep(leaderCheckIntervalMillis))
 				return;
 		}
-	}
-
-	@Override
-	public void destroy()
-	{
-		workerExecutor.shutdown();
 	}
 
 	private void runLeaderCycle()

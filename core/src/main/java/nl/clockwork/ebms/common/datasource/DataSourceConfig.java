@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
@@ -93,6 +94,7 @@ public class DataSourceConfig
 	}
 
 	@EventListener(ContextRefreshedEvent.class)
+	@Order(0)
 	public void init()
 	{
 		if (updateDb)

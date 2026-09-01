@@ -15,11 +15,13 @@
  */
 package nl.clockwork.ebms.client.delivery.task;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +44,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 class DAODeliveryTaskExecutorTest
 {
@@ -83,6 +87,11 @@ class DAODeliveryTaskExecutorTest
 				.build();
 	}
 
+	private void startExecutor()
+	{
+		executor.onApplicationEvent(new ContextRefreshedEvent(mock(ApplicationContext.class)));
+	}
+
 	private static DeliveryTask sampleTask()
 	{
 		return DeliveryTask.builder().cpaId("cpa").receiveDeliveryChannelId("channel").messageId("msg-1").timestamp(Instant.now()).build();
@@ -98,6 +107,7 @@ class DAODeliveryTaskExecutorTest
 			return false;
 		});
 		executor = build(50, 200);
+		startExecutor();
 		assertTrue(leaderChecks.await(2, TimeUnit.SECONDS), "expected raftHandle.isLeader() to be polled several times");
 		verify(deliveryTaskDAO, never()).getTasksBefore(any(Instant.class), any(String.class));
 		verify(deliveryTaskDAO, never()).getTasksBefore(any(Instant.class), any(String.class), anyInt());
@@ -119,6 +129,7 @@ class DAODeliveryTaskExecutorTest
 			return Collections.emptyList();
 		});
 		executor = build(50, 200);
+		startExecutor();
 		assertTrue(polled.await(3, TimeUnit.SECONDS), "expected DAO to be polled at least twice across leader transitions");
 	}
 
@@ -141,6 +152,7 @@ class DAODeliveryTaskExecutorTest
 			return stuck;
 		});
 		executor = build(0, 100);
+		startExecutor();
 		assertThrows(CancellationException.class, () -> stuck.get(3, TimeUnit.SECONDS));
 	}
 
@@ -155,6 +167,7 @@ class DAODeliveryTaskExecutorTest
 			return Collections.emptyList();
 		});
 		executor = build(50, 200);
+		startExecutor();
 		assertTrue(polled.await(2, TimeUnit.SECONDS), "expected worker to start polling before destroy");
 		var start = System.currentTimeMillis();
 		executor.destroy();
@@ -178,6 +191,30 @@ class DAODeliveryTaskExecutorTest
 			return Collections.emptyList();
 		});
 		executor = build(50, 200);
+		startExecutor();
 		assertTrue(polled.await(3, TimeUnit.SECONDS), "expected polling to continue after a DAO exception");
+	}
+
+	@Test
+	void doesNotPollBeforeContextRefreshed() throws Exception
+	{
+		// The worker used to start from the constructor, racing ahead of the Flyway migration on a
+		// fresh database ("Table DELIVERY_TASK not found"). It must now wait for the context refresh.
+		var refreshed = new CountDownLatch(1);
+		when(raftHandle.isLeader()).thenAnswer(inv ->
+		{
+			refreshed.countDown();
+			return true;
+		});
+		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
+		{
+			refreshed.countDown();
+			return Collections.emptyList();
+		});
+		executor = build(20, 200);
+		// give a (buggy) eager worker a chance to start polling before the context is refreshed
+		assertFalse(refreshed.await(1, TimeUnit.SECONDS), "expected the executor to remain idle before the context refresh");
+		startExecutor();
+		assertTrue(refreshed.await(2, TimeUnit.SECONDS), "expected the executor to start polling after the context refresh");
 	}
 }
