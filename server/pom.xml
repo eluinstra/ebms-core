@@ -201,22 +201,10 @@
       <artifactId>swagger-ui</artifactId>
       <version>5.32.6</version>
     </dependency>
-    <!-- DB + messaging plugins provided at runtime (uber-jar inclusions). -->
+    <!-- Default H2 database plugin. Other plugins (DB / messaging) are optional: add their jars to the classpath at runtime to enable them. -->
     <dependency>
       <groupId>nl.clockwork.ebms.plugin.db</groupId>
       <artifactId>ebms-h2-db-plugin</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>nl.clockwork.ebms.plugin.messaging</groupId>
-      <artifactId>ebms-jms-messaging-plugin</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>nl.clockwork.ebms.plugin.messaging</groupId>
-      <artifactId>ebms-kafka-messaging-plugin</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

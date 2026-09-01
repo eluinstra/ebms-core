@@ -19,12 +19,12 @@ import java.util.Objects;
 import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -36,9 +36,6 @@ public class MessageEventListenerConfig
 	{
 		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT, SIMPLE_KAFKA, KAFKA, KAFKA_TEXT
 	}
-
-	@Value("${eventListener.filter}")
-	String eventListenerFilter;
 
 	@Bean
 	@Conditional(DefaultEventListenerType.class)
@@ -60,10 +57,13 @@ public class MessageEventListenerConfig
 		return new MessageEventDAOImpl(new JdbcTemplate(Objects.requireNonNull(dataSource)));
 	}
 
+	// Static so Spring does not instantiate this configuration class (and inject its fields) just to
+	// obtain the BeanPostProcessor: a non-static factory method creates the processor before @Value
+	// resolution runs, leaving the filter property as the raw placeholder string.
 	@Bean
-	public MessageEventListenerFilterProcessor messageEventListenerFilterProcessor()
+	public static MessageEventListenerFilterProcessor messageEventListenerFilterProcessor(Environment environment)
 	{
-		return new MessageEventListenerFilterProcessor(eventListenerFilter);
+		return new MessageEventListenerFilterProcessor(environment.getProperty("eventListener.filter", ""));
 	}
 
 	public static class DefaultEventListenerType implements Condition
