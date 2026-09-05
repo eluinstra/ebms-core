@@ -1,0 +1,53 @@
+name: CI
+
+# ebms-core is a git submodule of the eluinstra/ebms parent; a PR opened directly
+# against this repository does NOT trigger the parent's CI. This workflow gives
+# ebms-core PRs their own build + the two-adapter smoke test (smoke-test.sh),
+# which verifies bidirectional EbMS messaging between a local ebms-core server
+# and a published docker adapter.
+on:
+  pull_request:
+    branches: [ dev-2.20.x, dev ]
+  push:
+    branches: [ dev-2.20.x, dev ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-smoke-test:
+    name: Build + two-adapter smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Maven
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Build the full reactor (common, core, server, plugins) and run its test
+      # suite, leaving the ebms-server jar and H2 db plugin jar in their target/
+      # dirs for the smoke test. Docker is available on GitHub-hosted runners for
+      # the Docker-dependent integration tests.
+      - name: Build and test ebms-core
+        run: mvn -B -T 1C clean install -Ddependency-check.skip=true
+
+      # Adapter 1 = the ebms-core server jar built above (local StartEmbedded,
+      # property-driven), adapter 2 = the published eluinstra/ebms-adapter-bin
+      # image from docker-compose.yml. Verifies health, CPA load, ping both
+      # ways, sendMessage (both directions) and sendMessageMTOM with payloads.
+      - name: Two-adapter smoke test (bidirectional EbMS messaging)
+        run: ./smoke-test.sh

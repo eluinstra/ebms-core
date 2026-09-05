@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Log4j2 configuration for the two-adapter smoke test (smoke-test.sh).
+    Console-only so adapter 1's output is captured into adapter1.log; the
+    in-process server is started with -Dlog4j.configurationFile=log4j2.xml
+    and its working directory set to the location of this file.
+-->
+<Configuration>
+
+    <Appenders>
+        <Console name="Console">
+            <PatternLayout pattern="%d [%t] %-5p %c - %m%n" />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <AsyncLogger name="com.zaxxer.hikari" level="INFO" />
+        <AsyncLogger name="nl.clockwork.ebms" level="INFO" />
+        <AsyncLogger name="nl.clockwork.ebms.server" level="INFO" />
+        <AsyncLogger name="org.apache" level="WARN" />
+        <AsyncLogger name="org.apache.http.headers" level="WARN" />
+        <AsyncLogger name="org.apache.http.wire" level="WARN" />
+        <AsyncLogger name="org.apache.cxf" level="WARN" />
+        <AsyncLogger name="org.springframework.beans.factory" level="WARN" />
+        <AsyncLogger name="org.springframework.jdbc" level="WARN" />
+        <AsyncRoot level="INFO">
+            <AppenderRef ref="Console" />
+        </AsyncRoot>
+    </Loggers>
+</Configuration>
