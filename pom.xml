@@ -40,9 +40,9 @@
     <developer>
       <id>eluinstra</id>
       <name>Edwin Luinstra</name>
-      <email>edwin.luinstra@ordina.nl</email>
+      <email>edwin.luinstra@soprasteria.com</email>
       <organization>Ordina</organization>
-      <organizationUrl>http://www.ordina.nl</organizationUrl>
+      <organizationUrl>https://www.soprasteria.com</organizationUrl>
       <roles>
         <role>Architect</role>
         <role>Developer</role>
@@ -52,9 +52,6 @@
     <developer>
       <id>jwentink</id>
       <name>John Wentink</name>
-      <email>john.wentink@ordina.nl</email>
-      <organization>Ordina</organization>
-      <organizationUrl>http://www.ordina.nl</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
