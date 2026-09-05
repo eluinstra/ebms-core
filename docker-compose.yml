@@ -1,0 +1,76 @@
+services:
+  # digipoort:
+  #   image: eluinstra/ebms-adapter-bin:2.20.4
+  #   environment:
+  #     ebms_verifyHostnames: "false"
+  #     https_verifyHostnames: "false"
+  #     ebms_jdbc_update: "true"
+  #   command: "./start.sh -h2 -soap"
+  #   expose:
+  #     - 8080
+  #     - 8888
+  #   ports:
+  #     - "8080:8080"
+  overheid:
+    container_name: overheid
+    image: eluinstra/ebms-adapter-bin:2.20.4
+    environment:
+      ebms_verifyHostnames: "false"
+      https_verifyHostnames: "false"
+      ebms_jdbc_update: "true"
+      # Use the SAME keystore / truststore / password as adapter 1 (the local
+      # ebms-core build) so both adapters can validate each other's TLS certs
+      # and find a signing cert matching the CPA. The published image ships an
+      # older keystore (different CA / key size + password), which breaks the
+      # handshake and the S/MIME signature ("No certificate found with subject
+      # ..."). Each of these overrides an image default (env var = key with the
+      # '.' replaced by '_'); KeyStoreUtils resolves a bare file path before the
+      # classpath, so the mounted files below are the ones actually used.
+      keystore_path: "/home/user/keystore.p12"
+      keystore_password: "my-secret-password"
+      truststore_path: "/home/user/truststore.p12"
+      truststore_password: "my-secret-password"
+      client_keystore_path: "/home/user/keystore.p12"
+      client_keystore_password: "my-secret-password"
+      client_keystore_keyPassword: "my-secret-password"
+      signature_keystore_path: "/home/user/keystore.p12"
+      signature_keystore_password: "my-secret-password"
+      signature_keystore_keyPassword: "my-secret-password"
+      encryption_keystore_path: "/home/user/keystore.p12"
+      encryption_keystore_password: "my-secret-password"
+      encryption_keystore_keyPassword: "my-secret-password"
+    command: "./start.sh -h2 -soap -health"
+    expose:
+      - 8080
+      - 8888
+    ports:
+      - "8000:8080"
+      - "8088:8888"
+    extra_hosts: 
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - "./core/src/main/resources/nl/clockwork/ebms/keystore.p12:/home/user/keystore.p12:ro"
+      - "./core/src/main/resources/nl/clockwork/ebms/truststore.p12:/home/user/truststore.p12:ro"
+    healthcheck:
+      test: "curl -f http://localhost:8008/health"
+      start_period: 3s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  overheid_init:
+    image: alpine/curl:latest
+    depends_on:
+      overheid:
+        condition: service_healthy
+    environment:
+      CPA_FILE: cpa.xml
+    volumes:
+      # same CPA the smoke test loads into adapter 1 (kept in sync with the
+      # keystore), instead of the older one previously fetched from GitHub
+      - "./resources/CPAs/cpaStubEBF.rm.https.signed.xml:/cpa.xml:ro"
+    entrypoint: /bin/sh -c
+    command: |
+      "
+        curl -X POST -H \"Content-Type: text/plain\" --data @/cpa.xml http://overheid:8080/service/rest/v19/cpas?overwrite=true && \
+        curl -X POST -H \"Content-Type: application/json\" --data '{\"source\": \"https://localhost:8888/ebms\", \"destination\": \"https://host.docker.internal:8888/ebms\" }' http://overheid:8080/service/rest/v19/urlMappings
+      "
