@@ -52,29 +52,44 @@ import org.xml.sax.SAXException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DOMUtils
 {
-	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
+	private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = createDocumentBuilderFactory();
+	private static final TransformerFactory TRANSFORMER_FACTORY = createTransformerFactory();
+
+	private static DocumentBuilderFactory createDocumentBuilderFactory()
 	{
 		val dbf = DocumentBuilderFactory.newInstance();
-		dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-		dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-		dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbf.setXIncludeAware(false);
-		dbf.setExpandEntityReferences(false);
-		dbf.setNamespaceAware(true);
-		return dbf.newDocumentBuilder();
+		try
+		{
+			dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			dbf.setXIncludeAware(false);
+			dbf.setExpandEntityReferences(false);
+			dbf.setNamespaceAware(true);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new ExceptionInInitializerError(e);
+		}
+		return dbf;
+	}
+
+	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
+	{
+		return DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 	}
 
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
-		val result = createTransformerFactory().newTransformer();
+		val result = TRANSFORMER_FACTORY.newTransformer();
 		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		return result;
 	}
 
 	public static Transformer getTransformer(String xslFile) throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
-		val result = createTransformerFactory().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
+		val result = TRANSFORMER_FACTORY.newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
 		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		return result;
 	}
