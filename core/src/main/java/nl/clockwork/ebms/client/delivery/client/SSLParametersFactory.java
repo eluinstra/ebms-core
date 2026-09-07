@@ -42,7 +42,7 @@ public class SSLParametersFactory implements FactoryBean<SSLParameters>
 		val result = new SSLParameters();
 		if (enabledProtocols.length > 0)
 			result.setProtocols(enabledProtocols);
-		if (enabledProtocols.length > 0)
+		if (enabledCipherSuites.length > 0)
 			result.setCipherSuites(enabledCipherSuites);
 		return result;
 	}
