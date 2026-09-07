@@ -38,7 +38,7 @@ public class DeliveryTaskManagerConfig
 	@Value("${deliveryTaskManager.nrAutoRetries}")
 	int nrAutoRetries;
 	@Value("${deliveryTaskManager.autoRetryInterval}")
-	int autoRetryInterval;
+	long autoRetryInterval;
 
 	@Bean
 	public DeliveryTaskManager deliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO, EbMSDAO ebMSDAO, CPAManager cpaManager)

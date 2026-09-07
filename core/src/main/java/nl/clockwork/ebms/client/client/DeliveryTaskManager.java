@@ -16,22 +16,56 @@
 package nl.clockwork.ebms.client.client;
 
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.client.delivery.EbMSDAO;
+import nl.clockwork.ebms.client.delivery.task.DeliveryTaskDAO;
+import nl.clockwork.ebms.client.transport.http.EbMSUnrecoverableResponseException;
+import nl.clockwork.ebms.common.cpa.CPAManager;
+import nl.clockwork.ebms.common.protocol.EbMSAction;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 
-public interface DeliveryTaskManager
+@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+public abstract class DeliveryTaskManager
 {
-	void insertTask(final DeliveryTask task);
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	DeliveryTaskDAO deliveryTaskDAO;
+	@NonNull
+	CPAManager cpaManager;
+	int nrAutoRetries;
+	long autoRetryInterval;
 
-	void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status);
+	public DeliveryTaskManager(
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull DeliveryTaskDAO deliveryTaskDAO,
+			@NonNull CPAManager cpaManager,
+			int nrAutoRetries,
+			long autoRetryInterval)
+	{
+		this.ebMSDAO = ebMSDAO;
+		this.deliveryTaskDAO = deliveryTaskDAO;
+		this.cpaManager = cpaManager;
+		this.nrAutoRetries = nrAutoRetries;
+		this.autoRetryInterval = autoRetryInterval;
+	}
 
-	void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status, final String errorMessage);
+	public abstract void insertTask(DeliveryTask task);
 
-	void deleteTask(String messageId);
+	public abstract void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status);
 
-	default DeliveryTask createNewTask(
+	public abstract void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage);
+
+	public abstract void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage, Exception e);
+
+	public abstract void deleteTask(String messageId);
+
+	public DeliveryTask createNewTask(
 			String cpaId,
 			String sendDeliveryChannelId,
 			String receiveDeliveryChannelId,
@@ -43,7 +77,7 @@ public interface DeliveryTaskManager
 		return new DeliveryTask(cpaId, sendDeliveryChannelId, receiveDeliveryChannelId, messageId, timeToLive, timestamp, confidential, 0);
 	}
 
-	default DeliveryTask createNextTask(DeliveryTask task, DeliveryChannel deliveryChannel)
+	public DeliveryTask createNextTask(DeliveryTask task, DeliveryChannel deliveryChannel)
 	{
 		val rm = getReceiverReliableMessaging(deliveryChannel);
 		val timestamp = task.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : task.getTimeToLive();
@@ -55,8 +89,17 @@ public interface DeliveryTaskManager
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
 	}
 
-	default DeliveryTask createNextTask(DeliveryTask task, long retryInterval)
+	public DeliveryTask createNextTask(DeliveryTask task, long retryInterval)
 	{
 		return task.createNextTask(Instant.now().plusSeconds(60 * retryInterval));
+	}
+
+	public boolean shouldRetryUnreliable(DeliveryTask task, DeliveryTaskStatus status, Exception e, boolean reliableMessaging)
+	{
+		return status != DeliveryTaskStatus.SUCCEEDED
+				&& !(e instanceof EbMSUnrecoverableResponseException)
+				&& !reliableMessaging
+				&& task.getRetries() < nrAutoRetries
+				&& ebMSDAO.getMessageAction(task.getMessageId()).map(a -> a == EbMSAction.ACKNOWLEDGMENT || a == EbMSAction.MESSAGE_ERROR).orElse(false);
 	}
 }
