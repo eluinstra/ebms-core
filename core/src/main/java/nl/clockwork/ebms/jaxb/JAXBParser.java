@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -48,6 +49,9 @@ public class JAXBParser<T>
 		try
 		{
 			saxParserFactory = SAXParserFactory.newInstance();
+			saxParserFactory.setNamespaceAware(true);
+			saxParserFactory.setXIncludeAware(false);
+			saxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
 			saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
@@ -59,21 +63,15 @@ public class JAXBParser<T>
 	}
 
 	@SuppressWarnings("unchecked")
-	public T handleUnsafe(String xml) throws JAXBException
-	{
-		if (StringUtils.isEmpty(xml))
-			return null;
-		val r = new StringReader(xml);
-		val unmarshaller = context.createUnmarshaller();
-		val o = unmarshaller.unmarshal(r);
-		return o instanceof JAXBElement<?> ? ((JAXBElement<T>)o).getValue() : (T)o;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T handleUnsafe(Node n) throws JAXBException
+	public T handle(Node n) throws JAXBException
 	{
 		if (n == null)
 			return null;
+
+		Document document = n.getNodeType() == Node.DOCUMENT_NODE ? (Document)n : n.getOwnerDocument();
+		if (document != null && document.getDoctype() != null)
+			throw new JAXBException("Unsafe XML parsing is not allowed");
+
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(n);
 		return o instanceof JAXBElement<?> ? ((JAXBElement<T>)o).getValue() : (T)o;

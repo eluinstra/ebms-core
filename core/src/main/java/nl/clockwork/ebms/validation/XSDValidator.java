@@ -16,8 +16,8 @@
 package nl.clockwork.ebms.validation;
 
 import java.io.IOException;
-import java.io.StringReader;
 import javax.xml.XMLConstants;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import nl.clockwork.ebms.util.DOMUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -51,10 +52,14 @@ public class XSDValidator
 		}
 	}
 
-	public void validate(String xml) throws SAXException, IOException
+	public void validate(String xml) throws SAXException, IOException, ParserConfigurationException
 	{
+		// Parse through the hardened DOM builder (disallow-doctype-decl, no external
+		// entities/DTDs) so a billion-laughs / XXE bomb in the raw XML is rejected
+		// before XSD validation, instead of relying on the JDK's implicit expansion cap.
+		val document = DOMUtils.read(xml);
 		val validator = schema.newValidator();
-		validator.validate(new StreamSource(new StringReader(xml)));
+		validator.validate(new DOMSource(document));
 	}
 
 	public void validate(Node node) throws SAXException, IOException
