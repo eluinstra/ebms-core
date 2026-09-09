@@ -1292,4 +1292,20 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 				.header("Content-Length", equalTo("0"));
 	}
 
+	@Test
+	@Order(44)
+	void ebMSPingBillionLaughs()
+	{
+		var uuid = randomUUID().toString();
+		RestAssured.with()
+				.header("SOAPAction", "\"ebXML\"")
+				.header("Content-Type", "text/xml; charset=UTF-8")
+				.body(ebMSPingBillionLaughs(templateEngine, ebMSPingContext(uuid)))
+				.when()
+				.request(Method.POST, "/ebms")
+				.then()
+				.statusCode(500)
+				.header("Content-Length", equalTo("0"));
+	}
+
 }
