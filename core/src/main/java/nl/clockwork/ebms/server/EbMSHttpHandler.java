@@ -18,6 +18,7 @@ package nl.clockwork.ebms.server;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.LimitedInputStream;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -35,6 +37,7 @@ public class EbMSHttpHandler
 {
 	@NonNull
 	EbMSMessageProcessor messageProcessor;
+	long maxMessageSize;
 
 	public void handle(final HttpServletRequest request, final HttpServletResponse response) throws EbMSProcessorException
 	{
@@ -99,11 +102,16 @@ public class EbMSHttpHandler
 				}
 
 			};
-			inputStreamHandler.handle(request.getInputStream());
+			inputStreamHandler.handle(wrap(request));
 		}
 		catch (IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
+	}
+
+	private InputStream wrap(final HttpServletRequest request) throws IOException
+	{
+		return maxMessageSize > 0 ? new LimitedInputStream(request.getInputStream(), maxMessageSize) : request.getInputStream();
 	}
 }
