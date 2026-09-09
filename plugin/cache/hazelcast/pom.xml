@@ -104,6 +104,18 @@
                 <exclude>**/module-info.class</exclude>
               </excludes>
             </filter>
+            <!-- hazelcast and hazelcast-spring both ship a root-level attribution.txt, a
+                 META-INF/attribution.txt and a META-INF/NOTICE. hazelcast's copies are strict
+                 supersets of hazelcast-spring's, so drop hazelcast-spring's redundant copies to
+                 silence the duplicate warnings while keeping the complete version. -->
+            <filter>
+              <artifact>com.hazelcast:hazelcast-spring</artifact>
+              <excludes>
+                <exclude>attribution.txt</exclude>
+                <exclude>META-INF/attribution.txt</exclude>
+                <exclude>META-INF/NOTICE</exclude>
+              </excludes>
+            </filter>
           </filters>
         </configuration>
         <dependencies>
