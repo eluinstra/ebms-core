@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.api.ebms;
 
 import static java.util.UUID.randomUUID;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
@@ -1290,6 +1291,28 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 				.then()
 				.statusCode(500)
 				.header("Content-Length", equalTo("0"));
+	}
+
+	@Test
+	@Order(44)
+	void ebMSMessageOversized()
+	{
+		// Exercises the DoS guard (LimitedInputStream) end-to-end. The test server runs with a small
+		// ebmsMessage.maxMessageSize=10000 (see test default.properties); pad a valid ping body well
+		// past it. The cap trips mid-read (before XML is parsed), so only its size matters; the
+		// asserted faultstring echoes that cap value.
+		val base = ebMSPing(templateEngine, ebMSPingContext(randomUUID().toString()));
+		val oversized = base + "<!--" + "x".repeat(60_000) + "-->";
+		RestAssured.with()
+				.header("SOAPAction", "\"ebXML\"")
+				.header("Content-Type", "text/xml; charset=UTF-8")
+				.body(oversized)
+				.when()
+				.request(Method.POST, "/ebms")
+				.then()
+				.statusCode(500)
+				.contentType(ContentType.XML)
+				.body("Envelope.Body.Fault.faultstring", containsString("maximum allowed size of 10000 bytes"));
 	}
 
 }
