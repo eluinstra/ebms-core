@@ -532,6 +532,19 @@
                   <exclude>META-INF/*.DSA</exclude>
                   <exclude>META-INF/*.RSA</exclude>
                   <exclude>**/module-info.class</exclude>
+                  <!-- Non-legal build/runtime artifacts duplicated across CXF jars; EbMS does not use
+                       CXF Blueprint or the javax.wsdl plugins, so a single copy suffices. -->
+                  <exclude>META-INF/DEPENDENCIES</exclude>
+                  <exclude>META-INF/blueprint.handlers</exclude>
+                  <exclude>META-INF/wsdl.plugin.xml</exclude>
+                </excludes>
+              </filter>
+              <!-- jakarta.xml.ws-api bundles a copy of the jakarta.jws spec classes; keep the dedicated
+                   jakarta.jws-api artifact as the single provider to avoid class duplication. -->
+              <filter>
+                <artifact>jakarta.xml.ws:jakarta.xml.ws-api</artifact>
+                <excludes>
+                  <exclude>jakarta/jws/**</exclude>
                 </excludes>
               </filter>
             </filters>
