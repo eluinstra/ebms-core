@@ -18,6 +18,7 @@ package nl.clockwork.ebms.server;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,9 +26,12 @@ import org.springframework.context.annotation.Configuration;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSServerConfig
 {
+	@Value("${ebmsMessage.maxMessageSize:104857600}")
+	long maxMessageSize;
+
 	@Bean
 	public EbMSHttpHandler httpHandler(EbMSMessageProcessor messageProcessor)
 	{
-		return new EbMSHttpHandler(messageProcessor);
+		return new EbMSHttpHandler(messageProcessor, maxMessageSize);
 	}
 }
