@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -29,6 +30,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.StreamUtils;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 class SignatureValidator
@@ -93,7 +95,10 @@ class SignatureValidator
 		}
 		catch (ValidationException e)
 		{
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature", EbMSErrorCode.SECURITY_FAILURE, e.getMessage()));
+			// Log the root cause server-side but return a generic reason to the peer; the raw
+			// XML-Security exception message can leak internal detail (algorithms, digests, URIs).
+			log.warn("Signature verification failed: {}", e.getMessage(), e);
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature", EbMSErrorCode.SECURITY_FAILURE, "Signature verification failed."));
 		}
 	}
 
