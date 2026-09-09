@@ -475,4 +475,9 @@ public interface WithTemplate
 		return templateEngine.process("EbMSPingXXE", context);
 	}
 
+	default String ebMSPingBillionLaughs(TemplateEngine templateEngine, Context context)
+	{
+		return templateEngine.process("EbMSPingBillionLaughs", context);
+	}
+
 }
