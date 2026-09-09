@@ -63,7 +63,7 @@ public abstract class EbMSInputStreamHandler
 		}
 		catch (ValidationException e)
 		{
-			log.error("", e);
+			log.error(e.getMessage(), e);
 			handleValidationException("Client", e.getMessage());
 		}
 		catch (Exception e)
@@ -95,8 +95,8 @@ public abstract class EbMSInputStreamHandler
 			request = getRequestLogger(request);
 		val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"), getRequestHeader("Content-Type"));
 		val requestDocument = messageReader.read(request);
-		if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
-			messageLog.info("<<<<\n{}", DOMUtils.toString(requestDocument.getMessage()));
+		if (messageLog.isDebugEnabled())
+			messageLog.debug("<<<<\n{}", DOMUtils.toString(requestDocument.getMessage()));
 		return messageProcessor.processRequest(requestDocument);
 	}
 
@@ -111,8 +111,8 @@ public abstract class EbMSInputStreamHandler
 		val soapAction = getRequestHeader("SOAPAction");
 		if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 		{
-			if (messageLog.isInfoEnabled())
-				messageLog.info("<<<<\n{}\n{}", getRequestHeaders(), IOUtils.toString(request, Charset.defaultCharset()));
+			if (messageLog.isDebugEnabled())
+				messageLog.debug("<<<<\n{}\n{}", getRequestHeaders(), IOUtils.toString(request, Charset.defaultCharset()));
 			throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
 		}
 	}
@@ -140,12 +140,9 @@ public abstract class EbMSInputStreamHandler
 		}
 		else
 		{
-			if (messageLog.isInfoEnabled())
-				messageLog.info(
-						">>>>\nStatusCode={}\nContent-Type=text/xml\nSOAPAction={}\n{}",
-						HttpServletResponse.SC_OK,
-						Constants.EBMS_SOAP_ACTION,
-						DOMUtils.toString(responseDocument.getMessage()));
+			messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\nSOAPAction={}", HttpServletResponse.SC_OK, Constants.EBMS_SOAP_ACTION);
+			if (messageLog.isDebugEnabled())
+				messageLog.debug(">>>>\n{}", DOMUtils.toString(responseDocument.getMessage()));
 			writeResponseStatus(HttpServletResponse.SC_OK);
 			writeResponseHeader("Content-Type", "text/xml");
 			writeResponseHeader("SOAPAction", Constants.EBMS_SOAP_ACTION);
