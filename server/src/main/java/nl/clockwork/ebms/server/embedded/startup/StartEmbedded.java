@@ -254,7 +254,11 @@ public class StartEmbedded extends Start
 					EnumSet.allOf(DispatcherType.class));
 		if (isEbmsClientCertificateAuthenticationEnabled(properties))
 			result.addFilter(
-					createClientCertificateManagerFilterHolder(properties.getProperty(HTTPS_CLIENT_CERTIFICATE_HEADER_PROPERTY)),
+					createClientCertificateManagerFilterHolder(
+							properties.getProperty(HTTPS_CLIENT_CERTIFICATE_HEADER_PROPERTY),
+							properties.getProperty(TRUSTSTORE_TYPE_PROPERTY),
+							properties.getProperty(TRUSTSTORE_PATH_PROPERTY),
+							properties.getProperty(TRUSTSTORE_PASSWORD_PROPERTY)),
 					"/*",
 					EnumSet.allOf(DispatcherType.class));
 		result.addServlet(EbMSServlet.class, properties.getProperty(EBMS_PATH_PROPERTY));

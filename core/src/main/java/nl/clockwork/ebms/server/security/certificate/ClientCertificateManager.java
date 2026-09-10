@@ -36,4 +36,13 @@ public class ClientCertificateManager
 		else
 			certificateHolder.set(certificate);
 	}
+
+	/**
+	 * Removes the certificate bound to the current thread. Called by the servlet filters that populate {@link #setCertificate} so a thread that is returned to
+	 * the pool does not leak a peer's identity to the next request it serves.
+	 */
+	public static void clear()
+	{
+		certificateHolder.remove();
+	}
 }

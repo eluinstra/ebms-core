@@ -40,6 +40,12 @@ public interface SystemInterface
 		return value != null ? Integer.parseInt(value) : defaultValue;
 	}
 
+	default long getLongProperty(String key, long defaultValue)
+	{
+		val value = System.getProperty(key);
+		return value != null ? Long.parseLong(value) : defaultValue;
+	}
+
 	default boolean getBooleanProperty(String key, boolean defaultValue)
 	{
 		val value = System.getProperty(key);

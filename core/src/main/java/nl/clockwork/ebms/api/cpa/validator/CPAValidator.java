@@ -25,6 +25,7 @@ import lombok.val;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
+import nl.clockwork.ebms.server.endpoint.servlet.filters.LoopbackUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -218,5 +219,41 @@ public class CPAValidator
 					"Multiple endpoints defined in TransportReceiver of Transport "
 							+ t.getTransportId()
 							+ "not supported! Only allPurpose endpoint supported. Using first endpoint.");
+		t.getTransportReceiver().getEndpoint().forEach(CPAValidator::validateEndpointUri);
+	}
+
+	// F3: reject CPA endpoint URIs that would let an attacker redirect outbound EbMS traffic or
+	// exfiltrate business messages. For non-loopback endpoints the scheme must be https and the host
+	// must not be a literal RFC-1918 / loopback / link-local / site-local IPv4 or IPv6 address. Named
+	// (non-IP) hosts are allowed so DNS-identified partners keep working; loopback endpoints are
+	// allowed (both http:// and https://) so local / CI test CPAs keep working. The check can be
+	// disabled with -Dcpa.endpoint.validate=false (on by default).
+	private static void validateEndpointUri(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Endpoint endpoint)
+	{
+		if (!Boolean.parseBoolean(System.getProperty("cpa.endpoint.validate", "true")))
+			return;
+		val uri = endpoint.getUri();
+		if (uri == null)
+			return;
+		java.net.URL url;
+		try
+		{
+			url = java.net.URI.create(uri).toURL();
+		}
+		catch (java.net.MalformedURLException e)
+		{
+			throw new ValidationException("Invalid endpoint URI " + uri);
+		}
+		val host = url.getHost();
+		if (host == null)
+			return;
+		if (LoopbackUtils.isLoopback(host))
+			// Local / CI test CPAs may use cleartext http:// as well as https:// against the loopback
+			// interface, so no further restriction applies to them.
+			return;
+		if (!"https".equalsIgnoreCase(url.getProtocol()))
+			throw new ValidationException("Endpoint " + uri + " must use https (cleartext endpoints are not allowed).");
+		if (LoopbackUtils.isPrivateOrLocalHost(host))
+			throw new ValidationException("Endpoint " + uri + " host " + host + " is a private/reserved address and is not allowed.");
 	}
 }

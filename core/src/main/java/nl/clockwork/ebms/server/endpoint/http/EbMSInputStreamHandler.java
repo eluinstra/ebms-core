@@ -18,6 +18,7 @@ package nl.clockwork.ebms.server.endpoint.http;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.xml.bind.JAXBException;
 import java.io.BufferedInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -73,7 +74,7 @@ public abstract class EbMSInputStreamHandler
 	{
 		try
 		{
-			val responseDocument = handleRequest(request);
+			val responseDocument = handleRequest(wrapRequestForSizeLimit(request));
 			returnResponse(responseDocument);
 		}
 		catch (ValidationException e)
@@ -129,6 +130,44 @@ public abstract class EbMSInputStreamHandler
 		val contentLength = getRequestContentLength();
 		if (contentLength > maxRequestBytes)
 			throw new ValidationException("Unable to process message! Request too large");
+	}
+
+	/**
+	 * Wraps the request body so the <em>actual</em> number of bytes consumed is capped, not just the declared {@code Content-Length}. A client can send a body
+	 * with no {@code Content-Length} (chunked transfer) or a value smaller than what it streams, both of which slip past {@link #validateRequestSize()}; this
+	 * wrapper aborts the read with a {@link ValidationException} the moment the real byte count exceeds {@code maxRequestBytes}.
+	 */
+	private InputStream wrapRequestForSizeLimit(InputStream request)
+	{
+		return new FilterInputStream(request)
+		{
+			private long bytesRead;
+
+			@Override
+			public int read() throws IOException
+			{
+				int b = super.read();
+				if (b != -1)
+					accountFor(1);
+				return b;
+			}
+
+			@Override
+			public int read(byte[] buffer, int offset, int length) throws IOException
+			{
+				int n = super.read(buffer, offset, length);
+				if (n > 0)
+					accountFor(n);
+				return n;
+			}
+
+			private void accountFor(int n)
+			{
+				bytesRead += n;
+				if (bytesRead > maxRequestBytes)
+					throw new ValidationException("Unable to process message! Request too large");
+			}
+		};
 	}
 
 	private void validateSoapAction(InputStream request) throws IOException

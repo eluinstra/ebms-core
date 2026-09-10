@@ -41,6 +41,7 @@ import nl.clockwork.ebms.server.embedded.config.EbMSKeyStore;
 import nl.clockwork.ebms.server.embedded.utils.Utils;
 import nl.clockwork.ebms.server.embedded.web.ExtensionProvider;
 import nl.clockwork.ebms.server.endpoint.servlet.filters.HealthServlet;
+import nl.clockwork.ebms.server.endpoint.servlet.filters.LoopbackUtils;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -246,6 +247,9 @@ public class Start implements SystemInterface
 	{
 		val httpConfig = new HttpConfiguration();
 		httpConfig.setSendServerVersion(false);
+		// F7: Jetty 12's HttpConfiguration only caps request headers (not the body); cap those
+		// here. The request body cap for every endpoint is enforced by MaxRequestBodySizeFilter.
+		httpConfig.setRequestHeaderSize(64 * 1024);
 		val result = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
 		result.setHost(getProperty("api.host", DEFAULT_HOST));
 		result.setPort(getIntegerProperty("api.port", 8080));
@@ -331,6 +335,7 @@ public class Start implements SystemInterface
 	{
 		val httpConfig = new HttpConfiguration();
 		httpConfig.setSendServerVersion(false);
+		httpConfig.setRequestHeaderSize(64 * 1024);
 		httpConfig.addCustomizer(new SecureRequestCustomizer(!isHostnameVerificationDisabled()));
 		val result = new ServerConnector(server, sslContextFactory, new HttpConnectionFactory(httpConfig));
 		result.setHost(getProperty("api.host", DEFAULT_HOST));
@@ -402,7 +407,21 @@ public class Start implements SystemInterface
 			result.addFilter(createRateLimiterFilterHolder(getProperty("api.server.queriesPerSecond")), "/*", EnumSet.allOf(DispatcherType.class));
 		if (hasUserRateLimit())
 			result.addFilter(createUserRateLimiterFilterHolder(getProperty("api.server.userQueriesPerSecond")), "/*", EnumSet.allOf(DispatcherType.class));
-		if (isAuthenticationEnabled())
+		// F7: hard connector-level request body cap applied to every endpoint (REST + SOAP).
+		result.addFilter(createMaxRequestBodySizeFilterHolder(getMaxRequestBytes()), "/*", EnumSet.allOf(DispatcherType.class));
+		// F1: an unauthenticated REST/SOAP management API must not be exposed on a non-loopback
+		// address. If it is not authenticated, refuse to bind unless the host is loopback (dev/CI)
+		// or the operator explicitly opts out with api.allowUnauthenticated=true. This fails safe: an
+		// externally reachable API always requires authentication.
+		val authenticationEnabled = isAuthenticationEnabled();
+		if (!authenticationEnabled && !LoopbackUtils.isLoopback(getProperty("api.host", DEFAULT_HOST)) && !getBooleanProperty("api.allowUnauthenticated", false))
+		{
+			printWarn("Web Server not available: api.host is not loopback and api.authentication.enabled=false.");
+			printWarn(
+					"Refusing to start the management API without authentication. Enable api.authentication.enabled, bind to loopback (api.host=localhost), or explicitly set api.allowUnauthenticated=true.");
+			exit(1);
+		}
+		if (authenticationEnabled)
 			addAuthenticationHandler(result);
 		if (isSoapEnabled())
 			result.addServlet(CXFServlet.class, SOAP_URL + "/*");
@@ -438,7 +457,17 @@ public class Start implements SystemInterface
 
 	private boolean isAuthenticationEnabled()
 	{
+		// F1: authentication is enabled via api.authentication.enabled (or -authentication in the admin
+		// server). The security guarantee is enforced in createWebContextHandler, which refuses to bind
+		// an unauthenticated API to a non-loopback address (so it can never be exposed externally
+		// without authentication). Loopback binds may run unauthenticated (local dev / CI).
 		return getBooleanProperty("api.authentication.enabled", false);
+	}
+
+	private long getMaxRequestBytes()
+	{
+		// F7: connector-level request body cap, defaults to the EbMS message limit (8 MiB).
+		return getLongProperty("api.server.maxRequestBytes", getLongProperty("ebms.request.maxBytes", 8 * 1024 * 1024L));
 	}
 
 	private boolean containsHelpOption(Options options, String[] args)
@@ -482,8 +511,15 @@ public class Start implements SystemInterface
 
 	protected FilterHolder createUserRateLimiterFilterHolder(String queriesPerSecond)
 	{
-		val result = new FilterHolder(nl.clockwork.ebms.server.endpoint.servlet.filters.RateLimiterFilter.class);
-		result.setInitParameter("api.server.userQueriesPerSecond", queriesPerSecond);
+		val result = new FilterHolder(nl.clockwork.ebms.server.endpoint.servlet.filters.UserRateLimiterFilter.class);
+		result.setInitParameter("queriesPerSecond", queriesPerSecond);
+		return result;
+	}
+
+	protected FilterHolder createMaxRequestBodySizeFilterHolder(long maxRequestBytes)
+	{
+		val result = new FilterHolder(nl.clockwork.ebms.server.endpoint.servlet.filters.MaxRequestBodySizeFilter.class);
+		result.setInitParameter("maxRequestBytes", Long.toString(maxRequestBytes));
 		return result;
 	}
 
@@ -511,10 +547,17 @@ public class Start implements SystemInterface
 		}
 	}
 
-	protected FilterHolder createClientCertificateManagerFilterHolder(String clientCertificateHeader)
+	protected
+			FilterHolder
+			createClientCertificateManagerFilterHolder(String clientCertificateHeader, String trustStoreType, String trustStorePath, String trustStorePassword)
 	{
 		val result = new FilterHolder(nl.clockwork.ebms.server.endpoint.servlet.filters.ClientCertificateManagerFilter.class);
 		result.setInitParameter("x509CertificateHeader", clientCertificateHeader);
+		// F2: pass the truststore so a reverse-proxy (header) certificate is validated against it
+		// before being trusted as the peer's identity.
+		result.setInitParameter("trustStoreType", trustStoreType);
+		result.setInitParameter("trustStorePath", trustStorePath);
+		result.setInitParameter("trustStorePassword", trustStorePassword);
 		return result;
 	}
 
@@ -533,7 +576,11 @@ public class Start implements SystemInterface
 		else if (isSslEnabled())
 		{
 			result.addFilter(
-					createClientCertificateManagerFilterHolder(getProperty("api.clientCertificateHeader")),
+					createClientCertificateManagerFilterHolder(
+							getProperty("api.clientCertificateHeader"),
+							getProperty("api.ssl.trustStoreType", DEFAULT_KEYSTORE_TYPE),
+							getProperty("api.ssl.trustStorePath"),
+							getProperty("api.ssl.trustStorePassword")),
 					"/*",
 					EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR));
 			result.addFilter(createClientCertificateAuthenticationFilterHolder(), "/*", EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR));

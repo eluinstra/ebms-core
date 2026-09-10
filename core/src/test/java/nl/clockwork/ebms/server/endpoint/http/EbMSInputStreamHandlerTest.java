@@ -46,6 +46,21 @@ class EbMSInputStreamHandlerTest
 		verifyNoInteractions(messageProcessor);
 	}
 
+	@Test
+	void handleRejectsChunkedBodyLargerThanDeclaredLength()
+	{
+		// Content-Length is absent (-1, as for chunked transfer), so the declared-length check passes;
+		// the cap must instead trip on the actual bytes streamed.
+		val messageProcessor = mock(EbMSMessageRouter.class);
+		val handler = new TestHandler(messageProcessor, 16, 128, "POST", -1, "\"ebXML\"");
+
+		handler.handle(new ByteArrayInputStream("x".repeat(100).getBytes(StandardCharsets.UTF_8)));
+
+		assertEquals(500, handler.statusCode);
+		assertTrue(handler.responseBody().contains("Request too large"));
+		verifyNoInteractions(messageProcessor);
+	}
+
 	private static class TestHandler extends EbMSInputStreamHandler
 	{
 		final String method;

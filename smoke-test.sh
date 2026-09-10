@@ -286,6 +286,7 @@ info "Starting adapter 1 (local ebms-core server, property-driven)..."
     -Debms.jdbc.update=true \
     -Debms.verifyHostnames=false \
     -Ddatabase.start=true \
+    -Dapi.host=localhost \
     -Dapi.ssl.enabled=true \
     -Dapi.ssl.keyStorePassword=my-secret-password \
     -Dapi.health.enabled=true \
