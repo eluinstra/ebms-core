@@ -133,7 +133,8 @@ public class EbMSMessageDecrypter
 			// Log the root cause server-side but return a generic reason to the peer; the raw
 			// XML-Enc exception message can leak internal detail (algorithms, key info, structure).
 			log.warn("Message decryption failed for {}: {}", attachment.getContentId(), e.getMessage(), e);
-			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(), EbMSErrorCode.SECURITY_FAILURE, "Decryption of message content failed."));
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("cid:" + attachment.getContentId(), EbMSErrorCode.SECURITY_FAILURE, "Decryption of message content failed."));
 		}
 	}
 }
