@@ -39,14 +39,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Regression guard for the <b>REST</b> (JAX-RS) CPA entry points against billion-laughs
- * and XXE.
- *
- * <p>{@code CPARestController} takes the CPA as a {@code text/plain} {@link String} and never
- * XML-parses it at the transport layer; the first parse happens inside
- * {@code CPAControllerImpl} (XSD validation, then JAXB). Those parsers are hardened
- * (disallow-doctype-decl / ACCESS_EXTERNAL_DTD=""), so a DOCTYPE-based attack must be rejected
- * with a 400 Bad Request — not expand (DoS) and not resolve external entities (XXE).
+ * Regression guard for the <b>REST</b> (JAX-RS) CPA entry points against billion-laughs and XXE.
+ * <p>
+ * {@code CPARestController} takes the CPA as a {@code text/plain} {@link String} and never XML-parses it at the transport layer; the first parse happens inside
+ * {@code CPAControllerImpl} (XSD validation, then JAXB). Those parsers are hardened (disallow-doctype-decl / ACCESS_EXTERNAL_DTD=""), so a DOCTYPE-based attack
+ * must be rejected with a 400 Bad Request — not expand (DoS) and not resolve external entities (XXE).
  */
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)

@@ -38,7 +38,7 @@ class Db2FlywayMigrationIT
 	private static final String PASSWORD = "test";
 
 	@ParameterizedTest(name = "db2 migrations apply cleanly: {0}")
-	@ValueSource(strings = {"default"/* FIXME, "strict"*/})
+	@ValueSource(strings = {"default"/* FIXME, "strict" */})
 	void migrationsApplyCleanly(String variant)
 	{
 		Flyway flyway = Flyway.configure().dataSource(JDBC_URL, USER, PASSWORD).locations("classpath:db/migration/" + variant).cleanDisabled(false).load();

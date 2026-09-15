@@ -21,12 +21,10 @@ import java.io.InputStream;
 import nl.clockwork.ebms.validation.ValidationException;
 
 /**
- * An {@link InputStream} wrapper that throws a {@link ValidationException} once more than
- * {@code maxBytes} bytes have been read from the underlying stream.
- *
- * <p>This guards the EbMS message endpoint against oversized (denial-of-service) payloads.
- * Unlike a {@code Content-Length} check it is robust to missing or lying length headers
- * and to chunked transfer, because the cap is enforced on the bytes actually read.
+ * An {@link InputStream} wrapper that throws a {@link ValidationException} once more than {@code maxBytes} bytes have been read from the underlying stream.
+ * <p>
+ * This guards the EbMS message endpoint against oversized (denial-of-service) payloads. Unlike a {@code Content-Length} check it is robust to missing or lying
+ * length headers and to chunked transfer, because the cap is enforced on the bytes actually read.
  */
 public class LimitedInputStream extends FilterInputStream
 {
