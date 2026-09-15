@@ -44,13 +44,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Servlet filter that restricts a servlet context to authenticated Basic users read from a
- * Jetty-style {@code realm.properties} file ({@code user=password,role1,role2}).
- *
- * <p>Passwords must be stored as a salted, iterated PBKDF2-HMAC-SHA256 hash in the form
- * {@code {PBKDF2WithHmacSHA256}<base64(salt|iterations(4)|derivedKey)>}. Legacy weak formats
- * ({@code MD5:}, {@code OBF:}, {@code CRYPT:} and plaintext) are rejected, so a realm containing
- * them will not authenticate. Use {@link #main(String[])} to generate a password hash for the realm.
+ * Servlet filter that restricts a servlet context to authenticated Basic users read from a Jetty-style {@code realm.properties} file
+ * ({@code user=password,role1,role2}).
+ * <p>
+ * Passwords must be stored as a salted, iterated PBKDF2-HMAC-SHA256 hash in the form {@code {PBKDF2WithHmacSHA256}<base64(salt|iterations(4)|derivedKey)>}.
+ * Legacy weak formats ({@code MD5:}, {@code OBF:}, {@code CRYPT:} and plaintext) are rejected, so a realm containing them will not authenticate. Use
+ * {@link #main(String[])} to generate a password hash for the realm.
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BasicAuthenticationFilter implements Filter
@@ -113,8 +112,7 @@ public class BasicAuthenticationFilter implements Filter
 	/**
 	 * Compares a supplied password against a stored {@code {PBKDF2WithHmacSHA256}...} hash.
 	 *
-	 * @return true on a match; false on a mismatch or when the stored value is in an unsupported
-	 *         (legacy/weak) format
+	 * @return true on a match; false on a mismatch or when the stored value is in an unsupported (legacy/weak) format
 	 */
 	boolean checkPassword(String storedHash, String password)
 	{
@@ -125,7 +123,8 @@ public class BasicAuthenticationFilter implements Filter
 			val raw = Base64.getDecoder().decode(storedHash.substring(PBKDF2_PREFIX.length()));
 			val saltLength = raw.length - KEY_BYTES - 4;
 			val salt = Arrays.copyOfRange(raw, 0, saltLength);
-			val iterations = ((raw[saltLength] & 0xff) << 24) | ((raw[saltLength + 1] & 0xff) << 16) | ((raw[saltLength + 2] & 0xff) << 8) | (raw[saltLength + 3] & 0xff);
+			val iterations =
+					((raw[saltLength] & 0xff) << 24) | ((raw[saltLength + 1] & 0xff) << 16) | ((raw[saltLength + 2] & 0xff) << 8) | (raw[saltLength + 3] & 0xff);
 			val expected = Arrays.copyOfRange(raw, saltLength + 4, raw.length);
 			return MessageDigest.isEqual(derive(password.toCharArray(), salt, iterations), expected);
 		}
@@ -142,8 +141,8 @@ public class BasicAuthenticationFilter implements Filter
 	}
 
 	/**
-	 * Generates a new {@code {PBKDF2WithHmacSHA256}...} hash. Runs standalone:
-	 * {@code java ... BasicAuthenticationFilter <password>} prints the value to store in the realm file.
+	 * Generates a new {@code {PBKDF2WithHmacSHA256}...} hash. Runs standalone: {@code java ... BasicAuthenticationFilter <password>} prints the value to store in
+	 * the realm file.
 	 */
 	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
@@ -155,7 +154,9 @@ public class BasicAuthenticationFilter implements Filter
 		}
 		val salt = new byte[SALT_BYTES];
 		new SecureRandom().nextBytes(salt);
-		val key = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM).generateSecret(new PBEKeySpec(args[0].toCharArray(), salt, ITERATIONS, KEY_BYTES * Byte.SIZE)).getEncoded();
+		val key = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM)
+				.generateSecret(new PBEKeySpec(args[0].toCharArray(), salt, ITERATIONS, KEY_BYTES * Byte.SIZE))
+				.getEncoded();
 		val encoded = new byte[salt.length + 4 + key.length];
 		System.arraycopy(salt, 0, encoded, 0, salt.length);
 		int offset = salt.length;
