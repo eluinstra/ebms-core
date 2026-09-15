@@ -36,15 +36,6 @@
       <version>${flyway.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.ibm.db2</groupId>
-      <artifactId>jcc</artifactId>
-      <version>12.1.5.0</version>
-      <!-- IBM's International Program License Agreement (IPLA) does not clearly
-           permit redistribution, so the driver is not bundled into the shaded
-           jar. It is provided by the deployment environment. -->
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <scope>compile</scope>
@@ -52,6 +43,15 @@
     <dependency>
       <groupId>nl.clockwork.ebms.common</groupId>
       <artifactId>ebms-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.db2</groupId>
+      <artifactId>jcc</artifactId>
+      <version>12.1.5.0</version>
+      <!-- IBM's International Program License Agreement (IPLA) does not clearly
+           permit redistribution, so the driver is not bundled into the shaded
+           jar. It is provided by the deployment environment. -->
       <scope>provided</scope>
     </dependency>
     <dependency>

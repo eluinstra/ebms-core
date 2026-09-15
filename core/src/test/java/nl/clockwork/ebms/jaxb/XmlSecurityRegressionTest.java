@@ -35,12 +35,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Regression tests guarding every untrusted-XML entry point against the
- * billion-laughs / XXE attack (exponential internal-entity expansion).
- *
- * <p>A "billion laughs" payload is a DOCTYPE with escalating internal entities;
- * it only needs to be rejected (by disallow-doctype-decl) and must never expand
- * to a huge in-memory value.
+ * Regression tests guarding every untrusted-XML entry point against the billion-laughs / XXE attack (exponential internal-entity expansion).
+ * <p>
+ * A "billion laughs" payload is a DOCTYPE with escalating internal entities; it only needs to be rejected (by disallow-doctype-decl) and must never expand to a
+ * huge in-memory value.
  */
 class XmlSecurityRegressionTest
 {
@@ -54,7 +52,9 @@ class XmlSecurityRegressionTest
 	/** Escalating internal-entity bomb: the final reference expands to 1,000,000 characters. */
 	private static String bomb(String root)
 	{
-		return "<!DOCTYPE " + root + " [\n"
+		return "<!DOCTYPE "
+				+ root
+				+ " [\n"
 				+ " <!ENTITY a \"xxxxxxxxxx\">\n"
 				+ " <!ENTITY b \"&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;\">\n"
 				+ " <!ENTITY c \"&b;&b;&b;&b;&b;&b;&b;&b;&b;&b;\">\n"
@@ -62,7 +62,11 @@ class XmlSecurityRegressionTest
 				+ " <!ENTITY e \"&d;&d;&d;&d;&d;&d;&d;&d;&d;&d;\">\n"
 				+ " <!ENTITY f \"&e;&e;&e;&e;&e;&e;&e;&e;&e;&e;\">\n"
 				+ "]\n"
-				+ "<" + root + " attr=\"&f;\"></" + root + ">";
+				+ "<"
+				+ root
+				+ " attr=\"&f;\"></"
+				+ root
+				+ ">";
 	}
 
 	/** Minimal DOCTYPE (no large expansion) used to build a DOM that still carries a DOCTYPE. */
