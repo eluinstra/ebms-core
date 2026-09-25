@@ -16,9 +16,12 @@
 package nl.clockwork.ebms.client.delivery.handler;
 
 import jakarta.annotation.PostConstruct;
+import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider;
 import nl.clockwork.ebms.client.client.DeliveryTaskDispatcher;
 import nl.clockwork.ebms.client.client.DeliveryTaskManager;
 import nl.clockwork.ebms.client.client.URLMappingRepository;
@@ -29,9 +32,6 @@ import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.event.MessageEventListener;
 import nl.clockwork.ebms.common.security.EbMSMessageEncrypter;
 import nl.clockwork.ebms.server.message.processor.message.EbMSMessageProcessor;
-import org.jgroups.JChannel;
-import org.jgroups.raft.RaftHandle;
-import org.jgroups.raft.StateMachine;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
@@ -79,10 +79,8 @@ public class DeliveryTaskHandlerConfig
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	@Value("${http.uuid.headerName}")
 	String uuidHeader;
-	@Value("${raft.configLocation:ebms-raft.xml}")
-	String raftConfigLocation;
-	@Value("${raft.clusterName:ebms-cluster}")
-	String raftClusterName;
+	@Value("${deliveryTaskHandler.default.lockAtMostForMillis:300000}")
+	long lockAtMostForMillis;
 
 	@PostConstruct
 	public void validateConfiguration()
@@ -98,7 +96,7 @@ public class DeliveryTaskHandlerConfig
 							+ configuredTaskHandlerType
 							+ "' for property '"
 							+ DELIVERY_TASK_HANDLER_TYPE
-							+ "'. Supported values are DEFAULT (Raft-leader DAO executor sending directly via HTTP), JMS (requires the JMS messaging plugin) and KAFKA (requires the Kafka messaging plugin).");
+							+ "'. Supported values are DEFAULT (lock-gated DAO executor sending directly via HTTP), JMS (requires the JMS messaging plugin) and KAFKA (requires the Kafka messaging plugin).");
 		}
 	}
 
@@ -114,20 +112,11 @@ public class DeliveryTaskHandlerConfig
 		return result;
 	}
 
-	@Bean(destroyMethod = "close")
-	@Conditional(TaskHandlerActive.class)
-	public JChannel raftChannel() throws Exception
-	{
-		val ch = new JChannel(raftConfigLocation);
-		ch.connect(raftClusterName);
-		return ch;
-	}
-
 	@Bean
 	@Conditional(TaskHandlerActive.class)
-	public RaftHandle raftHandle(JChannel raftChannel)
+	public LockProvider lockProvider(DataSource dataSource)
 	{
-		return new RaftHandle(raftChannel, new NoOpStateMachine());
+		return new JdbcLockProvider(dataSource);
 	}
 
 	@Bean
@@ -139,17 +128,18 @@ public class DeliveryTaskHandlerConfig
 
 	@Bean
 	@Conditional(TaskHandlerActive.class)
-	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskDispatcher dispatcher, RaftHandle raftHandle)
+	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskDispatcher dispatcher, LockProvider lockProvider)
 	{
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.dispatcher(dispatcher)
-				.raftHandle(raftHandle)
+				.lockProvider(lockProvider)
 				.timedTask(new TimedTask(taskHandlerExecutionInterval))
 				.maxTasks(maxTasks)
 				.serverId(serverId)
 				.leaderCheckIntervalMillis(leaderCheckIntervalMillis)
 				.taskAwaitTimeoutMillis(taskAwaitTimeoutMillis)
+				.lockAtMostForMillis(lockAtMostForMillis)
 				.build();
 	}
 
@@ -195,27 +185,6 @@ public class DeliveryTaskHandlerConfig
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty(DELIVERY_TASK_HANDLER_START, Boolean.class, true);
-		}
-	}
-
-	private static final class NoOpStateMachine implements StateMachine
-	{
-		@Override
-		public byte[] apply(byte[] data, int offset, int length, boolean serializeResponse)
-		{
-			return new byte[0];
-		}
-
-		@Override
-		public void readContentFrom(java.io.DataInput in)
-		{
-			// no state to read
-		}
-
-		@Override
-		public void writeContentTo(java.io.DataOutput out)
-		{
-			// no state to write
 		}
 	}
 }

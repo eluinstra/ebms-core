@@ -29,16 +29,19 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import net.javacrumbs.shedlock.core.LockConfiguration;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.core.SimpleLock;
 import nl.clockwork.ebms.client.client.DeliveryTask;
 import nl.clockwork.ebms.client.client.DeliveryTaskDispatcher;
 import nl.clockwork.ebms.client.delivery.handler.DAODeliveryTaskExecutor;
 import nl.clockwork.ebms.client.delivery.handler.TimedTask;
-import org.jgroups.raft.RaftHandle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +57,7 @@ class DAODeliveryTaskExecutorTest
 	@Mock
 	DeliveryTaskDispatcher dispatcher;
 	@Mock
-	RaftHandle raftHandle;
+	LockProvider lockProvider;
 
 	AutoCloseable mocks;
 	DAODeliveryTaskExecutor executor;
@@ -78,7 +81,7 @@ class DAODeliveryTaskExecutorTest
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.dispatcher(dispatcher)
-				.raftHandle(raftHandle)
+				.lockProvider(lockProvider)
 				.timedTask(new TimedTask(executionIntervalMillis))
 				.maxTasks(0)
 				.serverId("server-1")
@@ -98,29 +101,29 @@ class DAODeliveryTaskExecutorTest
 	}
 
 	@Test
-	void doesNotPollWhenNotLeader() throws Exception
+	void doesNotPollWhenLockNotAcquired() throws Exception
 	{
-		var leaderChecks = new CountDownLatch(5);
-		when(raftHandle.isLeader()).thenAnswer(inv ->
+		var lockAttempts = new CountDownLatch(5);
+		when(lockProvider.lock(any(LockConfiguration.class))).thenAnswer(inv ->
 		{
-			leaderChecks.countDown();
-			return false;
+			lockAttempts.countDown();
+			return Optional.empty();
 		});
 		executor = build(50, 200);
 		startExecutor();
-		assertTrue(leaderChecks.await(2, TimeUnit.SECONDS), "expected raftHandle.isLeader() to be polled several times");
+		assertTrue(lockAttempts.await(2, TimeUnit.SECONDS), "expected lock acquisition to be attempted several times");
 		verify(deliveryTaskDAO, never()).getTasksBefore(any(Instant.class), any(String.class));
 		verify(deliveryTaskDAO, never()).getTasksBefore(any(Instant.class), any(String.class), anyInt());
 	}
 
 	@Test
-	void pollsAgainAfterLeaderRegained() throws Exception
+	void pollsAgainAfterLockRegained() throws Exception
 	{
 		var callCount = new AtomicInteger();
-		when(raftHandle.isLeader()).thenAnswer(inv ->
+		when(lockProvider.lock(any(LockConfiguration.class))).thenAnswer(inv ->
 		{
 			int n = callCount.getAndIncrement();
-			return n == 0 || n >= 3;
+			return (n == 0 || n >= 3) ? Optional.of(mock(SimpleLock.class)) : Optional.empty();
 		});
 		var polled = new CountDownLatch(2);
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
@@ -130,13 +133,13 @@ class DAODeliveryTaskExecutorTest
 		});
 		executor = build(50, 200);
 		startExecutor();
-		assertTrue(polled.await(3, TimeUnit.SECONDS), "expected DAO to be polled at least twice across leader transitions");
+		assertTrue(polled.await(3, TimeUnit.SECONDS), "expected DAO to be polled at least twice across lock transitions");
 	}
 
 	@Test
 	void cancelsFutureExceedingTimeout() throws Exception
 	{
-		when(raftHandle.isLeader()).thenReturn(true);
+		when(lockProvider.lock(any(LockConfiguration.class))).thenReturn(Optional.of(mock(SimpleLock.class)));
 		var task = sampleTask();
 		var stuck = new CompletableFuture<Void>();
 		var handed = new CountDownLatch(1);
@@ -159,7 +162,7 @@ class DAODeliveryTaskExecutorTest
 	@Test
 	void destroyTerminatesWorkerQuickly() throws Exception
 	{
-		when(raftHandle.isLeader()).thenReturn(true);
+		when(lockProvider.lock(any(LockConfiguration.class))).thenReturn(Optional.of(mock(SimpleLock.class)));
 		var polled = new CountDownLatch(1);
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
 		{
@@ -179,7 +182,7 @@ class DAODeliveryTaskExecutorTest
 	@Test
 	void recoversFromDaoFailure() throws Exception
 	{
-		when(raftHandle.isLeader()).thenReturn(true);
+		when(lockProvider.lock(any(LockConfiguration.class))).thenReturn(Optional.of(mock(SimpleLock.class)));
 		var invocations = new AtomicInteger();
 		var polled = new CountDownLatch(2);
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
@@ -201,10 +204,10 @@ class DAODeliveryTaskExecutorTest
 		// The worker used to start from the constructor, racing ahead of the Flyway migration on a
 		// fresh database ("Table DELIVERY_TASK not found"). It must now wait for the context refresh.
 		var refreshed = new CountDownLatch(1);
-		when(raftHandle.isLeader()).thenAnswer(inv ->
+		when(lockProvider.lock(any(LockConfiguration.class))).thenAnswer(inv ->
 		{
 			refreshed.countDown();
-			return true;
+			return Optional.of(mock(SimpleLock.class));
 		});
 		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv ->
 		{

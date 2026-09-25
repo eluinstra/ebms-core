@@ -93,3 +93,12 @@ CREATE TABLE message_event
 );
 
 CREATE INDEX i_message_event ON message_event (time_stamp);
+
+CREATE TABLE shedlock
+(
+	name						VARCHAR(256)		NOT NULL,
+	lock_until					TIMESTAMP		NOT NULL,
+	locked_at					TIMESTAMP		NOT NULL,
+	locked_by					VARCHAR(256)		NOT NULL
+	PRIMARY KEY (name)
+);

@@ -15,9 +15,11 @@
  */
 package nl.clockwork.ebms.client.delivery.handler;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -30,25 +32,39 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.javacrumbs.shedlock.core.LockConfiguration;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.core.SimpleLock;
 import nl.clockwork.ebms.client.client.DeliveryTaskDispatcher;
 import nl.clockwork.ebms.client.delivery.task.DeliveryTaskDAO;
-import org.jgroups.raft.RaftHandle;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+/**
+ * Polls {@link DeliveryTaskDAO} for pending delivery tasks and dispatches them, ensuring that across a cluster at most one worker polls at any time. The
+ * single-writer guarantee is provided by a {@link LockProvider} (ShedLock, JDBC-backed) rather than by JGroups Raft: the executor acquires the
+ * {@link #LOCK_NAME} lock for the duration of each poll cycle and releases it afterwards. A crashed worker keeps the lock until {@code lockAtMostFor} elapses,
+ * after which another worker takes over.
+ */
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<ContextRefreshedEvent>, Ordered, DisposableBean
 {
 	private static final long DEFAULT_LEADER_CHECK_INTERVAL_MILLIS = 1_000L;
 	private static final long DEFAULT_TASK_AWAIT_TIMEOUT_MILLIS = 60_000L;
-	private static final int WORKER_AWAIT_TERMINATION_SECONDS = 30;
 	/**
-	 * Ordered after the Flyway migration listener (which runs at {@code @Order(0)}) so the poller only starts once the schema exists. The first poll used to run
-	 * from the constructor, ahead of the migration, on a fresh database ({@code Table "DELIVERY_TASK" not found}).
+	 * Safety window: how long a crashed worker's lock is kept before another worker may take over. Only relevant when the process dies without releasing the
+	 * lock; a healthy worker releases the lock at the end of every cycle.
+	 */
+	private static final long DEFAULT_LOCK_AT_MOST_FOR_MILLIS = 5 * 60_000L;
+	private static final int WORKER_AWAIT_TERMINATION_SECONDS = 30;
+	private static final String LOCK_NAME = "ebms-delivery-task-executor";
+	/**
+	 * Ordered after the Flyway migration listener (which runs at {@code @Order(0)}) so the poller only starts once the schema (including the shedlock table)
+	 * exists. The first poll used to run from the constructor, ahead of the migration, on a fresh database ({@code Table "DELIVERY_TASK" not found}).
 	 */
 	static final int START_ORDER = 1;
 
@@ -57,13 +73,14 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 	@NonNull
 	DeliveryTaskDispatcher dispatcher;
 	@NonNull
-	RaftHandle raftHandle;
+	LockProvider lockProvider;
 	@NonNull
 	TimedTask timedTask;
 	int maxTasks;
 	String serverId;
 	long leaderCheckIntervalMillis;
 	long taskAwaitTimeoutMillis;
+	long lockAtMostForMillis;
 	ThreadPoolTaskExecutor workerExecutor;
 	final AtomicBoolean running = new AtomicBoolean();
 
@@ -71,21 +88,23 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 	public DAODeliveryTaskExecutor(
 			@NonNull DeliveryTaskDAO deliveryTaskDAO,
 			@NonNull DeliveryTaskDispatcher dispatcher,
-			@NonNull RaftHandle raftHandle,
+			@NonNull LockProvider lockProvider,
 			@NonNull TimedTask timedTask,
 			int maxTasks,
 			String serverId,
 			long leaderCheckIntervalMillis,
-			long taskAwaitTimeoutMillis)
+			long taskAwaitTimeoutMillis,
+			long lockAtMostForMillis)
 	{
 		this.deliveryTaskDAO = deliveryTaskDAO;
 		this.dispatcher = dispatcher;
-		this.raftHandle = raftHandle;
+		this.lockProvider = lockProvider;
 		this.timedTask = timedTask;
 		this.maxTasks = maxTasks;
 		this.serverId = serverId;
 		this.leaderCheckIntervalMillis = leaderCheckIntervalMillis > 0 ? leaderCheckIntervalMillis : DEFAULT_LEADER_CHECK_INTERVAL_MILLIS;
 		this.taskAwaitTimeoutMillis = taskAwaitTimeoutMillis > 0 ? taskAwaitTimeoutMillis : DEFAULT_TASK_AWAIT_TIMEOUT_MILLIS;
+		this.lockAtMostForMillis = lockAtMostForMillis > 0 ? lockAtMostForMillis : DEFAULT_LOCK_AT_MOST_FOR_MILLIS;
 		this.workerExecutor = new ThreadPoolTaskExecutor();
 		workerExecutor.setDaemon(true);
 		workerExecutor.setMaxPoolSize(1);
@@ -122,10 +141,45 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 	{
 		while (!Thread.currentThread().isInterrupted())
 		{
-			if (raftHandle.isLeader())
-				runLeaderCycle();
+			Optional<SimpleLock> acquired = acquireLock();
+			if (acquired.isPresent())
+			{
+				try
+				{
+					runLeaderCycle();
+				}
+				finally
+				{
+					releaseLock(acquired.get());
+				}
+			}
 			else if (!sleep(leaderCheckIntervalMillis))
 				return;
+		}
+	}
+
+	private Optional<SimpleLock> acquireLock()
+	{
+		try
+		{
+			return lockProvider.lock(new LockConfiguration(Instant.now(), LOCK_NAME, Duration.ofMillis(lockAtMostForMillis), Duration.ZERO));
+		}
+		catch (RuntimeException e)
+		{
+			log.error("Failed to acquire delivery-task lock", e);
+			return Optional.empty();
+		}
+	}
+
+	private void releaseLock(SimpleLock lock)
+	{
+		try
+		{
+			lock.unlock();
+		}
+		catch (RuntimeException e)
+		{
+			log.error("Failed to release delivery-task lock; it will lapse after {} ms", lockAtMostForMillis, e);
 		}
 	}
 

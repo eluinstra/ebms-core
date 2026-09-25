@@ -1,3 +1,5 @@
+DROP TABLE shedlock;
+
 DROP TABLE message_event;
 
 DROP TABLE delivery_log;
