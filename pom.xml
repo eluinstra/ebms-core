@@ -101,9 +101,9 @@
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <flyway.version>12.6.2</flyway.version>
-    <jdk.version>17</jdk.version>
+    <jdk.version>21</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <revision>2.20.7-SNAPSHOT</revision>
+    <revision>2.21.0-SNAPSHOT</revision>
     <!-- Provide an absolute path for legacy POMs that reference ${tools.jar} -->
     <tools.jar>${java.home}/../lib/tools.jar</tools.jar>
   </properties>

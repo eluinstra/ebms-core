@@ -65,7 +65,7 @@
 #                   container log are copied there (used by the release
 #                   workflow to upload the logs as an artifact)
 #
-#  Requirements: JDK 17, Maven, Docker (daemon + compose), curl, jq
+#  Requirements: JDK 21, Maven, Docker (daemon + compose), curl, jq
 #===============================================================================
 
 set -u
@@ -202,7 +202,7 @@ else
   DC=(docker-compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE")
 fi
 java_major=$(java -version 2>&1 | head -1 | sed -E 's/.*"([0-9]+).*/\1/')
-(( java_major >= 17 )) || die "JDK 17+ required, found $java_major"
+(( java_major >= 21 )) || die "JDK 21+ required, found $java_major"
 for p in $NEEDED_PORTS; do
   port_in_use "$p" && die "port $p is already in use; stop the other process and retry"
 done
