@@ -27,25 +27,24 @@ import nl.clockwork.ebms.common.event.MessageEventListenerConfig.EventListenerTy
 import nl.clockwork.ebms.common.security.KeyStoreType;
 import org.junit.jupiter.api.Test;
 
-class AdminPropertiesDefaultsTest
+class ServerPropertiesDefaultsTest
 {
-	private AdminProperties read(String content, PropertiesType type) throws Exception
+	private ServerProperties read(String content) throws Exception
 	{
 		try (val in = new ByteArrayInputStream(content.getBytes(StandardCharsets.ISO_8859_1)))
 		{
-			return new AdminPropertiesReader(in, type).read();
+			return new ServerPropertiesReader(in).read();
 		}
 	}
 
 	@Test
 	void shouldUseDefaultsForEmptyFile() throws Exception
 	{
-		val model = read("", PropertiesType.EBMS_ADMIN_EMBEDDED);
+		val model = read("");
 
-		assertThat(model.getConsoleProperties().getMaxItemsPerPage()).isEqualTo(20);
 		assertThat(model.getCoreProperties().getEventListener()).isEqualTo(EventListenerType.DEFAULT);
 		assertThat(model.getHttpProperties().getHost()).isEqualTo("0.0.0.0");
-		assertThat(model.getHttpProperties().getPort()).isEqualTo(8088);
+		assertThat(model.getHttpProperties().getPort()).isEqualTo(8888);
 		assertThat(model.getHttpProperties().getPath()).isEqualTo("/ebms");
 		assertThat(model.getHttpProperties().isChunkedStreamingMode()).isTrue();
 		assertThat(model.getServerDatabase().isStart()).isTrue();
@@ -62,7 +61,7 @@ class AdminPropertiesDefaultsTest
 	void shouldParseKeystoreTypeCaseInsensitive() throws Exception
 	{
 		val content = "ebms.ssl=true\nkeystore.type=jks\nkeystore.path=/keystore.jks\n";
-		val model = read(content, PropertiesType.EBMS_ADMIN_EMBEDDED);
+		val model = read(content);
 		assertThat(model.getHttpProperties().isSsl()).isTrue();
 		assertThat(model.getHttpProperties().getSslProperties().getKeystoreProperties().getType()).isEqualTo(KeyStoreType.JKS);
 	}
@@ -70,21 +69,20 @@ class AdminPropertiesDefaultsTest
 	@Test
 	void shouldNotCrashOnUnknownEventListenerTypeAndKeepDefault() throws Exception
 	{
-		val model = read("eventListener.type=BOGUS\n", PropertiesType.EBMS_ADMIN);
+		val model = read("eventListener.type=BOGUS\n");
 		assertThat(model.getCoreProperties().getEventListener()).isEqualTo(EventListenerType.DEFAULT);
 	}
 
 	@Test
 	void shouldWriteStableOutputForDefaults() throws Exception
 	{
-		val model = read("", PropertiesType.EBMS_ADMIN);
+		val model = read("");
 		val out = new StringWriter();
-		new AdminPropertiesWriter(out).write(model, PropertiesType.EBMS_ADMIN);
+		new ServerPropertiesWriter(out).write(model);
 		val props = new Properties();
 		props.load(new StringReader(out.toString()));
-		assertThat(props.getProperty("maxItemsPerPage")).isEqualTo("20");
 		assertThat(props.getProperty("eventListener.type")).isEqualTo("DEFAULT");
-		assertThat(props.getProperty("service.ebms.url")).isEqualTo("");
+		assertThat(props.getProperty("ebms.port")).isEqualTo("8888");
 		assertThat(props.getProperty("ebms.jdbc.driverClassName")).isEqualTo("org.h2.Driver");
 	}
 }

@@ -25,8 +25,8 @@ class PropertiesTypeTest
 	@Test
 	void shouldFindTypeByFileName()
 	{
-		assertThat(PropertiesType.getPropertiesType("ebms-admin.properties")).contains(PropertiesType.EBMS_ADMIN);
-		assertThat(PropertiesType.getPropertiesType("ebms-admin.embedded.properties")).contains(PropertiesType.EBMS_ADMIN_EMBEDDED);
+		assertThat(PropertiesType.getPropertiesType("ebms-server.properties")).contains(PropertiesType.EBMS_SERVER);
+		assertThat(PropertiesType.getPropertiesType("ebms-admin.properties")).isEmpty();
 		assertThat(PropertiesType.getPropertiesType("other.properties")).isEmpty();
 	}
 
@@ -39,7 +39,6 @@ class PropertiesTypeTest
 	@Test
 	void shouldExposePropertiesFileName()
 	{
-		assertThat(PropertiesType.EBMS_ADMIN.getPropertiesFile()).isEqualTo("ebms-admin.properties");
-		assertThat(PropertiesType.EBMS_ADMIN_EMBEDDED.getPropertiesFile()).isEqualTo("ebms-admin.embedded.properties");
+		assertThat(PropertiesType.EBMS_SERVER.getPropertiesFile()).isEqualTo("ebms-server.properties");
 	}
 }

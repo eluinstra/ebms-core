@@ -27,8 +27,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public enum PropertiesType
 {
-	EBMS_ADMIN("ebms-admin.properties", "standalone (Wicket admin / SOAP-REST) server"),
-	EBMS_ADMIN_EMBEDDED("ebms-admin.embedded.properties", "embedded (Jetty) server");
+	EBMS_SERVER("ebms-server.properties", "embedded (Jetty) server");
 
 	String propertiesFile;
 	String description;

@@ -23,7 +23,7 @@ import lombok.NonNull;
 @NoArgsConstructor
 public class HttpProperties
 {
-	public static final int DEFAULT_PORT = 8088;
+	public static final int DEFAULT_PORT = 8888;
 
 	@NonNull
 	String host = "0.0.0.0";

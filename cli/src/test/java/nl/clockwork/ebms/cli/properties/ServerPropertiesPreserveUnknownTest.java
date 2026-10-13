@@ -25,9 +25,9 @@ import java.util.Properties;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class AdminPropertiesPreserveUnknownTest
+class ServerPropertiesPreserveUnknownTest
 {
-	private final String embeddedContent = """
+	private final String content = """
 			database.start=true
 			ebms.jdbc.driverClassName=org.h2.Driver
 			ebms.jdbc.url=jdbc:h2:tcp://localhost:9092/ebms
@@ -38,32 +38,32 @@ class AdminPropertiesPreserveUnknownTest
 			my.extra.key=value with spaces
 			""";
 
-	private AdminProperties read(String content, PropertiesType type) throws Exception
+	private ServerProperties read(String content) throws Exception
 	{
 		try (val in = new ByteArrayInputStream(content.getBytes(StandardCharsets.ISO_8859_1)))
 		{
-			return new AdminPropertiesReader(in, type).read();
+			return new ServerPropertiesReader(in).read();
 		}
 	}
 
-	private String write(AdminProperties model, PropertiesType type) throws Exception
+	private String write(ServerProperties model) throws Exception
 	{
 		val out = new StringWriter();
-		new AdminPropertiesWriter(out).write(model, type);
+		new ServerPropertiesWriter(out).write(model);
 		return out.toString();
 	}
 
 	@Test
 	void shouldCollectUnmodeledPropertiesAsAdditional() throws Exception
 	{
-		val model = read(embeddedContent, PropertiesType.EBMS_ADMIN_EMBEDDED);
+		val model = read(content);
 		assertThat(model.getAdditionalProperties()).containsEntry("custom.feature.enabled", "true").containsEntry("my.extra.key", "value with spaces");
 	}
 
 	@Test
 	void shouldNotCollectModeledPropertiesAsAdditional() throws Exception
 	{
-		val model = read(embeddedContent, PropertiesType.EBMS_ADMIN_EMBEDDED);
+		val model = read(content);
 		assertThat(model.getAdditionalProperties())
 				.doesNotContainKeys("database.start", "ebms.jdbc.driverClassName", "ebms.jdbc.url", "ebms.jdbc.username", "ebms.jdbc.password");
 	}
@@ -71,10 +71,10 @@ class AdminPropertiesPreserveUnknownTest
 	@Test
 	void shouldPreserveUnmodeledPropertiesOnWrite() throws Exception
 	{
-		val model = read(embeddedContent, PropertiesType.EBMS_ADMIN_EMBEDDED);
+		val model = read(content);
 		// the user edits a modeled value
 		model.getJdbcProperties().setPassword("changed");
-		val props = toProperties(write(model, PropertiesType.EBMS_ADMIN_EMBEDDED));
+		val props = toProperties(write(model));
 		assertThat(props.getProperty("custom.feature.enabled")).isEqualTo("true");
 		assertThat(props.getProperty("my.extra.key")).isEqualTo("value with spaces");
 		assertThat(props.getProperty("ebms.jdbc.password")).isEqualTo("changed");
@@ -84,10 +84,10 @@ class AdminPropertiesPreserveUnknownTest
 	void shouldKeepUnmodeledPropertyWhenItMatchesACuratedSection() throws Exception
 	{
 		// a key that the user changed is written from the model, but still kept in the output
-		val model = read(embeddedContent, PropertiesType.EBMS_ADMIN_EMBEDDED);
+		val model = read(content);
 		assertThat(model.getAdditionalProperties()).hasSize(2);
 		// after a full round trip the same two unmodeled keys remain
-		val props = toProperties(write(model, PropertiesType.EBMS_ADMIN_EMBEDDED));
+		val props = toProperties(write(model));
 		assertThat(props).containsKeys("custom.feature.enabled", "my.extra.key");
 	}
 

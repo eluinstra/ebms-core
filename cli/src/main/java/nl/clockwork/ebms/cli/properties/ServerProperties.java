@@ -22,18 +22,14 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
- * Model of an ebms-admin properties file. All sections are present in every file; which sections are written depends on the {@link PropertiesType}.
+ * Model of an ebms-server properties file. All sections are present in every file; which sections are written depends on the {@link PropertiesType}.
  */
 @Data
 @NoArgsConstructor
-public class AdminProperties
+public class ServerProperties
 {
 	@NonNull
-	ConsoleProperties consoleProperties = new ConsoleProperties();
-	@NonNull
 	CoreProperties coreProperties = new CoreProperties();
-	@NonNull
-	ServiceProperties serviceProperties = new ServiceProperties();
 	@NonNull
 	HttpProperties httpProperties = new HttpProperties();
 	@NonNull

@@ -24,54 +24,31 @@ import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Writes an {@link AdminProperties} model to a properties file. Keys set in {@link AdminProperties#getAdditionalProperties()} take precedence over the modeled
- * (curated) sections.
+ * Writes a {@link ServerProperties} model to an ebms-server properties file. Keys set in {@link ServerProperties#getAdditionalProperties()} take precedence
+ * over the modeled (curated) sections.
  */
-public class AdminPropertiesWriter
+public class ServerPropertiesWriter
 {
 	private final Writer writer;
 
-	public AdminPropertiesWriter(Writer writer)
+	public ServerPropertiesWriter(Writer writer)
 	{
 		this.writer = writer;
 	}
 
-	public void write(AdminProperties adminProperties, PropertiesType propertiesType) throws IOException
+	public void write(ServerProperties serverProperties) throws IOException
 	{
 		val p = new LinkedHashMap<String, String>();
-		write(p, adminProperties.getConsoleProperties());
-		write(p, adminProperties.getCoreProperties());
-		switch (propertiesType)
-		{
-			case EBMS_ADMIN:
-				write(p, adminProperties.getServiceProperties());
-				break;
-			case EBMS_ADMIN_EMBEDDED:
-				write(p, adminProperties.getHttpProperties());
-				write(p, adminProperties.getServerDatabase());
-				write(p, adminProperties.getSignatureProperties());
-				write(p, adminProperties.getEncryptionProperties());
-				break;
-		}
-		write(p, adminProperties.getJdbcProperties());
+		write(p, serverProperties.getCoreProperties());
+		write(p, serverProperties.getHttpProperties());
+		write(p, serverProperties.getServerDatabase());
+		write(p, serverProperties.getSignatureProperties());
+		write(p, serverProperties.getEncryptionProperties());
+		write(p, serverProperties.getJdbcProperties());
 		// additional (unmodeled) properties take precedence over the curated sections
 		val result = new LinkedHashMap<>(p);
-		result.putAll(adminProperties.getAdditionalProperties());
-		write(result, commentFor(propertiesType));
-	}
-
-	private static String commentFor(PropertiesType propertiesType)
-	{
-		return switch (propertiesType)
-		{
-			case EBMS_ADMIN -> "EbMS Admin properties";
-			case EBMS_ADMIN_EMBEDDED -> "EbMS Admin Embedded properties";
-		};
-	}
-
-	private void write(Map<String, String> p, ConsoleProperties consoleProperties)
-	{
-		p.put("maxItemsPerPage", Integer.toString(consoleProperties.getMaxItemsPerPage()));
+		result.putAll(serverProperties.getAdditionalProperties());
+		write(result, "EbMS Server properties");
 	}
 
 	private void write(Map<String, String> p, CoreProperties coreProperties)
@@ -82,11 +59,6 @@ public class AdminPropertiesWriter
 		p.put("jms.broker.start", Boolean.toString(coreProperties.isStartEmbeddedBroker()));
 		p.put("jms.broker.config", StringUtils.defaultString(coreProperties.getActiveMQConfigFile()));
 		p.put("ebmsMessage.deleteContentOnProcessed", Boolean.toString(coreProperties.isDeleteMessageContentOnProcessed()));
-	}
-
-	private void write(Map<String, String> p, ServiceProperties serviceProperties)
-	{
-		p.put("service.ebms.url", StringUtils.defaultString(serviceProperties.getUrl()));
 	}
 
 	private void write(Map<String, String> p, HttpProperties httpProperties)

@@ -21,24 +21,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.cli.prompt.AdditionalSection;
-import nl.clockwork.ebms.cli.prompt.ConsoleSection;
 import nl.clockwork.ebms.cli.prompt.CoreSection;
 import nl.clockwork.ebms.cli.prompt.EncryptionSection;
 import nl.clockwork.ebms.cli.prompt.HttpSection;
 import nl.clockwork.ebms.cli.prompt.JdbcSection;
 import nl.clockwork.ebms.cli.prompt.Prompts;
 import nl.clockwork.ebms.cli.prompt.ServerDatabaseSection;
-import nl.clockwork.ebms.cli.prompt.ServiceSection;
 import nl.clockwork.ebms.cli.prompt.SignatureSection;
-import nl.clockwork.ebms.cli.properties.AdminProperties;
-import nl.clockwork.ebms.cli.properties.AdminPropertiesReader;
-import nl.clockwork.ebms.cli.properties.AdminPropertiesWriter;
 import nl.clockwork.ebms.cli.properties.PropertiesType;
+import nl.clockwork.ebms.cli.properties.ServerProperties;
+import nl.clockwork.ebms.cli.properties.ServerPropertiesReader;
+import nl.clockwork.ebms.cli.properties.ServerPropertiesWriter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -52,10 +48,10 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 /**
- * Command line interface to create and edit ebms-admin properties files.
+ * Command line interface to create and edit ebms-server properties files.
  *
  * <pre>
- * ebms-cli create [EBMS_ADMIN|EBMS_ADMIN_EMBEDDED] [-o file]
+ * ebms-cli create [ebms-server.properties] [-o file]
  * ebms-cli edit &lt;file&gt;
  * </pre>
  */
@@ -139,16 +135,17 @@ public class EbMSCLI
 
 	private int create(CommandLine cmd) throws IOException, UserInterruptException
 	{
-		val propertiesType = promptPropertiesType(cmd.getArgList().size() > 1 ? cmd.getArgList().get(1) : null);
-		val file = resolveOutputFile(cmd, propertiesType);
+		if (cmd.getArgList().size() > 1)
+			PropertiesType.getPropertiesTypeOrFail(cmd.getArgList().get(1));
+		val file = resolveOutputFile(cmd);
 		if (file.exists())
 		{
 			println(file + " already exists, refusing to overwrite.");
 			return 1;
 		}
-		val adminProperties = new AdminProperties();
-		promptSections(propertiesType, adminProperties);
-		return write(file, adminProperties, propertiesType);
+		val serverProperties = new ServerProperties();
+		promptSections(serverProperties);
+		return write(file, serverProperties);
 	}
 
 	private int edit(CommandLine cmd) throws IOException, UserInterruptException
@@ -164,94 +161,49 @@ public class EbMSCLI
 			println("File does not exist: " + file);
 			return 1;
 		}
-		val propertiesType = PropertiesType.getPropertiesTypeOrFail(file.getName());
-		AdminProperties adminProperties;
+		PropertiesType.getPropertiesTypeOrFail(file.getName());
+		ServerProperties serverProperties;
 		try (val in = new FileInputStream(file))
 		{
-			adminProperties = new AdminPropertiesReader(in, propertiesType).read();
+			serverProperties = new ServerPropertiesReader(in).read();
 		}
 		println("Loaded " + file);
-		promptSections(propertiesType, adminProperties);
-		return write(file, adminProperties, propertiesType);
+		promptSections(serverProperties);
+		return write(file, serverProperties);
 	}
 
-	private PropertiesType promptPropertiesType(String hint) throws UserInterruptException, IOException
+	private File resolveOutputFile(CommandLine cmd)
 	{
-		if (hint != null)
-		{
-			val propertiesType = resolvePropertiesType(hint);
-			System.out.println(propertiesType.getDescription() + " (" + propertiesType.getPropertiesFile() + ")");
-			return propertiesType;
-		}
-		val options = new LinkedHashMap<String, String>();
-		Arrays.asList(PropertiesType.values()).forEach(t -> options.put(t.name(), t.getDescription() + " (" + t.getPropertiesFile() + ")"));
-		val selected = Prompts.list(prompter, "propertiesType", "Properties type", options, PropertiesType.EBMS_ADMIN_EMBEDDED.name());
-		return PropertiesType.valueOf(selected);
-	}
-
-	/**
-	 * Accepts either the enum name (e.g. {@code EBMS_ADMIN_EMBEDDED}) or the properties file name (e.g. {@code ebms-admin.embedded.properties}).
-	 */
-	private static PropertiesType resolvePropertiesType(String hint)
-	{
-		try
-		{
-			return PropertiesType.valueOf(hint.toUpperCase());
-		}
-		catch (IllegalArgumentException e)
-		{
-			return PropertiesType.getPropertiesTypeOrFail(hint);
-		}
-	}
-
-	private File resolveOutputFile(CommandLine cmd, PropertiesType propertiesType)
-	{
-		String output = cmd.getOptionValue(OUTPUT_OPTION, propertiesType.getPropertiesFile());
+		String output = cmd.getOptionValue(OUTPUT_OPTION, PropertiesType.EBMS_SERVER.getPropertiesFile());
 		return new File(output);
 	}
 
-	private void promptSections(PropertiesType propertiesType, AdminProperties adminProperties) throws UserInterruptException, IOException
+	private void promptSections(ServerProperties serverProperties) throws UserInterruptException, IOException
 	{
 		System.out.println();
-		System.out.println("Console properties (press Enter to keep the shown value)");
-		ConsoleSection.prompt(prompter, adminProperties.getConsoleProperties());
+		System.out.println("Core properties (press Enter to keep the shown value)");
+		CoreSection.prompt(prompter, serverProperties.getCoreProperties());
 		System.out.println();
-		System.out.println("Core properties");
-		CoreSection.prompt(prompter, adminProperties.getCoreProperties());
-		switch (propertiesType)
-		{
-			case EBMS_ADMIN:
-				System.out.println();
-				System.out.println("Service properties");
-				ServiceSection.prompt(prompter, adminProperties.getServiceProperties());
-				break;
-			case EBMS_ADMIN_EMBEDDED:
-				System.out.println();
-				System.out.println("HTTP properties");
-				HttpSection.prompt(prompter, adminProperties.getHttpProperties());
-				System.out.println();
-				System.out.println("Server database properties");
-				ServerDatabaseSection.prompt(prompter, adminProperties.getServerDatabase());
-				break;
-		}
+		System.out.println("EbMS connector properties");
+		HttpSection.prompt(prompter, serverProperties.getHttpProperties());
+		System.out.println();
+		System.out.println("Server database properties");
+		ServerDatabaseSection.prompt(prompter, serverProperties.getServerDatabase());
 		System.out.println();
 		System.out.println("JDBC properties");
-		JdbcSection.prompt(prompter, adminProperties.getJdbcProperties());
-		if (PropertiesType.EBMS_ADMIN_EMBEDDED.equals(propertiesType))
-		{
-			System.out.println();
-			System.out.println("Signature properties");
-			SignatureSection.prompt(prompter, adminProperties.getSignatureProperties());
-			System.out.println();
-			System.out.println("Encryption properties");
-			EncryptionSection.prompt(prompter, adminProperties.getEncryptionProperties());
-		}
+		JdbcSection.prompt(prompter, serverProperties.getJdbcProperties());
+		System.out.println();
+		System.out.println("Signature properties");
+		SignatureSection.prompt(prompter, serverProperties.getSignatureProperties());
+		System.out.println();
+		System.out.println("Encryption properties");
+		EncryptionSection.prompt(prompter, serverProperties.getEncryptionProperties());
 		System.out.println();
 		System.out.println("Additional properties");
-		AdditionalSection.prompt(prompter, adminProperties.getAdditionalProperties());
+		AdditionalSection.prompt(prompter, serverProperties.getAdditionalProperties());
 	}
 
-	private int write(File file, AdminProperties adminProperties, PropertiesType propertiesType) throws IOException, UserInterruptException
+	private int write(File file, ServerProperties serverProperties) throws IOException, UserInterruptException
 	{
 		System.out.println();
 		System.out.println("Properties will be written to " + file.getAbsolutePath());
@@ -262,7 +214,7 @@ public class EbMSCLI
 		}
 		try (val writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))
 		{
-			new AdminPropertiesWriter(writer).write(adminProperties, propertiesType);
+			new ServerPropertiesWriter(writer).write(serverProperties);
 		}
 		println("Written " + file.getAbsolutePath());
 		println("Restart the server to apply the new configuration.");
@@ -273,7 +225,7 @@ public class EbMSCLI
 	{
 		val result = new Options();
 		result.addOption(HELP_OPTION, "help", false, "print this message");
-		result.addOption(OUTPUT_OPTION, "output", true, "output file (create, default: <properties file of the selected type> in the current directory)");
+		result.addOption(OUTPUT_OPTION, "output", true, "output file (create, default: ebms-server.properties in the current directory)");
 		return result;
 	}
 
@@ -283,8 +235,8 @@ public class EbMSCLI
 				Usage: ebms-cli <command> [options]
 
 				Commands:
-				  create [EBMS_ADMIN|EBMS_ADMIN_EMBEDDED]  create a new ebms-admin properties file
-				  edit <file>                               edit an existing ebms-admin properties file
+				  create            create a new ebms-server properties file
+				  edit <file>       edit an existing ebms-server properties file
 				""", "Options:", options, 2, 2, null);
 	}
 

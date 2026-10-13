@@ -28,50 +28,35 @@ import nl.clockwork.ebms.common.security.KeyStoreType;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Reads an ebms-admin properties file into an {@link AdminProperties} model. Missing keys fall back to the defaults of the model; keys that are not modeled are
- * collected in {@link AdminProperties#getAdditionalProperties()}.
+ * Reads an ebms-server properties file into a {@link ServerProperties} model. Missing keys fall back to the defaults of the model; keys that are not modeled
+ * are collected in {@link ServerProperties#getAdditionalProperties()}.
  */
 @Slf4j
-public class AdminPropertiesReader
+public class ServerPropertiesReader
 {
 	private final Properties properties;
-	private final PropertiesType propertiesType;
 	private final List<String> knownKeys = new ArrayList<>();
 
-	public AdminPropertiesReader(Properties properties, PropertiesType propertiesType)
+	public ServerPropertiesReader(Properties properties)
 	{
 		this.properties = properties;
-		this.propertiesType = propertiesType;
 	}
 
-	public AdminPropertiesReader(InputStream inputStream, PropertiesType propertiesType) throws IOException
+	public ServerPropertiesReader(InputStream inputStream) throws IOException
 	{
 		this.properties = new Properties();
 		properties.load(inputStream);
-		this.propertiesType = propertiesType;
 	}
 
-	public AdminProperties read()
+	public ServerProperties read()
 	{
-		val result = new AdminProperties();
-		read(result.getConsoleProperties());
+		val result = new ServerProperties();
 		read(result.getCoreProperties());
-		switch (propertiesType)
-		{
-			case EBMS_ADMIN:
-				read(result.getServiceProperties());
-				break;
-			case EBMS_ADMIN_EMBEDDED:
-				read(result.getHttpProperties());
-				read(result.getServerDatabase());
-				break;
-		}
+		read(result.getHttpProperties());
+		read(result.getServerDatabase());
 		read(result.getJdbcProperties());
-		if (PropertiesType.EBMS_ADMIN_EMBEDDED.equals(propertiesType))
-		{
-			read(result.getSignatureProperties());
-			read(result.getEncryptionProperties());
-		}
+		read(result.getSignatureProperties());
+		read(result.getEncryptionProperties());
 		readAdditional(result);
 		return result;
 	}
@@ -109,11 +94,6 @@ public class AdminPropertiesReader
 		return result.stream().map(String::trim).toList();
 	}
 
-	private void read(ConsoleProperties consoleProperties)
-	{
-		consoleProperties.setMaxItemsPerPage(getInt("maxItemsPerPage", consoleProperties.getMaxItemsPerPage()));
-	}
-
 	private void read(CoreProperties coreProperties)
 	{
 		known("eventListener.type");
@@ -134,11 +114,6 @@ public class AdminPropertiesReader
 		coreProperties.setStartEmbeddedBroker(getBool("jms.broker.start", coreProperties.isStartEmbeddedBroker()));
 		coreProperties.setActiveMQConfigFile(get("jms.broker.config", coreProperties.getActiveMQConfigFile()));
 		coreProperties.setDeleteMessageContentOnProcessed(getBool("ebmsMessage.deleteContentOnProcessed", coreProperties.isDeleteMessageContentOnProcessed()));
-	}
-
-	private void read(ServiceProperties serviceProperties)
-	{
-		serviceProperties.setUrl(get("service.ebms.url", serviceProperties.getUrl()));
 	}
 
 	private void read(HttpProperties httpProperties)
@@ -253,7 +228,7 @@ public class AdminPropertiesReader
 		jdbcProperties.setPassword(get("ebms.jdbc.password", jdbcProperties.getPassword()));
 	}
 
-	private void readAdditional(AdminProperties result)
+	private void readAdditional(ServerProperties result)
 	{
 		val additional = new LinkedHashMap<String, String>();
 		for (val name : properties.stringPropertyNames())
