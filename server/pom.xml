@@ -236,16 +236,20 @@
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
           <!--
-            Override the inherited artifactSet excludes: Spring 7's spring-core
-            depends on the real commons-logging artifact (spring-jcl is gone),
-            so the fat jar must contain it; otherwise `java -jar` fails with
-            NoClassDefFoundError: org/apache/commons/logging/LogFactory.
+            Override the inherited artifactSet excludes:
+            - Spring 7's spring-core depends on the real commons-logging artifact
+              (spring-jcl is gone), so the fat jar must contain it; otherwise
+              `java -jar` fails with NoClassDefFoundError: .../LogFactory.
+            - jakarta.jws-api must be kept: the parent filter strips jakarta/jws/**
+              from jakarta.xml.ws-api expecting this artifact as the single provider,
+              but the parent artifactSet also excludes it, so the fat jar would have
+              neither and the SOAP endpoints fail with ClassNotFoundException:
+              jakarta.jws.WebService.
           -->
           <artifactSet combine.self="override">
             <excludes>
               <exclude>org.projectlombok:lombok</exclude>
               <exclude>org.apache.geronimo.specs:geronimo-jta_1.1_spec</exclude>
-              <exclude>jakarta.jws:jakarta.jws-api</exclude>
               <exclude>jakarta.activation:jakarta.activation</exclude>
             </excludes>
           </artifactSet>

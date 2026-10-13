@@ -27,8 +27,8 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 @Import({DAOConfig.class, DataSourceConfig.class, TransactionManagerConfig.class})
 @PropertySource(
-		value = {"classpath:nl/clockwork/ebms/default.properties", "classpath:nl/clockwork/ebms/admin/default.properties",
-				"file:${ebms.configDir}ebms-admin.embedded.advanced.properties", "file:${ebms.configDir}ebms-admin.embedded.properties"},
+		value = {"classpath:nl/clockwork/ebms/default.properties", "classpath:nl/clockwork/ebms/server/default.properties",
+				"file:${ebms.configDir}ebms-server.advanced.properties", "file:${ebms.configDir}ebms-server.properties"},
 		ignoreResourceNotFound = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DBConfig
