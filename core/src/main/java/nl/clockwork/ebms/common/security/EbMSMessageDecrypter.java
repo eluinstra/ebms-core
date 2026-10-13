@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import nl.clockwork.ebms.common.cpa.CPAManager;
 import nl.clockwork.ebms.common.cpa.CPAUtils;
@@ -39,6 +40,7 @@ import nl.clockwork.ebms.common.util.ValidationException;
 import nl.clockwork.ebms.common.util.ValidatorException;
 import nl.clockwork.ebms.server.message.processor.EbMSProcessingException;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EbMSMessageDecrypter
@@ -107,7 +109,11 @@ public class EbMSMessageDecrypter
 		}
 		catch (XMLStreamException | IOException | GeneralSecurityException | IllegalArgumentException e)
 		{
-			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(), EbMSErrorCode.SECURITY_FAILURE, e.getMessage()));
+			// Log the root cause server-side but return a generic reason to the peer; the raw
+			// XML-Enc exception message can leak internal detail (algorithms, key info, structure).
+			log.warn("Message decryption failed for {}: {}", attachment.getContentId(), e.getMessage(), e);
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("cid:" + attachment.getContentId(), EbMSErrorCode.SECURITY_FAILURE, "Decryption of message content failed."));
 		}
 	}
 }
