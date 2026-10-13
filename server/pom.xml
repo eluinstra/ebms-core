@@ -235,9 +235,23 @@
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
+          <!--
+            Override the inherited artifactSet excludes: Spring 7's spring-core
+            depends on the real commons-logging artifact (spring-jcl is gone),
+            so the fat jar must contain it; otherwise `java -jar` fails with
+            NoClassDefFoundError: org/apache/commons/logging/LogFactory.
+          -->
+          <artifactSet combine.self="override">
+            <excludes>
+              <exclude>org.projectlombok:lombok</exclude>
+              <exclude>org.apache.geronimo.specs:geronimo-jta_1.1_spec</exclude>
+              <exclude>jakarta.jws:jakarta.jws-api</exclude>
+              <exclude>jakarta.activation:jakarta.activation</exclude>
+            </excludes>
+          </artifactSet>
           <transformers combine.children="append">
             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-              <mainClass>nl.clockwork.ebms.server.embedded.StartEmbedded</mainClass>
+              <mainClass>nl.clockwork.ebms.server.embedded.startup.StartEmbedded</mainClass>
               <manifestEntries>
                 <Multi-Release>true</Multi-Release>
               </manifestEntries>
