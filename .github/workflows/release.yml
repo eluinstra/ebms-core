@@ -1,0 +1,322 @@
+name: Release
+
+# Standalone release of this repository (ebms-core, including the ebms-server
+# embedded server module). This is the self-contained twin of the parent
+# (eluinstra/ebms) release workflow: everything it touches lives in this repo,
+# so it needs no submodule handling, no parent-repo pin commit, and no PAT —
+# the job token can do all of it.
+#
+# Trigger: Actions tab -> Release -> Run workflow, enter the target version,
+# e.g. 2.20.9 (stable) or 2.21.0-M1 (pre-release). The branch input is
+# optional and defaults to dev-<major>.<minor>.x derived from the version.
+#
+# Pre-releases (milestones, RCs):
+#   A version of the form MAJOR.MINOR.PATCH-QUALIFIER (e.g. 2.21.0-M1,
+#   2.21.0-RC1, 2.21.0-beta.1) releases a pre-release of MAJOR.MINOR.PATCH:
+#     - the GitHub release is created with prerelease: true (and its tag
+#       ebms-core-<v>, e.g. ebms-core-2.21.0-M1)
+#     - the <revision> is bumped to the version itself (2.21.0-M1) and the
+#       "next development iteration" step returns it to MAJOR.MINOR.PATCH-SNAPSHOT
+#       (2.21.0-SNAPSHOT), i.e. the base version stays in development; it is NOT
+#       bumped to the next patch like a stable release
+#     - the branch is derived from the version (2.21.x -> dev-2.21.x);
+#       override with the optional branch input
+#   Version parsing/validation lives in scripts/release-version.sh (run it
+#   with --self-test when you change it).
+#
+# What it does (in order):
+#   1. Check out the tip of the release branch (dev-<major>.<minor>.x)
+#   2. Bump the <revision> in pom.xml to the target release version
+#   3. Build and test the reactor (same command as ci.yml)
+#   4. Smoke test (smoke-test.sh): adapter 1 = the just-built ebms-core server
+#      jar running locally (StartEmbedded SSL), adapter 2 = the published
+#      eluinstra/ebms-adapter-bin docker image; verifies bidirectional ping +
+#      message exchange (the release candidate must be able to message an
+#      already-deployed adapter). A failure aborts the release before any
+#      tag, push or GitHub release is created
+#   5. Commit + tag + push (ebms-core-<v>)
+#   6. Create a GitHub release on the new tag, with the built JARs attached
+#      as assets (core jar, ebms-server shaded jar + all db/cache plugins)
+#   7. Bump to the next development iteration SNAPSHOT ("prepare for next
+#      development iteration": <next patch>-SNAPSHOT for a stable release,
+#      <base>-SNAPSHOT for a pre-release), commit + push
+#   8. Dispatch ci.yml on the release branch tip and wait for it to finish
+#      green (pushes made with the job token do not trigger workflows, so the
+#      run is dispatched explicitly via the Actions API)
+#
+# Pre-release caveat: the smoke test messages the release candidate against the
+# published eluinstra/ebms-adapter-bin image, which is built from the last
+# stable release. A milestone whose behaviour intentionally diverges from that
+# image (incompatible wire format, CPA/policy changes) can legitimately fail
+# step 4; that is a judgement call for the releaser, not a pipeline bug.
+#
+# Nothing is published to Maven Central or GitHub Packages; the built JARs
+# are attached to the GitHub release only.
+#
+# Job token permissions (declared in `permissions:` below, all minimal):
+#   contents: write  - push the release commit/tag and create the release
+#   actions: write   - dispatch the final CI run
+#   actions: read    - poll the dispatched run
+# No repository secrets are required.
+#
+# Optional approval gate: create an environment named "release"
+# (Settings -> Environments) with required reviewers, then uncomment the
+# `environment` line below.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, e.g. 2.20.9 or 2.21.0-M1 (pre-release)'
+        required: true
+        type: string
+      branch:
+        description: 'Branch to release from (optional; defaults to dev-<major>.<minor>.x of the version)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write  # push the release commit/tag, create the GitHub release
+  actions: write   # dispatch + poll the final CI run (job-token pushes don't trigger workflows)
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60  # build + test + smoke test + up to 30 min CI wait
+    # environment: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history + tags: the changelog needs them
+
+      - name: Validate version input
+        id: check
+        env:
+          VERSION: ${{ inputs.version }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          # parse validates the version (MAJOR.MINOR.PATCH, optionally with a
+          # -QUALIFIER for a pre-release/milestone) and derives everything the
+          # remaining steps need: prerelease, branch, snapshot, tag.
+          # See scripts/release-version.sh.
+          set -o pipefail
+          scripts/release-version.sh parse "$VERSION" ${BRANCH:+--branch "$BRANCH"} \
+            | tee -a "$GITHUB_OUTPUT"
+
+      - name: Check out the release branch
+        env:
+          BRANCH: ${{ steps.check.outputs.branch }}
+        run: |
+          # a derived branch that does not exist remotely (e.g. releasing
+          # 2.22.0-M1 before dev-2.22.x was created) otherwise fails with a
+          # bare "couldn't find remote ref"
+          if ! git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            echo "::error::branch $BRANCH does not exist on this repository (derived from the version; pass the branch input to override)"
+            exit 1
+          fi
+          git fetch --quiet --tags origin "$BRANCH"
+          git checkout --quiet "$BRANCH"
+          # release from the branch tip; refuse to run on a dirty tree
+          if ! git diff --quiet "origin/$BRANCH" HEAD; then
+            echo "::error::HEAD is not at the tip of origin/$BRANCH"
+            exit 1
+          fi
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::the working tree has uncommitted changes; commit them first"
+            exit 1
+          fi
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Maven
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Bump version
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+        run: |
+          # single <revision> in the root pom (children, including the
+          # ebms-server module, inherit it)
+          sed -i "s|<revision>.*</revision>|<revision>${VERSION}</revision>|" pom.xml
+          grep -H "<revision>" pom.xml
+
+      - name: Build and test
+        run: mvn -B -T 1C clean install -Ddependency-check.skip=true
+
+      - name: Collect release artifacts
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+        run: |
+          mkdir -p dist/ebms-core
+          cp "core/target/ebms-core-${VERSION}.jar" dist/ebms-core/
+          # the embedded server fat jar (replaces the former ebms-admin jar)
+          cp "server/target/ebms-server-${VERSION}.jar" dist/ebms-core/
+          # plugin JARs (db + cache + messaging)
+          for j in $(find plugin -name "ebms-*-${VERSION}.jar"); do
+            cp "$j" dist/ebms-core/
+          done
+          echo "ebms-core assets:"; ls dist/ebms-core
+
+      - name: Smoke test (two-adapter message exchange)
+        # adapter 1 = the just-built ebms-core server jar (local StartEmbedded,
+        # launched like the "Launch StartEmbedded SSL Server" VSCode config),
+        # adapter 2 = the published docker image from docker-compose.yml:
+        # ping + sendMessage (both directions) + sendMessageMTOM. On failure
+        # the script saves its workdir + the overheid container log to
+        # SMOKE_LOG_DIR, uploaded by the next step.
+        env:
+          SMOKE_LOG_DIR: ${{ runner.temp }}/ebms-smoke-logs
+        run: ./smoke-test.sh
+
+      - name: Upload smoke test logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ebms-smoke-logs
+          path: ${{ runner.temp }}/ebms-smoke-logs
+          if-no-files-found: ignore
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and tag the release
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+          BRANCH: ${{ steps.check.outputs.branch }}
+        run: |
+          git add pom.xml
+          git commit -m "release ${VERSION}"
+          git tag "ebms-core-${VERSION}"
+          git push origin "HEAD:${BRANCH}" "refs/tags/ebms-core-${VERSION}"
+
+      - name: Create GitHub release
+        # runs after the tag is pushed: posting a release for a tag that does
+        # not exist yet would make GitHub create a lightweight tag at the
+        # default branch, i.e. the wrong commit
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+          BRANCH: ${{ steps.check.outputs.branch }}
+          PRERELEASE: ${{ steps.check.outputs.prerelease }}
+          TOKEN: ${{ github.token }}
+        run: |
+          tag="ebms-core-${VERSION}"
+          # changelog body: commit subjects since the previous release tag on
+          # this branch. The tag we just created sits at HEAD and must not be
+          # its own predecessor; the script picks the newest tag that is an
+          # ancestor of HEAD and not superseded by a newer one, which handles
+          # the milestone -> RC -> GA sequence that a plain version sort gets
+          # wrong (sort -V puts 2.21.0 before 2.21.0-M1).
+          prev_tag=$(scripts/release-version.sh prev-tag --dir . --exclude "$tag")
+          body=""
+          if [ -n "$prev_tag" ]; then
+            body=$(git log --no-merges --pretty='- %s' "${prev_tag}..HEAD" | grep -v '^- release ' || true)
+          fi
+          [ -n "$body" ] || body="- (no changelog available)"
+          payload=$(jq -n --arg tag "$tag" --arg body "$body" --arg target "$BRANCH" --argjson pre "$PRERELEASE" \
+            '{tag_name: $tag, target_commitish: $target, body: $body, draft: false, prerelease: $pre}')
+          release_id=$(curl -sf -X POST \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -d "$payload" \
+              "https://api.github.com/repos/${{ github.repository }}/releases" | jq .id) \
+            || release_id=$(curl -sf \
+              -H "Authorization: Bearer ${TOKEN}" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/tags/${tag}" | jq .id)
+          if [ -z "$release_id" ] || [ "$release_id" = "null" ]; then
+            echo "::error::could not create or fetch release ${tag}"
+            exit 1
+          fi
+          for f in dist/ebms-core/*.jar; do
+            # retry a few times in case the uploads endpoint is flaky, and
+            # fail with an explicit message (previously a 4xx surfaced only
+            # as a bare "exit code 22" under bash -e)
+            if ! curl -fs --retry 3 --retry-delay 5 --retry-all-errors -X POST \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "Content-Type: application/java-archive" \
+              --data-binary @"$f" \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${release_id}/assets?name=$(basename "$f")" \
+              > /dev/null; then
+              echo "::error::asset upload failed after retries: $(basename "$f") (release ${release_id})"
+              exit 1
+            fi
+          done
+          echo "created release ${tag} (id ${release_id}, prerelease ${PRERELEASE}) with $(ls dist/ebms-core | wc -l) assets"
+
+      - name: Prepare for next development iteration
+        env:
+          SNAPSHOT: ${{ steps.check.outputs.snapshot }}
+          BRANCH: ${{ steps.check.outputs.branch }}
+        run: |
+          # stable release: <next patch>-SNAPSHOT; pre-release: back to
+          # <base>-SNAPSHOT, i.e. the version it is a pre-release of stays in
+          # development (see scripts/release-version.sh)
+          sed -i "s|<revision>.*</revision>|<revision>${SNAPSHOT}</revision>|" pom.xml
+          git add pom.xml
+          git commit -m "prepare for next development iteration"
+          git push origin "HEAD:${BRANCH}"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        id: next
+
+      - name: Dispatch CI and wait for it to go green
+        env:
+          BRANCH: ${{ steps.check.outputs.branch }}
+          TOKEN: ${{ github.token }}
+          SHA: ${{ steps.next.outputs.sha }}
+        run: |
+          # pushes made with the job token do not trigger workflows, so the
+          # final CI run is dispatched explicitly. The dispatch response is
+          # 204 with no body, so the run is found by polling the runs list for
+          # this branch and matching the SHA we just pushed.
+          curl -sf -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/ci.yml/dispatches" \
+            -d "{\"ref\":\"${BRANCH}\"}"
+          echo "dispatched ci.yml on ${BRANCH}; waiting for a run at ${SHA}"
+          run_id=""
+          for i in $(seq 1 20); do
+            sleep 15
+            run_id=$(curl -sf -H "Authorization: Bearer ${TOKEN}" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/ci.yml/runs?branch=${BRANCH}&event=workflow_dispatch&per_page=5" \
+              | SHA="${SHA}" python3 -c "import json,os,sys; runs=json.load(sys.stdin)['workflow_runs']; sha=os.environ['SHA']; m=[r for r in runs if r['head_sha']==sha]; print(m[0]['id'] if m else '')")
+            [ -n "$run_id" ] && break
+            echo "poll ${i}: dispatched run not visible yet"
+          done
+          if [ -z "$run_id" ]; then
+            echo "::error::the dispatched CI run never appeared"
+            exit 1
+          fi
+          echo "found run ${run_id}"
+          for i in $(seq 1 60); do
+            STATUS=$(curl -sf -H "Authorization: Bearer ${TOKEN}" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/runs/${run_id}" \
+              | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['status'], d['conclusion'])")
+            echo "poll ${i}: ${STATUS}"
+            case "${STATUS}" in
+              completed\ success) exit 0 ;;
+              completed\ *)
+                echo "::error::CI failed after release"
+                exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "::error::timed out waiting for CI"
+          exit 1
