@@ -40,7 +40,13 @@ name: Release
 #   7. Bump to the next development iteration SNAPSHOT ("prepare for next
 #      development iteration": <next patch>-SNAPSHOT for a stable release,
 #      <base>-SNAPSHOT for a pre-release), commit + push
-#   8. Dispatch ci.yml on the release branch tip and wait for it to finish
+#   8. Companion GitHub release in the legacy eluinstra/ebms-admin repository
+#      (scripts/release-admin-companion.sh): admin jar + the plugin jars, on
+#      the same release branch, body linking to this primary release. The
+#      companion NEVER blocks this release: it is skipped with a warning when
+#      the optional secret EBMS_ADMIN_TOKEN is not set, the admin release
+#      branch does not exist, or the admin build fails.
+#   9. Dispatch ci.yml on the release branch tip and wait for it to finish
 #      green (pushes made with the job token do not trigger workflows, so the
 #      run is dispatched explicitly via the Actions API)
 #
@@ -57,7 +63,10 @@ name: Release
 #   contents: write  - push the release commit/tag and create the release
 #   actions: write   - dispatch the final CI run
 #   actions: read    - poll the dispatched run
-# No repository secrets are required.
+# No repository secrets are REQUIRED. The optional secret EBMS_ADMIN_TOKEN
+# (PAT with Contents read+write on eluinstra/ebms-admin) enables the
+# companion ebms-admin GitHub release; without it the companion is skipped
+# with a warning.
 #
 # Optional approval gate: create an environment named "release"
 # (Settings -> Environments) with required reviewers, then uncomment the
@@ -274,6 +283,23 @@ jobs:
           git push origin "HEAD:${BRANCH}"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         id: next
+
+      - name: Companion ebms-admin GitHub release
+        # the legacy admin console (eluinsa/ebms-admin) gets a companion
+        # GitHub release next to this PRIMARY one. The script is tolerant by
+        # design: missing secret, missing admin release branch, or a failing
+        # admin build each skip the companion with a warning; this step can
+        # never fail the ebms-core release. It builds the admin against the
+        # ebms-core artifacts of this version, which the Build step above
+        # (clean install) put in the local Maven repository.
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+          BRANCH: ${{ steps.check.outputs.branch }}
+          EBMS_ADMIN_TOKEN: ${{ secrets.EBMS_ADMIN_TOKEN }}
+        run: |
+          ./scripts/release-admin-companion.sh --version "$VERSION" --branch "$BRANCH" \
+            --plugins-glob 'plugin/db/*/target/ebms-*-<version>.jar' \
+            --plugins-glob 'plugin/cache/*/target/ebms-*-<version>.jar'
 
       - name: Dispatch CI and wait for it to go green
         env:
