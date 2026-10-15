@@ -23,8 +23,8 @@
 			<PatternLayout pattern="%d [%t] %-5p %c - %m %X %n" />
 		</Console>
 		<RollingFile name="File" 
-			fileName="logs/ebms-admin.log"
-			filePattern="logs/ebms-admin-%d{yyyy-MM-dd}.log">
+			fileName="logs/ebms-core.log"
+			filePattern="logs/ebms-core-%d{yyyy-MM-dd}.log">
 			<PatternLayout pattern="%d [%t] %-5p %c - %m %X %n" />
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1"/>

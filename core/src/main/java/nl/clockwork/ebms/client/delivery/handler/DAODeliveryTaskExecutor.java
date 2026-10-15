@@ -46,8 +46,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 /**
  * Polls {@link DeliveryTaskDAO} for pending delivery tasks and dispatches them, ensuring that across a cluster at most one worker polls at any time. The
  * single-writer guarantee is provided by a {@link LockProvider} (ShedLock, JDBC-backed) rather than by JGroups Raft: the executor acquires the
- * {@link #LOCK_NAME} lock for the duration of each poll cycle and releases it afterwards. A crashed worker keeps the lock until {@code lockAtMostFor} elapses,
- * after which another worker takes over.
+ * {@link #LOCK_NAME} lock for the duration of each poll cycle and releases it afterwards. The lease is renewed (extended) before each awaited task future, so a
+ * slow cycle cannot let it lapse while the worker is still inside the critical section; if renewal reports the lease was lost, the worker stops waiting and
+ * never calls {@code unlock()}, since the JDBC provider's unlock has no owner check and a stale holder could otherwise release another node's live lock. A
+ * crashed worker keeps the lock until {@code lockAtMostFor} elapses, after which another worker takes over.
  */
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -105,6 +107,11 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 		this.leaderCheckIntervalMillis = leaderCheckIntervalMillis > 0 ? leaderCheckIntervalMillis : DEFAULT_LEADER_CHECK_INTERVAL_MILLIS;
 		this.taskAwaitTimeoutMillis = taskAwaitTimeoutMillis > 0 ? taskAwaitTimeoutMillis : DEFAULT_TASK_AWAIT_TIMEOUT_MILLIS;
 		this.lockAtMostForMillis = lockAtMostForMillis > 0 ? lockAtMostForMillis : DEFAULT_LOCK_AT_MOST_FOR_MILLIS;
+		// a single awaited future must complete strictly within the lease, otherwise the gate can
+		// lapse while this worker is still inside the critical section
+		if (this.taskAwaitTimeoutMillis >= this.lockAtMostForMillis)
+			throw new IllegalArgumentException(
+					"taskAwaitTimeoutMillis (" + this.taskAwaitTimeoutMillis + ") must be less than lockAtMostForMillis (" + this.lockAtMostForMillis + ")");
 		this.workerExecutor = new ThreadPoolTaskExecutor();
 		workerExecutor.setDaemon(true);
 		workerExecutor.setMaxPoolSize(1);
@@ -139,18 +146,24 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 	@Override
 	public void run()
 	{
-		while (!Thread.currentThread().isInterrupted())
+		while (running.get() && !Thread.currentThread().isInterrupted())
 		{
 			Optional<SimpleLock> acquired = acquireLock();
 			if (acquired.isPresent())
 			{
+				Lease lease = new Lease(acquired.get());
 				try
 				{
-					runLeaderCycle();
+					runLeaderCycle(lease);
 				}
 				finally
 				{
-					releaseLock(acquired.get());
+					// never unlock() after the lease was lost: the JDBC provider does not verify the
+					// owner, so releasing would reset lock_until and could free another node's live lock
+					if (lease.held())
+						releaseLock(lease.lock);
+					else
+						log.warn("Delivery-task lock lost mid-cycle; leaving it to the current holder to lapse after {} ms", lockAtMostForMillis);
 				}
 			}
 			else if (!sleep(leaderCheckIntervalMillis))
@@ -183,11 +196,11 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 		}
 	}
 
-	private void runLeaderCycle()
+	private void runLeaderCycle(Lease lease)
 	{
 		try
 		{
-			timedTask.run(() -> awaitAll(pollAndDispatch()));
+			timedTask.run(() -> awaitAll(pollAndDispatch(), lease));
 		}
 		catch (RuntimeException e)
 		{
@@ -211,10 +224,16 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 		return futures;
 	}
 
-	private void awaitAll(List<Future<?>> futures)
+	private void awaitAll(List<Future<?>> futures, Lease lease)
 	{
 		for (int i = 0; i < futures.size(); i++)
 		{
+			if (!renewLease(lease))
+			{
+				lease.lost = true;
+				cancelRemaining(futures, i);
+				return;
+			}
 			val f = futures.get(i);
 			try
 			{
@@ -235,6 +254,47 @@ public class DAODeliveryTaskExecutor implements Runnable, ApplicationListener<Co
 			{
 				log.error("Delivery task execution failed", e);
 			}
+		}
+	}
+
+	/**
+	 * Renews the lease so it cannot lapse during the next f.get() wait. extend() invalidates the old handle and returns a fresh one; an empty result, or a
+	 * provider that does not support extension at all, is treated as lost, which errs towards leaving the lock to its holder.
+	 */
+	private boolean renewLease(Lease lease)
+	{
+		try
+		{
+			Optional<SimpleLock> extended = lease.lock.extend(Duration.ofMillis(lockAtMostForMillis), Duration.ZERO);
+			extended.ifPresent(l -> lease.lock = l);
+			return extended.isPresent();
+		}
+		catch (UnsupportedOperationException | IllegalStateException e)
+		{
+			log.warn("Delivery-task lock extension not applicable; treating the lease as lost", e);
+			return false;
+		}
+		catch (RuntimeException e)
+		{
+			log.error("Failed to extend delivery-task lock", e);
+			return false;
+		}
+	}
+
+	/** Mutable holder for the current lock handle: extend() replaces it and lease.lost gates the final unlock(). */
+	static final class Lease
+	{
+		volatile SimpleLock lock;
+		volatile boolean lost;
+
+		Lease(SimpleLock lock)
+		{
+			this.lock = lock;
+		}
+
+		boolean held()
+		{
+			return !lost;
 		}
 	}
 

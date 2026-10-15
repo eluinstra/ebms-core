@@ -301,7 +301,7 @@ public class DBClean implements SystemInterface
 		}
 		val total = jdbc.update("delete from ebms_message where cpa_id = ?", cpaId);
 		println("A total number of " + total + " " + MESSAGE_COMMAND + " rows deleted");
-		println("delete cpa " + cpaId + " in ebms-admin to delete it from the cache!!!");
+		println("CPA " + cpaId + " may still be cached by running servers; evict it via DELETE /rest/v19/cpas/cache");
 	}
 
 	private void cleanMessages(Instant dateFrom, boolean includeNoPersistDuration)

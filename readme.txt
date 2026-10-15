@@ -21,7 +21,7 @@ Examples:
 
 Notes:
 
-- API changes in core can impact ebms-admin and plugin modules.
+- API changes in core can impact the server, cli and plugin modules.
 - DB schema and SQL changes should be reflected in plugin/db and test resources
 	under core/resources/test.
 - For broader project docs, see https://eluinstra.github.io/ebms-admin/

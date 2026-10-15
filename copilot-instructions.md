@@ -13,7 +13,7 @@ Build and test
 
 High-impact change rules
 
-- If changing core APIs, verify callers in ebms-admin and plugin modules.
+- If changing core APIs, verify callers in the server, cli and plugin modules.
 - If changing SQL/schema in plugin/db, update matching test resources under
   ebms-core/core/resources/test and document migration implications.
 - Keep tests deterministic and prefer targeted tests before full verify.

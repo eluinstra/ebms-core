@@ -26,6 +26,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -78,6 +79,11 @@ class DAODeliveryTaskExecutorTest
 
 	private DAODeliveryTaskExecutor build(long executionIntervalMillis, long taskAwaitTimeoutMillis)
 	{
+		return build(executionIntervalMillis, taskAwaitTimeoutMillis, 10_000);
+	}
+
+	private DAODeliveryTaskExecutor build(long executionIntervalMillis, long taskAwaitTimeoutMillis, long lockAtMostForMillis)
+	{
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.dispatcher(dispatcher)
@@ -87,6 +93,7 @@ class DAODeliveryTaskExecutorTest
 				.serverId("server-1")
 				.leaderCheckIntervalMillis(20)
 				.taskAwaitTimeoutMillis(taskAwaitTimeoutMillis)
+				.lockAtMostForMillis(lockAtMostForMillis)
 				.build();
 	}
 
@@ -219,5 +226,103 @@ class DAODeliveryTaskExecutorTest
 		assertFalse(refreshed.await(1, TimeUnit.SECONDS), "expected the executor to remain idle before the context refresh");
 		startExecutor();
 		assertTrue(refreshed.await(2, TimeUnit.SECONDS), "expected the executor to start polling after the context refresh");
+	}
+
+	@Test
+	void renewsLeaseBeforeEachAwait() throws Exception
+	{
+		// A cycle can wait taskAwaitTimeoutMillis per future; the lease (lockAtMostFor) must be
+		// renewed before each wait so a slow cycle cannot let another node take the gate.
+		var extended = new CountDownLatch(2);
+		var lock = new TestableSimpleLock();
+		lock.onExtend = () ->
+		{
+			extended.countDown();
+			return Optional.of(lock);
+		};
+		when(lockProvider.lock(any(LockConfiguration.class))).thenReturn(Optional.of(lock));
+		var tasks = new java.util.concurrent.atomic.AtomicReference<>(List.of(sampleTask(), sampleTask()));
+		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv -> tasks.getAndSet(Collections.emptyList()));
+		var done = new CountDownLatch(2);
+		when(dispatcher.dispatch(any(DeliveryTask.class))).thenAnswer(inv ->
+		{
+			done.countDown();
+			return CompletableFuture.completedFuture(null);
+		});
+		executor = build(0, 200, 10_000);
+		startExecutor();
+		assertTrue(done.await(3, TimeUnit.SECONDS), "expected both tasks dispatched");
+		assertTrue(extended.await(3, TimeUnit.SECONDS), "expected the lease extended before each awaited future");
+	}
+
+	@Test
+	void doesNotUnlockAfterLeaseLoss() throws Exception
+	{
+		// When extend() reports the lease was lost mid-cycle, the executor must NOT unlock: unlock()
+		// without ownership verification would reset lock_until and could release another node's live
+		// lock. The cycle has two futures: the first extend succeeds, the second reports the loss.
+		var lostLeaseLock = new TestableSimpleLock();
+		var extendsLeft = new java.util.concurrent.atomic.AtomicInteger(1);
+		lostLeaseLock.onExtend = () ->
+		{
+			// first renewal keeps the lease, the next one reports it lost to another node
+			return extendsLeft.decrementAndGet() >= 0 ? Optional.of(lostLeaseLock) : Optional.<SimpleLock>empty();
+		};
+		var firstCycle = new java.util.concurrent.atomic.AtomicBoolean(true);
+		when(lockProvider.lock(any(LockConfiguration.class)))
+				.thenAnswer(inv -> firstCycle.getAndSet(false) ? Optional.of(lostLeaseLock) : Optional.<SimpleLock>empty());
+		var dispatched = new CountDownLatch(2);
+		var tasks = new java.util.concurrent.atomic.AtomicReference<>(List.of(sampleTask(), sampleTask()));
+		when(deliveryTaskDAO.getTasksBefore(any(Instant.class), any(String.class))).thenAnswer(inv -> tasks.getAndSet(Collections.emptyList()));
+		when(dispatcher.dispatch(any(DeliveryTask.class))).thenAnswer(inv ->
+		{
+			dispatched.countDown();
+			return CompletableFuture.completedFuture(null);
+		});
+		executor = build(0, 300, 10_000);
+		startExecutor();
+		assertTrue(dispatched.await(3, TimeUnit.SECONDS), "expected both tasks dispatched");
+		// give a (buggy) unconditional unlock a chance to run after the second extend failed
+		Thread.sleep(500);
+		assertFalse(lostLeaseLock.unlocked, "expected no unlock() after the lease was lost");
+	}
+
+	@Test
+	void rejectsAwaitTimeoutNotBelowLease()
+	{
+		// Invariant: one awaited future must complete strictly within the lease, otherwise the
+		// gate can lapse mid-wait. taskAwaitTimeoutMillis must stay below lockAtMostForMillis.
+		assertThrows(
+				IllegalArgumentException.class,
+				() -> DAODeliveryTaskExecutor.builder()
+						.deliveryTaskDAO(deliveryTaskDAO)
+						.dispatcher(dispatcher)
+						.lockProvider(lockProvider)
+						.timedTask(new TimedTask(0))
+						.maxTasks(0)
+						.serverId("server-1")
+						.leaderCheckIntervalMillis(20)
+						.taskAwaitTimeoutMillis(300_000)
+						.lockAtMostForMillis(10_000)
+						.build());
+	}
+
+	/** Hand-rolled SimpleLock (not a mock of the behaviour under test) recording unlock/extend calls. */
+	static class TestableSimpleLock implements SimpleLock
+	{
+		volatile boolean unlocked;
+		volatile java.util.function.Supplier<Optional<SimpleLock>> onExtend = () -> Optional.of(this);
+
+		@Override
+		public void unlock()
+		{
+			unlocked = true;
+		}
+
+		@Override
+		public Optional<SimpleLock> extend(Duration lockAtMostFor, Duration lockAtLeastFor)
+		{
+			return onExtend.get();
+		}
 	}
 }
