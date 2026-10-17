@@ -24,14 +24,16 @@ import lombok.val;
 /**
  * Maps the EbMS Admin 2.20.x commandline startup options onto the spring properties used by EbMS Core and Server 2.21.x.
  * <p>
- * In 2.20.x the embedded server was configured through the {@code Start}/{@code StartEmbedded} options of ebms-admin, which set the web ({@code --port},
- * {@code --ssl}, ...) and the EbMS connector ({@code ebms.*}) settings. In 2.21.x the same configuration is read from spring property sources, with the web/API
- * settings under {@code api.*} (see {@code nl/clockwork/ebms/server/default.properties}) and the EbMS connector settings under {@code ebms.*}, {@code https.*}
- * and the keystore prefixes.
+ * In 2.20.x the {@code Start}/{@code StartEmbedded} options of ebms-admin configured the web connector only; the EbMS connector was configured through the
+ * {@code ebms.*}, {@code https.*} and keystore properties of the 2.20 ebms-server.properties. In 2.21.x the web/API settings live under {@code api.*} (see
+ * {@code nl/clockwork/ebms/server/default.properties}), so the web options are migrated there. The EbMS connector settings of the existing
+ * ebms-server.properties are kept unchanged: only the genuine EbMS connector options of 2.20.x ({@code --disableEbMSServer} and {@code --disableEbMSClient})
+ * are mapped.
  * </p>
  * <p>
- * Only options that were actually given are written, so that the defaults of an existing properties file are preserved. Options without an equivalent spring
- * property in 2.21.x are reported as warnings instead of being written.
+ * Only options that were actually given are written, so that the defaults of an existing properties file are preserved. One exception: {@code --soap} is always
+ * emitted, because the default differs between 2.20.x (SOAP off unless {@code --soap}) and 2.21.x ({@code api.soap.enabled} defaults to {@code true}). Options
+ * without an equivalent spring property in 2.21.x are reported as warnings instead of being written.
  * </p>
  */
 public class AdminOptionsMigrator
@@ -63,16 +65,17 @@ public class AdminOptionsMigrator
 
 	private void migrateWeb(AdminStartupOptions options, Map<String, String> api)
 	{
+		// in 2.20.x --host configured the web connector only; the ebms connector reads ebms.host from the properties file
 		if (options.hasOption("host"))
-		{
-			// in 2.20.x --host applied to both the web and the ebms connector
 			api.put("api.host", options.getOptionValue("host"));
-			api.put("ebms.host", options.getOptionValue("host"));
-		}
 		if (options.hasOption("path"))
 			api.put("api.path", options.getOptionValue("path"));
 		if (options.hasOption("headless"))
 			api.put("api.headless", TRUE);
+		// --soap must always be emitted: SOAP was off unless given in 2.20.x, but api.soap.enabled defaults to true in 2.21.x
+		api.put("api.soap.enabled", options.hasOption("soap") ? TRUE : FALSE);
+		if (options.hasOption("disableHostnameVerification"))
+			api.put("api.disableHostnameVerification", TRUE);
 		if (options.hasOption("health"))
 			api.put("api.health.enabled", TRUE);
 		if (options.hasOption("healthPort"))
@@ -89,6 +92,8 @@ public class AdminOptionsMigrator
 			api.put("api.logging.echoHeaderNames", options.getOptionValue("echoHeaderNames"));
 		if (options.hasOption("mdcHeaderNames"))
 			api.put("api.logging.mdcHeaderNames", options.getOptionValue("mdcHeaderNames"));
+		if (options.hasOption("clientCertificateHeader"))
+			api.put("api.clientCertificateHeader", options.getOptionValue("clientCertificateHeader"));
 		if (options.hasOption("configDir"))
 		{
 			// api.configDir drives the ebms.configDir system property used to locate the properties files,
@@ -146,26 +151,9 @@ public class AdminOptionsMigrator
 
 	private void migrateEbmsConnector(AdminStartupOptions options, Map<String, String> ebms)
 	{
-		if (options.hasOption("ssl"))
-			ebms.put("ebms.ssl", TRUE);
-		if (options.hasOption("protocols"))
-			ebms.put("https.protocols", options.getOptionValue("protocols"));
-		if (options.hasOption("cipherSuites"))
-			ebms.put("https.cipherSuites", options.getOptionValue("cipherSuites"));
-		if (options.hasOption("keyStoreType"))
-			ebms.put("keystore.type", options.getOptionValue("keyStoreType"));
-		if (options.hasOption("keyStorePath"))
-			ebms.put("keystore.path", options.getOptionValue("keyStorePath"));
-		if (options.hasOption("keyStorePassword"))
-			ebms.put("keystore.password", options.getOptionValue("keyStorePassword"));
-		if (options.hasOption("clientAuthentication"))
-			ebms.put("https.requireClientAuthentication", TRUE);
-		if (options.hasOption("trustStoreType"))
-			ebms.put("truststore.type", options.getOptionValue("trustStoreType"));
-		if (options.hasOption("trustStorePath"))
-			ebms.put("truststore.path", options.getOptionValue("trustStorePath"));
-		if (options.hasOption("trustStorePassword"))
-			ebms.put("truststore.password", options.getOptionValue("trustStorePassword"));
+		// In 2.20.x the EbMS connector was configured through the ebms-server.properties (ebms.*, https.*, keystore.*),
+		// not through the command line. Only the two genuine EbMS connector options are mapped; the web options
+		// (--ssl, --keyStore*, --trustStore*, --protocols, ...) must not leak into the EbMS connector settings.
 		if (options.hasOption("disableEbMSServer"))
 			ebms.put("ebms.server.disabled", TRUE);
 		if (options.hasOption("disableEbMSClient"))
@@ -176,22 +164,52 @@ public class AdminOptionsMigrator
 	{
 		val result = new ArrayList<String>(options.warningLines());
 		if (options.hasOption("soap"))
-			result.add("--soap: the SOAP service is always enabled in 2.21.x (property api.soap.enabled, default true)");
+			result.add("--soap: no option needed in 2.21.x, the SOAP service is enabled by api.soap.enabled=true, which was migrated");
 		if (options.hasOption("jmx"))
-			result.add("--jmx: the JMX connector starts with the migrated api.jmx properties, no --jmx equivalent option exists");
+			result.add(
+					"--jmx: the JMX server starts with the migrated api.jmx.* properties; there is no --jmx option in 2.21.x, disable it with api.jmx.enabled=false");
+		if (options.hasOption("headless"))
+			result.add("--headless: the 2.21.x server has no web console; api.headless=true was migrated");
 		options.movedClientCertificateHeaderValue()
 				.ifPresent(
 						value -> result.add(
 								"--clientCertificateHeader="
 										+ value
-										+ ": moved, set api.clientCertificateHeader="
-										+ value
-										+ " manually (the ebms connector always reads https.clientCertificateHeader)"));
-		if (options.hasOption("disableHostnameVerification"))
-			result.add("--disableHostnameVerification: set ebms.verifyHostnames=" + FALSE + " to disable hostname verification on the ebms connector");
+										+ ": migrated to api.clientCertificateHeader; the ebms connector always reads https.clientCertificateHeader, set that manually if needed"));
 		if (options.hasOption("keyStoresType"))
 			result.add("--keyStoresType: was already unused in 2.20.x, the keystore type is set with --keyStoreType");
+		validate(result, options);
 		return result;
+	}
+
+	private void validate(List<String> warnings, AdminStartupOptions options)
+	{
+		if (options.hasOption("ssl"))
+		{
+			if (isBlank(options.getOptionValue("keyStorePassword")))
+				warnings.add(
+						"validation: --ssl without --keyStorePassword; the 2.20.x server (and 2.21.x api.ssl.keyStorePassword) requires a non-default keystore password");
+			if (options.hasOption("clientAuthentication") && isBlank(options.getOptionValue("trustStorePath")))
+				warnings.add("validation: --clientAuthentication without --trustStorePath; the 2.20.x server would have failed to start without one");
+		}
+		else
+		{
+			if (!isBlank(options.getOptionValue("keyStorePassword")) || !isBlank(options.getOptionValue("keyStorePath")))
+				warnings.add("validation: --keyStore* given without --ssl; the 2.20.x server started the web connector without SSL and ignored the keystore options");
+			if (!isBlank(options.getOptionValue("trustStorePath")))
+				warnings.add("validation: --trustStore* given without --ssl; the 2.20.x server ignored the truststore options");
+		}
+		// in 2.20.x the client truststore was used only by the client-certificate authentication filter,
+		// which was added only with --authentication, --clientAuthentication and --ssl
+		if (options.hasOption("clientTrustStorePath")
+				&& !(options.hasOption("ssl") && options.hasOption("clientAuthentication") && options.hasOption("authentication")))
+			warnings.add(
+					"validation: --clientTrustStore* given without --ssl, --clientAuthentication and --authentication; the 2.20.x server ignored the client truststore options");
+	}
+
+	private static boolean isBlank(String value)
+	{
+		return value == null || value.isBlank();
 	}
 
 	/**

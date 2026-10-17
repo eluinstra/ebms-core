@@ -40,9 +40,12 @@ class EbMSMigratorTest
 		assertThat(properties).containsEntry("api.port", "9090")
 				.containsEntry("api.ssl.enabled", "true")
 				.containsEntry("api.ssl.keyStorePassword", "secret")
-				.containsEntry("ebms.host", "0.0.0.0")
-				.containsEntry("ebms.ssl", "true")
-				.containsEntry("keystore.password", "secret");
+				// SOAP was off in 2.20.x (--soap not given) and api.soap.enabled defaults to true in 2.21.x
+				.containsEntry("api.soap.enabled", "false")
+				// the web options must not leak into the EbMS connector settings
+				.doesNotContainKey("ebms.host")
+				.doesNotContainKey("ebms.ssl")
+				.doesNotContainKey("keystore.password");
 	}
 
 	@Test

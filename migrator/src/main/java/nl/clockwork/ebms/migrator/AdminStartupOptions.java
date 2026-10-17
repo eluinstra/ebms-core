@@ -33,8 +33,6 @@ public class AdminStartupOptions
 {
 	private static final List<String> ADMIN_ONLY_OPTIONS = List.of("keyStoresType");
 
-	private static final List<String> REMOVED_BOOL_OPTIONS = List.of("clientCertificateHeader", "disableHostnameVerification");
-
 	private static final int HELP_LINE_LENGTH = 140;
 
 	private final CommandLine commandLine;
@@ -146,17 +144,6 @@ public class AdminStartupOptions
 		return result;
 	}
 
-	public List<String> removedOptionNames()
-	{
-		val result = new ArrayList<String>();
-		for (val option : REMOVED_BOOL_OPTIONS)
-		{
-			if (commandLine.hasOption(option))
-				result.add(option);
-		}
-		return result;
-	}
-
 	public Optional<String> movedClientCertificateHeaderValue()
 	{
 		val value = commandLine.getOptionValue("clientCertificateHeader");
@@ -168,8 +155,6 @@ public class AdminStartupOptions
 		val result = new ArrayList<String>();
 		for (val option : unknownOptionNames())
 			result.add("ignored: --" + option + " has no equivalent spring property in 2.21.x");
-		for (val option : removedOptionNames())
-			result.add("ignored: --" + option + " has been removed from the ebms-server in 2.21.x");
 		return result;
 	}
 }

@@ -31,14 +31,16 @@ class AdminOptionsMigratorTest
 	@Test
 	void shouldMigrateNothingWithoutOptions() throws Exception
 	{
-		assertThat(migrate()).isEmpty();
+		// api.soap.enabled is always emitted: SOAP was off by default in 2.20.x but defaults to true in 2.21.x
+		assertThat(migrate()).containsOnly(Map.entry("api.soap.enabled", "false"));
 	}
 
 	@Test
-	void shouldMigrateHostToBothConnectors() throws Exception
+	void shouldMigrateHostToApiConnectorOnly() throws Exception
 	{
+		// in 2.20.x --host configured the web connector only; the ebms connector reads ebms.host from the properties file
 		val properties = migrate("--host", "10.0.0.1");
-		assertThat(properties).containsEntry("api.host", "10.0.0.1").containsEntry("ebms.host", "10.0.0.1");
+		assertThat(properties).containsEntry("api.host", "10.0.0.1").doesNotContainKey("ebms.host");
 	}
 
 	@Test
@@ -107,26 +109,53 @@ class AdminOptionsMigratorTest
 				.containsEntry("api.ssl.trustStoreType", "JKS")
 				.containsEntry("api.ssl.trustStorePath", "/etc/ebms/truststore.jks")
 				.containsEntry("api.ssl.trustStorePassword", "topsecret")
-				.containsEntry("ebms.ssl", "true")
-				.containsEntry("https.protocols", "TLSv1.3")
-				.containsEntry("https.cipherSuites", "TLS_AES_256_GCM_SHA384")
-				.containsEntry("https.requireClientAuthentication", "true")
-				.containsEntry("keystore.type", "JKS")
-				.containsEntry("keystore.path", "/etc/ebms/keystore.jks")
-				.containsEntry("keystore.password", "secret")
-				.containsEntry("truststore.type", "JKS")
-				.containsEntry("truststore.path", "/etc/ebms/truststore.jks")
-				.containsEntry("truststore.password", "topsecret");
+				// the web options must not leak into the EbMS connector settings
+				.doesNotContainKey("ebms.ssl")
+				.doesNotContainKey("https.protocols")
+				.doesNotContainKey("https.cipherSuites")
+				.doesNotContainKey("https.requireClientAuthentication")
+				.doesNotContainKey("keystore.type")
+				.doesNotContainKey("keystore.path")
+				.doesNotContainKey("keystore.password")
+				.doesNotContainKey("truststore.type")
+				.doesNotContainKey("truststore.path")
+				.doesNotContainKey("truststore.password");
 	}
 
 	@Test
-	void shouldOnlyMigrateKeystoreOptionsToApiWhenSslEnabled() throws Exception
+	void shouldMigrateSoapDisabledByDefault() throws Exception
 	{
+		// in 2.20.x the SOAP service was off unless --soap was given, but api.soap.enabled defaults to true in 2.21.x
+		assertThat(migrate("--port", "9090")).containsEntry("api.soap.enabled", "false");
+	}
+
+	@Test
+	void shouldMigrateSoapEnabled() throws Exception
+	{
+		assertThat(migrate("--soap")).containsEntry("api.soap.enabled", "true");
+	}
+
+	@Test
+	void shouldMigrateDisableHostnameVerificationToApi() throws Exception
+	{
+		assertThat(migrate("--disableHostnameVerification")).containsEntry("api.disableHostnameVerification", "true");
+	}
+
+	@Test
+	void shouldMigrateClientCertificateHeaderToApi() throws Exception
+	{
+		assertThat(migrate("--clientCertificateHeader", "X-Ssl-Cert")).containsEntry("api.clientCertificateHeader", "X-Ssl-Cert");
+	}
+
+	@Test
+	void shouldOnlyMigrateKeystoreOptionsWithSslEnabled() throws Exception
+	{
+		// in 2.20.x the keystore options configured the web connector and were ignored without --ssl
 		val properties = migrate("--keyStorePath", "/etc/ebms/keystore.p12", "--keyStorePassword", "secret");
 		assertThat(properties).doesNotContainKey("api.ssl.enabled")
 				.doesNotContainKey("api.ssl.keyStorePath")
-				.containsEntry("keystore.path", "/etc/ebms/keystore.p12")
-				.containsEntry("keystore.password", "secret");
+				.doesNotContainKey("keystore.path")
+				.doesNotContainKey("keystore.password");
 	}
 
 	@Test
@@ -173,14 +202,81 @@ class AdminOptionsMigratorTest
 	@Test
 	void shouldWarnAboutOptionsWithoutEquivalent() throws Exception
 	{
-		val options =
-				AdminStartupOptions.parse("--soap", "--jmx", "--keyStoresType", "PKCS12", "--clientCertificateHeader", "X-Ssl-Cert", "--disableHostnameVerification");
+		val options = AdminStartupOptions.parse("--soap", "--jmx", "--headless", "--keyStoresType", "PKCS12", "--clientCertificateHeader", "X-Ssl-Cert");
 		val warnings = new AdminOptionsMigrator().warnings(options);
 		assertThat(warnings).anyMatch(w -> w.startsWith("--soap"))
 				.anyMatch(w -> w.startsWith("--jmx"))
+				.anyMatch(w -> w.startsWith("--headless"))
 				.anyMatch(w -> w.startsWith("--keyStoresType"))
-				.anyMatch(w -> w.startsWith("--clientCertificateHeader"))
-				.anyMatch(w -> w.startsWith("--disableHostnameVerification"));
+				.anyMatch(w -> w.startsWith("--clientCertificateHeader"));
+	}
+
+	@Test
+	void shouldNotWarnAboutMigratedHostnameVerification() throws Exception
+	{
+		val warnings = new AdminOptionsMigrator().warnings(AdminStartupOptions.parse("--disableHostnameVerification"));
+		assertThat(warnings).isEmpty();
+	}
+
+	@Test
+	void shouldWarnWhenSslWithoutKeyStorePassword() throws Exception
+	{
+		val warnings = new AdminOptionsMigrator().warnings(AdminStartupOptions.parse("--ssl"));
+		assertThat(warnings).anyMatch(w -> w.startsWith("validation: --ssl without --keyStorePassword"));
+	}
+
+	@Test
+	void shouldWarnWhenClientAuthenticationWithoutTrustStorePath() throws Exception
+	{
+		val warnings = new AdminOptionsMigrator().warnings(AdminStartupOptions.parse("--ssl", "--clientAuthentication"));
+		assertThat(warnings).anyMatch(w -> w.startsWith("validation: --clientAuthentication without --trustStorePath"));
+	}
+
+	@Test
+	void shouldNotWarnWhenSslOptionsAreComplete() throws Exception
+	{
+		val warnings = new AdminOptionsMigrator()
+				.warnings(AdminStartupOptions.parse("--ssl", "--keyStorePassword", "secret", "--clientAuthentication", "--trustStorePath", "/trust.p12"));
+		assertThat(warnings).noneMatch(w -> w.startsWith("validation:"));
+	}
+
+	@Test
+	void shouldWarnWhenKeyStoreWithoutSsl() throws Exception
+	{
+		val warnings = new AdminOptionsMigrator().warnings(AdminStartupOptions.parse("--keyStorePath", "/etc/ebms/keystore.p12", "--keyStorePassword", "secret"));
+		assertThat(warnings).anyMatch(w -> w.startsWith("validation: --keyStore* given without --ssl"));
+	}
+
+	@Test
+	void shouldWarnWhenTrustStoreWithoutSsl() throws Exception
+	{
+		val warnings = new AdminOptionsMigrator().warnings(AdminStartupOptions.parse("--trustStorePath", "/etc/ebms/trust.p12"));
+		assertThat(warnings).anyMatch(w -> w.startsWith("validation: --trustStore* given without --ssl"));
+	}
+
+	@Test
+	void shouldWarnWhenClientTrustStoreWithoutClientCertificateAuthentication() throws Exception
+	{
+		val warnings =
+				new AdminOptionsMigrator().warnings(AdminStartupOptions.parse("--ssl", "--clientAuthentication", "--clientTrustStorePath", "/etc/ebms/client.ts"));
+		assertThat(warnings).anyMatch(w -> w.startsWith("validation: --clientTrustStore* given without"));
+	}
+
+	@Test
+	void shouldNotWarnWhenClientTrustStoreWithClientCertificateAuthentication() throws Exception
+	{
+		val warnings = new AdminOptionsMigrator().warnings(
+				AdminStartupOptions.parse(
+						"--ssl",
+						"--keyStorePassword",
+						"secret",
+						"--clientAuthentication",
+						"--trustStorePath",
+						"/trust.p12",
+						"--authentication",
+						"--clientTrustStorePath",
+						"/client.ts"));
+		assertThat(warnings).noneMatch(w -> w.startsWith("validation:"));
 	}
 
 	@Test

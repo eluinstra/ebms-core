@@ -67,7 +67,7 @@ public class EbMSMigrator
 			return 0;
 		}
 		val adminOptions = AdminStartupOptions.of(cmd);
-		if (adminOptions.unknownOptionNames().isEmpty() && adminOptions.removedOptionNames().isEmpty() && !hasAnyAdminOption(adminOptions))
+		if (adminOptions.unknownOptionNames().isEmpty() && !hasAnyAdminOption(adminOptions))
 		{
 			println("No EbMS Admin 2.20.x startup options given; nothing to migrate.");
 			AdminStartupOptions.printUsage(getSimpleName());
