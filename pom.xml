@@ -62,6 +62,7 @@
     <module>cli</module>
     <module>common</module>
     <module>core</module>
+    <module>migrate</module>
     <module>plugin/cache/ehcache</module>
     <module>plugin/cache/hazelcast</module>
     <module>plugin/db/db2</module>
