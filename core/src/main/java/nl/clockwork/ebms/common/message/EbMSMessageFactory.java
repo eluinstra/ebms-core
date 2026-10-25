@@ -99,7 +99,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val messageHeader = createResponseMessageHeader(message.getMessageHeader(), timestamp, EbMSAction.ACKNOWLEDGMENT);
+			val messageHeader = createAcknowledgmentResponseMessageHeader(message.getMessageHeader(), timestamp);
 			val acknowledgment = new Acknowledgment();
 			acknowledgment.setVersion(Constants.EBMS_VERSION);
 			acknowledgment.setMustUnderstand(true);
@@ -339,6 +339,21 @@ public class EbMSMessageFactory
 		val hostname = CPAUtils.getHostname(deliveryChannel);
 		val from = createForm(messageHeader.getTo().getPartyId(), null);
 		val to = createTo(messageHeader.getFrom().getPartyId(), null);
+		val service = createService(null, action.getServiceUri());
+		val messageId = ebMSIdGenerator.generateMessageId(hostname);
+		val messageData = createMessageData(messageId, messageHeader.getMessageData().getMessageId(), timestamp, null);
+		return createMessageHeader(messageHeader.getCPAId(), messageHeader.getConversationId(), from, to, service, action.getAction(), messageData, null);
+	}
+
+	private MessageHeader createAcknowledgmentResponseMessageHeader(MessageHeader messageHeader, Instant timestamp)
+			throws DatatypeConfigurationException, JAXBException
+	{
+		val cpaId = messageHeader.getCPAId();
+		val action = EbMSAction.ACKNOWLEDGMENT;
+		val deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId, messageHeader.getTo().getPartyId(), action.getAction()).orElse(null);
+		val hostname = CPAUtils.getHostname(deliveryChannel);
+		val from = createForm(messageHeader.getTo().getPartyId(), messageHeader.getTo().getRole());
+		val to = createTo(messageHeader.getFrom().getPartyId(), messageHeader.getFrom().getRole());
 		val service = createService(null, action.getServiceUri());
 		val messageId = ebMSIdGenerator.generateMessageId(hostname);
 		val messageData = createMessageData(messageId, messageHeader.getMessageData().getMessageId(), timestamp, null);
