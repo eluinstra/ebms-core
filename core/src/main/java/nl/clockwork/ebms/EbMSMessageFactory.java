@@ -297,7 +297,7 @@ public class EbMSMessageFactory
 		val fromPartyInfo = cpaManager.getFromPartyInfo(cpaId, fromParty, properties.getService(), properties.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo", cpaId, fromParty, properties.getService(), properties.getAction()));
 		val toParty = properties.getToPartyId() != null ? Party.of(properties.getToPartyId(), properties.getToRole()) : null;
-		val toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, properties.getService(), properties.getAction())
+		val toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, toParty, properties.getService(), properties.getAction())
 				.orElse(
 						cpaManager.getToPartyInfo(cpaId, toParty, properties.getService(), properties.getAction())
 								.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo", cpaId, toParty, properties.getService(), properties.getAction())));
