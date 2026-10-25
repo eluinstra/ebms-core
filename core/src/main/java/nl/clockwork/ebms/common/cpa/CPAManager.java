@@ -112,8 +112,14 @@ public class CPAManager
 	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
+		return self().getToPartyInfoByFromPartyActionBinding(cpaId, fromParty, null, service, action);
+	}
+
+	@Cacheable(cacheNames = "CPAManager", keyGenerator = "ebMSKeyGenerator")
+	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, Party toParty, String service, String action)
+	{
 		return self().getFromPartyInfo(cpaId, fromParty, service, action)
-				.flatMap(fromPartyInfo -> cpaRepository.getCPA(cpaId).map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo)))
+				.flatMap(fromPartyInfo -> cpaRepository.getCPA(cpaId).map(CPAQuery.getToPartyInfoByFromPartyActionBinding(toParty, fromPartyInfo)))
 				.orElse(empty());
 	}
 

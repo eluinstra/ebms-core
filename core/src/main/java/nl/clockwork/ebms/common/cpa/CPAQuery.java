@@ -163,8 +163,7 @@ class CPAQuery
 
 	private static Function<CanSend, FromPartyInfo> toFromPartyInfo(Party fromParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
 	{
-		return canSend -> CPAUtils
-				.getFromPartyInfo(fromParty == null ? partyInfo.getPartyId().get(0) : fromParty.getPartyId(partyInfo.getPartyId()), collaborationRole, canSend);
+		return canSend -> CPAUtils.getFromPartyInfo(resolvePartyId(fromParty, partyInfo), collaborationRole, canSend);
 	}
 
 	private static Function<CanReceive, ToPartyInfo> toToPartyInfo(PartyInfo partyInfo, CollaborationRole collaborationRole)
@@ -174,8 +173,19 @@ class CPAQuery
 
 	private static Function<CanReceive, ToPartyInfo> toToPartyInfo(Party toParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
 	{
-		return canReceive -> CPAUtils
-				.getToPartyInfo(toParty == null ? partyInfo.getPartyId().get(0) : toParty.getPartyId(partyInfo.getPartyId()), collaborationRole, canReceive);
+		return canReceive -> CPAUtils.getToPartyInfo(resolvePartyId(toParty, partyInfo), collaborationRole, canReceive);
+	}
+
+	/**
+	 * The PartyId requested by the caller is used throughout the whole process, so it must not be replaced by the first PartyId of the matched PartyInfo. Only
+	 * when no specific PartyId was requested (e.g. internal MSH signal paths) does the first PartyId of the PartyInfo apply.
+	 */
+	private static org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId resolvePartyId(Party party, PartyInfo partyInfo)
+	{
+		if (party == null)
+			return partyInfo.getPartyId().get(0);
+		var partyId = party.getPartyId(partyInfo.getPartyId());
+		return partyId == null ? partyInfo.getPartyId().get(0) : partyId;
 	}
 
 	private static Function<OverrideMshActionBinding, DeliveryChannel> toDeliveryChannel()
@@ -232,6 +242,11 @@ class CPAQuery
 
 	static Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>> getToPartyInfoByFromPartyActionBinding(FromPartyInfo fromPartyInfo)
 	{
+		return getToPartyInfoByFromPartyActionBinding(null, fromPartyInfo);
+	}
+
+	static Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>> getToPartyInfoByFromPartyActionBinding(Party toParty, FromPartyInfo fromPartyInfo)
+	{
 		return cpa -> cpa.getPartyInfo()
 				.stream()
 				.flatMap(
@@ -242,7 +257,7 @@ class CPAQuery
 												.getCanReceive()
 												.stream()
 												.filter(matchesCanReceive(fromPartyInfo))
-												.map(toToPartyInfo(partyInfo, collaborationRole))))
+												.map(toToPartyInfo(toParty, partyInfo, collaborationRole))))
 				.findFirst();
 	}
 

@@ -49,6 +49,7 @@ public class CPAManagerTest
 	private static final String DEFAULT_CPA_ID = "cpaStubEBF.rm.https.signed";
 	private static final String ENCRYPTED_CPA_ID = "cpaStubEBF.rm.https.signed.encrypted";
 	private static final String SYNC_CPA_ID = "cpaStubEBF.rm.https.signed.sync";
+	private static final String MULTI_CPA_ID = "cpaStubEBF.rm.https.signed.multi";
 	private static final String NOT_EXISTING_CPA_ID = "cpaStubEBF.rm.https.signed.not.existing";
 
 	private static final String DEFAULT_PARTY_ID_TYPE = "urn:osb:oin";
@@ -62,6 +63,7 @@ public class CPAManagerTest
 	private static final String DIGIPOORT_PARTY_NAME = "Logius";
 	private static final String DIGIPOORT_PARTY_ID_VALUE = "00000000000000000000";
 	private static final PartyId DIGIPOORT_PARTY_ID = createPartyId(DEFAULT_PARTY_ID_TYPE, DIGIPOORT_PARTY_ID_VALUE);
+	private static final PartyId DIGIPOORT_PARTY_ID_SECOND = createPartyId(DEFAULT_PARTY_ID_TYPE, "90000000000000000001");
 	private static final String DIGIPOORT_ROLE = "DIGIPOORT";
 	private static final String DIGIPOORT_DEFAULT_DELIVERY_CHANNEL = "DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned";
 	private static final String DIGIPOORT_RELIABLE_DELIVERY_CHANNEL = "DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned";
@@ -69,6 +71,7 @@ public class CPAManagerTest
 
 	private static final String OVERHEID_PARTY_NAME = "Overheid";
 	private static final PartyId OVERHEID_PARTY_ID = createPartyId(DEFAULT_PARTY_ID_TYPE, "00000000000000000001");
+	private static final PartyId OVERHEID_PARTY_ID_SECOND = createPartyId(DEFAULT_PARTY_ID_TYPE, "90000000000000000002");
 	private static final String OVERHEID_ROLE = "OVERHEID";
 	private static final String OVERHEID_DEFAULT_DELIVERY_CHANNEL = "OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned";
 	private static final String OVERHEID_RELIABLE_DELIVERY_CHANNEL = "OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned";
@@ -96,6 +99,8 @@ public class CPAManagerTest
 		when(cpaRepository.getCPA(DEFAULT_CPA_ID)).thenReturn(loadCPA(DEFAULT_CPA_ID));
 		when(cpaRepository.getCPA(ENCRYPTED_CPA_ID)).thenReturn(loadCPA(ENCRYPTED_CPA_ID));
 		when(cpaRepository.getCPA(SYNC_CPA_ID)).thenReturn(loadCPA(SYNC_CPA_ID));
+		when(cpaRepository.existsCPA(MULTI_CPA_ID)).thenReturn(true);
+		when(cpaRepository.getCPA(MULTI_CPA_ID)).thenReturn(loadCPA(MULTI_CPA_ID));
 		cpaManager = new CPAManager(
 				cpaRepository,
 				(cpaId, certificate) -> certificate,
@@ -326,6 +331,79 @@ public class CPAManagerTest
 				arguments(DEFAULT_CPA_ID, Party.of(OVERHEID_PARTY_ID.toString(), OVERHEID_ROLE), AANLEVEREN_SERVICE.toString(), BEVESTIG_AANLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE), null, BEVESTIG_AFLEVEREN_ACTION),
 				arguments(DEFAULT_CPA_ID, Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE), AFLEVEREN_SERVICE.toString(), null));
+	}
+
+	@Test
+	void getFromPartyInfoUsesRequestedPartyId()
+	{
+		// The requested (non-first) PartyId of the PartyInfo must be projected, not the first one
+		assertThat(
+				cpaManager
+						.getFromPartyInfo(MULTI_CPA_ID, Party.of(DIGIPOORT_PARTY_ID_SECOND.toString(), DIGIPOORT_ROLE), AFLEVEREN_SERVICE.toString(), AFLEVEREN_ACTION))
+								.hasValueSatisfying(
+										fromPartyInfo -> assertThat(fromPartyInfo.getPartyIds())
+												.extracting(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId::toString)
+												.containsExactly(DIGIPOORT_PARTY_ID_SECOND.toString()));
+		assertThat(
+				cpaManager.getFromPartyInfo(MULTI_CPA_ID, Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE), AFLEVEREN_SERVICE.toString(), AFLEVEREN_ACTION))
+						.hasValueSatisfying(
+								fromPartyInfo -> assertThat(fromPartyInfo.getPartyIds()).extracting(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId::toString)
+										.containsExactly(DIGIPOORT_PARTY_ID.toString()));
+	}
+
+	@Test
+	void getToPartyInfoUsesRequestedPartyId()
+	{
+		// The requested (non-first) PartyId of the PartyInfo must be projected, not the first one
+		assertThat(
+				cpaManager.getToPartyInfo(
+						MULTI_CPA_ID,
+						Party.of(DIGIPOORT_PARTY_ID_SECOND.toString(), DIGIPOORT_ROLE),
+						AFLEVEREN_SERVICE.toString(),
+						BEVESTIG_AFLEVEREN_ACTION)).hasValueSatisfying(
+								toPartyInfo -> assertThat(toPartyInfo.getPartyIds()).extracting(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId::toString)
+										.containsExactly(DIGIPOORT_PARTY_ID_SECOND.toString()));
+		assertThat(
+				cpaManager
+						.getToPartyInfo(MULTI_CPA_ID, Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE), AFLEVEREN_SERVICE.toString(), BEVESTIG_AFLEVEREN_ACTION))
+								.hasValueSatisfying(
+										toPartyInfo -> assertThat(toPartyInfo.getPartyIds()).extracting(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId::toString)
+												.containsExactly(DIGIPOORT_PARTY_ID.toString()));
+	}
+
+	@Test
+	void getToPartyInfoByFromPartyActionBindingUsesRequestedToPartyId()
+	{
+		// Even when the To PartyInfo is found via the From party action binding, the requested To PartyId must be projected
+		Party fromParty = Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE);
+		assertThat(
+				cpaManager.getToPartyInfoByFromPartyActionBinding(
+						MULTI_CPA_ID,
+						fromParty,
+						Party.of(OVERHEID_PARTY_ID_SECOND.toString(), OVERHEID_ROLE),
+						AFLEVEREN_SERVICE.toString(),
+						AFLEVEREN_ACTION)).hasValueSatisfying(
+								toPartyInfo -> assertThat(toPartyInfo.getPartyIds()).extracting(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId::toString)
+										.containsExactly(OVERHEID_PARTY_ID_SECOND.toString()));
+		assertThat(
+				cpaManager.getToPartyInfoByFromPartyActionBinding(
+						MULTI_CPA_ID,
+						fromParty,
+						Party.of(OVERHEID_PARTY_ID.toString(), OVERHEID_ROLE),
+						AFLEVEREN_SERVICE.toString(),
+						AFLEVEREN_ACTION)).hasValueSatisfying(
+								toPartyInfo -> assertThat(toPartyInfo.getPartyIds()).extracting(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId::toString)
+										.containsExactly(OVERHEID_PARTY_ID.toString()));
+	}
+
+	@Test
+	void getToPartyInfoByFromPartyActionBindingWithoutToPartyFallsBackToFirstPartyId()
+	{
+		// Back-compat: internal paths without a specific To Party keep using the first PartyId of the PartyInfo
+		Party fromParty = Party.of(DIGIPOORT_PARTY_ID.toString(), DIGIPOORT_ROLE);
+		assertThat(cpaManager.getToPartyInfoByFromPartyActionBinding(MULTI_CPA_ID, fromParty, AFLEVEREN_SERVICE.toString(), AFLEVEREN_ACTION)).hasValueSatisfying(
+				toPartyInfo -> assertThat(toPartyInfo.getPartyIds()).extracting(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId::toString)
+						.containsExactly(OVERHEID_PARTY_ID.toString()));
 	}
 
 	@ParameterizedTest
