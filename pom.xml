@@ -100,7 +100,7 @@
     <checkstyle.config-location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config-location>
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <flyway.version>13.10.0</flyway.version>
+    <flyway.version>13.11.1</flyway.version>
     <jdk.version>21</jdk.version>
     <nvd.api.key/>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -295,32 +295,32 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jms</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.kafka</groupId>
         <artifactId>spring-kafka</artifactId>
-        <version>4.0.7</version>
+        <version>4.0.8</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>io.vavr</groupId>
@@ -376,7 +376,7 @@
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
-        <version>6.1.0</version>
+        <version>6.3.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -400,13 +400,13 @@
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>6.1.0</version>
+        <version>6.3.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -568,12 +568,11 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>12.2.2</version>
+        <version>13.0.0</version>
         <configuration>
           <failBuildOnCVSS>7</failBuildOnCVSS>
           <autoUpdate>true</autoUpdate>
           <nvdApiKey>${nvd.api.key}</nvdApiKey>
-          <ossindex>false</ossindex>
           <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
           <suppressionFiles>
             <suppressionFile>${maven-parent.basedir}/resources/reporting/dependency-check-suppressions.xml</suppressionFile>
@@ -611,7 +610,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.7.3</version>
+        <version>1.8.0</version>
         <configuration>
           <updatePomFile>true</updatePomFile>
           <flattenMode>resolveCiFriendliesOnly</flattenMode>
@@ -636,7 +635,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.15</version>
+        <version>0.8.16</version>
         <executions>
           <execution>
             <goals>
@@ -655,7 +654,7 @@
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>5.0.0</version>
+        <version>5.1.2</version>
         <configuration>
           <strictCheck>true</strictCheck>
           <failIfMissing>true</failIfMissing>
@@ -714,7 +713,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.15.0</version>
+        <version>3.16.0</version>
         <configuration>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
@@ -740,7 +739,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.1.4</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>default-deploy</id>
@@ -775,7 +774,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.5.5</version>
+        <version>3.6.1</version>
         <configuration>
           <systemPropertyVariables>
             <api.version>1.44</api.version>
@@ -792,7 +791,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.1</version>
         <configuration>
           <archive>
             <manifest>
@@ -863,7 +862,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.5</version>
+        <version>3.6.1</version>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -879,7 +878,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.10.4</version>
         <configuration>
           <formats>
             <format>
@@ -1001,13 +1000,12 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>12.2.2</version>
+        <version>13.0.0</version>
         <configuration>
           <suppressionFiles>
             <suppressionFile>${maven-parent.basedir}/resources/reporting/dependency-check-suppressions.xml</suppressionFile>
           </suppressionFiles>
           <failBuildOnCVSS>7</failBuildOnCVSS>
-          <ossindex>false</ossindex>
           <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
         </configuration>
         <reportSets>
@@ -1070,7 +1068,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.5.5</version>
+        <version>3.6.1</version>
       </plugin>
       <plugin>
         <groupId>com.github.spotbugs</groupId>
