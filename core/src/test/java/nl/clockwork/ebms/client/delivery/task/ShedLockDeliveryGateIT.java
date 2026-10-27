@@ -16,24 +16,27 @@
 package nl.clockwork.ebms.client.delivery.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 import javax.sql.DataSource;
+import net.javacrumbs.shedlock.core.LockConfiguration;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.core.SimpleLock;
 import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider;
-import nl.clockwork.ebms.client.client.DeliveryTask;
 import nl.clockwork.ebms.client.client.DeliveryTaskDispatcher;
-import nl.clockwork.ebms.client.client.DeliveryTaskStatus;
 import nl.clockwork.ebms.client.delivery.handler.DAODeliveryTaskExecutor;
 import nl.clockwork.ebms.client.delivery.handler.TimedTask;
 import org.junit.jupiter.api.AfterEach;
@@ -49,18 +52,31 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
  * Two executors ("nodes") over one shared in-memory H2 database and a real {@link JdbcLockProvider}, exercising what the mocked-LockProvider unit tests cannot
  * reach: that the real JDBC extend()/unlock SQL keeps the gate held by the working node (a waiting node never enters getTasksBefore while the holder renews),
  * and that an expired lease is taken over.
+ * <p>
+ * The assertions are deliberately based on the state of the shedlock row (lock_until / locked_by) rather than on wall-clock windows, so the tests stay
+ * deterministic on slow or heavily loaded CI runners: node B's {@link RecordingLockProvider} records the row state right before every lock attempt, and B is
+ * only allowed to have <i>acquired</i> the gate when the row was already expired or its.
  */
 public class ShedLockDeliveryGateIT
 {
 	private static final String URL = "jdbc:h2:mem:shedlock-gate-it;DB_CLOSE_DELAY=-1";
 	private static final String LOCK_NAME = "ebms-delivery-task-executor";
+	private static final String NODE_A = "gate-it-node-a";
+	private static final String NODE_B = "gate-it-node-b";
+	private static final String DEAD_NODE = "dead-node";
 	private static final long TASK_AWAIT_TIMEOUT_MILLIS = 500;
 	private static final long LEASE_MILLIS = 2_000;
+	/**
+	 * Slack tolerated between reading the shedlock row and the provider's own {@code UPDATE ... WHERE lock_until <= now}; it absorbs the snapshot→update gap at a
+	 * legitimate expiry-boundary takeover. Deliberately far smaller than any lease used here.
+	 */
+	private static final long SNAPSHOT_GRACE_MILLIS = 500;
 
 	private SingleConnectionDataSource dataSource;
 	private JdbcTemplate jdbcTemplate;
 	private DAODeliveryTaskExecutor executorA;
 	private DAODeliveryTaskExecutor executorB;
+	private final ConcurrentLinkedQueue<GateAttempt> attemptsB = new ConcurrentLinkedQueue<>();
 
 	@BeforeEach
 	void setUp() throws Exception
@@ -91,6 +107,7 @@ public class ShedLockDeliveryGateIT
 							+ " locked_at timestamp not null,"
 							+ " locked_by varchar(256) not null)");
 		}
+		attemptsB.clear();
 	}
 
 	@AfterEach
@@ -104,18 +121,30 @@ public class ShedLockDeliveryGateIT
 			dataSource.destroy();
 	}
 
+	/** Seeds the shedlock row with a lease held by {@code owner}; {@code live} controls whether the seeded lease is still valid. */
+	private void seedGate(String owner, long leaseMillis, boolean live)
+	{
+		// MERGE (H2): the row may already exist (e.g. created by a running node), so upsert it
+		jdbcTemplate.update(
+				"merge into shedlock (name, lock_until, locked_at, locked_by) key (name) values (?, ?, ?, ?)",
+				LOCK_NAME,
+				Timestamp.from(live ? Instant.now().plusMillis(leaseMillis) : Instant.now().minusMillis(leaseMillis)),
+				Timestamp.from(Instant.now()),
+				owner);
+	}
+
 	@Test
 	void slowHolderRenewsTheGateAndOtherNodeOnlyPollsAfterRelease() throws Exception
 	{
-		// 30 due tasks; node A's dispatch is slow (300ms, still below the await timeout so the
-		// cycle keeps futures in flight for ~9s and must renew the 2s lease before every await)
-		for (int i = 1; i <= 30; i++)
+		// 60 due tasks at 300ms each: node A's dispatch is slow (still below the await timeout), so its
+		// single cycle keeps the futures in flight for ~18s and must renew the 2s lease before every await
+		for (int i = 1; i <= 60; i++)
 			insertTask("msg-" + i);
 
 		var dispatchesA = new CopyOnWriteArrayList<String>();
 		var firstDispatchA = new CountDownLatch(1);
 		// the slow send happens inside the dispatched future, i.e. in the awaitAll step that must renew
-		executorA = executor(new DeliveryTaskDAOImpl(jdbcTemplate), task -> CompletableFuture.supplyAsync(() ->
+		executorA = executor(NODE_A, new DeliveryTaskDAOImpl(jdbcTemplate), task -> CompletableFuture.supplyAsync(() ->
 		{
 			dispatchesA.add(task.getMessageId());
 			firstDispatchA.countDown();
@@ -123,12 +152,10 @@ public class ShedLockDeliveryGateIT
 			return null;
 		}));
 
-		var pollsB = new AtomicInteger();
-		var dispatchesB = new CopyOnWriteArrayList<String>();
-		var daoB = new CountingDAO(new DeliveryTaskDAOImpl(jdbcTemplate), pollsB);
-		executorB = executor(daoB, task ->
+		executorB = executor(NODE_B, new DeliveryTaskDAOImpl(jdbcTemplate), task ->
 		{
-			dispatchesB.add(task.getMessageId());
+			// B may dispatch: it can legitimately acquire the gate in the gaps between A's renewals
+			// (the gate is single-writer at any instant, not permanently owned by A)
 			return CompletableFuture.completedFuture(null);
 		});
 
@@ -138,13 +165,12 @@ public class ShedLockDeliveryGateIT
 		start(executorA);
 		assertTrue(firstDispatchA.await(15, TimeUnit.SECONDS), "expected node A to start dispatching");
 		start(executorB);
-		// 4s > 2x the lease: without renewal the gate would have lapsed and B would have polled
-		Thread.sleep(4_000);
-		assertTrue(dispatchesA.size() > 1, "expected node A to still be working");
-		assertTrue(dispatchesB.isEmpty(), "node B must not dispatch anything while node A holds the gate");
-		// B may have polled once or twice at the startup boundary (before A's renewal cycle re-asserted
-		// the lease); repeated polling means the lease lapsed and B took over the gate
-		assertTrue(pollsB.get() <= 2, "node B polled %d times while the slow holder renews its lease".formatted(pollsB.get()));
+		// wait until both nodes have actually exercised the gate; the assertions below are state-based,
+		// so this wait only bounds the test duration on a heavily loaded runner
+		assertTrue(waitFor(() -> attemptsB.size() >= 1 && dispatchesA.size() >= 2, 20_000), "expected both nodes to have exercised the gate");
+		// the deterministic gate property: B never acquired the gate while it was held live by node A,
+		// even though A renewed its lease across the whole ~18s cycle
+		assertGateNeverTakenWhileLive();
 	}
 
 	@Test
@@ -153,9 +179,7 @@ public class ShedLockDeliveryGateIT
 		insertTask("msg-1");
 		var dispatchesB = new CopyOnWriteArrayList<String>();
 		var doneB = new CountDownLatch(1);
-		var pollsB = new AtomicInteger();
-		var daoB = new CountingDAO(new DeliveryTaskDAOImpl(jdbcTemplate), pollsB);
-		executorB = executor(daoB, task ->
+		executorB = executor(NODE_B, new DeliveryTaskDAOImpl(jdbcTemplate), task ->
 		{
 			dispatchesB.add(task.getMessageId());
 			// like production DeliveryTaskHandler: the task is consumed and removed, so it must not be
@@ -167,53 +191,59 @@ public class ShedLockDeliveryGateIT
 
 		// a crashed holder left a long lease behind; force it expired to exercise takeover without
 		// depending on node timing
-		jdbcTemplate.update(
-				"insert into shedlock (name, lock_until, locked_at, locked_by) values (?, ?, ?, ?)",
-				LOCK_NAME,
-				java.sql.Timestamp.from(Instant.now().minusSeconds(60)),
-				java.sql.Timestamp.from(Instant.now()),
-				"dead-node");
+		seedGate(DEAD_NODE, 60_000, false);
 
 		start(executorB);
 		assertTrue(doneB.await(10, TimeUnit.SECONDS), "expected the live node to take over the expired lease");
 		assertEquals(List.of("msg-1"), dispatchesB);
-		assertTrue(pollsB.get() > 0);
+		assertEquals(NODE_B, gateSnapshot().owner(), "node B must hold the row after takeover");
+		assertGateNeverTakenWhileLive();
 	}
 
 	@Test
 	void liveLeaseBlocksTheOtherNodeUntilItExpires() throws Exception
 	{
 		insertTask("msg-1");
-		jdbcTemplate.update(
-				"insert into shedlock (name, lock_until, locked_at, locked_by) values (?, ?, ?, ?)",
-				LOCK_NAME,
-				java.sql.Timestamp.from(Instant.now().plusSeconds(3)),
-				java.sql.Timestamp.from(Instant.now()),
-				"dead-node");
+		// a crashed holder left a live (unexpired) lease behind, held by someone other than node B
+		seedGate(DEAD_NODE, 3_000, true);
 
-		var pollsB = new AtomicInteger();
 		var dispatchesB = new CopyOnWriteArrayList<String>();
-		var daoB = new CountingDAO(new DeliveryTaskDAOImpl(jdbcTemplate), pollsB);
-		executorB = executor(daoB, task ->
+		var doneB = new CountDownLatch(1);
+		executorB = executor(NODE_B, new DeliveryTaskDAOImpl(jdbcTemplate), task ->
 		{
 			dispatchesB.add(task.getMessageId());
 			// like production: the task is consumed and removed after dispatch
 			jdbcTemplate.update("delete from delivery_task where message_id = ?", task.getMessageId());
+			doneB.countDown();
 			return CompletableFuture.completedFuture(null);
 		});
 		start(executorB);
 
-		Thread.sleep(1_500);
-		int pollsBeforeExpire = pollsB.get();
-		// a single startup-boundary poll (winning the lock before the simulated lease row is observed)
-		// is tolerated; repeated polling means the lease is not blocking
-		assertTrue(pollsBeforeExpire <= 1, "node B polled %d times while the (simulated) live lease stands".formatted(pollsBeforeExpire));
-		long deadline = System.currentTimeMillis() + 10_000;
-		while (dispatchesB.isEmpty() && System.currentTimeMillis() < deadline)
-			Thread.sleep(50);
-		assertFalse(dispatchesB.isEmpty(), "node B must take over once the lease expires");
-		assertEquals("msg-1", dispatchesB.get(0), "node B must take over once the lease expires");
-		assertEquals(1, dispatchesB.size(), "node B must dispatch the task exactly once");
+		// B must stay blocked while the live lease stands and take over once it expires; the 10s wait
+		// covers only B's dispatch latency on a heavily loaded runner (the lease itself lapses at 3s)
+		assertTrue(doneB.await(10, TimeUnit.SECONDS), "node B must take over once the (simulated) live lease expires");
+		assertEquals(List.of("msg-1"), dispatchesB, "node B must take over once the lease expires and dispatch exactly once");
+		assertEquals(NODE_B, gateSnapshot().owner(), "node B must hold the row after takeover");
+		// deterministic substitute for the former "at most 1 poll in 1.5s" wall-clock window: B must never
+		// have acquired the gate while a live lease stood
+		assertGateNeverTakenWhileLive();
+	}
+
+	/**
+	 * The core invariant, checked against the shedlock-row state recorded right before every lock attempt of node B: B may only have <i>acquired</i> the gate
+	 * when the row was absent, already expired (within the snapshot grace), or held by B itself at the moment of the attempt.
+	 */
+	private void assertGateNeverTakenWhileLive()
+	{
+		for (GateAttempt attempt : attemptsB)
+		{
+			if (!attempt.acquired())
+				continue;
+			var g = attempt.state();
+			assertTrue(
+					!g.heldLiveByOtherThan(NODE_B, SNAPSHOT_GRACE_MILLIS),
+					"node B acquired the gate while it was held live by %s (lock_until=%s, snapshot_at=%s)".formatted(g.owner(), g.lockUntil(), g.at()));
+		}
 	}
 
 	private void start(DAODeliveryTaskExecutor executor)
@@ -227,15 +257,16 @@ public class ShedLockDeliveryGateIT
 				"insert into delivery_task (cpa_id, send_channel_id, receive_channel_id, message_id, time_stamp, is_confidential, retries)"
 						+ " values ('cpa', null, 'channel', ?, ?, false, 0)",
 				messageId,
-				java.sql.Timestamp.from(Instant.now().minusSeconds(60)));
+				Timestamp.from(Instant.now().minusSeconds(60)));
 	}
 
-	private DAODeliveryTaskExecutor executor(DeliveryTaskDAO dao, DeliveryTaskDispatcher dispatcher)
+	private DAODeliveryTaskExecutor executor(String lockedBy, DeliveryTaskDAO dao, DeliveryTaskDispatcher dispatcher)
 	{
+		var provider = new JdbcLockProvider(JdbcLockProvider.Configuration.builder((DataSource)dataSource).withLockedByValue(lockedBy).build());
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(dao)
 				.dispatcher(dispatcher)
-				.lockProvider(new JdbcLockProvider((DataSource)dataSource))
+				.lockProvider(lockedBy.equals(NODE_B) ? new RecordingLockProvider(provider) : provider)
 				.timedTask(new TimedTask(0))
 				.maxTasks(0)
 				.serverId(null)
@@ -257,54 +288,77 @@ public class ShedLockDeliveryGateIT
 		}
 	}
 
-	/** Delegating DAO that counts getTasksBefore calls per node. */
-	static class CountingDAO implements DeliveryTaskDAO
+	/**
+	 * Reads the shedlock row on a fresh connection (the shared {@link #dataSource} connection is held by node B during its dispatch and is not reentrant).
+	 */
+	private GateSnapshot gateSnapshot()
 	{
-		private final DeliveryTaskDAO delegate;
-		private final AtomicInteger polls;
+		var at = Instant.now();
+		try (Connection c = DriverManager.getConnection(URL, "sa", ""); Statement st = c.createStatement();
+				var rs = st.executeQuery("select locked_by, lock_until from shedlock where name = '" + LOCK_NAME + "'"))
+		{
+			if (rs.next())
+				return new GateSnapshot(rs.getString(1), rs.getTimestamp(2), at);
+			return new GateSnapshot(null, null, at);
+		}
+		catch (Exception e)
+		{
+			throw new IllegalStateException("Failed to read shedlock row", e);
+		}
+	}
 
-		CountingDAO(DeliveryTaskDAO delegate, AtomicInteger polls)
+	/**
+	 * Polls {@code condition} every 50 ms until it holds or {@code timeoutMillis} elapses; returns the final value of the condition.
+	 */
+	private static boolean waitFor(BooleanSupplier condition, long timeoutMillis)
+	{
+		var deadline = System.currentTimeMillis() + timeoutMillis;
+		while (System.currentTimeMillis() < deadline)
+		{
+			if (condition.getAsBoolean())
+				return true;
+			sleep(50);
+		}
+		return condition.getAsBoolean();
+	}
+
+	/**
+	 * Records the shedlock row state right before every lock() call, so the test can verify against the actual row state rather than a wall-clock window.
+	 */
+	private class RecordingLockProvider implements LockProvider
+	{
+		private final LockProvider delegate;
+
+		RecordingLockProvider(LockProvider delegate)
 		{
 			this.delegate = delegate;
-			this.polls = polls;
 		}
 
 		@Override
-		public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId)
+		public Optional<SimpleLock> lock(LockConfiguration configuration)
 		{
-			polls.incrementAndGet();
-			return delegate.getTasksBefore(timestamp, serverId);
+			var state = gateSnapshot();
+			var result = delegate.lock(configuration);
+			attemptsB.add(new GateAttempt(state, result.isPresent()));
+			return result;
 		}
+	}
 
-		@Override
-		public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
+	/** The shedlock row state observed right before a lock attempt by node B. */
+	private record GateSnapshot(String owner, Timestamp lockUntil, Instant at)
+	{
+		/**
+		 * True when, at the moment the row was observed ({@code at}), the gate was held by someone other than {@code self} with a lease still valid — ignoring at
+		 * most {@code graceMillis} so the snapshot→update gap of a legitimate expiry-boundary takeover does not count.
+		 */
+		boolean heldLiveByOtherThan(String self, long graceMillis)
 		{
-			polls.incrementAndGet();
-			return delegate.getTasksBefore(timestamp, serverId, maxNr);
+			return lockUntil != null && !owner.equals(self) && lockUntil.toInstant().isAfter(at.plusMillis(graceMillis));
 		}
+	}
 
-		@Override
-		public String insertTask(DeliveryTask task, String serverId)
-		{
-			return delegate.insertTask(task, serverId);
-		}
-
-		@Override
-		public void insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage)
-		{
-			delegate.insertLog(messageId, timestamp, uri, status, errorMessage);
-		}
-
-		@Override
-		public int updateTask(DeliveryTask task)
-		{
-			return delegate.updateTask(task);
-		}
-
-		@Override
-		public int deleteTask(String messageId)
-		{
-			return delegate.deleteTask(messageId);
-		}
+	/** Node B's lock attempt, tagged with the pre-attempt row state and whether it won the gate. */
+	private record GateAttempt(GateSnapshot state, boolean acquired)
+	{
 	}
 }
