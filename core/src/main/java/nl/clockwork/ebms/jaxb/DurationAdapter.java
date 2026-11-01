@@ -56,6 +56,6 @@ public class DurationAdapter extends XmlAdapter<String, java.time.Duration>
 
 	private static Duration toDuration(java.time.Duration duration)
 	{
-		return duration != null ? datatypeFactory.newDuration(duration.toMillis()) : null;
+		return duration != null ? datatypeFactory.newDuration(duration.toString()) : null;
 	}
 }
