@@ -19,6 +19,7 @@ import jakarta.xml.bind.DatatypeConverter;
 import java.time.Instant;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
@@ -26,6 +27,8 @@ import lombok.val;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InstantConverter
 {
+	private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("GMT");
+
 	public static Instant parseDateTime(String date)
 	{
 		return DatatypeConverter.parseDateTime(date).getTime().toInstant();
@@ -33,7 +36,7 @@ public class InstantConverter
 
 	public static String printDateTime(Instant date)
 	{
-		val calendar = new GregorianCalendar();
+		val calendar = new GregorianCalendar(UTC_TIME_ZONE);
 		calendar.setTime(Date.from(date));
 		return DatatypeConverter.printDateTime(calendar);
 	}
