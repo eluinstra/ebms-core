@@ -99,7 +99,7 @@
     <checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
     <checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
     <dependency.locations.enabled>false</dependency.locations.enabled>
-    <flyway.version>13.7.0</flyway.version>
+    <flyway.version>13.12.0</flyway.version>
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <revision>2.20.11-SNAPSHOT</revision>
@@ -109,22 +109,22 @@
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-broker</artifactId>
-        <version>6.3.2</version>
+        <version>6.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>6.3.2</version>
+        <version>6.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-kahadb-store</artifactId>
-        <version>6.3.2</version>
+        <version>6.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-spring</artifactId>
-        <version>6.3.2</version>
+        <version>6.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.james</groupId>
@@ -134,7 +134,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.22.1</version>
+        <version>1.23.0</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -144,17 +144,17 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.20.0</version>
+        <version>3.21.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-core</artifactId>
-        <version>4.2.3</version>
+        <version>4.2.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-        <version>4.2.3</version>
+        <version>4.2.4</version>
       </dependency>
       <dependency>
         <groupId>nl.clockwork.ebms.common</groupId>
@@ -174,7 +174,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>33.7.1-jre</version>
+        <version>33.7.2-jre</version>
       </dependency>
       <dependency>
         <groupId>com.zaxxer</groupId>
@@ -250,27 +250,27 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jms</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
       </dependency>
       <dependency>
         <groupId>com.atomikos</groupId>
@@ -293,7 +293,7 @@
       <dependency>
         <groupId>io.vavr</groupId>
         <artifactId>vavr</artifactId>
-        <version>1.0.1</version>
+        <version>1.1.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.xbean</groupId>
@@ -314,13 +314,13 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-features-logging</artifactId>
-        <version>4.2.3</version>
+        <version>4.2.4</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        <version>4.2.3</version>
+        <version>4.2.4</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -336,7 +336,7 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        <version>4.2.3</version>
+        <version>4.2.4</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -352,13 +352,13 @@
       <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-webapp</artifactId>
-        <version>12.1.13</version>
+        <version>12.1.14</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
-        <version>12.1.13</version>
+        <version>12.1.14</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -370,7 +370,7 @@
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
-        <version>6.0.1</version>
+        <version>6.3.0</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -394,7 +394,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.23.0</version>
+        <version>5.24.0</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -406,7 +406,7 @@
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>6.0.1</version>
+        <version>6.3.0</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -432,7 +432,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>7.0.9</version>
+        <version>7.0.10</version>
         <scope>test</scope>
       </dependency>
       <dependency>
