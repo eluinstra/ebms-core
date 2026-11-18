@@ -164,11 +164,11 @@ class MessageHeaderValidator
 								EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(), EbMSErrorCode.UNKNOWN, "No DeliveryChannel found.")));
 		validateDuplicateElimination(deliveryChannel, messageHeader);
 		val ackRequested = message.getAckRequested();
-		validateAckRequested(deliveryChannel, ackRequested);
 		val syncReply = message.getSyncReply();
+		validateAckRequested(deliveryChannel, ackRequested, syncReply);
 		validateSyncReply(deliveryChannel, syncReply);
 		val messageOrder = message.getMessageOrder();
-		validateMessageOrder(messageOrder);
+		validateMessageOrder(messageOrder, syncReply);
 	}
 
 	private void validateService(MessageHeader messageHeader, Service service)
@@ -198,7 +198,7 @@ class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination", EbMSErrorCode.INCONSISTENT, "Wrong value."));
 	}
 
-	private void validateAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
+	private void validateAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested, SyncReply syncReply)
 	{
 		if (!checkAckRequested(deliveryChannel, ackRequested))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested", EbMSErrorCode.INCONSISTENT, "Wrong value."));
@@ -208,7 +208,12 @@ class MessageHeaderValidator
 				&& ackRequested.getActor() != null
 				&& !ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value()))
 			if (ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
+			{
+				// ebMS 2.0 10.1.1: when the SyncReply element is present, an AckRequested element with actor NextMSH must not be present
+				if (syncReply != null)
+					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested/@actor", EbMSErrorCode.INCONSISTENT, "SyncReply not allowed."));
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested/@actor", EbMSErrorCode.NOT_SUPPORTED, "NextMSH not supported."));
+			}
 			else
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested/@actor", EbMSErrorCode.INCONSISTENT, "Invalid value."));
 		if (!checkAckSignatureRequested(deliveryChannel, ackRequested))
@@ -225,10 +230,15 @@ class MessageHeaderValidator
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply/@actor", EbMSErrorCode.INCONSISTENT, "Wrong value."));
 	}
 
-	private void validateMessageOrder(MessageOrder messageOrder)
+	private void validateMessageOrder(MessageOrder messageOrder, SyncReply syncReply)
 	{
 		if (messageOrder != null)
+		{
+			// ebMS 2.0 9.2: the MessageOrder element must not be present with the SyncReply element
+			if (syncReply != null)
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder", EbMSErrorCode.INCONSISTENT, "SyncReply not allowed."));
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder", EbMSErrorCode.NOT_SUPPORTED, "MessageOrder not supported."));
+		}
 		// if (messageOrder != null && !Constants.EBMS_VERSION.equals(messageOrder.getVersion()))
 		// throw new EbMSValidationException(
 		// EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
