@@ -454,6 +454,10 @@ public interface WithTemplate
 	{
 		return templateEngine.process("EbMSMessageMessageOrder", context);
 	}
+	default String ebMSMessageMessageOrderNoSyncReply(TemplateEngine templateEngine, Context context)
+	{
+		return templateEngine.process("EbMSMessageMessageOrderNoSyncReply", context);
+	}
 
 	default String ebMSMessageMissingManifest(TemplateEngine templateEngine, Context context)
 	{

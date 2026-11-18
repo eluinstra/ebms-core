@@ -99,7 +99,6 @@ public class EbMSMessageValidator
 	{
 		try
 		{
-			// return message.getSyncReply() != null;
 			val messageHeader = message.getMessageHeader();
 			val syncReply = cpaManager
 					.getSendSyncReply(

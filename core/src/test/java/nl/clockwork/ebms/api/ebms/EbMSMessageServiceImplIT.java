@@ -910,10 +910,10 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 				.body("Envelope.Header.MessageHeader.MessageData.RefToMessageId", startsWith(uuid))
 				.body("Envelope.Header.ErrorList.@eb:highestSeverity", equalTo("Error"))
 				.body("Envelope.Header.ErrorList.Error.@eb:codeContext", equalTo("urn:oasis:names:tc:ebxml-msg:service:errors"))
-				.body("Envelope.Header.ErrorList.Error.@eb:errorCode", equalTo("NotSupported"))
+				.body("Envelope.Header.ErrorList.Error.@eb:errorCode", equalTo("Inconsistent"))
 				.body("Envelope.Header.ErrorList.Error.@eb:location", equalTo("//Header/AckRequested/@actor"))
 				.body("Envelope.Header.ErrorList.Error.@eb:severity", equalTo("Error"))
-				.body("Envelope.Header.ErrorList.Error.Description", equalTo("NextMSH not supported."));
+				.body("Envelope.Header.ErrorList.Error.Description", equalTo("SyncReply not allowed."));
 	}
 
 	@Test
@@ -1102,10 +1102,10 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 				.body("Envelope.Header.MessageHeader.MessageData.RefToMessageId", startsWith(uuid))
 				.body("Envelope.Header.ErrorList.@eb:highestSeverity", equalTo("Error"))
 				.body("Envelope.Header.ErrorList.Error.@eb:codeContext", equalTo("urn:oasis:names:tc:ebxml-msg:service:errors"))
-				.body("Envelope.Header.ErrorList.Error.@eb:errorCode", equalTo("NotSupported"))
+				.body("Envelope.Header.ErrorList.Error.@eb:errorCode", equalTo("Inconsistent"))
 				.body("Envelope.Header.ErrorList.Error.@eb:location", equalTo("//Header/MessageOrder"))
 				.body("Envelope.Header.ErrorList.Error.@eb:severity", equalTo("Error"))
-				.body("Envelope.Header.ErrorList.Error.Description", equalTo("MessageOrder not supported."));
+				.body("Envelope.Header.ErrorList.Error.Description", equalTo("SyncReply not allowed."));
 	}
 
 	@Test
@@ -1337,4 +1337,49 @@ class EbMSMessageServiceImplIT implements WithFile, WithTemplate, WithRestAssure
 				.body("Envelope.Body.Fault.faultstring", containsString("maximum allowed size of 10000 bytes"));
 	}
 
+	@Test
+	@Order(46)
+	void ebMSMessageMessageOrderNoSyncReply()
+	{
+		// ebMS 2.0 9: MessageOrder present without SyncReply (async channel, syncReplyMode=none).
+		// MessageOrder is not supported, so the MSH stores the message as failed and returns
+		// an empty response (204); the rejection is confirmed on the stored message status.
+		var uuid = randomUUID().toString();
+		val cpaId = "cpaStubEBF.rm.http.unsigned";
+		// Register the async delivery-channel CPA (syncReplyMode=none) for this test.
+		RestAssured.with()
+				.header("Content-Type", "text/xml; charset=UTF-8")
+				.header("SOAPAction", "")
+				.body(insertCpa(templateEngine, insertCpaContext(readFile("nl/clockwork/ebms/cpas/cpaStubEBF.rm.http.unsigned.xml"))))
+				.when()
+				.port(8080)
+				.request(Method.POST, "/service/cpa")
+				.then()
+				.statusCode(200)
+				.contentType(ContentType.XML)
+				.body("Envelope.Body.insertCPAResponse.cpaId", equalTo(cpaId));
+		val context = ebMSMessageContext(uuid);
+		context.setVariable("cpaId", cpaId);
+		RestAssured.with()
+				.header("SOAPAction", "\"ebXML\"")
+				.header("Content-Type", "text/xml; charset=UTF-8")
+				.body(ebMSMessageMessageOrderNoSyncReply(templateEngine, context))
+				.when()
+				.request(Method.POST, "/ebms")
+				.then()
+				.statusCode(204);
+		// The rejected async message is persisted as FAILED (not received).
+		RestAssured.with()
+				.header("Content-Type", "text/xml; charset=UTF-8")
+				.header("SOAPAction", "")
+				.body(getMessage(templateEngine, getMessageContext(uuid)))
+				.when()
+				.port(8080)
+				.request(Method.POST, "/service/ebms")
+				.then()
+				.statusCode(200)
+				.contentType(ContentType.XML)
+				.body("Envelope.Body.getMessageResponse.message.properties.cpaId", equalTo(cpaId))
+				.body("Envelope.Body.getMessageResponse.message.properties.messageStatus", equalTo("FAILED"));
+	}
 }
