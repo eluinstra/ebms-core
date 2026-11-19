@@ -84,16 +84,6 @@
     <system>Tickets</system>
     <url>https://sourceforge.net/p/muleebmsadapter/tickets/</url>
   </issueManagement>
-  <distributionManagement>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
   <properties>
     <checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
     <checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
@@ -843,17 +833,6 @@
         <version>3.5.5</version>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.14</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
         <version>3.5.1</version>
@@ -1081,6 +1060,46 @@
     </plugins>
   </reporting>
   <profiles>
+    <!--
+      Publishing to Maven Central, via the Central Portal publishing API
+      (org.sonatype.central:central-publishing-maven-plugin, the successor of
+      the deprecated org.sonatype.plugins:nexus-staging-maven-plugin). Kept in a
+      dedicated, opt-in profile so the plugin is only resolved when actually
+      publishing (never on a regular build/CI run, which previously forced the
+      nexus-staging build extension to download on every cold-cache build).
+
+      Activate with: -DperformRelease=true
+      (requires a 'central' server entry in settings.xml holding a Central
+      Portal token; publishes + auto-promotes on `mvn deploy`).
+    -->
+    <profile>
+      <id>release</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>central</id>
+          <url>https://central.sonatype.com/api</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.12.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <!-- GPG Signature on release -->
     <profile>
       <id>release-sign-artifacts</id>
