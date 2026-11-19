@@ -433,12 +433,10 @@ public class EbMSMessageFactory
 	{
 		val cpaId = properties.getCpaId();
 		val fromParty = Party.of(properties.getFromPartyId(), properties.getFromRole());
-		val partyId = cpaManager.getFromPartyInfo(cpaId, fromParty, properties.getService(), properties.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo", cpaId, fromParty, properties.getService(), properties.getAction()))
-				.getPartyIds();
-		return EbMSMessageUtils.createSyncReply(
-				cpaManager.getDefaultDeliveryChannel(cpaId, partyId, properties.getAction())
-						.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel", cpaId, partyId, properties.getAction())));
+		val channel = cpaManager.getFromPartyInfo(cpaId, fromParty, properties.getService(), properties.getAction())
+				.map(p -> nl.clockwork.ebms.CPAUtils.getDeliveryChannel(p.getCanSend().getThisPartyActionBinding()))
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo", cpaId, fromParty, properties.getService(), properties.getAction()));
+		return EbMSMessageUtils.createSyncReply(channel);
 	}
 
 	private StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Instant timestamp) throws DatatypeConfigurationException
