@@ -92,7 +92,7 @@
     <flyway.version>13.13.0</flyway.version>
     <jdk.version>17</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <revision>2.20.12</revision>
+    <revision>2.20.13-SNAPSHOT</revision>
   </properties>
   <dependencyManagement>
     <dependencies>
